@@ -22,9 +22,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-INACTIVITY_THRESHOLD = 60 * 60
-CHECK_INTERVAL = 60 * 5
-
 
 @dp.message()
 async def handle_message(message: Message):
