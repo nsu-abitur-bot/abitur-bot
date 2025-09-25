@@ -11,6 +11,9 @@ line-length = 88
 select = ["E", "F", "I"]
 fix = true
 
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio", "fakeredis[asyncio]"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
