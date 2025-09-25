@@ -2,15 +2,13 @@ from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.client.default import DefaultBotProperties
 import asyncio
-import os
+from os import getenv
 import logging
-import random
 from dotenv import load_dotenv
 from llm.llm_client import ask_local_llm
 
 load_dotenv()
-
-BOT_TOKEN = os.getenv("BOT_TOKEN")
+BOT_TOKEN = getenv("BOT_TOKEN")
 if BOT_TOKEN is None:
     raise ValueError("BOT_TOKEN не задан")
 
