@@ -1,5 +1,5 @@
 {
-  "python.defaultInterpreterPath": "abitur-env/bin/python",
+  "python.defaultInterpreterPath": ".venv/bin/python",
   "editor.formatOnSave": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"

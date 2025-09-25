@@ -1,3 +1,0 @@
-aiogram
-python-dotenv
-httpx

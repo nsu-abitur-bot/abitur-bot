@@ -1,10 +1,12 @@
-from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from aiogram.client.default import DefaultBotProperties
 import asyncio
-from os import getenv
 import logging
+from os import getenv
+
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.types import Message
 from dotenv import load_dotenv
+
 from llm.llm_client import ask_local_llm
 
 load_dotenv()
