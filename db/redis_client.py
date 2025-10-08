@@ -72,7 +72,7 @@ class RedisClient:
     async def close(self) -> None:
         """Закрывает соединение с Redis."""
         try:
-            await self.client.close()
+            await self.client.aclose()
             logger.debug("Соединение с Redis закрыто")
         except redis.RedisError as e:
             logger.error("Ошибка закрытия соединения с Redis: %s", e)
