@@ -1,12 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
 
-from parser.resources.config import PARSER_CONFIG
+from parser.config.load_config import get_parser_config
 from parser.utils import parse_content_blocks, parse_header_faculty
 
 
 def parse_nsu_faculty(faculty) -> dict:
     try:
+        PARSER_CONFIG = get_parser_config()
+
         response = requests.get(
             f"{PARSER_CONFIG['url']}{faculty}", headers=PARSER_CONFIG["headers"]
         )

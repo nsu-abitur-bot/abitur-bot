@@ -1,6 +1,6 @@
 import logging
 
-from nsu_parser import parse_nsu_faculty
+from parser.nsu_parser import parse_nsu_faculty
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
