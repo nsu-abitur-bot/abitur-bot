@@ -1,19 +1,24 @@
 # Установка локальной копии
 
-Установить uv
+Создать новое виртуальное окружение
+
+```sh
+python -m venv abitur-env
+```
+
+Активировать его
 
 ```sh
 # Linux/macOS
-brew install uv
-
-# Windows (PowerShell)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+source abitur-env/bin/activate
+# windows
+abitur-env\Scripts\activate
 ```
 
 Установить зависимости
 
 ```sh
-uv sync
+pip install -r requirements.txt
 ```
 
 Настроить переменные окружения
@@ -28,5 +33,5 @@ copy .env.example .env
 Запустить бота
 
 ```sh
-uv run python main.py
+python main.py
 ```

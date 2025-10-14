@@ -1,26 +1,35 @@
+import os
+import sys
 import asyncio
 import logging
-from os import getenv
-
 from aiogram import Bot, Dispatcher
-from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message
+from aiogram.client.default import DefaultBotProperties
 from dotenv import load_dotenv
+
+# Добавляем родительскую папку в PATH для импорта модуля llm
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from llm.llm_client import ask_local_llm
 
+# Загрузка переменных окружения
 load_dotenv()
-BOT_TOKEN = getenv("BOT_TOKEN")
-if BOT_TOKEN is None:
-    raise ValueError("BOT_TOKEN не задан")
 
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
-dp = Dispatcher()
+# Конфигурация
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN не задан в .env файле")
 
+# Настройка логирования
 logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Инициализация бота и диспетчера
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
+dp = Dispatcher()
 
 
 @dp.message()

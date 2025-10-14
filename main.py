@@ -1,5 +1,4 @@
 import asyncio
-
 from bot.main import main as bot_main
 
 

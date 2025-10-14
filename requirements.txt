@@ -1,0 +1,6 @@
+aiogram
+python-dotenv
+langchain
+langchain-community
+langchain-openai
+httpx
