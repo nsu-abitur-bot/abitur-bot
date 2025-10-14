@@ -1,21 +1,9 @@
-import requests
-from bs4 import BeautifulSoup
-
-from parser.config.load_config import get_parser_config
 from parser.utils import parse_content_blocks, parse_header_faculty
 
 
 class TestUtils:
-    def test_parse_header_fit(self):
-        PARSER_CONFIG = get_parser_config()
-
-        response = requests.get(
-            f"{PARSER_CONFIG['url']}information-technologies/",
-            headers=PARSER_CONFIG["headers"],
-        )
-        response.raise_for_status()
-
-        soup = BeautifulSoup(response.text, "html.parser")
+    def test_parse_header_fit(self, load_html_fixture):
+        soup = load_html_fixture("it.html")
         data = {}
 
         parse_header_faculty(soup, data)
@@ -31,16 +19,8 @@ class TestUtils:
         )
         assert "content_blocks" not in data
 
-    def test_parse_content_blocks_fit(self):
-        PARSER_CONFIG = get_parser_config()
-
-        response = requests.get(
-            f"{PARSER_CONFIG['url']}information-technologies/",
-            headers=PARSER_CONFIG["headers"],
-        )
-        response.raise_for_status()
-
-        soup = BeautifulSoup(response.text, "html.parser")
+    def test_parse_content_blocks_fit(self, load_html_fixture):
+        soup = load_html_fixture("it.html")
         data = {}
 
         k_blocks = 0
@@ -52,3 +32,4 @@ class TestUtils:
         data["total_blocks"] = k_blocks
 
         assert len(data["content_blocks"]) == data["total_blocks"] > 0
+        assert data["total_blocks"] == 3
