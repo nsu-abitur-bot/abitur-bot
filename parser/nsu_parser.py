@@ -21,13 +21,23 @@ def parse_nsu_faculty(faculty) -> dict:
 
         k_blocks = 0
 
-        k_blocks = parse_content_blocks(
-            soup, data, style="div", attr="tn-atom", k_blocks=k_blocks
-        )
-        k_blocks = parse_content_blocks(
-            soup, data, style="div", attr="t585__text", k_blocks=k_blocks
-        )
-        # ещё парсинг блоков
+        selectors = PARSER_CONFIG.get("selectors", [])
+
+        if not selectors:
+            print("Список селекторов в конфигурации пуст!")
+            return {}
+
+        for selector in selectors:
+            style = selector.get("style")
+            attr = selector.get("attr")
+
+            k_blocks = parse_content_blocks(
+                soup,
+                data,
+                style=style,
+                attr=attr,
+                k_blocks=k_blocks,
+            )
 
         data["total_blocks"] = k_blocks
 

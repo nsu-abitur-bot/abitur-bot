@@ -9,8 +9,15 @@ def parse_header_faculty(soup, data):
     data["keywords"] = meta_keywords["content"] if meta_keywords else ""
 
 
-def parse_content_blocks(soup, data, style, attr, k_blocks) -> int:
-    content_blocks = soup.select(f"{style}.{attr}")
+def parse_content_blocks(soup, data, style=None, attr=None, k_blocks=0) -> int:
+    if style and attr:
+        selector = f"{style}.{attr}"
+    elif style:
+        selector = style
+    else:
+        return k_blocks
+
+    content_blocks = soup.select(selector)
     blocks = (
         [block.text for block in content_blocks if block.text and block.text.strip()]
         if content_blocks

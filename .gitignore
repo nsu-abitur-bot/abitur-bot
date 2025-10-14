@@ -1,5 +1,6 @@
 .env
 __pycache__/
+.venv
 .pytest_cache/
 .idea/
-.venv
+parsed_faculties.json
