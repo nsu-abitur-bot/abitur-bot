@@ -5,14 +5,12 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-	"ruff",
-	"aiogram",
-	"python-dotenv",
-	"httpx",
-	"langchain>=0.3.27",
-	"langchain-community>=0.3.31",
-	"langchain-openai>=0.3.35",
-	"langchain-ollama>=0.3.10",
+    "ruff",
+    "aiogram",
+    "python-dotenv",
+    "langchain>=0.3.27",
+    "langchain-core>=0.3.79",
+    "langchain-openai>=0.3.35",
 ]
 
 [tool.ruff]
