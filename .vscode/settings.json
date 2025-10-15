@@ -1,3 +1,11 @@
 {
+  "python.defaultInterpreterPath": ".venv/bin/python",
   "editor.formatOnSave": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "ruff.enable": true,
+  "ruff.lint.enable": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": true
 }
