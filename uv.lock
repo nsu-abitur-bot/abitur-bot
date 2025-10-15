@@ -10,11 +10,15 @@ dependencies = [
     { name = "aiogram" },
     { name = "bs4" },
     { name = "httpx" },
-    { name = "pytest" },
     { name = "python-dotenv" },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "ruff" },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "pytest" },
 ]
 
 [package.metadata]
@@ -22,12 +26,14 @@ requires-dist = [
     { name = "aiogram" },
     { name = "bs4", specifier = ">=0.0.2" },
     { name = "httpx" },
-    { name = "pytest", specifier = ">=8.4.2" },
     { name = "python-dotenv" },
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "requests", specifier = ">=2.32.5" },
     { name = "ruff" },
 ]
+
+[package.metadata.requires-dev]
+dev = [{ name = "pytest" }]
 
 [[package]]
 name = "aiofiles"
