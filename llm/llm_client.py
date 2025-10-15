@@ -1,13 +1,15 @@
+import logging
 import os
 import re
-import logging
-from typing import Optional
+
 from dotenv import load_dotenv
-from langchain_ollama import ChatOllama
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.chat_history import (
+    BaseChatMessageHistory,
+    InMemoryChatMessageHistory,
+)
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain_core.chat_history import BaseChatMessageHistory, InMemoryChatMessageHistory
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_ollama import ChatOllama
 
 load_dotenv()
 
@@ -20,7 +22,7 @@ SYSTEM_PROMPT = os.getenv(
     "SYSTEM_PROMPT",
     "ТЫ LLM помощник для поступления в НГУ (Новосибирский государственный университет), "
     "отвечай только на вопросы связанные с университетом и поступлением. "
-    "Отвечай коротко, долго не думай"
+    "Отвечай коротко, долго не думай",
 )
 
 logger = logging.getLogger(__name__)
@@ -48,11 +50,13 @@ llm = ChatOllama(
 )
 
 # Создание промпт-шаблона
-prompt = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT),
-    MessagesPlaceholder(variable_name="history"),
-    ("human", "{input}"),
-])
+prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", SYSTEM_PROMPT),
+        MessagesPlaceholder(variable_name="history"),
+        ("human", "{input}"),
+    ]
+)
 
 # Создание цепочки с историей
 chain = prompt | llm
@@ -75,35 +79,34 @@ def _clean_response(content: str) -> str:
 async def ask_local_llm(message: str, session_id: str) -> str:
     """
     Отправка запроса к LLM с сохранением контекста диалога
-    
+
     Args:
         message: сообщение от пользователя
         session_id: идентификатор переписки для сохранения контекста
-        
+
     Returns:
         Ответ от LLM
     """
     try:
         logger.info(f"Обработка сообщения для сессии {session_id}")
-        
+
         # Вызов цепочки с историей
         response = await chain_with_history.ainvoke(
-            {"input": message},
-            config={"configurable": {"session_id": session_id}}
+            {"input": message}, config={"configurable": {"session_id": session_id}}
         )
-        
+
         content = response.content
         logger.info(f"Ответ LLM получен для сессии {session_id}")
-        
+
         # Очистка ответа
         content = _clean_response(content)
-        
+
         if not content:
             logger.warning("Пустой ответ от LLM")
             return "Извините, я не смог сформулировать ответ"
-        
+
         return content
-        
+
     except Exception as e:
         logger.error(f"Ошибка при обработке запроса к LLM: {e}", exc_info=True)
         return "Что-то пошло не так. Попробуйте позже."
