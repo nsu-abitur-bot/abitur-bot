@@ -4,12 +4,25 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["ruff", "aiogram", "python-dotenv", "httpx"]
+dependencies = [
+    "ruff",
+    "aiogram",
+    "python-dotenv",
+    "httpx",
+    "langchain-community>=0.4",
+    "sentence-transformers>=5.1.1",
+    "langchain-huggingface>=1.0.0",
+    "chromadb>=1.2.1",
+    "langchain-chroma>=1.0.0",
+]
 
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "I"]
 fix = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.ruff.format]
 quote-style = "double"
