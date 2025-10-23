@@ -1,4 +1,4 @@
-from parser.utils import parse_content_blocks, parse_header_faculty
+from parser.utils import calculate_page_hash, parse_content_blocks, parse_header_faculty
 
 
 class TestUtils:
@@ -33,3 +33,22 @@ class TestUtils:
 
         assert len(data["content_blocks"]) == data["total_blocks"] > 0
         assert data["total_blocks"] == 3
+
+    def test_calculate_page_hash(self):
+        # Test with simple content
+        content1 = "<html><body>Test content</body></html>"
+        hash1 = calculate_page_hash(content1)
+
+        # Hash should be a hexadecimal string of length 64 (SHA-256)
+        assert isinstance(hash1, str)
+        assert len(hash1) == 64
+        assert all(c in "0123456789abcdef" for c in hash1)
+
+        # Same content should produce same hash
+        hash1_duplicate = calculate_page_hash(content1)
+        assert hash1 == hash1_duplicate
+
+        # Different content should produce different hash
+        content2 = "<html><body>Different content</body></html>"
+        hash2 = calculate_page_hash(content2)
+        assert hash1 != hash2
