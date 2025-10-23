@@ -35,20 +35,20 @@ class TestUtils:
         assert data["total_blocks"] == 3
 
     def test_calculate_page_hash(self):
-        # Test with simple content
+        # Тест с простым контентом
         content1 = "<html><body>Test content</body></html>"
         hash1 = calculate_page_hash(content1)
 
-        # Hash should be a hexadecimal string of length 64 (SHA-256)
+        # Хеш должен быть шестнадцатеричной строкой длиной 64 (SHA-256)
         assert isinstance(hash1, str)
         assert len(hash1) == 64
         assert all(c in "0123456789abcdef" for c in hash1)
 
-        # Same content should produce same hash
+        # Одинаковый контент должен давать одинаковый хеш
         hash1_duplicate = calculate_page_hash(content1)
         assert hash1 == hash1_duplicate
 
-        # Different content should produce different hash
+        # Разный контент должен давать разный хеш
         content2 = "<html><body>Different content</body></html>"
         hash2 = calculate_page_hash(content2)
         assert hash1 != hash2

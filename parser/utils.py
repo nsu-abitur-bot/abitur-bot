@@ -2,13 +2,13 @@ import hashlib
 
 
 def calculate_page_hash(html_content: str) -> str:
-    """Calculate SHA-256 hash of HTML content.
+    """Вычисляет SHA-256 хеш HTML контента.
 
     Args:
-        html_content: The HTML content as a string
+        html_content: HTML контент в виде строки
 
     Returns:
-        Hexadecimal string representation of the hash
+        Шестнадцатеричное представление хеша
     """
     return hashlib.sha256(html_content.encode("utf-8")).hexdigest()
 
