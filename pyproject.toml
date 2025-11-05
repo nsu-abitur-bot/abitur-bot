@@ -4,7 +4,23 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["ruff", "aiogram", "python-dotenv", "httpx"]
+dependencies = [
+    "ruff",
+    "aiogram",
+    "python-dotenv",
+    "httpx",
+    "asyncpg>=0.30.0",
+    "sqlalchemy[asyncio]>=2.0.44",
+]
+
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = ["asyncio: mark test as async"]
 
 [tool.ruff]
 line-length = 88
