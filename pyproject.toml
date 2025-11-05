@@ -12,10 +12,11 @@ dependencies = [
     "bs4>=0.0.2",
     "requests>=2.32.5",
     "pyyaml>=6.0.3",
+    "redis>=7.0.1",
 ]
 
 [dependency-groups]
-dev = ["pytest"]
+dev = ["pytest", "pytest-asyncio", "fakeredis[asyncio]"]
 
 
 [tool.pytest.ini_options]
@@ -25,6 +26,7 @@ pythonpath = ["."]
 line-length = 88
 select = ["E", "F", "I"]
 fix = true
+
 
 [tool.ruff.format]
 quote-style = "double"
