@@ -4,15 +4,29 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = ["ruff", "aiogram", "python-dotenv", "httpx", "redis"]
+dependencies = [
+    "ruff",
+    "aiogram",
+    "python-dotenv",
+    "httpx",
+    "bs4>=0.0.2",
+    "requests>=2.32.5",
+    "pyyaml>=6.0.3",
+    "redis>=7.0.1",
+]
+
+[dependency-groups]
+dev = ["pytest", "pytest-asyncio", "fakeredis[asyncio]"]
+
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "I"]
 fix = true
 
-[dependency-groups]
-dev = ["pytest", "pytest-asyncio", "fakeredis[asyncio]"]
 
 [tool.ruff.format]
 quote-style = "double"
