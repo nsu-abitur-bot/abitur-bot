@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from parser.config.load_config import get_parser_config
-from parser.utils import parse_content_blocks, parse_header_faculty
+from parser.utils import calculate_page_hash, parse_content_blocks, parse_header_faculty
 
 
 def parse_nsu_faculty(faculty) -> dict:
@@ -14,8 +14,11 @@ def parse_nsu_faculty(faculty) -> dict:
         )
         response.raise_for_status()
 
-        soup = BeautifulSoup(response.text, "html.parser")
-        data = {}
+        html_content = response.text
+        page_hash = calculate_page_hash(html_content)
+
+        soup = BeautifulSoup(html_content, "html.parser")
+        data = {"page_hash": page_hash}
 
         parse_header_faculty(soup, data)
 

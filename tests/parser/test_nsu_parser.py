@@ -19,3 +19,6 @@ class TestNsuParser:
         assert "title" in data
         assert data["title"] == "Информационные технологии НГУ"
         assert data["total_blocks"] > 0
+        assert "page_hash" in data
+        assert isinstance(data["page_hash"], str)
+        assert len(data["page_hash"]) == 64
