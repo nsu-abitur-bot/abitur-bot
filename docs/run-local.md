@@ -30,3 +30,9 @@ copy .env.example .env
 ```sh
 uv run python main.py
 ```
+
+Запуск тестов
+
+```sh
+uv run pytest -v
+```
