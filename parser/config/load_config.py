@@ -11,7 +11,7 @@ def load_config(config_path: str = "config.yaml") -> dict:
         return config
     except FileNotFoundError:
         raise FileNotFoundError(f"Файл конфигурации {config_path} не найден")
-    except yaml.YAMLError as e:
+    except yaml.YAMLError:
         raise
 
 
