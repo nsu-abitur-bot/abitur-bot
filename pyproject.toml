@@ -18,9 +18,10 @@ dependencies = [
     "langchain-huggingface>=1.0.0",
     "chromadb>=1.2.1",
     "langchain-chroma>=1.0.0",
-    "langchain>=0.3.27",
     "langchain-core>=0.3.79",
     "langchain-openai>=0.3.35",
+    "langchain>=1.0.3",
+    "langchain-text-splitters>=1.0.0",
 ]
 
 [dependency-groups]
