@@ -2,7 +2,7 @@ import logging
 import re
 
 from dotenv import load_dotenv
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 load_dotenv()
