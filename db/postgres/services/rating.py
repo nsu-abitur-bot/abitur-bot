@@ -44,7 +44,7 @@ class RatingService:
 
             if leaderboard:
                 leaderboard.content_hash = content_hash
-                leaderboard.updated_at = datetime.now(UTC)
+                leaderboard.updated_at = datetime.now(UTC).replace(tzinfo=None)
                 await self.session.commit()
                 logger.info(f"Обновлен хэш рейтинга {leaderboard_id}")
                 return True
@@ -75,7 +75,6 @@ class RatingService:
         user_rating = result.scalar_one_or_none()
 
         if not user_rating:
-            # Создаем новую запись
             user_rating = UserRating(
                 user_id=user_id, leaderboard_id=leaderboard_id, place=place
             )
@@ -84,7 +83,6 @@ class RatingService:
                 f"Создана новая запись рейтинга для пользователя {user_id}, место: {place}"  # noqa: E501
             )
         else:
-            # Обновляем существующую
             old_place = user_rating.place
             user_rating.place = place
             logger.info(
