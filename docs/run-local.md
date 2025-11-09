@@ -30,3 +30,9 @@ copy .env.example .env
 ```sh
 uv run python main.py
 ```
+
+Инициализировать БД и применить миграции
+
+```sh
+uv run python db/postgres/init_db.py
+```
