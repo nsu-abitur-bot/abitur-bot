@@ -4,6 +4,7 @@
 """
 
 import asyncio
+import logging
 import os
 import sys
 
@@ -15,6 +16,11 @@ from dotenv import load_dotenv
 # Загружаем переменные окружения из корня проекта
 load_dotenv()
 
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
+
 
 async def create_database_if_not_exists():
     """Создать БД если она не существует."""
@@ -25,7 +31,7 @@ async def create_database_if_not_exists():
     db_name = os.getenv("DB_NAME", "abitur")
 
     if not db_password:
-        print("DB_PASSWORD не задан в .env файле")
+        logger.info("DB_PASSWORD не задан в .env файле")
         sys.exit(1)
 
     # Подключаемся к postgres (служебная БД)
@@ -46,14 +52,14 @@ async def create_database_if_not_exists():
         if not exists:
             # Создаём БД
             await conn.execute(f'CREATE DATABASE "{db_name}"')
-            print(f"База данных '{db_name}' создана")
+            logger.info(f"База данных '{db_name}' создана")
         else:
-            print(f"База данных '{db_name}' уже существует")
+            logger.info(f"База данных '{db_name}' уже существует")
 
         await conn.close()
 
     except Exception as e:
-        print(f"Ошибка при создании БД: {e}")
+        logger.error(f"Ошибка при создании БД: {e}")
         sys.exit(1)
 
 
@@ -64,15 +70,15 @@ def run_migrations():
         config_path = "alembic.ini"
         alembic_cfg = Config(config_path)
         command.upgrade(alembic_cfg, "head")
-        print("Миграции применены успешно")
+        logger.info("Миграции применены успешно")
     except Exception as e:
-        print(f"Ошибка при применении миграций: {e}")
+        logger.info(f"Ошибка при применении миграций: {e}")
         sys.exit(1)
 
 
 async def main():
     """Главная функция инициализации."""
-    print("Инициализация базы данных PostgreSQL...")
+    logger.info("Инициализация базы данных PostgreSQL...")
 
     # Создаём БД если нужно
     await create_database_if_not_exists()
@@ -80,7 +86,7 @@ async def main():
     # Применяем миграции
     run_migrations()
 
-    print("Инициализация завершена успешно!")
+    logger.info("Инициализация завершена успешно!")
 
 
 if __name__ == "__main__":
