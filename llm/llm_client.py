@@ -51,3 +51,29 @@ async def ask_local_llm(message: str, session_id: str) -> str:
     except Exception as e:
         logger.error(f"LLM error: {e}")
         return "Что-то пошло не так"
+
+
+async def ask_local_llm_stream(message: str, session_id: str):
+    """
+    Стриминговая версия ask_local_llm.
+    Генерирует чанки ответа по мере их получения от LLM.
+    
+    message - сообщение от пользователя
+    session_id - идентификатор переписки
+    """
+    try:
+        messages = [
+            SystemMessage(content=SYSTEM_PROMPT),
+            HumanMessage(content=message),
+        ]
+
+        async for chunk in llm.astream(messages):
+            if hasattr(chunk, "content") and chunk.content:
+                # Удаляем блоки <think>...</think> из чанка
+                content = re.sub(r"<think>.*?</think>", "", chunk.content, flags=re.DOTALL)
+                if content:
+                    yield content
+
+    except Exception as e:
+        logger.error(f"LLM streaming error: {e}")
+        yield "Что-то пошло не так"
