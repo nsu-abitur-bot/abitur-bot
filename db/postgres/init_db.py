@@ -31,7 +31,7 @@ async def create_database_if_not_exists():
     db_name = os.getenv("DB_NAME", "abitur")
 
     if not db_password:
-        logger.info("DB_PASSWORD не задан в .env файле")
+        logger.error("DB_PASSWORD не задан в .env файле")
         sys.exit(1)
 
     # Подключаемся к postgres (служебная БД)
@@ -72,7 +72,7 @@ def run_migrations():
         command.upgrade(alembic_cfg, "head")
         logger.info("Миграции применены успешно")
     except Exception as e:
-        logger.info(f"Ошибка при применении миграций: {e}")
+        logger.error(f"Ошибка при применении миграций: {e}")
         sys.exit(1)
 
 
