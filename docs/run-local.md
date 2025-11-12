@@ -36,3 +36,9 @@ uv run python main.py
 ```sh
 uv run python db/postgres/init_db.py
 ```
+
+Запуск тестов
+
+```sh
+uv run pytest -v
+```

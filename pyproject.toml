@@ -9,6 +9,19 @@ dependencies = [
     "aiogram",
     "python-dotenv",
     "httpx",
+    "bs4>=0.0.2",
+    "requests>=2.32.5",
+    "pyyaml>=6.0.3",
+    "redis>=7.0.1",
+    "langchain-community>=0.4",
+    "sentence-transformers>=5.1.1",
+    "langchain-huggingface>=1.0.0",
+    "chromadb>=1.2.1",
+    "langchain-chroma>=1.0.0",
+    "langchain-core>=0.3.79",
+    "langchain-openai>=0.3.35",
+    "langchain>=1.0.3",
+    "langchain-text-splitters>=1.0.0",
     "asyncpg>=0.30.0",
     "sqlalchemy[asyncio]>=2.0.44",
     "alembic>=1.17.1",
@@ -16,7 +29,8 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.0.0", "pytest-asyncio>=0.24.0", "psycopg2-binary>=2.9.0"]
+dev = ["pytest", "pytest-asyncio", "fakeredis[asyncio]"]
+
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -29,6 +43,7 @@ markers = ["asyncio: mark test as async"]
 line-length = 88
 select = ["E", "F", "I"]
 fix = true
+
 
 [tool.ruff.format]
 quote-style = "double"
