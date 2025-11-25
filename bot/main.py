@@ -34,10 +34,10 @@ logger = logging.getLogger(__name__)
 
 def get_session_id(message: Message) -> str:
     """Вычисляет session_id для сообщения.
-    
+
     В групповых чатах возвращает chat_id:user_id для изоляции пользователей.
     В личных чатах возвращает только chat_id.
-    
+
     Raises:
         ValueError: Если message.from_user отсутствует.
     """
@@ -93,7 +93,9 @@ async def cmd_reset(message: Message):
     session_id = get_session_id(message)
     if session_id in session_states:
         session_states[session_id]["history"] = []
-    await bot.send_message(chat_id, "История переписки очищена")
+        await bot.send_message(chat_id, "История переписки очищена")
+    else:
+        await bot.send_message(chat_id, "Нет активной сессии для очистки")
 
 
 @dp.message()
@@ -115,6 +117,7 @@ async def handle_message(message: Message):
 
     # Если ожидали СНИЛС — сохраняем его
     if state.get("awaiting_snils"):
+        # Здесь нет никакой валидации, так как это просто заглушка
         state["snils"] = user_text
         state["awaiting_snils"] = False
         await bot.send_message(chat_id, "СНИЛС записан")
