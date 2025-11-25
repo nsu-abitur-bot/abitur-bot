@@ -32,6 +32,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+def get_session_id(message: Message) -> str:
+    """Вычисляет session_id для сообщения.
+    
+    В групповых чатах возвращает chat_id:user_id для изоляции пользователей.
+    В личных чатах возвращает только chat_id.
+    
+    Raises:
+        ValueError: Если message.from_user отсутствует.
+    """
+    if not message.from_user:
+        raise ValueError("message.from_user is required")
+    chat_id = str(message.chat.id)
+    user_id = str(message.from_user.id)
+    return (
+        f"{chat_id}:{user_id}"
+        if message.chat.type in ["group", "supergroup"]
+        else chat_id
+    )
+
+
 @dp.message(Command("start"))
 async def cmd_start(message: Message):
     """Обработчик /start: приветствие и подсказка по командам."""
@@ -47,12 +67,7 @@ async def cmd_track(message: Message):
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
-    user_id = str(message.from_user.id)
-    session_id = (
-        f"{chat_id}:{user_id}"
-        if message.chat.type in ["group", "supergroup"]
-        else chat_id
-    )
+    session_id = get_session_id(message)
     state = session_states.setdefault(session_id, {})
     state["awaiting_snils"] = True
     await bot.send_message(chat_id, "Укажите свой СНИЛС")
@@ -64,12 +79,7 @@ async def cmd_untrack(message: Message):
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
-    user_id = str(message.from_user.id)
-    session_id = (
-        f"{chat_id}:{user_id}"
-        if message.chat.type in ["group", "supergroup"]
-        else chat_id
-    )
+    session_id = get_session_id(message)
     session_states.pop(session_id, None)
     await bot.send_message(chat_id, "Отслеживание прекращено")
 
@@ -80,12 +90,7 @@ async def cmd_reset(message: Message):
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
-    user_id = str(message.from_user.id)
-    session_id = (
-        f"{chat_id}:{user_id}"
-        if message.chat.type in ["group", "supergroup"]
-        else chat_id
-    )
+    session_id = get_session_id(message)
     if session_id in session_states:
         session_states[session_id]["history"] = []
     await bot.send_message(chat_id, "История переписки очищена")
@@ -100,12 +105,7 @@ async def handle_message(message: Message):
     user_text = (message.text or "").strip()
 
     chat_id = str(message.chat.id)
-    user_id = str(message.from_user.id)
-    session_id = (
-        f"{chat_id}:{user_id}"
-        if message.chat.type in ["group", "supergroup"]
-        else chat_id
-    )
+    session_id = get_session_id(message)
     user_name = message.from_user.username or message.from_user.first_name or "Аноним"
     formatted_message = f"[from {user_name}] {user_text}"
 
