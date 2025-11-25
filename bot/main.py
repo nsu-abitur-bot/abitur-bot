@@ -37,9 +37,14 @@ def get_session_id(message: Message) -> str:
     
     В групповых чатах возвращает chat_id:user_id для изоляции пользователей.
     В личных чатах возвращает только chat_id.
+    
+    Raises:
+        ValueError: Если message.from_user отсутствует.
     """
+    if not message.from_user:
+        raise ValueError("message.from_user is required")
     chat_id = str(message.chat.id)
-    user_id = str(message.from_user.id) if message.from_user else ""
+    user_id = str(message.from_user.id)
     return (
         f"{chat_id}:{user_id}"
         if message.chat.type in ["group", "supergroup"]
