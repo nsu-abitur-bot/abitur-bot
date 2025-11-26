@@ -1,19 +1,17 @@
-from chonkie import chunk_text
+from chonkie.chunker import RecursiveChunker
+
 from rag.vectorstore import get_vectorstore
 
 
 def add_texts(texts: list[str]):
-    chunks = []
+    # Инициализация RecursiveChunker
+    chunker = RecursiveChunker(chunk_size=500, rules=None)
 
+    all_chunks: list[str] = []
     for text in texts:
-        # chunk_text возвращает генератор, поэтому оборачиваем в список
-        text_chunks = list(chunk_text(
-            text=text,
-            max_chunk_size=500,
-            overlap=50
-        ))
-        chunks.extend(text_chunks)
+        chunks = chunker.chunk(text)
+        for chunk in chunks:
+            all_chunks.append(chunk.text)
 
-    # Сохраняем чанки в векторное хранилище
     db = get_vectorstore()
-    db.add_texts(texts=chunks)
+    db.add_texts(all_chunks)
