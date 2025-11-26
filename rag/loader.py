@@ -1,13 +1,17 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+from chonkie.chunker import RecursiveChunker
 
 from rag.vectorstore import get_vectorstore
 
 
 def add_texts(texts: list[str]):
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
-    chunks = []
+    # Инициализация RecursiveChunker
+    chunker = RecursiveChunker(chunk_size=500, rules=None)
+
+    all_chunks: list[str] = []
     for text in texts:
-        chunks.extend(splitter.split_text(text))
+        chunks = chunker.chunk(text)
+        for chunk in chunks:
+            all_chunks.append(chunk.text)
 
     db = get_vectorstore()
-    db.add_texts(chunks)
+    db.add_texts(all_chunks)
