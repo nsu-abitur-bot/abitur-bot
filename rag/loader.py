@@ -1,20 +1,19 @@
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-from chonkie import Chonkie
+from chonkie import chunk_text
 from rag.vectorstore import get_vectorstore
 
 
 def add_texts(texts: list[str]):
-    # Инициализация Chonkie
-    chonkie = Chonkie(
-        max_chunk_size=500,
-        overlap=50,
-    )
-
     chunks = []
+
     for text in texts:
-        # Разбиваем текст с помощью Chonkie
-        text_chunks = chonkie.split(text)
+        # chunk_text возвращает генератор, поэтому оборачиваем в список
+        text_chunks = list(chunk_text(
+            text=text,
+            max_chunk_size=500,
+            overlap=50
+        ))
         chunks.extend(text_chunks)
 
+    # Сохраняем чанки в векторное хранилище
     db = get_vectorstore()
-    db.add_texts(chunks)
+    db.add_texts(texts=chunks)
