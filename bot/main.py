@@ -9,7 +9,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
-from llm.llm_client import ask_local_llm
+from llm.llm_client import ask_local_llm, cleanup_redis
 
 load_dotenv()
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -30,6 +30,8 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+logging.getLogger("llm.llm_client").setLevel(logging.DEBUG)
+logging.getLogger("db.redis_client").setLevel(logging.DEBUG)
 
 
 def get_session_id(message: Message) -> str:
@@ -133,7 +135,12 @@ async def handle_message(message: Message):
 
 async def main():
     logger.info("Бот запущен")
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        # Закрываем Redis при завершении бота
+        logger.info("Закрытие соединений...")
+        await cleanup_redis()
 
 
 if __name__ == "__main__":
