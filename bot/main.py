@@ -97,7 +97,7 @@ async def cmd_reset(message: Message):
     try:
         # Очищаем историю в Redis
         redis_client = await get_redis_client()
-        await redis_client.clear_history(session_id)  # type: ignore
+        await redis_client.clear_history(session_id)
 
         await bot.send_message(chat_id, "История переписки очищена")
     except Exception as e:
