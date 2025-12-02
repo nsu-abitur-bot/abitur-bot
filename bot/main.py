@@ -9,7 +9,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
-from llm.llm_client import ask_local_llm, cleanup_redis
+from llm.llm_client import ask_local_llm, cleanup_redis, get_redis_client
 
 load_dotenv()
 BOT_TOKEN = getenv("BOT_TOKEN")
@@ -93,11 +93,20 @@ async def cmd_reset(message: Message):
         return
     chat_id = str(message.chat.id)
     session_id = get_session_id(message)
-    if session_id in session_states:
-        session_states[session_id]["history"] = []
+
+    try:
+        # Очищаем историю в Redis
+        redis_client = await get_redis_client()
+        await redis_client.clear_history(session_id)  # type: ignore
+
+        # Также очищаем локальное состояние, если оно есть
+        if session_id in session_states:
+            session_states[session_id].pop("history", None)
+
         await bot.send_message(chat_id, "История переписки очищена")
-    else:
-        await bot.send_message(chat_id, "Нет активной сессии для очистки")
+    except Exception as e:
+        logger.error(f"Ошибка при очистке истории для сессии {session_id}: {e}")
+        await bot.send_message(chat_id, "Произошла ошибка при очистке истории")
 
 
 @dp.message()

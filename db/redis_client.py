@@ -69,6 +69,16 @@ class RedisClient:
             logger.error("Ошибка установки ключа %s: %s", key, e)
             raise
 
+    async def clear_history(self, session_id: str) -> None:
+        """Очищает историю чата для сессии."""
+        history_key = f"chat_history:{session_id}"
+        try:
+            await self.client.delete(history_key)
+            logger.debug("История очищена для сессии %s", session_id)
+        except redis.RedisError as e:
+            logger.error("Ошибка очистки истории для сессии %s: %s", session_id, e)
+            raise
+
     async def close(self) -> None:
         """Закрывает соединение с Redis."""
         try:
