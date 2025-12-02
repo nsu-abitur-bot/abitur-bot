@@ -26,6 +26,7 @@ dependencies = [
     "sqlalchemy[asyncio]>=2.0.44",
     "alembic>=1.17.1",
     "uuid6>=2024.1.12",
+    "chonkie>=1.4.2",
 ]
 
 [dependency-groups]
