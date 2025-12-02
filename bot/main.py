@@ -99,10 +99,6 @@ async def cmd_reset(message: Message):
         redis_client = await get_redis_client()
         await redis_client.clear_history(session_id)  # type: ignore
 
-        # Также очищаем локальное состояние, если оно есть
-        if session_id in session_states:
-            session_states[session_id].pop("history", None)
-
         await bot.send_message(chat_id, "История переписки очищена")
     except Exception as e:
         logger.error(f"Ошибка при очистке истории для сессии {session_id}: {e}")
