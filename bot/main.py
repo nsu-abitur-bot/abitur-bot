@@ -9,6 +9,8 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
+from db.postgres.db import get_session
+from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, cleanup_redis
 
 load_dotenv()
@@ -60,6 +62,20 @@ async def cmd_start(message: Message):
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
+    user_id = message.from_user.id
+
+    # Создаем пользователя в БД без СНИЛС
+    async for session in get_session():
+        user_service = UserService(session)
+        existing_user = await user_service.get_user(user_id)
+
+        if not existing_user:
+            # Создаем пользователя без СНИЛС
+            await user_service.create_user(user_id)
+            logger.info(f"Новый пользователь {user_id} создан в БД")
+        else:
+            logger.info(f"Пользователь {user_id} уже существует в БД")
+
     await bot.send_message(chat_id, "Привет! Используйте /track, /untrack и /reset")
 
 
@@ -77,11 +93,22 @@ async def cmd_track(message: Message):
 
 @dp.message(Command("untrack"))
 async def cmd_untrack(message: Message):
-    """Обработчик /untrack: удаляем состояние сессии."""
+    """Обработчик /untrack: удаляем состояние сессии и СНИЛС из БД."""
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
+    user_id = message.from_user.id
     session_id = get_session_id(message)
+
+    # Удаляем СНИЛС из БД (устанавливаем NULL)
+    async for session in get_session():
+        user_service = UserService(session)
+        updated = await user_service.update_snils(user_id, None)
+        if updated:
+            logger.info(f"СНИЛС пользователя {user_id} удален из БД")
+        else:
+            logger.warning(f"Пользователь {user_id} не найден в БД для удаления СНИЛС")
+
     session_states.pop(session_id, None)
     await bot.send_message(chat_id, "Отслеживание прекращено")
 
@@ -119,10 +146,24 @@ async def handle_message(message: Message):
 
     # Если ожидали СНИЛС — сохраняем его
     if state.get("awaiting_snils"):
-        # Здесь нет никакой валидации, так как это просто заглушка
-        state["snils"] = user_text
-        state["awaiting_snils"] = False
-        await bot.send_message(chat_id, "СНИЛС записан")
+        # Сохраняем СНИЛС в БД
+        async for session in get_session():
+            user_service = UserService(session)
+            user_id = message.from_user.id
+
+            # Обновляем СНИЛС пользователя в БД
+            updated = await user_service.update_snils(user_id, user_text)
+            if updated:
+                logger.info(f"СНИЛС пользователя {user_id} обновлен в БД: {user_text}")
+                state["snils"] = user_text
+                state["awaiting_snils"] = False
+                await bot.send_message(chat_id, "СНИЛС записан")
+            else:
+                logger.error(f"Не удалось обновить СНИЛС для пользователя {user_id}")
+                await bot.send_message(
+                    chat_id,
+                    "Ошибка при сохранении СНИЛС.",
+                )
         return
 
     # Пересылаем сообщение локальной модели LLM

@@ -19,7 +19,9 @@ class UserService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def create_user(self, user_id: int, snils: str) -> Optional[User]:
+    async def create_user(
+        self, user_id: int, snils: Optional[str] = None
+    ) -> Optional[User]:
         """Создать нового пользователя."""
         try:
             user = User(user_id=user_id, snils_id=snils)
@@ -108,7 +110,7 @@ class UserService:
             logger.error(f"Ошибка подсчета пользователей: {e}")
             return 0
 
-    async def update_snils(self, user_id: int, new_snils: str) -> bool:
+    async def update_snils(self, user_id: int, new_snils: Optional[str]) -> bool:
         """Обновить SNILS пользователя."""
         try:
             result = await self.session.execute(
