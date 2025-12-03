@@ -27,6 +27,7 @@ dependencies = [
     "alembic>=1.17.1",
     "uuid6>=2024.1.12",
     "chonkie>=1.4.2",
+    "psycopg2>=2.9.11",
 ]
 
 [dependency-groups]

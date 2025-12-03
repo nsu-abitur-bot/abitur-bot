@@ -24,7 +24,7 @@ class User(Base):
 
     # Это user_id из телеграмма
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    snils_id: Mapped[str] = mapped_column(String(14))
+    snils_id: Mapped[Optional[str]] = mapped_column(String(14), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
     ratings: Mapped[List["UserRating"]] = relationship(
