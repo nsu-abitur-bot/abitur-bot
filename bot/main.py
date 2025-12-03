@@ -9,7 +9,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
-from db.postgres.db import get_session
+from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, cleanup_redis
 
@@ -64,13 +64,11 @@ async def cmd_start(message: Message):
     chat_id = str(message.chat.id)
     user_id = message.from_user.id
 
-    # Создаем пользователя в БД без СНИЛС
-    async for session in get_session():
+    async with AsyncSessionLocal() as session:
         user_service = UserService(session)
         existing_user = await user_service.get_user(user_id)
 
         if not existing_user:
-            # Создаем пользователя без СНИЛС
             await user_service.create_user(user_id)
             logger.info(f"Новый пользователь {user_id} создан в БД")
         else:
@@ -100,8 +98,7 @@ async def cmd_untrack(message: Message):
     user_id = message.from_user.id
     session_id = get_session_id(message)
 
-    # Удаляем СНИЛС из БД (устанавливаем NULL)
-    async for session in get_session():
+    async with AsyncSessionLocal() as session:
         user_service = UserService(session)
         updated = await user_service.update_snils(user_id, None)
         if updated:
@@ -146,12 +143,10 @@ async def handle_message(message: Message):
 
     # Если ожидали СНИЛС — сохраняем его
     if state.get("awaiting_snils"):
-        # Сохраняем СНИЛС в БД
-        async for session in get_session():
+        async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             user_id = message.from_user.id
 
-            # Обновляем СНИЛС пользователя в БД
             updated = await user_service.update_snils(user_id, user_text)
             if updated:
                 logger.info(f"СНИЛС пользователя {user_id} обновлен в БД: {user_text}")
