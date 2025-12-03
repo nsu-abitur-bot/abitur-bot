@@ -6,6 +6,8 @@ from rag.vectorstore import get_vectorstore
 
 logger = logging.getLogger(__name__)
 
+_chunker = RecursiveChunker(chunk_size=500)
+
 
 def add_texts(texts: list[str]):
     """Добавляет тексты в векторную базу данных.
@@ -17,13 +19,11 @@ def add_texts(texts: list[str]):
         logger.warning("Список текстов пуст, нечего добавлять")
         return
 
-    chunker = RecursiveChunker(chunk_size=500)
-
     all_chunks: list[str] = []
     for text in texts:
         if not text or not text.strip():
             continue
-        chunks = chunker.chunk(text)
+        chunks = _chunker.chunk(text)
         for chunk in chunks:
             all_chunks.append(chunk.text)
 

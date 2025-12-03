@@ -6,9 +6,6 @@ from parser.config.load_config import get_parser_config
 from parser.nsu_parser import parse_nsu_faculty
 from rag.loader import add_texts
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 
