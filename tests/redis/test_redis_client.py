@@ -50,3 +50,17 @@ async def test_expire_sets_ttl(redis_client):
 async def test_get_non_existing_key(redis_client):
     value = await redis_client.get("missing-key")
     assert value is None
+
+
+@pytest.mark.asyncio
+async def test_clear_history(redis_client):
+    session_id = "test-session"
+
+    await redis_client.add_message(session_id, {"role": "user", "content": "Hello"})
+    history = await redis_client.get_history(session_id)
+    assert len(history) == 1
+
+    await redis_client.clear_history(session_id)
+
+    history = await redis_client.get_history(session_id)
+    assert len(history) == 0
