@@ -16,4 +16,11 @@ COPY . .
 FROM base AS final
 COPY --from=builder /app /app
 ENV PATH="/app/.venv/bin:$PATH"
+
+# Required environment variables:
+#   BOT_TOKEN
+#   REDIS_URL
+#   OPENAI_API_KEY
+# Set these when running the container, e.g.:
+#   docker run -e BOT_TOKEN=... -e REDIS_URL=... -e OPENAI_API_KEY=... <image>
 CMD ["python", "main.py"]
