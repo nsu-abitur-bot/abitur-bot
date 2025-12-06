@@ -8,6 +8,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from db.redis_client import RedisClient
+from rag.retriever import search_similar
 
 load_dotenv()
 
@@ -16,10 +17,16 @@ logger = logging.getLogger(__name__)
 LM_API_URL = "http://127.0.0.1:1234/v1"
 MODEL = "Llama-3.2-3B-Instruct-Q4_K_S.gguf"
 
-SYSTEM_PROMPT = """
+SYSTEM_PROMPT_BASE = """
 ТЫ LLM помощник для поступления в НГУ (Новосибирский государственный университет),
 отвечай только на вопросы связанные с университетом и поступлением.
 Отвечай коротко, долго не думай.
+
+Используй следующую информацию из базы знаний для ответа на вопрос пользователя:
+
+{context}
+
+Если информация в базе знаний не помогает ответить на вопрос, отвечай на основе общих знаний о НГУ.
 """
 
 # Создаём клиент, совместимый с LM Studio API
@@ -57,8 +64,19 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             session_id, {"role": "user", "content": message}
         )
 
+        # 2. Ищем релевантный контекст в векторной базе данных
+        try:
+            similar_docs = search_similar(message, k=3)
+            context = "\n\n".join([doc.page_content for doc in similar_docs])
+            if not context:
+                context = "Релевантной информации не найдено в базе знаний."
+        except Exception as e:
+            logger.warning(f"RAG search error: {e}")
+            context = "База знаний временно недоступна."
+
         # Формируем список сообщений для LLM
-        messages = [SystemMessage(content=SYSTEM_PROMPT)]
+        system_prompt = SYSTEM_PROMPT_BASE.format(context=context)
+        messages = [SystemMessage(content=system_prompt)]
 
         # Добавляем историю переписки
         for entry in history:
