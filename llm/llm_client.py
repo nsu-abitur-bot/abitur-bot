@@ -27,7 +27,7 @@ SYSTEM_PROMPT_BASE = """
 {context}
 
 Если информация в базе знаний не помогает ответить на вопрос, отвечай на основе общих знаний о НГУ.
-"""
+"""  # noqa: E501
 
 # Создаём клиент, совместимый с LM Studio API
 llm = ChatOpenAI(
@@ -68,6 +68,11 @@ async def ask_local_llm(message: str, session_id: str) -> str:
         try:
             similar_docs = search_similar(message, k=3)
             context = "\n\n".join([doc.page_content for doc in similar_docs])
+
+            logger.info(
+                f"\n=== НАЙДЕННЫЙ КОНТЕКСТ (RAG) ===\n{context}\n================================\n"  # noqa: E501
+            )
+
             if not context:
                 context = "Релевантной информации не найдено в базе знаний."
         except Exception as e:
