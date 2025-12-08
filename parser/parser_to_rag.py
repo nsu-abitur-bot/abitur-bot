@@ -32,36 +32,42 @@ def parse_and_save_to_vectorstore():
                 logger.warning(f"Не удалось спарсить факультет {fac_code}")
                 continue
 
-            # Собираем текстовые данные для индексации
-            texts_to_add = []
+            # Собираем части страницы в один список
+            page_parts = []
 
             # Добавляем заголовок и описание
             title = data.get("title", "")
             if title:
-                texts_to_add.append(f"Факультет: {title}")
+                page_parts.append(f"Факультет: {title}")
 
             description = data.get("description", "")
             if description:
-                texts_to_add.append(description)
+                page_parts.append(f"Описание: {description}")
 
             keywords = data.get("keywords", "")
             if keywords:
-                texts_to_add.append(f"Ключевые слова: {keywords}")
+                page_parts.append(f"Ключевые слова: {keywords}")
 
             # Добавляем блоки контента
             content_blocks = data.get("content_blocks", [])
-            texts_to_add.extend(content_blocks)
+            if content_blocks:
+                page_parts.extend(content_blocks)
 
-            logger.info(f"  Факультет: {title}, блоков контента: {len(content_blocks)}")
+            # Объединяем всё в одну строку (один документ)
+            full_page_text = "\n\n".join(page_parts)
 
-            all_texts.extend(texts_to_add)
+            if full_page_text:
+                all_texts.append(full_page_text)
+                logger.info(
+                    f"  Факультет: {title}, сформирован единый документ длиной {len(full_page_text)} символов"  # noqa: E501
+                )
 
         except Exception as e:
             logger.error(f"Ошибка при обработке факультета {fac_code}: {e}")
             continue
 
     if all_texts:
-        logger.info(f"Сохранение {len(all_texts)} текстовых блоков в ChromaDB...")
+        logger.info(f"Сохранение {len(all_texts)} документов (страниц) в ChromaDB...")
         try:
             add_texts(all_texts)
             logger.info("✓ Данные успешно сохранены в векторную базу данных")
