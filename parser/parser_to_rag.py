@@ -60,7 +60,7 @@ def parse_and_save_to_vectorstore():
                 all_texts.append(full_page_text)
                 logger.info(
                     f"  Факультет: {title}, сформирован единый документ длиной {len(full_page_text)} символов"  # noqa: E501
-                )  # noqa: E501
+                )
 
         except Exception as e:
             logger.error(f"Ошибка при обработке факультета {fac_code}: {e}")
