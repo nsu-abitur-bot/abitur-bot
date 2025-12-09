@@ -4,7 +4,7 @@ from contextlib import suppress
 from typing import Optional
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from db.redis_client import RedisClient
@@ -58,7 +58,8 @@ async def ask_local_llm(message: str, session_id: str) -> str:
         )
 
         # Формируем список сообщений для LLM
-        messages = [SystemMessage(content=SYSTEM_PROMPT)]
+        messages: list[BaseMessage] = []
+        messages.append(SystemMessage(content=SYSTEM_PROMPT))
 
         # Добавляем историю переписки
         for entry in history:

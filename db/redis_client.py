@@ -1,7 +1,7 @@
 import json
 import logging
 from os import getenv
-from typing import Dict, List
+from typing import Any, Dict, List, cast
 
 import redis.asyncio as redis
 import redis.asyncio.client as redis_client
@@ -17,22 +17,23 @@ logger = logging.getLogger(__name__)
 
 class RedisClient:
     def __init__(self):
-        self.client: redis_client.Redis = redis.from_url(
-            REDIS_URL, decode_responses=True
-        )
+        self.client: Any = redis.from_url(REDIS_URL, decode_responses=True)
 
     async def add_message(
         self, session_id: str, message: Dict[str, str]
     ) -> List[Dict[str, str]]:
         """Добавляет сообщение в историю чата и возвращает историю."""
         history_key = f"chat_history:{session_id}"
-        self.client.rpush
         try:
-            # pylance думает что эти функции могут быть синхронными, но они асинхронные
-            # TODO: Исправить это и убрать type ignore
-            await self.client.rpush(history_key, json.dumps(message))
-            await self.client.ltrim(history_key, -HISTORY_LIMIT, -1)
-            await self.client.expire(history_key, TTL_SECONDS)
+            # Cast bound methods to Any so Pyrefly doesn't treat their return
+            # types as synchronous values (false positive).
+            rpush_fn = cast(Any, self.client.rpush)
+            ltrim_fn = cast(Any, self.client.ltrim)
+            expire_fn = cast(Any, self.client.expire)
+
+            await rpush_fn(history_key, json.dumps(message))
+            await ltrim_fn(history_key, -HISTORY_LIMIT, -1)
+            await expire_fn(history_key, TTL_SECONDS)
             logger.debug("Добавлено сообщение в историю %s", session_id)
             return await self.get_history(session_id)
         except redis.RedisError as e:
@@ -43,7 +44,8 @@ class RedisClient:
         """Получает историю чата."""
         history_key = f"chat_history:{session_id}"
         try:
-            history_raw = await self.client.lrange(history_key, 0, -1)
+            lrange_fn = cast(Any, self.client.lrange)
+            history_raw = await lrange_fn(history_key, 0, -1)
             logger.debug(
                 "Получена история для %s: %d сообщений", session_id, len(history_raw)
             )
