@@ -30,8 +30,8 @@ class RedisClient:
         try:
             # pylance думает что эти функции могут быть синхронными, но они асинхронные
             # TODO: Исправить это и убрать type ignore
-            await self.client.rpush(history_key, json.dumps(message))  # type: ignore
-            await self.client.ltrim(history_key, -HISTORY_LIMIT, -1)  # type: ignore
+            await self.client.rpush(history_key, json.dumps(message))
+            await self.client.ltrim(history_key, -HISTORY_LIMIT, -1)
             await self.client.expire(history_key, TTL_SECONDS)
             logger.debug("Добавлено сообщение в историю %s", session_id)
             return await self.get_history(session_id)
@@ -43,7 +43,7 @@ class RedisClient:
         """Получает историю чата."""
         history_key = f"chat_history:{session_id}"
         try:
-            history_raw = await self.client.lrange(history_key, 0, -1)  # type: ignore
+            history_raw = await self.client.lrange(history_key, 0, -1)
             logger.debug(
                 "Получена история для %s: %d сообщений", session_id, len(history_raw)
             )

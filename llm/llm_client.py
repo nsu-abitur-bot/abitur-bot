@@ -68,17 +68,17 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             if role == "user":
                 # type: ignore нужен потому что mypy не может определить,
                 # что HumanMessage.content принимает str, хотя это валидно
-                messages.append(HumanMessage(content=content))  # type: ignore
+                messages.append(HumanMessage(content=content))
             elif role == "assistant":
                 # Аналогично для AIMessage.content
-                messages.append(AIMessage(content=content))  # type: ignore
+                messages.append(AIMessage(content=content))
 
         # Отправляем запрос в LLM
         response = await llm.ainvoke(messages)
 
         # type: ignore нужен потому что mypy не может определить,
         # что content принимает str, хотя это валидно
-        content = response.content.strip() if response.content else ""  # type: ignore
+        content = response.content.strip() if response.content else "" 
 
         # Удаляем блоки <think>...</think>
         content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)

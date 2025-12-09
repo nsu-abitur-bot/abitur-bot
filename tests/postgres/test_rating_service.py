@@ -46,7 +46,7 @@ async def test_update_leaderboard_hash(session: AsyncSession):
 
     # Проверяем обновление
     updated = await service.get_leaderboard_by_id(leaderboard.id)
-    assert updated.content_hash == "abc123"  # type: ignore
+    assert updated.content_hash == "abc123"
 
 
 @pytest.mark.asyncio

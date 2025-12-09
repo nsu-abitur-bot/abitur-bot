@@ -6,6 +6,7 @@
   },
   "ruff.enable": true,
   "ruff.lint.enable": true,
-  "python.analysis.typeCheckingMode": "basic",
+  "python.pyrefly.displayTypeErrors": "force-on",
+  "python.pyrefly.disableLanguageServices": false,
   "python.terminal.activateEnvironment": true
 }
