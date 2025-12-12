@@ -1,0 +1,7 @@
+project-includes = [
+    "**/*.py*",
+    "**/*.ipynb",
+]
+
+# Use the venv python for analysis
+python-interpreter = ".venv/bin/python"
