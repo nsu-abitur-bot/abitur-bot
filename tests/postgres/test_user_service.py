@@ -135,8 +135,7 @@ async def test_update_snils(session: AsyncSession):
 
     # Проверяем обновление
     user = await service.get_user(user_id=123456)
-    assert user is not None
-    assert user.snils_id == "999-999-999 99"
+    assert user.snils_id == "999-999-999 99"  # type: ignore
 
 
 @pytest.mark.asyncio

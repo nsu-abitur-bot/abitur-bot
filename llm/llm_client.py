@@ -4,7 +4,7 @@ from contextlib import suppress
 from typing import Optional
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
 from db.redis_client import RedisClient
@@ -58,8 +58,7 @@ async def ask_local_llm(message: str, session_id: str) -> str:
         )
 
         # Формируем список сообщений для LLM
-        messages: list[BaseMessage] = []
-        messages.append(SystemMessage(content=SYSTEM_PROMPT))
+        messages = [SystemMessage(content=SYSTEM_PROMPT)]
 
         # Добавляем историю переписки
         for entry in history:
@@ -69,17 +68,17 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             if role == "user":
                 # type: ignore нужен потому что mypy не может определить,
                 # что HumanMessage.content принимает str, хотя это валидно
-                messages.append(HumanMessage(content=content))
+                messages.append(HumanMessage(content=content))  # type: ignore
             elif role == "assistant":
                 # Аналогично для AIMessage.content
-                messages.append(AIMessage(content=content))
+                messages.append(AIMessage(content=content))  # type: ignore
 
         # Отправляем запрос в LLM
         response = await llm.ainvoke(messages)
 
         # type: ignore нужен потому что mypy не может определить,
         # что content принимает str, хотя это валидно
-        content = response.content.strip() if response.content else "" 
+        content = response.content.strip() if response.content else ""  # type: ignore
 
         # Удаляем блоки <think>...</think>
         content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
