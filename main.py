@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from bot.main import main as bot_main
-from parser.parser_to_rag import parse_and_save_to_vectorstore
+from parser.baza_to_rag import parse_baza_and_save_to_vectorstore
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -15,7 +15,7 @@ async def main():
     # Сначала парсим и сохраняем данные в ChromaDB
     logger.info("=== Инициализация векторной базы данных ===")
     try:
-        await asyncio.to_thread(parse_and_save_to_vectorstore)
+        await asyncio.to_thread(parse_baza_and_save_to_vectorstore)
     except Exception as e:
         logger.error(f"Ошибка при парсинге и сохранении данных: {e}")
         logger.info("Продолжаем запуск бота...")
