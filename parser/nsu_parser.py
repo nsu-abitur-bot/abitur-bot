@@ -18,7 +18,7 @@ def parse_nsu_faculty(faculty) -> dict:
         page_hash = calculate_page_hash(html_content)
 
         soup = BeautifulSoup(html_content, "html.parser")
-        data = {"page_hash": page_hash}
+        data = {"page_hash": page_hash, "total_blocks": 0}
 
         parse_header_faculty(soup, data)
 
