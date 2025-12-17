@@ -1,11 +1,12 @@
 import logging
+import os
 import re
 from contextlib import suppress
 from typing import Optional
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
+from langchain_gigachat.chat_models import GigaChat
 
 from db.redis_client import RedisClient
 from rag.retriever import search_similar
@@ -29,11 +30,12 @@ SYSTEM_PROMPT_BASE = """
 Если информация в базе знаний не помогает ответить на вопрос, отвечай на основе общих знаний о НГУ.
 """  # noqa: E501
 
-# Создаём клиент, совместимый с LM Studio API
-llm = ChatOpenAI(
-    base_url=LM_API_URL,
-    model=MODEL,
-    temperature=0.8,
+# Создаём клиент, совместимый с GigaChat API
+llm = GigaChat(
+    credentials=os.getenv("GIGACHAT_API_KEY"),
+    scope="GIGACHAT_API_PERS",
+    model="GigaChat",
+    verify_ssl_certs=False,
 )
 
 # Создаем глобальный экземпляр для переиспользования соединения
