@@ -32,7 +32,7 @@ SYSTEM_PROMPT_BASE = """
 
 # Создаём клиент, совместимый с GigaChat API
 llm = GigaChat(
-    credentials=os.getenv("OPENAI_API_KEY"),
+    credentials=os.getenv("GIGACHAT_API_KEY"),
     scope="GIGACHAT_API_PERS",
     model="GigaChat",
     verify_ssl_certs=False,
