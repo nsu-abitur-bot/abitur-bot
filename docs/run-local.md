@@ -42,3 +42,13 @@ uv run python db/postgres/init_db.py
 ```sh
 uv run pytest -v
 ```
+
+## Запуск через Docker
+
+Подробная инструкция доступна в [docker.md](docker.md).
+
+Кратко:
+
+```sh
+docker-compose up -d --build
+```

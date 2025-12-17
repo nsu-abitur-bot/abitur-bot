@@ -1,26 +1,33 @@
-# syntax=docker/dockerfile:1.7
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim AS base
+FROM python:3.12-slim
 
-ENV UV_COMPILE_BYTECODE=1 \
-    UV_LINK_MODE=copy \
-    PYTHONUNBUFFERED=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-FROM base AS builder
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy dependency files
 COPY pyproject.toml uv.lock ./
-RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
+
+# Install dependencies
+# --frozen ensures we use the exact versions from uv.lock
+# --no-install-project installs only dependencies first (better caching)
+RUN uv sync --frozen --no-install-project
+
+# Copy the rest of the application
 COPY . .
 
-FROM base AS final
-COPY --from=builder /app /app
-ENV PATH="/app/.venv/bin:$PATH"
+# Install the project itself
+RUN uv sync --frozen
 
-# Required environment variables:
-#   BOT_TOKEN
-#   REDIS_URL
-#   OPENAI_API_KEY
-# Set these when running the container, e.g.:
-#   docker run -e BOT_TOKEN=... -e REDIS_URL=... -e OPENAI_API_KEY=... <image>
+# Place executables in the environment at the front of the path
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONUNBUFFERED=1
+
+# Run the application
 CMD ["python", "main.py"]
