@@ -2,6 +2,7 @@ import logging
 import os
 import re
 from contextlib import suppress
+from os import getenv
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -15,8 +16,8 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-LM_API_URL = "http://127.0.0.1:1234/v1"
-MODEL = "Llama-3.2-3B-Instruct-Q4_K_S.gguf"
+LM_API_URL = getenv("LM_API_URL", "http://127.0.0.1:1234/v1")
+MODEL = getenv("LM_MODEL", "Llama-3.2-3B-Instruct-Q4_K_S.gguf")
 
 SYSTEM_PROMPT_BASE = """
 ТЫ LLM помощник для поступления в НГУ (Новосибирский государственный университет),
