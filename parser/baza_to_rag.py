@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 
 from rag.loader import add_texts
+from rag.vectorstore import get_vectorstore
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,17 @@ logger = logging.getLogger(__name__)
 def parse_baza_and_save_to_vectorstore():
     """Читает все .md файлы из папки baza и сохраняет данные в ChromaDB."""
     logger.info("Начало обработки файлов из папки baza...")
+
+    # Проверяем, есть ли уже данные в векторной базе
+    vectorstore = get_vectorstore()
+    collection = vectorstore._collection
+    existing_count = collection.count()
+
+    if existing_count > 0:
+        logger.info(
+            f"В векторной базе уже есть {existing_count} документов. Пропускаем загрузку из baza/"
+        )
+        return
 
     # Определяем путь к папке baza относительно корня проекта
     # Предполагаем, что скрипт находится в parser/
