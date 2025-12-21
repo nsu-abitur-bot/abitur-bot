@@ -21,12 +21,6 @@ if BOT_TOKEN is None:
 bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
 dp = Dispatcher()
 
-# Простое хранилище состояния сессий в памяти.
-# Ключ — session_id (чат или chat:user для групп)
-# Каждое значение — словарь с опциональными ключами:
-# - 'awaiting_snils' (bool), 'snils' (str), 'history' (list)
-# TODO: заменить на БД для долговременного хранения
-session_states: Dict[str, Dict[str, Any]] = {}
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
@@ -84,8 +78,10 @@ async def cmd_track(message: Message):
         return
     chat_id = str(message.chat.id)
     session_id = get_session_id(message)
-    state = session_states.setdefault(session_id, {})
-    state["awaiting_snils"] = True
+
+    redis_client = await get_redis_client()
+    await redis_client.set_awaiting_snils(session_id, True)
+
     await bot.send_message(chat_id, "Укажите свой СНИЛС")
 
 
@@ -106,7 +102,8 @@ async def cmd_untrack(message: Message):
         else:
             logger.warning(f"Пользователь {user_id} не найден в БД для удаления СНИЛС")
 
-    session_states.pop(session_id, None)
+    redis_client = await get_redis_client()
+    await redis_client.set_awaiting_snils(session_id, False)
     await bot.send_message(chat_id, "Отслеживание прекращено")
 
 
@@ -144,10 +141,11 @@ async def handle_message(message: Message):
 
     logger.info(f"Сообщение от {user_name} в чате {chat_id}: {user_text}")
 
-    state = session_states.setdefault(session_id, {})
+    redis_client = await get_redis_client()
+    is_awaiting = await redis_client.is_awaiting_snils(session_id)
 
     # Если ожидали СНИЛС — сохраняем его
-    if state.get("awaiting_snils"):
+    if is_awaiting:
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             user_id = message.from_user.id
@@ -155,8 +153,7 @@ async def handle_message(message: Message):
             updated = await user_service.update_snils(user_id, user_text)
             if updated:
                 logger.info(f"СНИЛС пользователя {user_id} обновлен в БД: {user_text}")
-                state["snils"] = user_text
-                state["awaiting_snils"] = False
+                await redis_client.set_awaiting_snils(session_id, False)
                 await bot.send_message(chat_id, "СНИЛС записан")
             else:
                 logger.error(f"Не удалось обновить СНИЛС для пользователя {user_id}")
