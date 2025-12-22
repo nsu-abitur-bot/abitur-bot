@@ -1,16 +1,12 @@
 import logging
-import os
-import re
 from contextlib import suppress
 from os import getenv
 from typing import Optional
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_gigachat.chat_models import GigaChat
 
 from db.redis_client import RedisClient
-from rag.retriever import search_similar
+from rag.retriever import query_graph
 
 load_dotenv()
 
@@ -18,26 +14,6 @@ logger = logging.getLogger(__name__)
 
 LM_API_URL = getenv("LM_API_URL", "http://127.0.0.1:1234/v1")
 MODEL = getenv("LM_MODEL", "Llama-3.2-3B-Instruct-Q4_K_S.gguf")
-
-SYSTEM_PROMPT_BASE = """
-ТЫ LLM помощник для поступления в НГУ (Новосибирский государственный университет),
-отвечай только на вопросы связанные с университетом и поступлением.
-Отвечай коротко, долго не думай.
-
-Используй следующую информацию из базы знаний для ответа на вопрос пользователя:
-
-{context}
-
-Если информация в базе знаний не помогает ответить на вопрос, отвечай на основе общих знаний о НГУ.
-"""  # noqa: E501
-
-# Создаём клиент, совместимый с GigaChat API
-llm = GigaChat(
-    credentials=os.getenv("GIGACHAT_API_KEY"),
-    scope="GIGACHAT_API_PERS",
-    model="GigaChat",
-    verify_ssl_certs=False,
-)
 
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
@@ -67,50 +43,20 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             session_id, {"role": "user", "content": message}
         )
 
-        # 2. Ищем релевантный контекст в векторной базе данных
+        # 2. Используем LightRAG для получения ответа
         try:
-            similar_docs = search_similar(message, k=3)
-            context = "\n\n".join([doc.page_content for doc in similar_docs])
-
+            # LightRAG сам выполняет поиск и генерацию ответа
+            content = await query_graph(message)
+            
             logger.info(
-                f"\n=== НАЙДЕННЫЙ КОНТЕКСТ (RAG) ===\n{context}\n================================\n"  # noqa: E501
+                f"\n=== ОТВЕТ LIGHTRAG ===\n{content}\n================================\n"
             )
 
-            if not context:
-                context = "Релевантной информации не найдено в базе знаний."
+            if not content:
+                content = "Ответ не найден в базе знаний."
         except Exception as e:
-            logger.warning(f"RAG search error: {e}")
-            context = "База знаний временно недоступна."
-
-        # Формируем список сообщений для LLM
-        system_prompt = SYSTEM_PROMPT_BASE.format(context=context)
-        messages = [SystemMessage(content=system_prompt)]
-
-        # Добавляем историю переписки
-        for entry in history:
-            role = entry.get("role", "")
-            content = entry.get("content", "")
-
-            if role == "user":
-                # type: ignore нужен потому что mypy не может определить,
-                # что HumanMessage.content принимает str, хотя это валидно
-                messages.append(HumanMessage(content=content))  # type: ignore
-            elif role == "assistant":
-                # Аналогично для AIMessage.content
-                messages.append(AIMessage(content=content))  # type: ignore
-
-        # Отправляем запрос в LLM
-        response = await llm.ainvoke(messages)
-
-        # type: ignore нужен потому что mypy не может определить,
-        # что content принимает str, хотя это валидно
-        content = response.content.strip() if response.content else ""  # type: ignore
-
-        # Удаляем блоки <think>...</think>
-        content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
-
-        if not content:
-            content = "Ответ не найден"
+            logger.warning(f"Graph query error: {e}")
+            content = "База знаний временно недоступна."
 
         # Сохраняем ответ бота в историю
         await redis_client.add_message(
