@@ -1,7 +1,6 @@
 import asyncio
 import logging
 from os import getenv
-from typing import Any, Dict
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
