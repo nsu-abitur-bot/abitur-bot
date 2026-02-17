@@ -17,3 +17,4 @@ class BaseLLMProvider(ABC):
         Returns:
             Текст ответа от модели
         """
+        pass

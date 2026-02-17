@@ -27,7 +27,7 @@ def get_llm_provider() -> BaseLLMProvider:
     else:
         raise ValueError(
             f"Неизвестный LLM провайдер: '{provider_name}'. "
-            f"Допустимые значения: gigachat, local"
+            f"Допустимые значения: gigachat"
         )
 
     logger.info("LLM провайдер инициализирован: %s", provider_name)

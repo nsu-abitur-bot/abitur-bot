@@ -17,9 +17,7 @@ def reset_provider():
 # Мокаем классы, чтобы не делать реальных запросов и не требовать установки пакетов, если они опциональны  # noqa: E501
 @pytest.fixture(autouse=True)
 def mock_deps():
-    with (
-        patch("llm.providers.gigachat.GigaChat"),
-    ):
+    with patch("llm.providers.gigachat.GigaChat"):
         yield
 
 

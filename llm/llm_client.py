@@ -4,7 +4,7 @@ from contextlib import suppress
 from typing import Optional
 
 from dotenv import load_dotenv
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from db.redis_client import RedisClient
 from llm.factory import get_llm_provider
@@ -71,7 +71,7 @@ async def ask_local_llm(message: str, session_id: str) -> str:
 
         # Формируем список сообщений для LLM
         system_prompt = SYSTEM_PROMPT_BASE.format(context=context)
-        messages = [SystemMessage(content=system_prompt)]
+        messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
         # Добавляем историю переписки
         for entry in history:
@@ -79,13 +79,13 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             content = entry.get("content", "")
 
             if role == "user":
-                messages.append(HumanMessage(content=content))  # type: ignore
+                messages.append(HumanMessage(content=content))
             elif role == "assistant":
-                messages.append(AIMessage(content=content))  # type: ignore
+                messages.append(AIMessage(content=content))
 
         # Отправляем запрос в LLM через провайдер
         provider = get_llm_provider()
-        content = await provider.generate(messages)  # type: ignore
+        content = await provider.generate(messages)
 
         # Удаляем блоки <think>...</think>
         content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
