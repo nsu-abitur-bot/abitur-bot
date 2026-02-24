@@ -2,6 +2,7 @@
 
 import logging
 from dataclasses import dataclass
+from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -119,8 +120,6 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str]:
 
 def _extract_params_from_url(url: str) -> dict:
     """Извлекает faculty/direction/condition/type из URL."""
-    from urllib.parse import parse_qs, urlparse
-
     parsed = urlparse(url)
     qs = parse_qs(parsed.query)
 
