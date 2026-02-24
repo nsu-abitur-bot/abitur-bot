@@ -42,8 +42,11 @@ def build_leaderboard_url(
 
 def _get_csrf_token(session: requests.Session, headers: dict) -> str | None:
     """Получает CSRF-токен со страницы."""
+    config = get_rating_config()
+    base_url = config.get("url", BASE_URL)
+
     try:
-        response = session.get(BASE_URL, headers=headers, timeout=10)
+        response = session.get(base_url, headers=headers, timeout=10)
         response.raise_for_status()
         soup = BeautifulSoup(response.text, "html.parser")
         meta = soup.find("meta", {"name": "csrf-token"})
@@ -51,7 +54,7 @@ def _get_csrf_token(session: requests.Session, headers: dict) -> str | None:
             token = meta.get("content")
             if token:
                 token_str = token[0] if isinstance(token, list) else str(token)
-                logger.info(f"CSRF-токен получен: {token_str[:20]}...")
+                logger.info("CSRF-токен успешно получен")
                 return token_str
         logger.error("CSRF-токен не найден на странице")
         return None
@@ -69,45 +72,49 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str]:
     """
     config = get_rating_config()
     headers = config.get("headers", {})
-    params = _extract_params_from_url(url)
-
-    session = requests.Session()
-
-    csrf_token = _get_csrf_token(session, headers)
-    if not csrf_token:
-        return [], ""
-
-    form_data = {
-        "_csrf-frontend": csrf_token,
-        "degree": "bachelor",
-        "faculty": str(params["faculty"]),
-        "direction": str(params["direction"]),
-        "condition": str(params["condition"]),
-        "type": str(params["type"]),
-    }
 
     try:
-        response = session.post(
-            API_ENDPOINT,
-            headers={**headers, "Accept": "application/json"},
-            data=form_data,  # Form Data
-            timeout=10,
-        )
-        response.raise_for_status()
-
-        data = response.json()
-        page_hash = calculate_page_hash(response.text)
-        entries = _extract_entries(data)
-
-        logger.info(f"Получено {len(entries)} записей из {url}")
-        return entries, page_hash
-
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Ошибка при запросе {url}: {e}")
+        params = _extract_params_from_url(url)
+    except ValueError as e:
+        logger.error(f"Некорректные параметры в URL {url}: {e}")
         return [], ""
-    except Exception as e:
-        logger.error(f"Ошибка при парсинге {url}: {e}")
-        return [], ""
+
+    with requests.Session() as session:
+        csrf_token = _get_csrf_token(session, headers)
+        if not csrf_token:
+            return [], ""
+
+        form_data = {
+            "_csrf-frontend": csrf_token,
+            "degree": "bachelor",
+            "faculty": str(params["faculty"]),
+            "direction": str(params["direction"]),
+            "condition": str(params["condition"]),
+            "type": str(params["type"]),
+        }
+
+        try:
+            response = session.post(
+                API_ENDPOINT,
+                headers={**headers, "Accept": "application/json"},
+                data=form_data,  # Form Data
+                timeout=10,
+            )
+            response.raise_for_status()
+
+            data = response.json()
+            page_hash = calculate_page_hash(response.text)
+            entries = _extract_entries(data)
+
+            logger.info(f"Получено {len(entries)} записей из {url}")
+            return entries, page_hash
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Ошибка при запросе {url}: {e}")
+            return [], ""
+        except Exception as e:
+            logger.error(f"Ошибка при парсинге {url}: {e}")
+            return [], ""
 
 
 def _extract_params_from_url(url: str) -> dict:
@@ -117,11 +124,19 @@ def _extract_params_from_url(url: str) -> dict:
     parsed = urlparse(url)
     qs = parse_qs(parsed.query)
 
+    config = get_rating_config()
+    defaults = config.get("defaults", {}) if isinstance(config, dict) else {}
+
+    faculty_default = int(defaults.get("faculty", 8))
+    direction_default = int(defaults.get("direction", 7))
+    condition_default = int(defaults.get("condition", 10))
+    type_default = int(defaults.get("type", 0))
+
     return {
-        "faculty": int(qs.get("faculty", [8])[0]),
-        "direction": int(qs.get("direction", [7])[0]),
-        "condition": int(qs.get("condition", [10])[0]),
-        "type": int(qs.get("type", [0])[0]),
+        "faculty": int(qs.get("faculty", [faculty_default])[0]),
+        "direction": int(qs.get("direction", [direction_default])[0]),
+        "condition": int(qs.get("condition", [condition_default])[0]),
+        "type": int(qs.get("type", [type_default])[0]),
     }
 
 

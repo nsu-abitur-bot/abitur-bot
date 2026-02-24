@@ -229,7 +229,8 @@ class TestParseRatingPage:
     @patch("parser.rating_parser.requests.Session")
     def test_returns_entries_on_success(self, mock_session_cls):
         mock_session = MagicMock()
-        mock_session_cls.return_value = mock_session
+        mock_session_cls.return_value.__enter__ = MagicMock(return_value=mock_session)
+        mock_session_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         # GET для CSRF
         get_response = MagicMock()
@@ -253,7 +254,8 @@ class TestParseRatingPage:
     @patch("parser.rating_parser.requests.Session")
     def test_returns_empty_when_no_csrf(self, mock_session_cls):
         mock_session = MagicMock()
-        mock_session_cls.return_value = mock_session
+        mock_session_cls.return_value.__enter__ = MagicMock(return_value=mock_session)
+        mock_session_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         get_response = MagicMock()
         get_response.text = MOCK_HTML_WITHOUT_CSRF
@@ -270,7 +272,8 @@ class TestParseRatingPage:
         import requests
 
         mock_session = MagicMock()
-        mock_session_cls.return_value = mock_session
+        mock_session_cls.return_value.__enter__ = MagicMock(return_value=mock_session)
+        mock_session_cls.return_value.__exit__ = MagicMock(return_value=False)
 
         get_response = MagicMock()
         get_response.text = MOCK_HTML_WITH_CSRF
