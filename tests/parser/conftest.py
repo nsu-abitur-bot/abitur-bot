@@ -1,12 +1,31 @@
+import json
 from pathlib import Path
 
 import pytest
 from bs4 import BeautifulSoup
 
+_FIXTURES_DIR = Path(__file__).parent / "fixtures"
+
 
 @pytest.fixture
 def fixtures_path():
-    return Path(__file__).parent / "fixtures"
+    return _FIXTURES_DIR
+
+
+@pytest.fixture(scope="session")
+def mock_json_response():
+    json_path = _FIXTURES_DIR / "json" / "mock_rating_response.json"
+    return json.loads(json_path.read_text(encoding="utf-8"))
+
+
+@pytest.fixture(scope="session")
+def mock_html_with_csrf():
+    return (_FIXTURES_DIR / "html" / "csrf_present.html").read_text(encoding="utf-8")
+
+
+@pytest.fixture(scope="session")
+def mock_html_without_csrf():
+    return (_FIXTURES_DIR / "html" / "csrf_absent.html").read_text(encoding="utf-8")
 
 
 @pytest.fixture

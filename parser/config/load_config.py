@@ -18,3 +18,8 @@ def load_config(config_path: str = "config.yaml") -> dict:
 def get_parser_config() -> dict:
     config = load_config()
     return config.get("parser", {})
+
+
+def get_rating_config() -> dict:
+    config = load_config()
+    return config.get("rating", {})
