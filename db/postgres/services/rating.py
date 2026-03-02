@@ -5,7 +5,9 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models import Leaderboard, UserRating
+from parser.rating_parser import RatingEntry
+
+from ..models import Leaderboard, User, UserRating
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -66,7 +68,12 @@ class RatingService:
         return leaderboards
 
     async def create_or_update_user_rating(
-        self, user_id: int, leaderboard_id: str, place: int
+        self,
+        user_id: int,
+        leaderboard_id: str,
+        place: int,
+        competition_type: str = "",
+        status: str = "",
     ) -> UserRating:
         """Создать или обновить рейтинг пользователя."""
         result = await self.session.execute(
@@ -79,7 +86,11 @@ class RatingService:
 
         if not user_rating:
             user_rating = UserRating(
-                user_id=user_id, leaderboard_id=leaderboard_id, place=place
+                user_id=user_id,
+                leaderboard_id=leaderboard_id,
+                place=place,
+                competition_type=competition_type,
+                status=status,
             )
             self.session.add(user_rating)
             logger.info(
@@ -88,6 +99,8 @@ class RatingService:
         else:
             old_place = user_rating.place
             user_rating.place = place
+            user_rating.competition_type = competition_type
+            user_rating.status = status
             logger.info(
                 f"Обновлена позиция пользователя {user_id}: {old_place} -> {place}"
             )
@@ -95,6 +108,81 @@ class RatingService:
         await self.session.commit()
         await self.session.refresh(user_rating)
         return user_rating
+
+    async def update_ratings_from_entries(
+        self,
+        leaderboard_id: str,
+        entries: List[RatingEntry],
+    ) -> dict:
+        stats = {"updated": 0, "created": 0, "skipped": 0}
+
+        for entry in entries:
+            # Ищем пользователя по идентификатору абитуриента
+            # (identifier из RatingEntry)
+            user_result = await self.session.execute(
+                select(User).where(User.applicant_id == entry.identifier)
+            )
+            user = user_result.scalar_one_or_none()
+
+            if user is None:
+                logger.debug(
+                    f"Абитуриент с идентификатором '{entry.identifier}' "
+                    f"не найден в БД — пропуск"
+                )
+                stats["skipped"] += 1
+                continue
+
+            # Ищем существующую запись рейтинга
+            rating_result = await self.session.execute(
+                select(UserRating).where(
+                    UserRating.user_id == user.user_id,
+                    UserRating.leaderboard_id == leaderboard_id,
+                )
+            )
+            user_rating = rating_result.scalar_one_or_none()
+
+            if user_rating is None:
+                user_rating = UserRating(
+                    user_id=user.user_id,
+                    leaderboard_id=leaderboard_id,
+                    place=entry.place,
+                    competition_type=entry.competition_type,
+                    status=entry.status,
+                )
+                self.session.add(user_rating)
+                stats["created"] += 1
+                logger.info(
+                    f"Создана запись рейтинга: user={user.user_id}, "
+                    f"place={entry.place}, "
+                    f"competition_type='{entry.competition_type}', "
+                    f"status='{entry.status}'"
+                )
+            else:
+                old_place = user_rating.place
+                user_rating.place = entry.place
+                user_rating.competition_type = entry.competition_type
+                user_rating.status = entry.status
+                user_rating.updated_at = datetime.now(UTC).replace(tzinfo=None)
+                stats["updated"] += 1
+                logger.info(
+                    f"Обновлена запись рейтинга: user={user.user_id}, "
+                    f"{old_place} -> {entry.place}, "
+                    f"competition_type='{entry.competition_type}', "
+                    f"status='{entry.status}'"
+                )
+
+        try:
+            await self.session.commit()
+        except Exception as e:
+            await self.session.rollback()
+            logger.error(f"Ошибка при сохранении обновлений рейтинга: {e}")
+            raise
+
+        logger.info(
+            f"update_ratings_from_entries: создано={stats['created']}, "
+            f"обновлено={stats['updated']}, пропущено={stats['skipped']}"
+        )
+        return stats
 
     async def get_user_ratings(self, user_id: int) -> List[UserRating]:
         """Получить все рейтинги пользователя."""

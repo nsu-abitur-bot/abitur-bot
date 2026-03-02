@@ -72,7 +72,7 @@ async def cmd_start(message: Message):
 
 @dp.message(Command("track"))
 async def cmd_track(message: Message):
-    """Обработчик /track: переводим сессию в ожидание СНИЛС."""
+    """Обработчик /track: переводим сессию в ожидание идентификатора абитуриента."""
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
@@ -81,12 +81,12 @@ async def cmd_track(message: Message):
     redis_client = await get_redis_client()
     await redis_client.set_awaiting_snils(session_id, True)
 
-    await bot.send_message(chat_id, "Укажите свой СНИЛС")
+    await bot.send_message(chat_id, "Укажите свой идентификатор абитуриента")
 
 
 @dp.message(Command("untrack"))
 async def cmd_untrack(message: Message):
-    """Обработчик /untrack: удаляем состояние сессии и СНИЛС из БД."""
+    """Обработчик /untrack: удаляем состояние сессии и идентификатор абитуриента из БД."""
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
@@ -95,11 +95,13 @@ async def cmd_untrack(message: Message):
 
     async with AsyncSessionLocal() as session:
         user_service = UserService(session)
-        updated = await user_service.update_snils(user_id, None)
+        updated = await user_service.update_applicant_id(user_id, None)
         if updated:
-            logger.info(f"СНИЛС пользователя {user_id} удален из БД")
+            logger.info(f"Идентификатор пользователя {user_id} удален из БД")
         else:
-            logger.warning(f"Пользователь {user_id} не найден в БД для удаления СНИЛС")
+            logger.warning(
+                f"Пользователь {user_id} не найден в БД для удаления идентификатора"
+            )
 
     redis_client = await get_redis_client()
     await redis_client.set_awaiting_snils(session_id, False)
@@ -127,7 +129,7 @@ async def cmd_reset(message: Message):
 
 @dp.message()
 async def handle_message(message: Message):
-    """Обычные сообщения: сохраняем СНИЛС или шлём в LLM."""
+    """Обычные сообщения: сохраняем идентификатор абитуриента или шлём в LLM."""
     if not message.from_user:
         return
 
@@ -149,16 +151,20 @@ async def handle_message(message: Message):
             user_service = UserService(session)
             user_id = message.from_user.id
 
-            updated = await user_service.update_snils(user_id, user_text)
+            updated = await user_service.update_applicant_id(user_id, user_text)
             if updated:
-                logger.info(f"СНИЛС пользователя {user_id} обновлен в БД: {user_text}")
+                logger.info(
+                    f"Идентификатор пользователя {user_id} обновлен в БД: {user_text}"
+                )
                 await redis_client.set_awaiting_snils(session_id, False)
-                await bot.send_message(chat_id, "СНИЛС записан")
+                await bot.send_message(chat_id, "Идентификатор записан")
             else:
-                logger.error(f"Не удалось обновить СНИЛС для пользователя {user_id}")
+                logger.error(
+                    f"Не удалось обновить идентификатор для пользователя {user_id}"
+                )
                 await bot.send_message(
                     chat_id,
-                    "Ошибка при сохранении СНИЛС.",
+                    "Ошибка при сохранении идентификатора.",
                 )
         return
 
