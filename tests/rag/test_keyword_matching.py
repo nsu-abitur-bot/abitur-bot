@@ -2,10 +2,12 @@
 Keyword Matching — проверяем что RAG находит нужные чанки
 с ключевыми словами для типичных вопросов абитуриентов.
 """
+from pathlib import Path
+
 import pytest
+
 from rag.loader import add_texts
 from rag.retriever import search_similar
-from pathlib import Path
 
 
 BAZA_DIR = Path(__file__).parent.parent.parent / "baza"
@@ -19,7 +21,7 @@ KEYWORD_CASES = [
     ),
     pytest.param(
         "Сколько стоит общежитие в НГУ?",
-        ["1 600", "1600", "рублей", "стоимост"],
+        ["1 600", "1\u202f600", "1600", "рублей", "стоимост"],
         marks=pytest.mark.xfail(reason="RAG не находит чанк с ценой — нужно улучшить чанкинг dorm.md"),
     ),
     (
@@ -38,7 +40,7 @@ KEYWORD_CASES = [
     # --- Общежития ---
     (
         "Где находятся общежития НГУ?",
-        ["академгородок", "10 минут", "университет"],
+        ["академгородк", "10 минут", "университет"],
     ),
     # --- Физический факультет (ff.md) ---
     (
@@ -126,11 +128,27 @@ KEYWORD_CASES = [
 
 
 @pytest.fixture(scope="module", autouse=True)
-def load_baza():
-    """Загружаем все .md файлы из baza/ перед тестами."""
+def load_baza(tmp_path_factory):
+    """Загружаем все .md файлы из baza/ в изолированное временное хранилище."""
+    import rag.vectorstore as vs_module
+
+    tmp_dir = tmp_path_factory.mktemp("chroma")
+    original_persist_dir = vs_module.PERSIST_DIR
+    original_instance = vs_module._vectorstore_instance
+
+    # Переключаемся на изолированную временную директорию
+    vs_module.PERSIST_DIR = str(tmp_dir)
+    vs_module._vectorstore_instance = None
+
     texts = [f.read_text(encoding="utf-8") for f in BAZA_DIR.glob("*.md")]
     assert texts, f"Не найдены .md файлы в {BAZA_DIR}"
     add_texts(texts)
+
+    yield
+
+    # Восстанавливаем оригинальное состояние
+    vs_module._vectorstore_instance = None
+    vs_module.PERSIST_DIR = original_persist_dir
 
 
 @pytest.mark.parametrize("question,keywords", KEYWORD_CASES)
