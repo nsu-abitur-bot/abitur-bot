@@ -79,14 +79,15 @@ async def cmd_track(message: Message):
     session_id = get_session_id(message)
 
     redis_client = await get_redis_client()
-    await redis_client.set_awaiting_snils(session_id, True)
+    await redis_client.set_awaiting_applicant_id(session_id, True)
 
     await bot.send_message(chat_id, "Укажите свой идентификатор абитуриента")
 
 
 @dp.message(Command("untrack"))
 async def cmd_untrack(message: Message):
-    """Обработчик /untrack: удаляем состояние сессии и идентификатор абитуриента из БД."""
+    """Обработчик /untrack: удаляем состояние сессии и идентификатор
+    абитуриента из БД."""
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
@@ -104,7 +105,7 @@ async def cmd_untrack(message: Message):
             )
 
     redis_client = await get_redis_client()
-    await redis_client.set_awaiting_snils(session_id, False)
+    await redis_client.set_awaiting_applicant_id(session_id, False)
     await bot.send_message(chat_id, "Отслеживание прекращено")
 
 
@@ -143,9 +144,9 @@ async def handle_message(message: Message):
     logger.info(f"Сообщение от {user_name} в чате {chat_id}: {user_text}")
 
     redis_client = await get_redis_client()
-    is_awaiting = await redis_client.is_awaiting_snils(session_id)
+    is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
 
-    # Если ожидали СНИЛС — сохраняем его
+    # Если ожидали идентификатор абитуриента — сохраняем его
     if is_awaiting:
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
@@ -156,7 +157,7 @@ async def handle_message(message: Message):
                 logger.info(
                     f"Идентификатор пользователя {user_id} обновлен в БД: {user_text}"
                 )
-                await redis_client.set_awaiting_snils(session_id, False)
+                await redis_client.set_awaiting_applicant_id(session_id, False)
                 await bot.send_message(chat_id, "Идентификатор записан")
             else:
                 logger.error(

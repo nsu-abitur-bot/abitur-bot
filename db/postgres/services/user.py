@@ -32,10 +32,12 @@ class UserService:
             return user
         except IntegrityError as e:
             await self.session.rollback()
-            logger.warning(
-                f"Пользователь {user_id} уже существует или "
-                f"applicant_id {applicant_id} занят: {e}"
+            conflict = (
+                f", applicant_id {applicant_id} занят"
+                if applicant_id is not None
+                else ""
             )
+            logger.warning(f"Пользователь {user_id} уже существует{conflict}: {e}")
             return None
         except Exception as e:
             await self.session.rollback()

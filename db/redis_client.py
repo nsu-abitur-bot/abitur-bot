@@ -79,28 +79,42 @@ class RedisClient:
             logger.error("Ошибка очистки истории для сессии %s: %s", session_id, e)
             raise
 
-    async def set_awaiting_snils(self, session_id: str, value: bool) -> None:
-        """Устанавливает флаг ожидания СНИЛС."""
-        key = f"session_state:{session_id}:awaiting_snils"
+    async def set_awaiting_applicant_id(self, session_id: str, value: bool) -> None:
+        """Устанавливает флаг ожидания идентификатора абитуриента."""
+        key = f"session_state:{session_id}:awaiting_applicant_id"
         try:
             if value:
                 await self.client.set(key, "1", ex=TTL_SECONDS)
             else:
                 await self.client.delete(key)
-            logger.debug("Установлен awaiting_snils=%s для %s", value, session_id)
+            logger.debug(
+                "Установлен awaiting_applicant_id=%s для %s", value, session_id
+            )
         except redis.RedisError as e:
-            logger.error("Ошибка установки awaiting_snils: %s", e)
+            logger.error("Ошибка установки awaiting_applicant_id: %s", e)
             raise
 
-    async def is_awaiting_snils(self, session_id: str) -> bool:
-        """Проверяет, ожидается ли СНИЛС."""
-        key = f"session_state:{session_id}:awaiting_snils"
+    async def is_awaiting_applicant_id(self, session_id: str) -> bool:
+        """Проверяет, ожидается ли идентификатор абитуриента."""
+        key = f"session_state:{session_id}:awaiting_applicant_id"
         try:
             val = await self.client.get(key)
             return val == "1"
         except redis.RedisError as e:
-            logger.error("Ошибка проверки awaiting_snils: %s", e)
+            logger.error("Ошибка проверки awaiting_applicant_id: %s", e)
             return False
+
+    # ------------------------------------------------------------------
+    # Устаревшие псевдонимы (deprecated)
+    # ------------------------------------------------------------------
+
+    async def set_awaiting_snils(self, session_id: str, value: bool) -> None:  # noqa: E501
+        """Deprecated: используйте set_awaiting_applicant_id."""
+        await self.set_awaiting_applicant_id(session_id, value)
+
+    async def is_awaiting_snils(self, session_id: str) -> bool:  # noqa: E501
+        """Deprecated: используйте is_awaiting_applicant_id."""
+        return await self.is_awaiting_applicant_id(session_id)
 
     async def close(self) -> None:
         """Закрывает соединение с Redis."""

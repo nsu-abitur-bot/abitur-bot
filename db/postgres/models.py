@@ -1,7 +1,15 @@
 from datetime import UTC, datetime
 from typing import List, Optional
 
-from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, Integer, String
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
 
@@ -30,6 +38,8 @@ class User(Base):
     ratings: Mapped[List["UserRating"]] = relationship(
         "UserRating", back_populates="user", cascade="all, delete-orphan"
     )
+
+    __table_args__ = (Index("idx_user_applicant_id", "applicant_id"),)
 
     def __repr__(self) -> str:
         return f"<User(user_id={self.user_id}, applicant_id='{self.applicant_id}')>"
