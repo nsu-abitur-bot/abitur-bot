@@ -29,6 +29,7 @@ dependencies = [
     "chonkie>=1.4.2",
     "psycopg2>=2.9.11",
     "langchain-gigachat>=0.3.12",
+    "cerebras-cloud-sdk>=1.54.0",
 ]
 
 [dependency-groups]

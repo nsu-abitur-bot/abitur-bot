@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -17,7 +17,11 @@ def reset_provider():
 # Мокаем классы, чтобы не делать реальных запросов и не требовать установки пакетов, если они опциональны  # noqa: E501
 @pytest.fixture(autouse=True)
 def mock_deps():
-    with patch("llm.providers.gigachat.GigaChat"):
+    with (
+        patch("llm.providers.gigachat.GigaChat"),
+        patch("llm.providers.cerebras._load_cerebras_class") as load_cerebras,
+    ):
+        load_cerebras.return_value = Mock()
         yield
 
 
@@ -46,6 +50,16 @@ def test_default_provider_is_gigachat(monkeypatch):
     provider = factory.get_llm_provider()
 
     assert type(provider).__name__ == "GigaChatProvider"
+
+
+def test_get_cerebras_provider(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "cerebras")
+    monkeypatch.setenv("CEREBRAS_API_KEY", "fake_key")
+
+    provider = factory.get_llm_provider()
+
+    assert type(provider).__name__ == "CerebrasProvider"
+    assert isinstance(provider, BaseLLMProvider)
 
 
 def test_singleton_behavior(monkeypatch):
