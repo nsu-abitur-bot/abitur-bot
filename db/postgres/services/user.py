@@ -32,12 +32,10 @@ class UserService:
             return user
         except IntegrityError as e:
             await self.session.rollback()
-            conflict = (
-                f", applicant_id {applicant_id} занят"
-                if applicant_id is not None
-                else ""
+            logger.warning(
+                f"Не удалось создать пользователя {user_id} из-за "
+                f"нарушения ограничения БД: {e}"
             )
-            logger.warning(f"Пользователь {user_id} уже существует{conflict}: {e}")
             return None
         except Exception as e:
             await self.session.rollback()
@@ -60,23 +58,26 @@ class UserService:
             logger.error(f"Ошибка получения пользователя {user_id}: {e}")
             return None
 
-    async def get_user_by_applicant_id(self, applicant_id: str) -> Optional[User]:
-        """Получить пользователя по идентификатору абитуриента."""
+    async def get_users_by_applicant_id(self, applicant_id: str) -> List[User]:
+        """Получить всех пользователей по идентификатору абитуриента.
+        
+        Возвращает список пользователей, т.к. несколько пользователей
+        могут быть подписаны на один applicant_id.
+        """
         try:
             result = await self.session.execute(
                 select(User).where(User.applicant_id == applicant_id)
             )
-            user = result.scalar_one_or_none()
-            if user:
-                logger.debug(f"Пользователь с applicant_id {applicant_id} найден")
-            else:
-                logger.debug(f"Пользователь с applicant_id {applicant_id} не найден")
-            return user
+            users = list(result.scalars().all())
+            logger.debug(
+                f"Найдено {len(users)} пользователей с applicant_id {applicant_id}"
+            )
+            return users
         except Exception as e:
             logger.error(
-                f"Ошибка получения пользователя по applicant_id {applicant_id}: {e}"
+                f"Ошибка получения пользователей по applicant_id {applicant_id}: {e}"
             )
-            return None
+            return []
 
     async def get_all_users(self) -> List[User]:
         """Получить всех пользователей."""
@@ -137,9 +138,11 @@ class UserService:
                 f"applicant_id пользователя {user_id} обновлен на {new_applicant_id}"
             )
             return True
-        except IntegrityError:
+        except IntegrityError as e:
             await self.session.rollback()
-            logger.warning(f"applicant_id {new_applicant_id} уже используется")
+            logger.warning(
+                f"Ошибка обновления applicant_id для пользователя {user_id}: {e}"
+            )
             return False
         except Exception as e:
             await self.session.rollback()

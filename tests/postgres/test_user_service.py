@@ -64,17 +64,22 @@ async def test_get_nonexistent_user(session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_get_user_by_applicant_id(session: AsyncSession):
-    """Тест получения пользователя по идентификатору абитуриента."""
+async def test_get_users_by_applicant_id(session: AsyncSession):
+    """Тест получения пользователей по идентификатору абитуриента.
+
+    Теперь несколько пользователей могут иметь один applicant_id.
+    """
     service = UserService(session)
 
-    # Создаём пользователя
+    # Создаём несколько пользователей с одним applicant_id
     await service.create_user(user_id=123456, applicant_id="1234567")
+    await service.create_user(user_id=789012, applicant_id="1234567")
 
-    # Получаем по applicant_id
-    user = await service.get_user_by_applicant_id(applicant_id="1234567")
-    assert user is not None
-    assert user.user_id == 123456
+    # Получаем всех пользователей с этим applicant_id
+    users = await service.get_users_by_applicant_id(applicant_id="1234567")
+    assert len(users) == 2
+    user_ids = {u.user_id for u in users}
+    assert user_ids == {123456, 789012}
 
 
 @pytest.mark.asyncio

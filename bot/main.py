@@ -152,6 +152,24 @@ async def handle_message(message: Message):
             user_service = UserService(session)
             user_id = message.from_user.id
 
+            # Валидация формата applicant_id (макс 7 символов)
+            if len(user_text) > 7:
+                await bot.send_message(
+                    chat_id,
+                    (
+                        "Идентификатор должен быть не длиннее 7 символов. "
+                        "Попробуйте еще раз."
+                    ),
+                )
+                return
+
+            if not user_text.strip():
+                await bot.send_message(
+                    chat_id,
+                    "Идентификатор не может быть пустым. Попробуйте еще раз.",
+                )
+                return
+
             updated = await user_service.update_applicant_id(user_id, user_text)
             if updated:
                 logger.info(
@@ -165,7 +183,10 @@ async def handle_message(message: Message):
                 )
                 await bot.send_message(
                     chat_id,
-                    "Ошибка при сохранении идентификатора.",
+                    (
+                        "Ошибка при сохранении идентификатора. "
+                        "Проверьте формат и попробуйте снова."
+                    ),
                 )
         return
 

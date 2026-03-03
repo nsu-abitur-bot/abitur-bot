@@ -4,7 +4,7 @@
 Новая логика (многопользовательская поддержка):
 - Один applicant_id может быть связан с несколькими пользователями
 - Для каждого пользователя с данным applicant_id создается/обновляется рейтинг
-- UniqueConstraint на applicant_id удалён, чтобы позволить несколько пользователей
+- Схема позволяет несколько пользователей с одним и тем же applicant_id
 """
 
 import pytest
@@ -68,7 +68,7 @@ async def test_creates_ratings_for_multiple_users_with_same_applicant_id(
     session: AsyncSession,
 ):
     """Если несколько пользователей имеют один applicant_id.
-    
+
     Создаются записи для всех.
     """
     user_service = UserService(session)

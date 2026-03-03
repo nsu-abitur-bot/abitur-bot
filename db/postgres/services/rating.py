@@ -218,7 +218,7 @@ class RatingService:
                     self._apply_entry_fields(user_rating, entry)
                     existing_ratings[user.user_id] = user_rating
                     stats["created"] += 1
-                    logger.info(
+                    logger.debug(
                         f"Создана запись рейтинга: user={user.user_id}, "
                         f"place={entry.place}, "
                         f"competition_type='{entry.competition_type}', "
@@ -228,7 +228,7 @@ class RatingService:
                     old_place = user_rating.place
                     self._apply_entry_fields(user_rating, entry)
                     stats["updated"] += 1
-                    logger.info(
+                    logger.debug(
                         f"Обновлена запись рейтинга: user={user.user_id}, "
                         f"{old_place} -> {entry.place}, "
                         f"competition_type='{entry.competition_type}', "
