@@ -966,5 +966,89 @@
     "create_time": 1772551121,
     "update_time": 1772551121,
     "_id": "hybrid:query:90a4299dff44054180d5bda27d8e8ddf"
+  },
+  "hybrid:keywords:cb22daa8bb7af83c7a41ddd02e026641": {
+    "return": "{\"high_level_keywords\": [\"\\u0414\\u043c\\u0438\\u0442\\u0440\\u0438\\u0439 \\u0418\\u0440\\u0442\\u0435\\u0433\\u043e\\u0432\"], \"low_level_keywords\": []}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Кто такой Дмитрий Иртегов?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772551244,
+    "update_time": 1772551244,
+    "_id": "hybrid:keywords:cb22daa8bb7af83c7a41ddd02e026641"
+  },
+  "hybrid:query:aa98d70ebcd3ed18e0370cd95e8a8767": {
+    "return": "### References\n```\n### References\n- [1] Институт интеллектуальной робототехники НГУ\n- [2] Клубы и кружки НГУ\n- [3] Гуманитарный институт НГУ\n- [4] Проживание и общежития (НГУ)\n- [5] Новосибирск государственный университет (НГУ)\n- [6] Факультет механико-математический (ММФ) НГУ\n- [7] Студенческое движение\n```\n\nIt appears that the provided context does not contain any direct information about \"Дмитрий Иртегов\". Therefore, I cannot provide details regarding this individual based on the given information. \n\nIf there is additional context or documents that could help identify who he is, please share them.",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Кто такой Дмитрий Иртегов?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "Дмитрий Иртегов",
+      "ll_keywords": "",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772551270,
+    "update_time": 1772551270,
+    "_id": "hybrid:query:aa98d70ebcd3ed18e0370cd95e8a8767"
+  },
+  "hybrid:keywords:6ef4119d30e4a149d8124ad309f6cb47": {
+    "return": "{\"high_level_keywords\": [\"\\u0415\\u0413\\u042d\", \"\\u041c\\u0430\\u0442\\u0435\\u043c\\u0430\\u0442\\u0438\\u0447\\u0435\\u0441\\u043a\\u0438\\u0439 \\u0444\\u0430\\u043a\\u0443\\u043b\\u044c\\u0442\\u0435\\u0442 (\\u041c\\u041c\\u0424)\", \"\\u0424\\u0430\\u043a\\u0443\\u043b\\u044c\\u0442\\u0435\\u0442 \\u0438\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u043e\\u043d\\u043d\\u044b\\u0445 \\u0442\\u0435\\u0445\\u043d\\u043e\\u043b\\u043e\\u0433\\u0438\\u0439 (\\u0424\\u0418\\u0422)\"], \"low_level_keywords\": [\"\\u041f\\u0440\\u0435\\u0434\\u043c\\u0435\\u0442\\u044b \\u0415\\u0413\\u042d\", \"\\u041c\\u0430\\u0442\\u0435\\u043c\\u0430\\u0442\\u0438\\u043a\\u0430 \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044c\\u043d\\u0430\\u044f\", \"\\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439 \\u044f\\u0437\\u044b\\u043a\", \"\\u0418\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0442\\u0438\\u043a\\u0430\", \"\\u0424\\u0438\\u0437\\u0438\\u043a\\u0430\"]}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Сравни какие предметы на ЕГЭ нужны для ММФ и ФИТ\n\nВерни ответ в Telegram-совместимом HTML без Markdown. Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href=\"...\">.",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772552573,
+    "update_time": 1772552573,
+    "_id": "hybrid:keywords:6ef4119d30e4a149d8124ad309f6cb47"
+  },
+  "hybrid:query:ccddf6ae9d876484e8cbfc47ea63ed2d": {
+    "return": "<b>Предметы на ЕГЭ для Механико-Математического Факультета (ММФ)</b>\n\n- Обязательные экзамены: русский язык, математика (профильная)\n- Дополнительный экзамен (по выбору): информатика/ИКТ или физика\n\n<b>Предметы на ЕГЭ для Факультета Информационных Технологий (ФИТ)</b>\n\n- Обязательные экзамены: русский язык, математика (профильная)\n- Третий предмет: физика или информатика/ИКТ (в зависимости от выбранного профиля)\n\nТаким образом, оба факультета требуют русский язык и математику (профильную) на ЕГЭ. Однако третий экзамен различается: для ММФ это может быть физика или информатика/ИКТ, тогда как для ФИТ необходимо выбрать либо физику, либо информатика/ИКТ.\n\n### References\n- [1] Document Chunk with reference_id \"\"\n- [2] Document Chunk with reference_id \"\"",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Сравни какие предметы на ЕГЭ нужны для ММФ и ФИТ\n\nВерни ответ в Telegram-совместимом HTML без Markdown. Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href=\"...\">.",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "ЕГЭ, Математический факультет (ММФ), Факультет информационных технологий (ФИТ)",
+      "ll_keywords": "Предметы ЕГЭ, Математика профильная, Русский язык, Информатика, Физика",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772552581,
+    "update_time": 1772552581,
+    "_id": "hybrid:query:ccddf6ae9d876484e8cbfc47ea63ed2d"
   }
 }

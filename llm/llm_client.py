@@ -1,6 +1,7 @@
 import logging
 import re
 from contextlib import suppress
+from html import escape
 from typing import Optional
 
 from dotenv import load_dotenv
@@ -19,6 +20,10 @@ SYSTEM_PROMPT_BASE = """
 отвечай только на вопросы связанные с университетом и поступлением.
 Отвечай коротко, долго не думай.
 
+Форматируй ответ в HTML для Telegram.
+Разрешены только теги: <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.
+Не используй Markdown.
+
 Используй следующую информацию из базы знаний для ответа на вопрос пользователя:
 
 {context}
@@ -27,8 +32,61 @@ SYSTEM_PROMPT_BASE = """
 и честно укажи, что данных мало.
 """
 
+LIGHTRAG_FORMAT_HINT = (
+    "Верни ответ в Telegram-совместимом HTML без Markdown. "
+    'Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.'
+)
+
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
+
+
+def _sanitize_telegram_html(text: str) -> str:
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+    text = re.sub(r"</p>\s*<p>", "\n\n", text, flags=re.IGNORECASE)
+    text = re.sub(r"</?p>", "", text, flags=re.IGNORECASE)
+    text = re.sub(
+        r"</?strong>",
+        lambda m: "</b>" if m.group(0).startswith("</") else "<b>",
+        text,
+        flags=re.IGNORECASE,
+    )
+    text = re.sub(
+        r"</?em>",
+        lambda m: "</i>" if m.group(0).startswith("</") else "<i>",
+        text,
+        flags=re.IGNORECASE,
+    )
+
+    allowed_simple = {"b", "i", "u", "s", "code", "pre"}
+
+    def replace_tag(match: re.Match[str]) -> str:
+        raw_tag = match.group(0)
+        tag = raw_tag.strip("<>").strip()
+        is_closing = tag.startswith("/")
+        tag_body = tag[1:].strip() if is_closing else tag
+        tag_name = tag_body.split()[0].lower() if tag_body else ""
+
+        if tag_name in allowed_simple:
+            return f"</{tag_name}>" if is_closing else f"<{tag_name}>"
+
+        if tag_name == "a":
+            if is_closing:
+                return "</a>"
+            href_match = re.search(
+                r"href\s*=\s*[\"\']([^\"\']+)[\"\']",
+                tag_body,
+                flags=re.IGNORECASE,
+            )
+            if href_match:
+                href = escape(href_match.group(1), quote=True)
+                return f'<a href="{href}">'
+            return ""
+
+        return ""
+
+    text = re.sub(r"<[^>]+>", replace_tag, text)
+    return text.strip()
 
 
 async def get_redis_client() -> RedisClient:
@@ -55,7 +113,8 @@ async def ask_local_llm(message: str, session_id: str) -> str:
 
         # 2. Получаем контекст из LightRAG
         try:
-            rag_context = await query_graph(message)
+            rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
+            rag_context = await query_graph(rag_query)
             if not rag_context or rag_context.startswith("Error executing query"):
                 rag_context = "Релевантный контекст из базы знаний не найден."
         except Exception as e:
@@ -83,6 +142,7 @@ async def ask_local_llm(message: str, session_id: str) -> str:
 
             # Удаляем блоки <think>...</think>
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
+            content = _sanitize_telegram_html(content)
 
             if not content:
                 content = "Ответ не найден"
