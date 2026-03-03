@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 import asyncio
 import logging
 from os import getenv
@@ -67,7 +68,11 @@ async def cmd_start(message: Message):
         else:
             logger.info(f"Пользователь {user_id} уже существует в БД")
 
-    await bot.send_message(chat_id, "Привет! Используйте /track, /untrack и /reset")
+    await bot.send_message(
+        chat_id,
+        "Привет! Используйте /track, /untrack и /reset",
+        parse_mode=ParseMode.MARKDOWN,
+    )
 
 
 @dp.message(Command("track"))
@@ -167,7 +172,7 @@ async def handle_message(message: Message):
     response = await ask_local_llm(formatted_message, session_id=session_id)
 
     if response:
-        await bot.send_message(chat_id, response)
+        await bot.send_message(chat_id, response, parse_mode=ParseMode.HTML)
 
 
 async def main():

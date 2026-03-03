@@ -14,7 +14,6 @@ import pytest
 from rag.loader import add_texts
 from rag.retriever import search_similar
 
-
 BAZA_DIR = Path(__file__).parent.parent.parent / "baza"
 
 

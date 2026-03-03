@@ -1,0 +1,1094 @@
+{
+  "doc-688c0fd847257d42c90181b4478949e1": {
+    "relation_pairs": [
+      [
+        "Chemistry",
+        "Entrance Exams"
+      ],
+      [
+        "Pass Rates",
+        "Tabiturient"
+      ],
+      [
+        "Geochemistry",
+        "Geology"
+      ],
+      [
+        "Geology",
+        "Geophysics"
+      ],
+      [
+        "Entrance Exams",
+        "Russian Language"
+      ],
+      [
+        "Entrance Exams",
+        "Math"
+      ],
+      [
+        "Geology",
+        "Petroleum and Gas"
+      ],
+      [
+        "Education Curriculum",
+        "Educational Program"
+      ],
+      [
+        "Geology",
+        "Natural Sciences"
+      ],
+      [
+        "Entrance Exams",
+        "Physics"
+      ],
+      [
+        "Entrance Exams",
+        "Informatics"
+      ],
+      [
+        "Entrance Exams",
+        "Geography"
+      ]
+    ],
+    "count": 12,
+    "create_time": 1766314365,
+    "update_time": 1766314365,
+    "_id": "doc-688c0fd847257d42c90181b4478949e1"
+  },
+  "doc-53eba8718e75c17146513afba80eb7ee": {
+    "relation_pairs": [
+      [
+        "Novosibirsk State University",
+        "Volunteerism"
+      ],
+      [
+        "Future Professional NSU",
+        "economic faculty of NGU"
+      ],
+      [
+        "Stуденческое движение",
+        "«Синтез»"
+      ],
+      [
+        "RSB",
+        "«Sintez» Brigade"
+      ],
+      [
+        "Stуденческое движение",
+        "«Синергия»"
+      ],
+      [
+        "Novosibirsk State University",
+        "Startup Studio"
+      ],
+      [
+        "RSB",
+        "«Sinergiya» Brigade"
+      ],
+      [
+        "Club «Geya»",
+        "Club «Kvant»"
+      ],
+      [
+        "SMBA (Student to Master of Business Administration)",
+        "economic faculty of NGU"
+      ],
+      [
+        "Novosibirsk State University",
+        "Student Movements"
+      ],
+      [
+        "Novosibirsk State University",
+        "Scientific Picnic"
+      ],
+      [
+        "дух студенчества",
+        "интеллектуальная свобода"
+      ],
+      [
+        "Financial Club NSU",
+        "economic faculty of NGU"
+      ],
+      [
+        "Club «Kvant»",
+        "Leonid Shles"
+      ],
+      [
+        "International Students Club",
+        "Novosibirsk State University"
+      ],
+      [
+        "Stуденческое движение",
+        "Штаб студенческих отрядов НГУ"
+      ],
+      [
+        "Intellectual Freedom",
+        "Novosibirsk State University"
+      ],
+      [
+        "Novosibirsk State University",
+        "Self-Organization"
+      ],
+      [
+        "Case Club NSU",
+        "economic faculty of NGU"
+      ],
+      [
+        "Club «Kvant»",
+        "RSB"
+      ],
+      [
+        "Future Professional NSU",
+        "Novosibirsk State University"
+      ],
+      [
+        "Novosibirsk State University",
+        "Public Discussions"
+      ],
+      [
+        "Stуденческое движение",
+        "«Золотое Сечение» им. Б.В. Войцеховского"
+      ],
+      [
+        "дух студенчества",
+        "стремление к самоорганизации"
+      ]
+    ],
+    "count": 24,
+    "create_time": 1766314587,
+    "update_time": 1766314587,
+    "_id": "doc-53eba8718e75c17146513afba80eb7ee"
+  },
+  "doc-bd2f568b9e1af22816c86ec4eb6770a6": {
+    "relation_pairs": [
+      [
+        "Hostel 1B",
+        "future conversion"
+      ],
+      [
+        "Kitchen Blocks",
+        "Living Rooms"
+      ],
+      [
+        "Identity Document",
+        "registration"
+      ],
+      [
+        "Laundry Room",
+        "dormitory"
+      ],
+      [
+        "Sanuzla",
+        "hostel"
+      ],
+      [
+        "Living Rooms",
+        "Two-Bedroom Rooms"
+      ],
+      [
+        "Innogorodnie Students",
+        "dormitory"
+      ],
+      [
+        "Living Rooms",
+        "University Hostels"
+      ],
+      [
+        "Living Rooms",
+        "Shared Bathrooms"
+      ],
+      [
+        "Storage Area",
+        "dormitory"
+      ],
+      [
+        "University Cafeteria",
+        "cafeteria"
+      ],
+      [
+        "Hostel 1A",
+        "future conversion"
+      ],
+      [
+        "Kitchen",
+        "block"
+      ],
+      [
+        "Common Zones",
+        "hostel"
+      ],
+      [
+        "Academic City",
+        "University Hostels"
+      ],
+      [
+        "Academic City",
+        "NSU"
+      ],
+      [
+        "Campus",
+        "Internet"
+      ],
+      [
+        "Campus",
+        "University Hostels"
+      ],
+      [
+        "Contract Rent Agreement",
+        "student"
+      ],
+      [
+        "Academic City Campus",
+        "hostel"
+      ],
+      [
+        "First-year Students",
+        "dormitory"
+      ]
+    ],
+    "count": 21,
+    "create_time": 1766314724,
+    "update_time": 1766314724,
+    "_id": "doc-bd2f568b9e1af22816c86ec4eb6770a6"
+  },
+  "doc-31701c0391c5c80fb014bf4ec2c31618": {
+    "relation_pairs": [
+      [
+        "Биология",
+        "Лечебное дело"
+      ],
+      [
+        "Клиническая психология",
+        "Русский язык"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "NSU"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "Tabiturient"
+      ],
+      [
+        "Обществознание",
+        "Организационная психология"
+      ],
+      [
+        "clinical practice",
+        "organizational models"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "Medicine"
+      ],
+      [
+        "clinical practice",
+        "organizational model"
+      ],
+      [
+        "organizational models",
+        "psychical health research"
+      ],
+      [
+        "Организационная психология",
+        "Русский язык"
+      ],
+      [
+        "organizational model",
+        "psychical health research"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "Клиническая психология"
+      ],
+      [
+        "Лечебное дело",
+        "Химия"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "Организационная психология"
+      ],
+      [
+        "Биология",
+        "Клиническая психология"
+      ],
+      [
+        "clinical practice",
+        "psychical health research"
+      ],
+      [
+        "Биология",
+        "Организационная психология"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "Leчебное дело"
+      ],
+      [
+        "Клиническая психология",
+        "Обществознание"
+      ],
+      [
+        "Leчебное дело",
+        "Русский язык"
+      ],
+      [
+        "Institute of Medicine and Psychology named after V. Zelman (IMPZ)",
+        "Psychology"
+      ]
+    ],
+    "count": 21,
+    "create_time": 1766314865,
+    "update_time": 1766314865,
+    "_id": "doc-31701c0391c5c80fb014bf4ec2c31618"
+  },
+  "doc-5b89994a7ab8748ecce9a8e321f19f62": {
+    "relation_pairs": [
+      [
+        "Mathematics",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "Mechanico-Mathematical Faculty",
+        "Russian Language"
+      ],
+      [
+        "Mechanics and Mathematical Modeling",
+        "budget admission"
+      ],
+      [
+        "Artificial Intelligence",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "Mechanico-Mathematical Faculty",
+        "Physics"
+      ],
+      [
+        "Mathematical Modelling",
+        "professionals"
+      ],
+      [
+        "IT",
+        "modeling"
+      ],
+      [
+        "Mathematical Modeling",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "Informatika/ICT",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "Fundamental Mathematics Research Group",
+        "students"
+      ],
+      [
+        "Akademgorodok",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "First Two Years",
+        "curriculum"
+      ],
+      [
+        "Computer Science and Information Technology",
+        "professionals"
+      ],
+      [
+        "Mathematics (professional)",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "Applied Engineering",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "Systems Engineering",
+        "professionals"
+      ],
+      [
+        "Physics",
+        "university entrance exam"
+      ],
+      [
+        "Informatics",
+        "Mechanico-Mathematical Faculty"
+      ],
+      [
+        "ICT",
+        "university entrance exam"
+      ],
+      [
+        "Mechanico-Mathematical Faculty",
+        "Mechanics"
+      ],
+      [
+        "Russian Language",
+        "university entrance exam"
+      ]
+    ],
+    "count": 21,
+    "create_time": 1766315249,
+    "update_time": 1766315249,
+    "_id": "doc-5b89994a7ab8748ecce9a8e321f19f62"
+  },
+  "doc-ab554c1a0b9a187935a1265714dcc638": {
+    "relation_pairs": [
+      [
+        "Faculty",
+        "High Salary Ranking"
+      ],
+      [
+        "Faculty",
+        "International Programs"
+      ],
+      [
+        "Faculty of Informatics and Computing Science",
+        "Russian Language"
+      ],
+      [
+        "09.03.01 «Informatics and Computer Engineering»",
+        "Bachelor's Degree Program"
+      ],
+      [
+        "Bachelor's Degree",
+        "Programmatic Engineering and Computer Science"
+      ],
+      [
+        "09.03.01 «Informatics and Computer Engineering»",
+        "«Computer Sciences and System Engineering» profile"
+      ],
+      [
+        "Faculty of Informatics and Computing Science",
+        "Mathematics (Advanced)"
+      ],
+      [
+        "09.03.01 «Informatics and Computer Engineering»",
+        "Faculty of Informatics and Computing Science"
+      ],
+      [
+        "09.03.01 «Informatics and Computer Engineering»",
+        "«Software Engineering and Computer Sciences» profile"
+      ],
+      [
+        "Faculty of Informatics and Computing Science",
+        "Physics or Information Technology and Communications (ICT)"
+      ],
+      [
+        "Faculty",
+        "IT Companies"
+      ],
+      [
+        "Academic City",
+        "Science Institutes"
+      ]
+    ],
+    "count": 12,
+    "create_time": 1766317000,
+    "update_time": 1766317000,
+    "_id": "doc-ab554c1a0b9a187935a1265714dcc638"
+  },
+  "doc-3d39e2340d46fb1483cba2f664490c81": {
+    "relation_pairs": [
+      [
+        "Economic Faculty NSU",
+        "Mathematics"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Foreign Language"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Programming"
+      ],
+      [
+        "Budget Places",
+        "Economic Faculty NSU"
+      ],
+      [
+        "Bachelor's Degree Program Economics",
+        "Economic Faculty NSU"
+      ],
+      [
+        "stages of study",
+        "students"
+      ],
+      [
+        "000 рублей",
+        "budgetary places"
+      ],
+      [
+        "faculty",
+        "practical experts"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Statistics"
+      ],
+      [
+        "entrance exams",
+        "foreign languages"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Sociology"
+      ],
+      [
+        "analytical skills",
+        "students"
+      ],
+      [
+        "programming",
+        "students"
+      ],
+      [
+        "Economic Faculty NSU",
+        "State Funding"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Russian Language"
+      ],
+      [
+        "entrance exams",
+        "sociology or history"
+      ],
+      [
+        "mathematical courses",
+        "students"
+      ],
+      [
+        "economic data",
+        "students"
+      ],
+      [
+        "graduates",
+        "modelists"
+      ],
+      [
+        "economic modeling",
+        "faculty"
+      ],
+      [
+        "statistics",
+        "students"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Paid Places"
+      ],
+      [
+        "Economic Faculty NSU",
+        "Master's Degree Programs"
+      ],
+      [
+        "Russian language",
+        "entrance exams"
+      ],
+      [
+        "financial companies",
+        "graduates"
+      ],
+      [
+        "Economic Faculty NSU",
+        "History"
+      ],
+      [
+        "consultants",
+        "graduates"
+      ],
+      [
+        "entrance exams",
+        "math"
+      ],
+      [
+        "business analysts",
+        "graduates"
+      ]
+    ],
+    "count": 29,
+    "create_time": 1766317534,
+    "update_time": 1766317534,
+    "_id": "doc-3d39e2340d46fb1483cba2f664490c81"
+  },
+  "doc-db2e55d178159415215bcd4904b8b2ce": {
+    "relation_pairs": [
+      [
+        "Entrance Exams",
+        "Russian Language"
+      ],
+      [
+        "Ethics",
+        "Philosophy"
+      ],
+      [
+        "law",
+        "research projects"
+      ],
+      [
+        "foundation preparation",
+        "legal program"
+      ],
+      [
+        "ethics",
+        "research projects"
+      ],
+      [
+        "Arbitration Skills",
+        "Jurisprudence"
+      ],
+      [
+        "legal program",
+        "practical legal skills"
+      ],
+      [
+        "Institute of Philosophy and Law NSU",
+        "Tabiturient"
+      ],
+      [
+        "Entrance Exams",
+        "History"
+      ],
+      [
+        "modern concepts",
+        "philosophical texts"
+      ],
+      [
+        "Philosophy",
+        "Societal Philosophy"
+      ],
+      [
+        "Institute of Philosophy and Law NSU",
+        "Philosophy"
+      ],
+      [
+        "Critical Analysis",
+        "Philosophy"
+      ],
+      [
+        "philosophy",
+        "research projects"
+      ],
+      [
+        "fundamental preparation",
+        "practical legal skills"
+      ],
+      [
+        "international exchange programs",
+        "research projects"
+      ],
+      [
+        "Entrance Exams",
+        "Informatics/ICT"
+      ],
+      [
+        "Philosophy",
+        "Theory of Knowledge"
+      ],
+      [
+        "Institute of Philosophy and Law NSU",
+        "Jurisprudence"
+      ],
+      [
+        "Philosophy",
+        "Social Philosophy"
+      ]
+    ],
+    "count": 20,
+    "create_time": 1766317734,
+    "update_time": 1766317734,
+    "_id": "doc-db2e55d178159415215bcd4904b8b2ce"
+  },
+  "doc-00e2123d531f62b9a37e343676f875d1": {
+    "relation_pairs": [
+      [
+        "Chemistry",
+        "Faculty of Natural Sciences"
+      ],
+      [
+        "Scientific Research Centers",
+        "Work Opportunities"
+      ],
+      [
+        "Faculty of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Biotechnology",
+        "Faculty of Natural Sciences"
+      ],
+      [
+        "Pharmaceutical Industry",
+        "Work Opportunities"
+      ],
+      [
+        "Ecology",
+        "Faculty of Natural Sciences"
+      ],
+      [
+        "High-Tech Manufacturing",
+        "Work Opportunities"
+      ],
+      [
+        "Biology",
+        "Faculty of Natural Sciences"
+      ],
+      [
+        "Laboratories",
+        "Work Opportunities"
+      ],
+      [
+        "Environmental Monitoring",
+        "Work Opportunities"
+      ],
+      [
+        "Faculty of Natural Sciences",
+        "Molecular Biology"
+      ],
+      [
+        "Faculty of Natural Sciences",
+        "Nanomaterials"
+      ],
+      [
+        "Education Sector",
+        "Work Opportunities"
+      ],
+      [
+        "Biotechnological Companies",
+        "Work Opportunities"
+      ]
+    ],
+    "count": 14,
+    "create_time": 1766317836,
+    "update_time": 1766317836,
+    "_id": "doc-00e2123d531f62b9a37e343676f875d1"
+  },
+  "doc-be8d967796b76307acdd17f303876039": {
+    "relation_pairs": [
+      [
+        "Employment Opportunities",
+        "Scientific Laboratories"
+      ],
+      [
+        "artificial intelligence",
+        "research and development"
+      ],
+      [
+        "Employment Opportunities",
+        "High Technology Industry"
+      ],
+      [
+        "good job prospects",
+        "scientific laboratories"
+      ],
+      [
+        "Passing Scores",
+        "Tabiturient"
+      ],
+      [
+        "Entrance Exams",
+        "Russian Language"
+      ],
+      [
+        "Entrance Exams",
+        "Mathematics"
+      ],
+      [
+        "Startup Participation",
+        "Startups"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Institute of Intelligent Robotics NSU"
+      ],
+      [
+        "ai research",
+        "university projects"
+      ],
+      [
+        "ai research",
+        "startups"
+      ],
+      [
+        "good job prospects",
+        "high-tech industries"
+      ],
+      [
+        "Institute of Intelligent Robotics NSU",
+        "Mechatronics and Robotics AI Bachelor's Program"
+      ],
+      [
+        "AI Research",
+        "Artificial Intelligence Research"
+      ],
+      [
+        "University Involvement",
+        "University Projects"
+      ],
+      [
+        "Employment Opportunities",
+        "Robotics Industry"
+      ],
+      [
+        "Entrance Exams",
+        "Physics or Informatics/ICT"
+      ]
+    ],
+    "count": 17,
+    "create_time": 1766317957,
+    "update_time": 1766317957,
+    "_id": "doc-be8d967796b76307acdd17f303876039"
+  },
+  "doc-c57b2d1adad253702d08e357c8a89810": {
+    "relation_pairs": [
+      [
+        "Academic City",
+        "Physical Faculty"
+      ],
+      [
+        "Job Prospects",
+        "Physical Modeling Skills"
+      ],
+      [
+        "Graduates",
+        "Instrument Manufacturing"
+      ],
+      [
+        "Institutional Facilities",
+        "Laboratory Practice"
+      ],
+      [
+        "Master's Degree Program",
+        "Physical Faculty"
+      ],
+      [
+        "Graduates",
+        "Information Technology Field"
+      ],
+      [
+        "Graduates",
+        "Research Laboratories"
+      ],
+      [
+        "Graduates",
+        "Optoelectronics Industry"
+      ],
+      [
+        "Novosibirsk State University",
+        "Physical Faculty"
+      ],
+      [
+        "Physical Faculty",
+        "Research Component"
+      ],
+      [
+        "Entrance Requirements",
+        "Physical Faculty"
+      ],
+      [
+        "Energy Sector",
+        "Graduates"
+      ],
+      [
+        "Analytical Departments",
+        "Graduates"
+      ],
+      [
+        "Bachelor's Degree Program",
+        "Physical Faculty"
+      ],
+      [
+        "Researcher Training",
+        "Siberian Branch of Russian Academy of Sciences"
+      ],
+      [
+        "Graduates",
+        "Science Organizations"
+      ],
+      [
+        "Physical Faculty",
+        "Russian Federal Subject Novosibirsk Oblast"
+      ],
+      [
+        "Aerospace Industry",
+        "Graduates"
+      ]
+    ],
+    "count": 18,
+    "create_time": 1766318087,
+    "update_time": 1766318087,
+    "_id": "doc-c57b2d1adad253702d08e357c8a89810"
+  },
+  "doc-16eabb1868f968b4c0bcaf47849bf268": {
+    "relation_pairs": [
+      [
+        "Economic Faculty",
+        "Novosibirsk State University"
+      ],
+      [
+        "Intelligent Robotics Institute",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty of Information Technology",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institute of Intelligent Robotics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Novosibirsk State University",
+        "Philosophy and Law Institute"
+      ],
+      [
+        "Novosibirsk State University",
+        "Physical Faculty"
+      ],
+      [
+        "Humanities Institute",
+        "Novosibirsk State University"
+      ],
+      [
+        "Novosibirsk State University",
+        "V. Zelman Philosophy and Psychology Institute"
+      ],
+      [
+        "Novosibirsk State University",
+        "S. L. Sobolev"
+      ],
+      [
+        "Geology and Geophysics Faculty",
+        "Novosibirsk State University"
+      ],
+      [
+        "I. N. Vekua",
+        "Novosibirsk State University"
+      ],
+      [
+        "M. A. Lavrentiev",
+        "Novosibirsk State University"
+      ],
+      [
+        "Mechanico-Mathematical Faculty",
+        "Novosibirsk State University"
+      ],
+      [
+        "Novosibirsk State University",
+        "V. Zelman Institute of Medicine and Psychology"
+      ]
+    ],
+    "count": 15,
+    "create_time": 1766318298,
+    "update_time": 1766318298,
+    "_id": "doc-16eabb1868f968b4c0bcaf47849bf268"
+  },
+  "doc-33f1967fb39b26fe26a7a2ecabc46492": {
+    "relation_pairs": [
+      [
+        "Conferences",
+        "Research"
+      ],
+      [
+        "Humanitarian Institute NSU",
+        "Journalism and Modern Media Technology"
+      ],
+      [
+        "History",
+        "Humanitarian Institute NSU"
+      ],
+      [
+        "Fundamental and Applied Linguistics",
+        "Humanitarian Institute NSU"
+      ],
+      [
+        "Internal Forms of Entrance Examinations",
+        "Journalism"
+      ],
+      [
+        "cognitive science",
+        "linguistics"
+      ],
+      [
+        "History",
+        "History Entrance Exam"
+      ],
+      [
+        "conference",
+        "students"
+      ],
+      [
+        "creative contest",
+        "journalism"
+      ],
+      [
+        "linguistics",
+        "mathematics"
+      ],
+      [
+        "Eastern Studies and African Studies",
+        "Humanitarian Institute NSU"
+      ],
+      [
+        "Linguistics",
+        "Linguistics Entrance Exam"
+      ],
+      [
+        "Projects",
+        "Research"
+      ],
+      [
+        "Journalism",
+        "Journalism Entrance Exam"
+      ],
+      [
+        "research",
+        "students"
+      ],
+      [
+        "informatics",
+        "linguistics"
+      ],
+      [
+        "Interdisciplinary Programs",
+        "Linguistics"
+      ],
+      [
+        "Humanitarian Institute NSU",
+        "Philology"
+      ],
+      [
+        "Interdisciplinary Programs",
+        "Mathematics/Informatics"
+      ],
+      [
+        "project",
+        "students"
+      ],
+      [
+        "Cognitive Science",
+        "Interdisciplinary Programs"
+      ],
+      [
+        "informatics",
+        "mathematics"
+      ],
+      [
+        "Humanitarian Institute NSU",
+        "Tabiturient"
+      ]
+    ],
+    "count": 23,
+    "create_time": 1766318623,
+    "update_time": 1766318623,
+    "_id": "doc-33f1967fb39b26fe26a7a2ecabc46492"
+  }
+}

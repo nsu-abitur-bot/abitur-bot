@@ -1,28 +1,18 @@
-"""Модуль для чтения markdown файлов из папки baza и сохранения данных в ChromaDB."""
+"""
+Модуль для чтения markdown файлов из папки baza и сохранения данных в графовую память.
+"""
 
 import logging
 from pathlib import Path
 
 from rag.loader import add_texts
-from rag.vectorstore import get_vectorstore
 
 logger = logging.getLogger(__name__)
 
 
-def parse_baza_and_save_to_vectorstore():
-    """Читает все .md файлы из папки baza и сохраняет данные в ChromaDB."""
+def parse_baza_and_save_to_memory():
+    """Читает все .md файлы из папки baza и сохраняет данные в графовую память."""
     logger.info("Начало обработки файлов из папки baza...")
-
-    # Проверяем, есть ли уже данные в векторной базе
-    vectorstore = get_vectorstore()
-    collection = vectorstore._collection
-    existing_count = collection.count()
-
-    if existing_count > 0:
-        logger.info(
-            f"В векторной базе уже есть {existing_count} документов. Пропускаем загрузку из baza/"
-        )
-        return
 
     # Определяем путь к папке baza относительно корня проекта
     # Предполагаем, что скрипт находится в parser/
@@ -61,13 +51,13 @@ def parse_baza_and_save_to_vectorstore():
             continue
 
     if all_texts:
-        logger.info(f"Сохранение {len(all_texts)} документов в ChromaDB...")
+        logger.info(f"Сохранение {len(all_texts)} документов в графовую память...")
         try:
             add_texts(all_texts)
-            logger.info("✓ Данные из baza успешно сохранены в векторную базу данных")
+            logger.info("✓ Данные из baza успешно сохранены в графовую память")
         except Exception as e:
-            logger.error(f"Ошибка при сохранении в ChromaDB: {e}")
+            logger.error(f"Ошибка при сохранении в графовую память: {e}")
     else:
-        logger.warning("Нет данных из baza для сохранения в ChromaDB")
+        logger.warning("Нет данных из baza для сохранения")
 
     logger.info("Обработка baza завершена")
