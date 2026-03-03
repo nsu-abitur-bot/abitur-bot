@@ -10,6 +10,7 @@ FAQ Matcher — модуль для поиска готовых ответов �
 """
 
 import logging
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -20,9 +21,47 @@ from sentence_transformers import SentenceTransformer
 logger = logging.getLogger(__name__)
 
 # Порог косинусного сходства для срабатывания FAQ.
-# 0.85 — достаточно строгий, чтобы не давать ложных срабатываний,
-# но и достаточно мягкий для перефразированных вопросов.
-SIMILARITY_THRESHOLD = 0.85
+# 0.75 — баланс между ложными срабатываниями и пропуском
+# перефразированных вопросов.
+SIMILARITY_THRESHOLD = 0.75
+
+# Слова-паразиты / приветствия, которые не несут смысловой нагрузки
+# и мешают семантическому сопоставлению с FAQ.
+_FILLER_WORDS = [
+    "привет", "здравствуйте", "здравствуй", "добрый день",
+    "добрый вечер", "доброе утро", "хай", "хей", "hello", "hi",
+    "подскажи", "подскажите", "скажи", "скажите",
+    "расскажи", "расскажите", "ответь", "ответьте",
+    "пожалуйста", "плз", "плиз",
+    "а ", "ну ", "так ", "вот ",
+]
+
+# Паттерн для удаления префикса [from username]
+_FROM_PREFIX_RE = re.compile(r"^\[from\s+[^\]]*\]\s*", re.IGNORECASE)
+
+
+def clean_user_input(text: str) -> str:
+    """Очищает пользовательский ввод от мусора для FAQ-сопоставления.
+
+    Удаляет:
+      - Префикс [from username]
+      - Приветствия и слова-паразиты
+      - Лишние пробелы и пунктуацию в начале
+    """
+    # Убираем [from ...]
+    text = _FROM_PREFIX_RE.sub("", text)
+
+    # Убираем приветствия / филлеры (без учёта регистра)
+    lower = text.lower()
+    for filler in _FILLER_WORDS:
+        if lower.startswith(filler):
+            text = text[len(filler):]
+            lower = text.lower()
+
+    # Убираем ведущие запятые, точки, пробелы
+    text = text.lstrip(" ,.:;!?-—")
+
+    return text.strip()
 
 # Путь к файлу с FAQ-данными
 FAQ_DATA_PATH = Path(__file__).parent / "faq_data.yaml"
@@ -116,8 +155,12 @@ class FAQMatcher:
         """
         Проверяет, подходит ли пользовательский вопрос под один из FAQ.
 
+        Перед сопоставлением очищает текст от приветствий, префикса
+        [from username] и слов-паразитов.
+
         Args:
-            user_question: Текст вопроса пользователя.
+            user_question: Текст вопроса пользователя (может содержать
+                           префикс [from ...], приветствия и т.д.).
 
         Returns:
             Готовый ответ, если сходство >= порога, иначе None.
@@ -125,9 +168,16 @@ class FAQMatcher:
         if self._embeddings is None or len(self._questions) == 0:
             return None
 
-        # Вычисляем embedding вопроса пользователя
+        # Очищаем вопрос от мусора
+        cleaned = clean_user_input(user_question)
+        if not cleaned:
+            return None
+
+        logger.debug(f"FAQ input cleaned: '{user_question}' → '{cleaned}'")
+
+        # Вычисляем embedding очищенного вопроса
         query_embedding = self._model.encode(
-            user_question, normalize_embeddings=True
+            cleaned, normalize_embeddings=True
         )
 
         # Косинусное сходство со всеми FAQ-фразами
@@ -143,7 +193,7 @@ class FAQMatcher:
 
         if best_score >= self._threshold:
             logger.info(
-                f"FAQ HIT: '{user_question}' → '{self._questions[best_idx]}' "
+                f"FAQ HIT: '{cleaned}' → '{self._questions[best_idx]}' "
                 f"(score={best_score:.4f})"
             )
             return self._answers[best_idx]

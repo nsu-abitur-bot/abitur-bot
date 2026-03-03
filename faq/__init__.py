@@ -1,3 +1,3 @@
-from faq.faq_matcher import FAQMatcher, get_faq_matcher
+from faq.faq_matcher import FAQMatcher, clean_user_input, get_faq_matcher
 
-__all__ = ["FAQMatcher", "get_faq_matcher"]
+__all__ = ["FAQMatcher", "clean_user_input", "get_faq_matcher"]

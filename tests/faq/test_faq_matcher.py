@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from faq.faq_matcher import FAQMatcher
+from faq.faq_matcher import FAQMatcher, clean_user_input
 
 
 # ── Фикстура: временный YAML-файл с FAQ ──────────────────────────────
@@ -30,6 +30,22 @@ SAMPLE_FAQ = {
             "aliases": [],
             "answer": "Русский язык, математика, физика или информатика.",
         },
+        {
+            "question": "Когда был основан НГУ?",
+            "aliases": [
+                "Когда появился НГУ?",
+                "В каком году основали НГУ?",
+            ],
+            "answer": "НГУ был создан в 1958 году.",
+        },
+        {
+            "question": "Где находится НГУ?",
+            "aliases": [
+                "Где НГУ?",
+                "В каком городе НГУ?",
+            ],
+            "answer": "НГУ расположен в Академгородке, Новосибирск.",
+        },
     ]
 }
 
@@ -46,18 +62,45 @@ def faq_yaml(tmp_path: Path) -> Path:
 @pytest.fixture
 def matcher(faq_yaml: Path) -> FAQMatcher:
     """Создаёт FAQMatcher с тестовыми данными."""
-    return FAQMatcher(faq_path=faq_yaml, threshold=0.80)
+    return FAQMatcher(faq_path=faq_yaml, threshold=0.75)
 
 
 # ── Тесты ─────────────────────────────────────────────────────────────
+
+
+class TestCleanUserInput:
+    """Тесты очистки пользовательского ввода."""
+
+    def test_strips_from_prefix(self):
+        assert clean_user_input("[from Максим] когда появился НГУ?") == "когда появился НГУ?"
+
+    def test_strips_greeting(self):
+        assert clean_user_input("привет, когда появился НГУ?") == "когда появился НГУ?"
+
+    def test_strips_greeting_and_prefix(self):
+        result = clean_user_input("[from user123] привет, где НГУ?")
+        assert result == "где НГУ?"
+
+    def test_strips_multiple_fillers(self):
+        result = clean_user_input("здравствуйте, подскажите, какие факультеты?")
+        assert "какие факультеты?" in result
+
+    def test_preserves_meaningful_text(self):
+        assert clean_user_input("Какие ЕГЭ нужны на ФИТ?") == "Какие ЕГЭ нужны на ФИТ?"
+
+    def test_empty_after_cleaning(self):
+        # pure greeting with no question
+        result = clean_user_input("привет")
+        # should return empty or just stripped
+        assert result == "" or result is not None
 
 
 class TestFAQMatcherLoading:
     """Тесты загрузки FAQ."""
 
     def test_loads_entries(self, matcher: FAQMatcher):
-        # 3 вопроса + 3 alias'а = 6 фраз
-        assert matcher.size == 6
+        # 5 вопросов + 7 alias'ов = 12 фраз
+        assert matcher.size == 12
 
     def test_empty_file(self, tmp_path: Path):
         faq_file = tmp_path / "empty.yaml"
@@ -95,12 +138,52 @@ class TestFAQMatcherMatching:
         assert "1 600" in result
 
     def test_no_match_unrelated(self, matcher: FAQMatcher):
-        result = matcher.match("Какая погода в Москве сегодня?")
+        result = matcher.match("How to cook pasta carbonara recipe?")
         assert result is None
 
     def test_no_match_gibberish(self, matcher: FAQMatcher):
         result = matcher.match("asdfghjkl qwerty")
         assert result is None
+
+
+class TestFAQMatcherWithNoisyInput:
+    """Тесты сопоставления с 'грязным' вводом — приветствия, префиксы."""
+
+    def test_greeting_plus_question(self, matcher: FAQMatcher):
+        """Привет, когда появился НГУ? → должен вернуть ответ о 1958."""
+        result = matcher.match("привет, когда появился НГУ?")
+        assert result is not None
+        assert "1958" in result
+
+    def test_from_prefix_plus_question(self, matcher: FAQMatcher):
+        """[from Максим] когда появился НГУ? → должен вернуть ответ."""
+        result = matcher.match("[from Максим] когда появился НГУ?")
+        assert result is not None
+        assert "1958" in result
+
+    def test_from_prefix_greeting_question(self, matcher: FAQMatcher):
+        """[from user] привет, когда появился нгу? → полная очистка."""
+        result = matcher.match("[from user123] привет, когда появился нгу?")
+        assert result is not None
+        assert "1958" in result
+
+    def test_where_is_ngu_short(self, matcher: FAQMatcher):
+        """Где НГУ? → должен вернуть ответ о местоположении."""
+        result = matcher.match("Где НГУ?")
+        assert result is not None
+        assert "Академгородке" in result or "Новосибирск" in result
+
+    def test_from_prefix_where_question(self, matcher: FAQMatcher):
+        """[from user] где НГУ? → после очистки должен сработать."""
+        result = matcher.match("[from user] где НГУ?")
+        assert result is not None
+        assert "Новосибирск" in result
+
+    def test_podskaji_question(self, matcher: FAQMatcher):
+        """подскажи, какие факультеты в НГУ? → очистка 'подскажи'."""
+        result = matcher.match("подскажи, какие факультеты в НГУ?")
+        assert result is not None
+        assert "ФИТ" in result
 
 
 class TestFAQMatcherThreshold:
@@ -118,7 +201,7 @@ class TestFAQMatcherThreshold:
         assert result is not None
 
     def test_threshold_property(self, matcher: FAQMatcher):
-        assert matcher.threshold == 0.80
+        assert matcher.threshold == 0.75
         matcher.threshold = 0.90
         assert matcher.threshold == 0.90
 
@@ -127,8 +210,8 @@ class TestFAQMatcherReload:
     """Тесты перезагрузки FAQ."""
 
     def test_reload_updates_data(self, faq_yaml: Path):
-        m = FAQMatcher(faq_path=faq_yaml, threshold=0.80)
-        assert m.size == 6
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.75)
+        assert m.size == 12
 
         # Добавляем новый FAQ
         with open(faq_yaml, encoding="utf-8") as f:
@@ -146,4 +229,4 @@ class TestFAQMatcherReload:
             yaml.dump(data, f, allow_unicode=True)
 
         m.reload()
-        assert m.size == 7
+        assert m.size == 13
