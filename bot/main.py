@@ -21,12 +21,7 @@ bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
 dp = Dispatcher()
 
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
-logging.getLogger("llm.llm_client").setLevel(logging.DEBUG)
-logging.getLogger("db.redis_client").setLevel(logging.DEBUG)
 
 
 def get_session_id(message: Message) -> str:
@@ -56,6 +51,7 @@ async def cmd_start(message: Message):
         return
     chat_id = str(message.chat.id)
     user_id = message.from_user.id
+    session_id = get_session_id(message)
 
     async with AsyncSessionLocal() as session:
         user_service = UserService(session)
@@ -66,6 +62,10 @@ async def cmd_start(message: Message):
             logger.info(f"Новый пользователь {user_id} создан в БД")
         else:
             logger.info(f"Пользователь {user_id} уже существует в БД")
+
+    # Сбрасываем флаг ожидания applicant_id на случай зависшего состояния
+    redis_client = await get_redis_client()
+    await redis_client.set_awaiting_applicant_id(session_id, False)
 
     await bot.send_message(chat_id, "Привет! Используйте /track, /untrack и /reset")
 
@@ -151,6 +151,13 @@ async def handle_message(message: Message):
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             user_id = message.from_user.id
+
+            # Убедимся, что пользователь существует в БД
+            # (на случай если /start не вызывался)
+            existing_user = await user_service.get_user(user_id)
+            if not existing_user:
+                await user_service.create_user(user_id)
+                logger.info(f"Пользователь {user_id} создан автоматически при /track")
 
             # Валидация формата applicant_id (макс 7 символов)
             if len(user_text) > 7:

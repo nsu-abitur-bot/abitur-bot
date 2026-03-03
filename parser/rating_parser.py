@@ -1,12 +1,12 @@
 """Парсер рейтинговых списков абитуриентов НГУ."""
 
 import logging
-from dataclasses import dataclass
 from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
+from db.postgres.dto import RatingEntry
 from parser.config.load_config import get_rating_config
 from parser.utils import calculate_page_hash
 
@@ -14,14 +14,6 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "https://abiturient.nsu.ru/bachelor"
 API_ENDPOINT = "https://abiturient.nsu.ru/site/list-content"
-
-
-@dataclass
-class RatingEntry:
-    identifier: str
-    place: int
-    status: str = ""
-    competition_type: str = ""
 
 
 def build_leaderboard_url(

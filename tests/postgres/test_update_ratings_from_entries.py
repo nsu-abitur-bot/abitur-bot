@@ -10,9 +10,9 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.postgres.dto import RatingEntry
 from db.postgres.services.rating import RatingService
 from db.postgres.services.user import UserService
-from parser.rating_parser import RatingEntry
 
 # ---------------------------------------------------------------------------
 # Вспомогательные функции

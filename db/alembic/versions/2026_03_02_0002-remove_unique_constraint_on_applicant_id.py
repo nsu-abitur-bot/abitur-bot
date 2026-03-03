@@ -27,5 +27,11 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    """Downgrade schema: re-create unique constraint on applicant_id."""
-    op.create_unique_constraint("uq_user_applicant_id", "user", ["applicant_id"])
+    """Downgrade schema: no-op.
+
+    Constraint uq_user_applicant_id не существовал до этой миграции
+    (не создавался ни в initial schema, ни в предыдущих миграциях),
+    поэтому восстанавливать его некорректно — это нарушило бы обратимость
+    на данных с дублирующимися applicant_id.
+    """
+    pass

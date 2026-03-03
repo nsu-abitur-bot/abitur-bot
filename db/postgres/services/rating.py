@@ -4,13 +4,9 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from parser.rating_parser import RatingEntry
-
+from ..dto import RatingEntry
 from ..models import Leaderboard, User, UserRating
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 
@@ -90,10 +86,13 @@ class RatingService:
         user_id: int,
         leaderboard_id: str,
         place: int,
-        competition_type: str = "",
-        status: str = "",
+        competition_type: Optional[str] = None,
+        status: Optional[str] = None,
     ) -> UserRating:
-        """Создать или обновить рейтинг пользователя (одиночный upsert)."""
+        """Создать или обновить рейтинг пользователя (одиночный upsert).
+
+        competition_type и status обновляются только если переданы явно (не None).
+        """
         result = await self.session.execute(
             select(UserRating).where(
                 UserRating.user_id == user_id,
@@ -107,8 +106,8 @@ class RatingService:
                 user_id=user_id,
                 leaderboard_id=leaderboard_id,
                 place=place,
-                competition_type=competition_type,
-                status=status,
+                competition_type=competition_type or "",
+                status=status or "",
             )
             self.session.add(user_rating)
             logger.info(
@@ -118,8 +117,10 @@ class RatingService:
         else:
             old_place = user_rating.place
             user_rating.place = place
-            user_rating.competition_type = competition_type
-            user_rating.status = status
+            if competition_type is not None:
+                user_rating.competition_type = competition_type
+            if status is not None:
+                user_rating.status = status
             logger.info(
                 f"Обновлена позиция пользователя {user_id}: {old_place} -> {place}"
             )
