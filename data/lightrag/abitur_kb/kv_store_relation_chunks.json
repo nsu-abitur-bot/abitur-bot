@@ -1,0 +1,2193 @@
+{
+  "Geology<SEP>Geophysics": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314340,
+    "update_time": 1766314340,
+    "_id": "Geology<SEP>Geophysics"
+  },
+  "Geochemistry<SEP>Geology": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314342,
+    "update_time": 1766314342,
+    "_id": "Geochemistry<SEP>Geology"
+  },
+  "Geology<SEP>Petroleum and Gas": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314344,
+    "update_time": 1766314344,
+    "_id": "Geology<SEP>Petroleum and Gas"
+  },
+  "Geology<SEP>Natural Sciences": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314347,
+    "update_time": 1766314347,
+    "_id": "Geology<SEP>Natural Sciences"
+  },
+  "Entrance Exams<SEP>Math": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314347,
+    "update_time": 1766314347,
+    "_id": "Entrance Exams<SEP>Math"
+  },
+  "Entrance Exams<SEP>Physics": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314350,
+    "update_time": 1766314350,
+    "_id": "Entrance Exams<SEP>Physics"
+  },
+  "Entrance Exams<SEP>Geography": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314352,
+    "update_time": 1766314352,
+    "_id": "Entrance Exams<SEP>Geography"
+  },
+  "Chemistry<SEP>Entrance Exams": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314354,
+    "update_time": 1766314354,
+    "_id": "Chemistry<SEP>Entrance Exams"
+  },
+  "Entrance Exams<SEP>Informatics": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314357,
+    "update_time": 1766314357,
+    "_id": "Entrance Exams<SEP>Informatics"
+  },
+  "Entrance Exams<SEP>Russian Language": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1",
+      "chunk-28bc70cf65a5203fe96b88628708441b",
+      "chunk-00319a41a425f6d6ec4233df0775ae96"
+    ],
+    "count": 3,
+    "update_time": 1766317926,
+    "_id": "Entrance Exams<SEP>Russian Language"
+  },
+  "Pass Rates<SEP>Tabiturient": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314359,
+    "update_time": 1766314359,
+    "_id": "Pass Rates<SEP>Tabiturient"
+  },
+  "Education Curriculum<SEP>Educational Program": {
+    "chunk_ids": [
+      "chunk-688c0fd847257d42c90181b4478949e1"
+    ],
+    "count": 1,
+    "create_time": 1766314361,
+    "update_time": 1766314361,
+    "_id": "Education Curriculum<SEP>Educational Program"
+  },
+  "Stуденческое движение<SEP>Штаб студенческих отрядов НГУ": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314467,
+    "update_time": 1766314467,
+    "_id": "Stуденческое движение<SEP>Штаб студенческих отрядов НГУ"
+  },
+  "Stуденческое движение<SEP>«Синергия»": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314469,
+    "update_time": 1766314469,
+    "_id": "Stуденческое движение<SEP>«Синергия»"
+  },
+  "Stуденческое движение<SEP>«Синтез»": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314471,
+    "update_time": 1766314471,
+    "_id": "Stуденческое движение<SEP>«Синтез»"
+  },
+  "Stуденческое движение<SEP>«Золотое Сечение» им. Б.В. Войцеховского": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314485,
+    "update_time": 1766314485,
+    "_id": "Stуденческое движение<SEP>«Золотое Сечение» им. Б.В. Войцеховского"
+  },
+  "SMBA (Student to Master of Business Administration)<SEP>economic faculty of NGU": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314485,
+    "update_time": 1766314485,
+    "_id": "SMBA (Student to Master of Business Administration)<SEP>economic faculty of NGU"
+  },
+  "Case Club NSU<SEP>economic faculty of NGU": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314494,
+    "update_time": 1766314494,
+    "_id": "Case Club NSU<SEP>economic faculty of NGU"
+  },
+  "Financial Club NSU<SEP>economic faculty of NGU": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314507,
+    "update_time": 1766314507,
+    "_id": "Financial Club NSU<SEP>economic faculty of NGU"
+  },
+  "Future Professional NSU<SEP>economic faculty of NGU": {
+    "chunk_ids": [
+      "chunk-d6781e5c3865e757f2db65d0434d0315"
+    ],
+    "count": 1,
+    "create_time": 1766314509,
+    "update_time": 1766314509,
+    "_id": "Future Professional NSU<SEP>economic faculty of NGU"
+  },
+  "Club «Kvant»<SEP>Leonid Shles": {
+    "chunk_ids": [
+      "chunk-07d1fb64c3ee5a648dad5f619523b0ca"
+    ],
+    "count": 1,
+    "create_time": 1766314509,
+    "update_time": 1766314509,
+    "_id": "Club «Kvant»<SEP>Leonid Shles"
+  },
+  "Club «Geya»<SEP>Club «Kvant»": {
+    "chunk_ids": [
+      "chunk-07d1fb64c3ee5a648dad5f619523b0ca"
+    ],
+    "count": 1,
+    "create_time": 1766314526,
+    "update_time": 1766314526,
+    "_id": "Club «Geya»<SEP>Club «Kvant»"
+  },
+  "Club «Kvant»<SEP>RSB": {
+    "chunk_ids": [
+      "chunk-07d1fb64c3ee5a648dad5f619523b0ca"
+    ],
+    "count": 1,
+    "create_time": 1766314528,
+    "update_time": 1766314528,
+    "_id": "Club «Kvant»<SEP>RSB"
+  },
+  "RSB<SEP>«Sinergiya» Brigade": {
+    "chunk_ids": [
+      "chunk-07d1fb64c3ee5a648dad5f619523b0ca"
+    ],
+    "count": 1,
+    "create_time": 1766314543,
+    "update_time": 1766314543,
+    "_id": "RSB<SEP>«Sinergiya» Brigade"
+  },
+  "RSB<SEP>«Sintez» Brigade": {
+    "chunk_ids": [
+      "chunk-07d1fb64c3ee5a648dad5f619523b0ca"
+    ],
+    "count": 1,
+    "create_time": 1766314560,
+    "update_time": 1766314560,
+    "_id": "RSB<SEP>«Sintez» Brigade"
+  },
+  "Future Professional NSU<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314560,
+    "update_time": 1766314560,
+    "_id": "Future Professional NSU<SEP>Novosibirsk State University"
+  },
+  "International Students Club<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314568,
+    "update_time": 1766314568,
+    "_id": "International Students Club<SEP>Novosibirsk State University"
+  },
+  "Novosibirsk State University<SEP>Scientific Picnic": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314570,
+    "update_time": 1766314570,
+    "_id": "Novosibirsk State University<SEP>Scientific Picnic"
+  },
+  "Novosibirsk State University<SEP>Volunteerism": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314572,
+    "update_time": 1766314572,
+    "_id": "Novosibirsk State University<SEP>Volunteerism"
+  },
+  "Novosibirsk State University<SEP>Student Movements": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314574,
+    "update_time": 1766314574,
+    "_id": "Novosibirsk State University<SEP>Student Movements"
+  },
+  "Novosibirsk State University<SEP>Startup Studio": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314576,
+    "update_time": 1766314576,
+    "_id": "Novosibirsk State University<SEP>Startup Studio"
+  },
+  "Novosibirsk State University<SEP>Public Discussions": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314578,
+    "update_time": 1766314578,
+    "_id": "Novosibirsk State University<SEP>Public Discussions"
+  },
+  "Intellectual Freedom<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314581,
+    "update_time": 1766314581,
+    "_id": "Intellectual Freedom<SEP>Novosibirsk State University"
+  },
+  "Novosibirsk State University<SEP>Self-Organization": {
+    "chunk_ids": [
+      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+    ],
+    "count": 1,
+    "create_time": 1766314583,
+    "update_time": 1766314583,
+    "_id": "Novosibirsk State University<SEP>Self-Organization"
+  },
+  "дух студенчества<SEP>интеллектуальная свобода": {
+    "chunk_ids": [
+      "chunk-c6fecf6389cdf3166e89adb484dae3b6"
+    ],
+    "count": 1,
+    "create_time": 1766314583,
+    "update_time": 1766314583,
+    "_id": "дух студенчества<SEP>интеллектуальная свобода"
+  },
+  "дух студенчества<SEP>стремление к самоорганизации": {
+    "chunk_ids": [
+      "chunk-c6fecf6389cdf3166e89adb484dae3b6"
+    ],
+    "count": 1,
+    "create_time": 1766314585,
+    "update_time": 1766314585,
+    "_id": "дух студенчества<SEP>стремление к самоорганизации"
+  },
+  "Sanuzla<SEP>hostel": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314670,
+    "update_time": 1766314670,
+    "_id": "Sanuzla<SEP>hostel"
+  },
+  "Kitchen<SEP>block": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314670,
+    "update_time": 1766314670,
+    "_id": "Kitchen<SEP>block"
+  },
+  "Common Zones<SEP>hostel": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314674,
+    "update_time": 1766314674,
+    "_id": "Common Zones<SEP>hostel"
+  },
+  "First-year Students<SEP>dormitory": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314674,
+    "update_time": 1766314674,
+    "_id": "First-year Students<SEP>dormitory"
+  },
+  "Innogorodnie Students<SEP>dormitory": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314679,
+    "update_time": 1766314679,
+    "_id": "Innogorodnie Students<SEP>dormitory"
+  },
+  "Contract Rent Agreement<SEP>student": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314679,
+    "update_time": 1766314679,
+    "_id": "Contract Rent Agreement<SEP>student"
+  },
+  "Identity Document<SEP>registration": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314679,
+    "update_time": 1766314679,
+    "_id": "Identity Document<SEP>registration"
+  },
+  "Storage Area<SEP>dormitory": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314683,
+    "update_time": 1766314683,
+    "_id": "Storage Area<SEP>dormitory"
+  },
+  "Academic City Campus<SEP>hostel": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314684,
+    "update_time": 1766314684,
+    "_id": "Academic City Campus<SEP>hostel"
+  },
+  "University Cafeteria<SEP>cafeteria": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314690,
+    "update_time": 1766314690,
+    "_id": "University Cafeteria<SEP>cafeteria"
+  },
+  "Laundry Room<SEP>dormitory": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314695,
+    "update_time": 1766314695,
+    "_id": "Laundry Room<SEP>dormitory"
+  },
+  "Hostel 1A<SEP>future conversion": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314698,
+    "update_time": 1766314698,
+    "_id": "Hostel 1A<SEP>future conversion"
+  },
+  "Hostel 1B<SEP>future conversion": {
+    "chunk_ids": [
+      "chunk-37ecb1276d31ad335d59969f4e30c068"
+    ],
+    "count": 1,
+    "create_time": 1766314712,
+    "update_time": 1766314712,
+    "_id": "Hostel 1B<SEP>future conversion"
+  },
+  "Academic City<SEP>NSU": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314712,
+    "update_time": 1766314712,
+    "_id": "Academic City<SEP>NSU"
+  },
+  "Academic City<SEP>University Hostels": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314714,
+    "update_time": 1766314714,
+    "_id": "Academic City<SEP>University Hostels"
+  },
+  "Living Rooms<SEP>University Hostels": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314716,
+    "update_time": 1766314716,
+    "_id": "Living Rooms<SEP>University Hostels"
+  },
+  "Kitchen Blocks<SEP>Living Rooms": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314719,
+    "update_time": 1766314719,
+    "_id": "Kitchen Blocks<SEP>Living Rooms"
+  },
+  "Campus<SEP>University Hostels": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314719,
+    "update_time": 1766314719,
+    "_id": "Campus<SEP>University Hostels"
+  },
+  "Campus<SEP>Internet": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314721,
+    "update_time": 1766314721,
+    "_id": "Campus<SEP>Internet"
+  },
+  "Living Rooms<SEP>Two-Bedroom Rooms": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314721,
+    "update_time": 1766314721,
+    "_id": "Living Rooms<SEP>Two-Bedroom Rooms"
+  },
+  "Living Rooms<SEP>Shared Bathrooms": {
+    "chunk_ids": [
+      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+    ],
+    "count": 1,
+    "create_time": 1766314722,
+    "update_time": 1766314722,
+    "_id": "Living Rooms<SEP>Shared Bathrooms"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>NSU": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314771,
+    "update_time": 1766314771,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>NSU"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Medicine": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314774,
+    "update_time": 1766314774,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Medicine"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Psychology": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314776,
+    "update_time": 1766314776,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Psychology"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Leчебное дело": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314778,
+    "update_time": 1766314778,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Leчебное дело"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Организационная психология": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314780,
+    "update_time": 1766314780,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Организационная психология"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Клиническая психология": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314782,
+    "update_time": 1766314782,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Клиническая психология"
+  },
+  "Leчебное дело<SEP>Русский язык": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314782,
+    "update_time": 1766314782,
+    "_id": "Leчебное дело<SEP>Русский язык"
+  },
+  "Организационная психология<SEP>Русский язык": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314784,
+    "update_time": 1766314784,
+    "_id": "Организационная психология<SEP>Русский язык"
+  },
+  "Клиническая психология<SEP>Русский язык": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314786,
+    "update_time": 1766314786,
+    "_id": "Клиническая психология<SEP>Русский язык"
+  },
+  "Лечебное дело<SEP>Химия": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314786,
+    "update_time": 1766314786,
+    "_id": "Лечебное дело<SEP>Химия"
+  },
+  "Биология<SEP>Лечебное дело": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314815,
+    "update_time": 1766314815,
+    "_id": "Биология<SEP>Лечебное дело"
+  },
+  "Биология<SEP>Организационная психология": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314822,
+    "update_time": 1766314822,
+    "_id": "Биология<SEP>Организационная психология"
+  },
+  "Биология<SEP>Клиническая психология": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314829,
+    "update_time": 1766314829,
+    "_id": "Биология<SEP>Клиническая психология"
+  },
+  "Обществознание<SEP>Организационная психология": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314829,
+    "update_time": 1766314829,
+    "_id": "Обществознание<SEP>Организационная психология"
+  },
+  "Клиническая психология<SEP>Обществознание": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314831,
+    "update_time": 1766314831,
+    "_id": "Клиническая психология<SEP>Обществознание"
+  },
+  "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Tabiturient": {
+    "chunk_ids": [
+      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+    ],
+    "count": 1,
+    "create_time": 1766314831,
+    "update_time": 1766314831,
+    "_id": "Institute of Medicine and Psychology named after V. Zelman (IMPZ)<SEP>Tabiturient"
+  },
+  "organizational model<SEP>psychical health research": {
+    "chunk_ids": [
+      "chunk-d31291ed3714cbfcb940521fe0faf0b6"
+    ],
+    "count": 1,
+    "create_time": 1766314846,
+    "update_time": 1766314846,
+    "_id": "organizational model<SEP>psychical health research"
+  },
+  "clinical practice<SEP>psychical health research": {
+    "chunk_ids": [
+      "chunk-d31291ed3714cbfcb940521fe0faf0b6"
+    ],
+    "count": 1,
+    "create_time": 1766314858,
+    "update_time": 1766314858,
+    "_id": "clinical practice<SEP>psychical health research"
+  },
+  "clinical practice<SEP>organizational model": {
+    "chunk_ids": [
+      "chunk-d31291ed3714cbfcb940521fe0faf0b6"
+    ],
+    "count": 1,
+    "create_time": 1766314861,
+    "update_time": 1766314861,
+    "_id": "clinical practice<SEP>organizational model"
+  },
+  "organizational models<SEP>psychical health research": {
+    "chunk_ids": [
+      "chunk-d31291ed3714cbfcb940521fe0faf0b6"
+    ],
+    "count": 1,
+    "create_time": 1766314861,
+    "update_time": 1766314861,
+    "_id": "organizational models<SEP>psychical health research"
+  },
+  "clinical practice<SEP>organizational models": {
+    "chunk_ids": [
+      "chunk-d31291ed3714cbfcb940521fe0faf0b6"
+    ],
+    "count": 1,
+    "create_time": 1766314863,
+    "update_time": 1766314863,
+    "_id": "clinical practice<SEP>organizational models"
+  },
+  "Akademgorodok<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315058,
+    "update_time": 1766315058,
+    "_id": "Akademgorodok<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Artificial Intelligence<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315061,
+    "update_time": 1766315061,
+    "_id": "Artificial Intelligence<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Applied Engineering<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315063,
+    "update_time": 1766315063,
+    "_id": "Applied Engineering<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Mathematics<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315065,
+    "update_time": 1766315065,
+    "_id": "Mathematics<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Informatics<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315087,
+    "update_time": 1766315087,
+    "_id": "Informatics<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Mechanico-Mathematical Faculty<SEP>Mechanics": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315099,
+    "update_time": 1766315099,
+    "_id": "Mechanico-Mathematical Faculty<SEP>Mechanics"
+  },
+  "Mathematical Modeling<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315121,
+    "update_time": 1766315121,
+    "_id": "Mathematical Modeling<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Mechanico-Mathematical Faculty<SEP>Russian Language": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315133,
+    "update_time": 1766315133,
+    "_id": "Mechanico-Mathematical Faculty<SEP>Russian Language"
+  },
+  "Mathematics (professional)<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315136,
+    "update_time": 1766315136,
+    "_id": "Mathematics (professional)<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Informatika/ICT<SEP>Mechanico-Mathematical Faculty": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315138,
+    "update_time": 1766315138,
+    "_id": "Informatika/ICT<SEP>Mechanico-Mathematical Faculty"
+  },
+  "Mechanico-Mathematical Faculty<SEP>Physics": {
+    "chunk_ids": [
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+    ],
+    "count": 1,
+    "create_time": 1766315151,
+    "update_time": 1766315151,
+    "_id": "Mechanico-Mathematical Faculty<SEP>Physics"
+  },
+  "Mechanics and Mathematical Modeling<SEP>budget admission": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315151,
+    "update_time": 1766315151,
+    "_id": "Mechanics and Mathematical Modeling<SEP>budget admission"
+  },
+  "Fundamental Mathematics Research Group<SEP>students": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315157,
+    "update_time": 1766315157,
+    "_id": "Fundamental Mathematics Research Group<SEP>students"
+  },
+  "Mathematical Modelling<SEP>professionals": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315189,
+    "update_time": 1766315189,
+    "_id": "Mathematical Modelling<SEP>professionals"
+  },
+  "Computer Science and Information Technology<SEP>professionals": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315226,
+    "update_time": 1766315226,
+    "_id": "Computer Science and Information Technology<SEP>professionals"
+  },
+  "Systems Engineering<SEP>professionals": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315229,
+    "update_time": 1766315229,
+    "_id": "Systems Engineering<SEP>professionals"
+  },
+  "Russian Language<SEP>university entrance exam": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315229,
+    "update_time": 1766315229,
+    "_id": "Russian Language<SEP>university entrance exam"
+  },
+  "ICT<SEP>university entrance exam": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315243,
+    "update_time": 1766315243,
+    "_id": "ICT<SEP>university entrance exam"
+  },
+  "Physics<SEP>university entrance exam": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315245,
+    "update_time": 1766315245,
+    "_id": "Physics<SEP>university entrance exam"
+  },
+  "First Two Years<SEP>curriculum": {
+    "chunk_ids": [
+      "chunk-a035eeb7895b7dadfd008f91646edee8"
+    ],
+    "count": 1,
+    "create_time": 1766315245,
+    "update_time": 1766315245,
+    "_id": "First Two Years<SEP>curriculum"
+  },
+  "IT<SEP>modeling": {
+    "chunk_ids": [
+      "chunk-b4055224d550d9110efe1e2fa145e03c"
+    ],
+    "count": 1,
+    "create_time": 1766315247,
+    "update_time": 1766315247,
+    "_id": "IT<SEP>modeling"
+  },
+  "09.03.01 «Informatics and Computer Engineering»<SEP>Faculty of Informatics and Computing Science": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316367,
+    "update_time": 1766316367,
+    "_id": "09.03.01 «Informatics and Computer Engineering»<SEP>Faculty of Informatics and Computing Science"
+  },
+  "09.03.01 «Informatics and Computer Engineering»<SEP>«Computer Sciences and System Engineering» profile": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316370,
+    "update_time": 1766316370,
+    "_id": "09.03.01 «Informatics and Computer Engineering»<SEP>«Computer Sciences and System Engineering» profile"
+  },
+  "09.03.01 «Informatics and Computer Engineering»<SEP>«Software Engineering and Computer Sciences» profile": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316373,
+    "update_time": 1766316373,
+    "_id": "09.03.01 «Informatics and Computer Engineering»<SEP>«Software Engineering and Computer Sciences» profile"
+  },
+  "Faculty of Informatics and Computing Science<SEP>Russian Language": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316373,
+    "update_time": 1766316373,
+    "_id": "Faculty of Informatics and Computing Science<SEP>Russian Language"
+  },
+  "Faculty of Informatics and Computing Science<SEP>Mathematics (Advanced)": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316376,
+    "update_time": 1766316376,
+    "_id": "Faculty of Informatics and Computing Science<SEP>Mathematics (Advanced)"
+  },
+  "Faculty of Informatics and Computing Science<SEP>Physics or Information Technology and Communications (ICT)": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316378,
+    "update_time": 1766316378,
+    "_id": "Faculty of Informatics and Computing Science<SEP>Physics or Information Technology and Communications (ICT)"
+  },
+  "09.03.01 «Informatics and Computer Engineering»<SEP>Bachelor's Degree Program": {
+    "chunk_ids": [
+      "chunk-96824a0b7bedfff01e1e931021742836"
+    ],
+    "count": 1,
+    "create_time": 1766316378,
+    "update_time": 1766316378,
+    "_id": "09.03.01 «Informatics and Computer Engineering»<SEP>Bachelor's Degree Program"
+  },
+  "Bachelor's Degree<SEP>Programmatic Engineering and Computer Science": {
+    "chunk_ids": [
+      "chunk-e2976471c53db5fbb9c437e851fe7def"
+    ],
+    "count": 1,
+    "create_time": 1766316380,
+    "update_time": 1766316380,
+    "_id": "Bachelor's Degree<SEP>Programmatic Engineering and Computer Science"
+  },
+  "Academic City<SEP>Science Institutes": {
+    "chunk_ids": [
+      "chunk-e2976471c53db5fbb9c437e851fe7def"
+    ],
+    "count": 1,
+    "create_time": 1766316380,
+    "update_time": 1766316380,
+    "_id": "Academic City<SEP>Science Institutes"
+  },
+  "Faculty<SEP>IT Companies": {
+    "chunk_ids": [
+      "chunk-e2976471c53db5fbb9c437e851fe7def"
+    ],
+    "count": 1,
+    "create_time": 1766316382,
+    "update_time": 1766316382,
+    "_id": "Faculty<SEP>IT Companies"
+  },
+  "Faculty<SEP>High Salary Ranking": {
+    "chunk_ids": [
+      "chunk-e2976471c53db5fbb9c437e851fe7def"
+    ],
+    "count": 1,
+    "create_time": 1766316388,
+    "update_time": 1766316388,
+    "_id": "Faculty<SEP>High Salary Ranking"
+  },
+  "Faculty<SEP>International Programs": {
+    "chunk_ids": [
+      "chunk-e2976471c53db5fbb9c437e851fe7def"
+    ],
+    "count": 1,
+    "create_time": 1766316997,
+    "update_time": 1766316997,
+    "_id": "Faculty<SEP>International Programs"
+  },
+  "000 рублей<SEP>budgetary places": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317153,
+    "update_time": 1766317153,
+    "_id": "000 рублей<SEP>budgetary places"
+  },
+  "mathematical courses<SEP>students": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317153,
+    "update_time": 1766317153,
+    "_id": "mathematical courses<SEP>students"
+  },
+  "statistics<SEP>students": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317157,
+    "update_time": 1766317157,
+    "_id": "statistics<SEP>students"
+  },
+  "programming<SEP>students": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317159,
+    "update_time": 1766317159,
+    "_id": "programming<SEP>students"
+  },
+  "analytical skills<SEP>students": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317162,
+    "update_time": 1766317162,
+    "_id": "analytical skills<SEP>students"
+  },
+  "economic data<SEP>students": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317164,
+    "update_time": 1766317164,
+    "_id": "economic data<SEP>students"
+  },
+  "economic modeling<SEP>faculty": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317164,
+    "update_time": 1766317164,
+    "_id": "economic modeling<SEP>faculty"
+  },
+  "business analysts<SEP>graduates": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317171,
+    "update_time": 1766317171,
+    "_id": "business analysts<SEP>graduates"
+  },
+  "consultants<SEP>graduates": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317180,
+    "update_time": 1766317180,
+    "_id": "consultants<SEP>graduates"
+  },
+  "graduates<SEP>modelists": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317182,
+    "update_time": 1766317182,
+    "_id": "graduates<SEP>modelists"
+  },
+  "financial companies<SEP>graduates": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317184,
+    "update_time": 1766317184,
+    "_id": "financial companies<SEP>graduates"
+  },
+  "Russian language<SEP>entrance exams": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317184,
+    "update_time": 1766317184,
+    "_id": "Russian language<SEP>entrance exams"
+  },
+  "entrance exams<SEP>math": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317187,
+    "update_time": 1766317187,
+    "_id": "entrance exams<SEP>math"
+  },
+  "entrance exams<SEP>sociology or history": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317190,
+    "update_time": 1766317190,
+    "_id": "entrance exams<SEP>sociology or history"
+  },
+  "entrance exams<SEP>foreign languages": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317192,
+    "update_time": 1766317192,
+    "_id": "entrance exams<SEP>foreign languages"
+  },
+  "faculty<SEP>practical experts": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317192,
+    "update_time": 1766317192,
+    "_id": "faculty<SEP>practical experts"
+  },
+  "stages of study<SEP>students": {
+    "chunk_ids": [
+      "chunk-134b04ed8f5bc457339155536f87ac47"
+    ],
+    "count": 1,
+    "create_time": 1766317194,
+    "update_time": 1766317194,
+    "_id": "stages of study<SEP>students"
+  },
+  "Bachelor's Degree Program Economics<SEP>Economic Faculty NSU": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317196,
+    "update_time": 1766317196,
+    "_id": "Bachelor's Degree Program Economics<SEP>Economic Faculty NSU"
+  },
+  "Economic Faculty NSU<SEP>Master's Degree Programs": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317203,
+    "update_time": 1766317203,
+    "_id": "Economic Faculty NSU<SEP>Master's Degree Programs"
+  },
+  "Economic Faculty NSU<SEP>Russian Language": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317205,
+    "update_time": 1766317205,
+    "_id": "Economic Faculty NSU<SEP>Russian Language"
+  },
+  "Economic Faculty NSU<SEP>Mathematics": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317208,
+    "update_time": 1766317208,
+    "_id": "Economic Faculty NSU<SEP>Mathematics"
+  },
+  "Economic Faculty NSU<SEP>Sociology": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317210,
+    "update_time": 1766317210,
+    "_id": "Economic Faculty NSU<SEP>Sociology"
+  },
+  "Economic Faculty NSU<SEP>History": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317212,
+    "update_time": 1766317212,
+    "_id": "Economic Faculty NSU<SEP>History"
+  },
+  "Economic Faculty NSU<SEP>Foreign Language": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317219,
+    "update_time": 1766317219,
+    "_id": "Economic Faculty NSU<SEP>Foreign Language"
+  },
+  "Budget Places<SEP>Economic Faculty NSU": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317222,
+    "update_time": 1766317222,
+    "_id": "Budget Places<SEP>Economic Faculty NSU"
+  },
+  "Economic Faculty NSU<SEP>Paid Places": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317224,
+    "update_time": 1766317224,
+    "_id": "Economic Faculty NSU<SEP>Paid Places"
+  },
+  "Economic Faculty NSU<SEP>Statistics": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317527,
+    "update_time": 1766317527,
+    "_id": "Economic Faculty NSU<SEP>Statistics"
+  },
+  "Economic Faculty NSU<SEP>Programming": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317529,
+    "update_time": 1766317529,
+    "_id": "Economic Faculty NSU<SEP>Programming"
+  },
+  "Economic Faculty NSU<SEP>State Funding": {
+    "chunk_ids": [
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+    ],
+    "count": 1,
+    "create_time": 1766317531,
+    "update_time": 1766317531,
+    "_id": "Economic Faculty NSU<SEP>State Funding"
+  },
+  "modern concepts<SEP>philosophical texts": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317585,
+    "update_time": 1766317585,
+    "_id": "modern concepts<SEP>philosophical texts"
+  },
+  "foundation preparation<SEP>legal program": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317585,
+    "update_time": 1766317585,
+    "_id": "foundation preparation<SEP>legal program"
+  },
+  "legal program<SEP>practical legal skills": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317589,
+    "update_time": 1766317589,
+    "_id": "legal program<SEP>practical legal skills"
+  },
+  "philosophy<SEP>research projects": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317589,
+    "update_time": 1766317589,
+    "_id": "philosophy<SEP>research projects"
+  },
+  "ethics<SEP>research projects": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317601,
+    "update_time": 1766317601,
+    "_id": "ethics<SEP>research projects"
+  },
+  "law<SEP>research projects": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317611,
+    "update_time": 1766317611,
+    "_id": "law<SEP>research projects"
+  },
+  "international exchange programs<SEP>research projects": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317626,
+    "update_time": 1766317626,
+    "_id": "international exchange programs<SEP>research projects"
+  },
+  "fundamental preparation<SEP>practical legal skills": {
+    "chunk_ids": [
+      "chunk-4c4044d3c14949df01a3373e809e35f1"
+    ],
+    "count": 1,
+    "create_time": 1766317626,
+    "update_time": 1766317626,
+    "_id": "fundamental preparation<SEP>practical legal skills"
+  },
+  "Institute of Philosophy and Law NSU<SEP>Philosophy": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317632,
+    "update_time": 1766317632,
+    "_id": "Institute of Philosophy and Law NSU<SEP>Philosophy"
+  },
+  "Institute of Philosophy and Law NSU<SEP>Jurisprudence": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317644,
+    "update_time": 1766317644,
+    "_id": "Institute of Philosophy and Law NSU<SEP>Jurisprudence"
+  },
+  "Institute of Philosophy and Law NSU<SEP>Tabiturient": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317646,
+    "update_time": 1766317646,
+    "_id": "Institute of Philosophy and Law NSU<SEP>Tabiturient"
+  },
+  "Philosophy<SEP>Social Philosophy": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317646,
+    "update_time": 1766317646,
+    "_id": "Philosophy<SEP>Social Philosophy"
+  },
+  "Philosophy<SEP>Theory of Knowledge": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317700,
+    "update_time": 1766317700,
+    "_id": "Philosophy<SEP>Theory of Knowledge"
+  },
+  "Ethics<SEP>Philosophy": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317724,
+    "update_time": 1766317724,
+    "_id": "Ethics<SEP>Philosophy"
+  },
+  "Entrance Exams<SEP>Informatics/ICT": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317728,
+    "update_time": 1766317728,
+    "_id": "Entrance Exams<SEP>Informatics/ICT"
+  },
+  "Entrance Exams<SEP>History": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317730,
+    "update_time": 1766317730,
+    "_id": "Entrance Exams<SEP>History"
+  },
+  "Philosophy<SEP>Societal Philosophy": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317730,
+    "update_time": 1766317730,
+    "_id": "Philosophy<SEP>Societal Philosophy"
+  },
+  "Critical Analysis<SEP>Philosophy": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317731,
+    "update_time": 1766317731,
+    "_id": "Critical Analysis<SEP>Philosophy"
+  },
+  "Arbitration Skills<SEP>Jurisprudence": {
+    "chunk_ids": [
+      "chunk-28bc70cf65a5203fe96b88628708441b"
+    ],
+    "count": 1,
+    "create_time": 1766317732,
+    "update_time": 1766317732,
+    "_id": "Arbitration Skills<SEP>Jurisprudence"
+  },
+  "Faculty of Natural Sciences<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f",
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e",
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 3,
+    "update_time": 1766318227,
+    "_id": "Faculty of Natural Sciences<SEP>Novosibirsk State University"
+  },
+  "Biology<SEP>Faculty of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f"
+    ],
+    "count": 1,
+    "create_time": 1766317776,
+    "update_time": 1766317776,
+    "_id": "Biology<SEP>Faculty of Natural Sciences"
+  },
+  "Biotechnology<SEP>Faculty of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f"
+    ],
+    "count": 1,
+    "create_time": 1766317783,
+    "update_time": 1766317783,
+    "_id": "Biotechnology<SEP>Faculty of Natural Sciences"
+  },
+  "Chemistry<SEP>Faculty of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f"
+    ],
+    "count": 1,
+    "create_time": 1766317785,
+    "update_time": 1766317785,
+    "_id": "Chemistry<SEP>Faculty of Natural Sciences"
+  },
+  "Faculty of Natural Sciences<SEP>Nanomaterials": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f"
+    ],
+    "count": 1,
+    "create_time": 1766317788,
+    "update_time": 1766317788,
+    "_id": "Faculty of Natural Sciences<SEP>Nanomaterials"
+  },
+  "Ecology<SEP>Faculty of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f"
+    ],
+    "count": 1,
+    "create_time": 1766317790,
+    "update_time": 1766317790,
+    "_id": "Ecology<SEP>Faculty of Natural Sciences"
+  },
+  "Faculty of Natural Sciences<SEP>Molecular Biology": {
+    "chunk_ids": [
+      "chunk-3c2048cbd8ab15bf77f8ce857685327f"
+    ],
+    "count": 1,
+    "create_time": 1766317793,
+    "update_time": 1766317793,
+    "_id": "Faculty of Natural Sciences<SEP>Molecular Biology"
+  },
+  "Biotechnological Companies<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317793,
+    "update_time": 1766317793,
+    "_id": "Biotechnological Companies<SEP>Work Opportunities"
+  },
+  "Laboratories<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317797,
+    "update_time": 1766317797,
+    "_id": "Laboratories<SEP>Work Opportunities"
+  },
+  "Scientific Research Centers<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317812,
+    "update_time": 1766317812,
+    "_id": "Scientific Research Centers<SEP>Work Opportunities"
+  },
+  "Pharmaceutical Industry<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317825,
+    "update_time": 1766317825,
+    "_id": "Pharmaceutical Industry<SEP>Work Opportunities"
+  },
+  "Environmental Monitoring<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317827,
+    "update_time": 1766317827,
+    "_id": "Environmental Monitoring<SEP>Work Opportunities"
+  },
+  "Education Sector<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317829,
+    "update_time": 1766317829,
+    "_id": "Education Sector<SEP>Work Opportunities"
+  },
+  "High-Tech Manufacturing<SEP>Work Opportunities": {
+    "chunk_ids": [
+      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+    ],
+    "count": 1,
+    "create_time": 1766317834,
+    "update_time": 1766317834,
+    "_id": "High-Tech Manufacturing<SEP>Work Opportunities"
+  },
+  "Institute of Intelligent Robotics NSU<SEP>Mechatronics and Robotics AI Bachelor's Program": {
+    "chunk_ids": [
+      "chunk-00319a41a425f6d6ec4233df0775ae96"
+    ],
+    "count": 1,
+    "create_time": 1766317916,
+    "update_time": 1766317916,
+    "_id": "Institute of Intelligent Robotics NSU<SEP>Mechatronics and Robotics AI Bachelor's Program"
+  },
+  "Applied Artificial Intelligence<SEP>Institute of Intelligent Robotics NSU": {
+    "chunk_ids": [
+      "chunk-00319a41a425f6d6ec4233df0775ae96"
+    ],
+    "count": 1,
+    "create_time": 1766317920,
+    "update_time": 1766317920,
+    "_id": "Applied Artificial Intelligence<SEP>Institute of Intelligent Robotics NSU"
+  },
+  "Entrance Exams<SEP>Mathematics": {
+    "chunk_ids": [
+      "chunk-00319a41a425f6d6ec4233df0775ae96"
+    ],
+    "count": 1,
+    "create_time": 1766317920,
+    "update_time": 1766317920,
+    "_id": "Entrance Exams<SEP>Mathematics"
+  },
+  "Entrance Exams<SEP>Physics or Informatics/ICT": {
+    "chunk_ids": [
+      "chunk-00319a41a425f6d6ec4233df0775ae96"
+    ],
+    "count": 1,
+    "create_time": 1766317924,
+    "update_time": 1766317924,
+    "_id": "Entrance Exams<SEP>Physics or Informatics/ICT"
+  },
+  "Passing Scores<SEP>Tabiturient": {
+    "chunk_ids": [
+      "chunk-00319a41a425f6d6ec4233df0775ae96"
+    ],
+    "count": 1,
+    "create_time": 1766317927,
+    "update_time": 1766317927,
+    "_id": "Passing Scores<SEP>Tabiturient"
+  },
+  "Employment Opportunities<SEP>Scientific Laboratories": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317929,
+    "update_time": 1766317929,
+    "_id": "Employment Opportunities<SEP>Scientific Laboratories"
+  },
+  "Employment Opportunities<SEP>High Technology Industry": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317933,
+    "update_time": 1766317933,
+    "_id": "Employment Opportunities<SEP>High Technology Industry"
+  },
+  "Employment Opportunities<SEP>Robotics Industry": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317935,
+    "update_time": 1766317935,
+    "_id": "Employment Opportunities<SEP>Robotics Industry"
+  },
+  "AI Research<SEP>Artificial Intelligence Research": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317935,
+    "update_time": 1766317935,
+    "_id": "AI Research<SEP>Artificial Intelligence Research"
+  },
+  "Startup Participation<SEP>Startups": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317937,
+    "update_time": 1766317937,
+    "_id": "Startup Participation<SEP>Startups"
+  },
+  "University Involvement<SEP>University Projects": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317938,
+    "update_time": 1766317938,
+    "_id": "University Involvement<SEP>University Projects"
+  },
+  "good job prospects<SEP>scientific laboratories": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317942,
+    "update_time": 1766317942,
+    "_id": "good job prospects<SEP>scientific laboratories"
+  },
+  "good job prospects<SEP>high-tech industries": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317946,
+    "update_time": 1766317946,
+    "_id": "good job prospects<SEP>high-tech industries"
+  },
+  "artificial intelligence<SEP>research and development": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317946,
+    "update_time": 1766317946,
+    "_id": "artificial intelligence<SEP>research and development"
+  },
+  "ai research<SEP>startups": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317950,
+    "update_time": 1766317950,
+    "_id": "ai research<SEP>startups"
+  },
+  "ai research<SEP>university projects": {
+    "chunk_ids": [
+      "chunk-b6fa5d3637fe3cef882531bd33600d83"
+    ],
+    "count": 1,
+    "create_time": 1766317955,
+    "update_time": 1766317955,
+    "_id": "ai research<SEP>university projects"
+  },
+  "Researcher Training<SEP>Siberian Branch of Russian Academy of Sciences": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318010,
+    "update_time": 1766318010,
+    "_id": "Researcher Training<SEP>Siberian Branch of Russian Academy of Sciences"
+  },
+  "Institutional Facilities<SEP>Laboratory Practice": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318010,
+    "update_time": 1766318010,
+    "_id": "Institutional Facilities<SEP>Laboratory Practice"
+  },
+  "Job Prospects<SEP>Physical Modeling Skills": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318011,
+    "update_time": 1766318011,
+    "_id": "Job Prospects<SEP>Physical Modeling Skills"
+  },
+  "Graduates<SEP>Science Organizations": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318015,
+    "update_time": 1766318015,
+    "_id": "Graduates<SEP>Science Organizations"
+  },
+  "Graduates<SEP>Research Laboratories": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318019,
+    "update_time": 1766318019,
+    "_id": "Graduates<SEP>Research Laboratories"
+  },
+  "Graduates<SEP>Instrument Manufacturing": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318022,
+    "update_time": 1766318022,
+    "_id": "Graduates<SEP>Instrument Manufacturing"
+  },
+  "Graduates<SEP>Optoelectronics Industry": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318024,
+    "update_time": 1766318024,
+    "_id": "Graduates<SEP>Optoelectronics Industry"
+  },
+  "Aerospace Industry<SEP>Graduates": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318026,
+    "update_time": 1766318026,
+    "_id": "Aerospace Industry<SEP>Graduates"
+  },
+  "Energy Sector<SEP>Graduates": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318029,
+    "update_time": 1766318029,
+    "_id": "Energy Sector<SEP>Graduates"
+  },
+  "Graduates<SEP>Information Technology Field": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318031,
+    "update_time": 1766318031,
+    "_id": "Graduates<SEP>Information Technology Field"
+  },
+  "Analytical Departments<SEP>Graduates": {
+    "chunk_ids": [
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+    ],
+    "count": 1,
+    "create_time": 1766318038,
+    "update_time": 1766318038,
+    "_id": "Analytical Departments<SEP>Graduates"
+  },
+  "Novosibirsk State University<SEP>Physical Faculty": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719",
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e",
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 3,
+    "update_time": 1766318222,
+    "_id": "Novosibirsk State University<SEP>Physical Faculty"
+  },
+  "Academic City<SEP>Physical Faculty": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719"
+    ],
+    "count": 1,
+    "create_time": 1766318055,
+    "update_time": 1766318055,
+    "_id": "Academic City<SEP>Physical Faculty"
+  },
+  "Physical Faculty<SEP>Russian Federal Subject Novosibirsk Oblast": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719"
+    ],
+    "count": 1,
+    "create_time": 1766318067,
+    "update_time": 1766318067,
+    "_id": "Physical Faculty<SEP>Russian Federal Subject Novosibirsk Oblast"
+  },
+  "Bachelor's Degree Program<SEP>Physical Faculty": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719"
+    ],
+    "count": 1,
+    "create_time": 1766318069,
+    "update_time": 1766318069,
+    "_id": "Bachelor's Degree Program<SEP>Physical Faculty"
+  },
+  "Master's Degree Program<SEP>Physical Faculty": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719"
+    ],
+    "count": 1,
+    "create_time": 1766318072,
+    "update_time": 1766318072,
+    "_id": "Master's Degree Program<SEP>Physical Faculty"
+  },
+  "Entrance Requirements<SEP>Physical Faculty": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719"
+    ],
+    "count": 1,
+    "create_time": 1766318074,
+    "update_time": 1766318074,
+    "_id": "Entrance Requirements<SEP>Physical Faculty"
+  },
+  "Physical Faculty<SEP>Research Component": {
+    "chunk_ids": [
+      "chunk-41b36f387ee21bd85d1d5642ee853719"
+    ],
+    "count": 1,
+    "create_time": 1766318084,
+    "update_time": 1766318084,
+    "_id": "Physical Faculty<SEP>Research Component"
+  },
+  "M. A. Lavrentiev<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e"
+    ],
+    "count": 1,
+    "create_time": 1766318198,
+    "update_time": 1766318198,
+    "_id": "M. A. Lavrentiev<SEP>Novosibirsk State University"
+  },
+  "Novosibirsk State University<SEP>S. L. Sobolev": {
+    "chunk_ids": [
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e"
+    ],
+    "count": 1,
+    "create_time": 1766318205,
+    "update_time": 1766318205,
+    "_id": "Novosibirsk State University<SEP>S. L. Sobolev"
+  },
+  "I. N. Vekua<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e"
+    ],
+    "count": 1,
+    "create_time": 1766318217,
+    "update_time": 1766318217,
+    "_id": "I. N. Vekua<SEP>Novosibirsk State University"
+  },
+  "Mechanico-Mathematical Faculty<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e"
+    ],
+    "count": 1,
+    "create_time": 1766318219,
+    "update_time": 1766318219,
+    "_id": "Mechanico-Mathematical Faculty<SEP>Novosibirsk State University"
+  },
+  "Faculty of Information Technology<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e",
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 2,
+    "create_time": 1766318239,
+    "update_time": 1766318239,
+    "_id": "Faculty of Information Technology<SEP>Novosibirsk State University"
+  },
+  "Geology and Geophysics Faculty<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318241,
+    "update_time": 1766318241,
+    "_id": "Geology and Geophysics Faculty<SEP>Novosibirsk State University"
+  },
+  "Economic Faculty<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318253,
+    "update_time": 1766318253,
+    "_id": "Economic Faculty<SEP>Novosibirsk State University"
+  },
+  "Humanities Institute<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318256,
+    "update_time": 1766318256,
+    "_id": "Humanities Institute<SEP>Novosibirsk State University"
+  },
+  "Novosibirsk State University<SEP>V. Zelman Philosophy and Psychology Institute": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318268,
+    "update_time": 1766318268,
+    "_id": "Novosibirsk State University<SEP>V. Zelman Philosophy and Psychology Institute"
+  },
+  "Intelligent Robotics Institute<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318270,
+    "update_time": 1766318270,
+    "_id": "Intelligent Robotics Institute<SEP>Novosibirsk State University"
+  },
+  "Novosibirsk State University<SEP>Philosophy and Law Institute": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318272,
+    "update_time": 1766318272,
+    "_id": "Novosibirsk State University<SEP>Philosophy and Law Institute"
+  },
+  "Novosibirsk State University<SEP>V. Zelman Institute of Medicine and Psychology": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318284,
+    "update_time": 1766318284,
+    "_id": "Novosibirsk State University<SEP>V. Zelman Institute of Medicine and Psychology"
+  },
+  "Institute of Intelligent Robotics<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+    ],
+    "count": 1,
+    "create_time": 1766318295,
+    "update_time": 1766318295,
+    "_id": "Institute of Intelligent Robotics<SEP>Novosibirsk State University"
+  },
+  "Interdisciplinary Programs<SEP>Linguistics": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318436,
+    "update_time": 1766318436,
+    "_id": "Interdisciplinary Programs<SEP>Linguistics"
+  },
+  "Interdisciplinary Programs<SEP>Mathematics/Informatics": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318441,
+    "update_time": 1766318441,
+    "_id": "Interdisciplinary Programs<SEP>Mathematics/Informatics"
+  },
+  "Cognitive Science<SEP>Interdisciplinary Programs": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318445,
+    "update_time": 1766318445,
+    "_id": "Cognitive Science<SEP>Interdisciplinary Programs"
+  },
+  "Internal Forms of Entrance Examinations<SEP>Journalism": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318445,
+    "update_time": 1766318445,
+    "_id": "Internal Forms of Entrance Examinations<SEP>Journalism"
+  },
+  "Conferences<SEP>Research": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318479,
+    "update_time": 1766318479,
+    "_id": "Conferences<SEP>Research"
+  },
+  "Projects<SEP>Research": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318502,
+    "update_time": 1766318502,
+    "_id": "Projects<SEP>Research"
+  },
+  "linguistics<SEP>mathematics": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318502,
+    "update_time": 1766318502,
+    "_id": "linguistics<SEP>mathematics"
+  },
+  "informatics<SEP>linguistics": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318509,
+    "update_time": 1766318509,
+    "_id": "informatics<SEP>linguistics"
+  },
+  "informatics<SEP>mathematics": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318511,
+    "update_time": 1766318511,
+    "_id": "informatics<SEP>mathematics"
+  },
+  "cognitive science<SEP>linguistics": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318511,
+    "update_time": 1766318511,
+    "_id": "cognitive science<SEP>linguistics"
+  },
+  "creative contest<SEP>journalism": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318512,
+    "update_time": 1766318512,
+    "_id": "creative contest<SEP>journalism"
+  },
+  "research<SEP>students": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318513,
+    "update_time": 1766318513,
+    "_id": "research<SEP>students"
+  },
+  "conference<SEP>students": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318528,
+    "update_time": 1766318528,
+    "_id": "conference<SEP>students"
+  },
+  "project<SEP>students": {
+    "chunk_ids": [
+      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
+    ],
+    "count": 1,
+    "create_time": 1766318545,
+    "update_time": 1766318545,
+    "_id": "project<SEP>students"
+  },
+  "History<SEP>Humanitarian Institute NSU": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318545,
+    "update_time": 1766318545,
+    "_id": "History<SEP>Humanitarian Institute NSU"
+  },
+  "Humanitarian Institute NSU<SEP>Philology": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318557,
+    "update_time": 1766318557,
+    "_id": "Humanitarian Institute NSU<SEP>Philology"
+  },
+  "Fundamental and Applied Linguistics<SEP>Humanitarian Institute NSU": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318575,
+    "update_time": 1766318575,
+    "_id": "Fundamental and Applied Linguistics<SEP>Humanitarian Institute NSU"
+  },
+  "Eastern Studies and African Studies<SEP>Humanitarian Institute NSU": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318581,
+    "update_time": 1766318581,
+    "_id": "Eastern Studies and African Studies<SEP>Humanitarian Institute NSU"
+  },
+  "Humanitarian Institute NSU<SEP>Journalism and Modern Media Technology": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318583,
+    "update_time": 1766318583,
+    "_id": "Humanitarian Institute NSU<SEP>Journalism and Modern Media Technology"
+  },
+  "Humanitarian Institute NSU<SEP>Tabiturient": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318595,
+    "update_time": 1766318595,
+    "_id": "Humanitarian Institute NSU<SEP>Tabiturient"
+  },
+  "History<SEP>History Entrance Exam": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318595,
+    "update_time": 1766318595,
+    "_id": "History<SEP>History Entrance Exam"
+  },
+  "Linguistics<SEP>Linguistics Entrance Exam": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318606,
+    "update_time": 1766318606,
+    "_id": "Linguistics<SEP>Linguistics Entrance Exam"
+  },
+  "Journalism<SEP>Journalism Entrance Exam": {
+    "chunk_ids": [
+      "chunk-46485aa8f930407871791b8e3c225998"
+    ],
+    "count": 1,
+    "create_time": 1766318612,
+    "update_time": 1766318612,
+    "_id": "Journalism<SEP>Journalism Entrance Exam"
+  }
+}
