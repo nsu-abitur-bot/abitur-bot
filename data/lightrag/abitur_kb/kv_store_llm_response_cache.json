@@ -798,5 +798,173 @@
     "create_time": 1766323579,
     "update_time": 1766323579,
     "_id": "hybrid:query:07321606e67ced6492da33a7a5eed1ae"
+  },
+  "hybrid:keywords:c467aa34c1d9ae150f6df926aa293282": {
+    "return": "{\"high_level_keywords\": [\"\\u0424\\u0438\\u0442\\u043d\\u0435\\u0441\", \"\\u0424\\u0438\\u0437\\u0438\\u0447\\u0435\\u0441\\u043a\\u0430\\u044f \\u043f\\u043e\\u0434\\u0433\\u043e\\u0442\\u043e\\u0432\\u043a\\u0430\", \"\\u0417\\u0434\\u043e\\u0440\\u043e\\u0432\\u044c\\u0435 \\u0438 \\u0441\\u043f\\u043e\\u0440\\u0442\"], \"low_level_keywords\": [\"\\u0410\\u044d\\u0440\\u043e\\u0431\\u0438\\u043a\\u0430\", \"\\u0413\\u0438\\u043c\\u043d\\u0430\\u0441\\u0442\\u0438\\u043a\\u0430\", \"\\u0419\\u043e\\u0433\\u0430\", \"\\u041a\\u0430\\u0440\\u0434\\u0438\\u043e\\u0442\\u0440\\u0435\\u043d\\u0438\\u0440\\u043e\\u0432\\u043a\\u0438\", \"\\u0421\\u0438\\u043b\\u043e\\u0432\\u044b\\u0435 \\u0443\\u043f\\u0440\\u0430\\u0436\\u043d\\u0435\\u043d\\u0438\\u044f\"]}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from colder159] что будет изучаться на фите?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772550020,
+    "update_time": 1772550020,
+    "_id": "hybrid:keywords:c467aa34c1d9ae150f6df926aa293282"
+  },
+  "hybrid:query:cf743a1ae0a9d396df64963563b4fa00": {
+    "return": "### Изучаемые дисциплины на факультете информационных технологий (ФИТ)\n\nФакультет информационных технологий (ФИТ) Новосибирского государственного университета (НГУ) предлагает обучение по направлению *\"Информатика и вычислительная техника\"*. Основные особенности и содержание учебного плана представлены ниже:\n\n#### 1. Обязательные предметы:\n- **Русский язык**: обязательное требование для всех поступающих.\n- **Математика (профильная)**: обязательный предмет для успешного поступления.\n- **Третий предмет**: выбирается в зависимости от выбранного профиля, чаще всего это физика или информатика/ИКТ.\n\n#### 2. Специализация и профили:\nФИТ предлагает два основных профиля:\n- **«Компьютерные науки и системотехника»**\n- **«Программная инженерия и компьютерные науки»**\n\n#### 3. Учебная программа:\nСтуденты осваивают следующие дисциплины:\n- Программирование\n- Алгоритмы\n- Структуры данных\n- Современные языки программирования (C++, Java, Python)\n- Технологии искусственного интеллекта (ИИ) и анализа данных\n\n#### 4. Дополнительные возможности:\nФакультет акцентирует внимание на фундаментальной подготовке по информатике, математике и физике, сочетая её с возможностью прикладной и научно-исследовательской работы.\n\n#### 5. Практическая направленность:\nУчащиеся получают возможность принимать участие в исследовательских работах и проектах, что способствует их профессиональной подготовке и развитию практических навыков.\n\n### Источники\n\n- [1] Документ Чанк: {\"reference_id\": \"\"} – Содержит информацию об учебном плане и особенностях обучения на ФИТ НГУ.\n- [2] Документ Чанк: {\"reference_id\": \"\"} – Описывает структуру и содержание учебных курсов на ФИТ.\n\n### References\n\n```\n### References\n\n- [1] Информация о факультете информационных технологий НГУ\n- [2] Подробности учебного плана и направлений подготовки на ФИТ\n```",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from colder159] что будет изучаться на фите?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "Фитнес, Физическая подготовка, Здоровье и спорт",
+      "ll_keywords": "Аэробика, Гимнастика, Йога, Кардиотренировки, Силовые упражнения",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772550029,
+    "update_time": 1772550029,
+    "_id": "hybrid:query:cf743a1ae0a9d396df64963563b4fa00"
+  },
+  "hybrid:keywords:1e2e81f51a72e850a25c7947f707e8a9": {
+    "return": "{\"high_level_keywords\": [\"\\u0424\\u0418\\u0422\", \"\\u041d\\u0430\\u043f\\u0440\\u0430\\u0432\\u043b\\u0435\\u043d\\u0438\\u044f \\u043f\\u043e\\u0434\\u0433\\u043e\\u0442\\u043e\\u0432\\u043a\\u0438\", \"\\u0412\\u044b\\u0441\\u0448\\u0435\\u0435 \\u043e\\u0431\\u0440\\u0430\\u0437\\u043e\\u0432\\u0430\\u043d\\u0438\\u0435\"], \"low_level_keywords\": [\"\\u0418\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0442\\u0438\\u043a\\u0430 \\u0438 \\u0432\\u044b\\u0447\\u0438\\u0441\\u043b\\u0438\\u0442\\u0435\\u043b\\u044c\\u043d\\u0430\\u044f \\u0442\\u0435\\u0445\\u043d\\u0438\\u043a\\u0430\", \"\\u0418\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u043e\\u043d\\u043d\\u044b\\u0435 \\u0441\\u0438\\u0441\\u0442\\u0435\\u043c\\u044b \\u0438 \\u0442\\u0435\\u0445\\u043d\\u043e\\u043b\\u043e\\u0433\\u0438\\u0438\", \"\\u041f\\u0440\\u043e\\u0433\\u0440\\u0430\\u043c\\u043c\\u043d\\u0430\\u044f \\u0438\\u043d\\u0436\\u0435\\u043d\\u0435\\u0440\\u0438\\u044f\", \"\\u042d\\u043b\\u0435\\u043a\\u0442\\u0440\\u043e\\u043d\\u0438\\u043a\\u0430 \\u0438 \\u043d\\u0430\\u043d\\u043e\\u044d\\u043b\\u0435\\u043a\\u0442\\u0440\\u043e\\u043d\\u0438\\u043a\\u0430\", \"\\u0410\\u0432\\u0442\\u043e\\u043c\\u0430\\u0442\\u0438\\u0437\\u0430\\u0446\\u0438\\u044f \\u0438 \\u0443\\u043f\\u0440\\u0430\\u0432\\u043b\\u0435\\u043d\\u0438\\u0435\"]}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Привет, я хочу поступить на ФИТ\nКакие направления там есть?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772550091,
+    "update_time": 1772550091,
+    "_id": "hybrid:keywords:1e2e81f51a72e850a25c7947f707e8a9"
+  },
+  "hybrid:query:200691347d51831492ed5c4f1d4a1ba3": {
+    "return": "### Directions Offered by the Faculty of Informatics and Technologies (FIT)\n\nThe **Faculty of Informatics and Technologies (FIT)** at Novosibirsk State University offers specialized programs tailored to prepare students for careers in computing and technology. Below are the directions and profiles available for prospective students:\n\n- **Main Direction:**  \n  *09.03.01 «Информатика и вычислительная техника»*\n  This direction includes two distinct profiles:\n  - **«Компьютерные науки и системотехника»**\n  - **«Программная инженерия и компьютерные науки»**\n\n- **Duration of Study:**  \n  Typically, the duration of study for a bachelor’s degree is 4 years.\n\n- **Entry Requirements:**  \n  For FIT, applicants must submit results from three entrance exams:  \n  - **Русский язык** (mandatory)  \n  - **Математика (профильная)** (mandatory)  \n  - **Третий Subject**:  \n    - Physics  \n    - Informatika/ИКТ (depending on the chosen profile)\n\n- **Minimum Admission Scores:**  \n  Based on data from 2025, the average score for entering the **09.03.01 «Информатика и вычислительная техника»** program was approximately **267 points** for budget admission.\n\n- **Cost of Education:**  \n  Tuition fees for the first semester range from **195,000 rubles per year** for non-budget (paid) places.\n\n### References\n\n- [1] Document Title: *\"Новосибирский государственный университет (НГУ)\"*\n- [2] Document Title: *\"Факультет информационных технологий НГУ\"*\n- [3] Document Title: *\"Программная инженерия и компьютерные науки\"*\n- [4] Document Title: *\"Информатика и вычислительная техника\"*\n- [5] Document Title: *\"Бакалавриат по направлению 'Информатика и вычислительная техника'\"*\n\n### Notes\nThis information is based solely on the provided documents and does not represent additional external sources.",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Привет, я хочу поступить на ФИТ\nКакие направления там есть?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "ФИТ, Направления подготовки, Высшее образование",
+      "ll_keywords": "Информатика и вычислительная техника, Информационные системы и технологии, Программная инженерия, Электроника и наноэлектроника, Автоматизация и управление",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772550100,
+    "update_time": 1772550100,
+    "_id": "hybrid:query:200691347d51831492ed5c4f1d4a1ba3"
+  },
+  "hybrid:keywords:3d7402dbc4ae3b40ed53f6807dbf2dc9": {
+    "return": "{\"high_level_keywords\": [\"Programming education\", \"Alternative to FIT\", \"Computer science courses\"], \"low_level_keywords\": [\"IT departments\", \"Technical universities\", \"Software engineering programs\", \"Computer programming\", \"Engineering faculties\"]}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] А если я не хочу на ФИТ, куда мне поступить чтобы учить программирование?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772550885,
+    "update_time": 1772550885,
+    "_id": "hybrid:keywords:3d7402dbc4ae3b40ed53f6807dbf2dc9"
+  },
+  "hybrid:query:fee8e252645a7119e3a68bd8112f85c8": {
+    "return": "### Options for Studying Programming\n\nIf you are interested in studying programming but do not wish to attend the Faculty of Informatics and Technologies (FIT), several alternatives are available based on your interests and goals:\n\n#### 1. **Mechanico-Mathematical Faculty**\n   - This faculty offers strong programs in mathematics, applied mathematics, and informatics. You can choose the following directions:\n     - **\"01.03.02 Прикладная математика и информатика\"**: This program includes courses in programming, algorithms, and data structures.\n     - **\"01.03.03 Механика и математическое моделирование\"**: Although focused primarily on mechanics and mathematical modeling, it also covers programming and computational techniques.\n   \n   **Pros:**  \n   - Strong foundation in mathematics and computing.\n   - Opportunities for interdisciplinary research.\n   \n   **Cons:**  \n   - Requires high-level math skills.\n\n   **Reference:**  \n   *[6] Factual description of Mechanico-Mathematical Faculty.*\n\n#### 2. **Geologo-Geophysical Faculty**\n   - While primarily focused on geology and geophysics, this faculty also offers opportunities for learning programming through its emphasis on computational methods and data analysis.\n   \n   **Pros:**  \n   - Interdisciplinary approach combining natural sciences and programming.\n   \n   **Cons:**  \n   - Less direct focus compared to specialized departments.\n\n   **Reference:**  \n   *[1] Description of Geologo-Geophysical Faculty.*\n\n#### 3. **Economic Faculty**\n   - The Economic Faculty offers a program in economics with a significant focus on quantitative methods and analytics. This could provide exposure to programming and statistical tools.\n   \n   **Pros:**  \n   - Opportunity to combine economics and programming.\n   \n   **Cons:**  \n   - More focused on economic theory rather than pure programming.\n\n   **Reference:**  \n   *[7] Description of Economic Faculty.*\n\n#### 4. **Philosophy and Law Institute**\n   - Philosophy and law programs might not seem directly related to programming, but they often involve critical thinking and problem-solving skills that can complement programming studies.\n   \n   **Pros:**  \n   - Flexibility to explore diverse intellectual disciplines.\n   \n   **Cons:**  \n   - Not specifically tailored for programming.\n\n   **Reference:**  \n   *[8] Description of Philosophy and Law Institute.*\n\n### Conclusion\n\nBased on these options, the **Mechanico-Mathematical Faculty** appears to be the best fit for someone seeking a rigorous and specialized program in programming and computational methods. However, depending on your broader interests, you may consider exploring other faculties as well.\n\n### References\n\n- [6] Factual description of Mechanico-Mathematical Faculty.\n- [1] Description of Geologo-Geophysical Faculty.\n- [7] Description of Economic Faculty.\n- [8] Description of Philosophy and Law Institute.",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] А если я не хочу на ФИТ, куда мне поступить чтобы учить программирование?",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "Programming education, Alternative to FIT, Computer science courses",
+      "ll_keywords": "IT departments, Technical universities, Software engineering programs, Computer programming, Engineering faculties",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772550896,
+    "update_time": 1772550896,
+    "_id": "hybrid:query:fee8e252645a7119e3a68bd8112f85c8"
+  },
+  "hybrid:keywords:a0ba1d6cb87542d06b5758b37f5058bd": {
+    "return": "{\"high_level_keywords\": [\"\\u0415\\u0413\\u042d\", \"\\u041c\\u0430\\u0442\\u0435\\u043c\\u0430\\u0442\\u0438\\u0447\\u0435\\u0441\\u043a\\u0438\\u0439 \\u0444\\u0430\\u043a\\u0443\\u043b\\u044c\\u0442\\u0435\\u0442 (\\u041c\\u041c\\u0424)\", \"\\u0424\\u0430\\u043a\\u0443\\u043b\\u044c\\u0442\\u0435\\u0442 \\u0438\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0446\\u0438\\u043e\\u043d\\u043d\\u044b\\u0445 \\u0442\\u0435\\u0445\\u043d\\u043e\\u043b\\u043e\\u0433\\u0438\\u0439 (\\u0424\\u0418\\u0422)\"], \"low_level_keywords\": [\"\\u041f\\u0440\\u0435\\u0434\\u043c\\u0435\\u0442\\u044b \\u0415\\u0413\\u042d\", \"\\u0420\\u0443\\u0441\\u0441\\u043a\\u0438\\u0439 \\u044f\\u0437\\u044b\\u043a\", \"\\u041c\\u0430\\u0442\\u0435\\u043c\\u0430\\u0442\\u0438\\u043a\\u0430 \\u043f\\u0440\\u043e\\u0444\\u0438\\u043b\\u044c\\u043d\\u0430\\u044f\", \"\\u0418\\u043d\\u0444\\u043e\\u0440\\u043c\\u0430\\u0442\\u0438\\u043a\\u0430\", \"\\u0424\\u0438\\u0437\\u0438\\u043a\\u0430\"]}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Сравни какие предметы на ЕГЭ нужны для ММФ и ФИТ",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772551072,
+    "update_time": 1772551072,
+    "_id": "hybrid:keywords:a0ba1d6cb87542d06b5758b37f5058bd"
+  },
+  "hybrid:query:90a4299dff44054180d5bda27d8e8ddf": {
+    "return": "## Comparison of Required Subjects for MМФ and ФИТ on Entrance Exams\n\n### Mechanico-Mathematical Faculty (ММФ)\nFor Mechanico-Mathematical Faculty (ММФ), the following subjects are required for entrance exams:\n- **Русский язык**: Mandatory.\n- **Математика (профильная)**: Mandatory.\n- **Дополнительный subject**: Either *информатика/ИКТ* or *физика*, depending on the chosen direction.\n\n#### Examples of Profiles and Their Specific Requirements\n- For **\"Математика и компьютерные науки\" (02.03.01)**:\n  - Required: Russian language + Math + choice between Informatika/ICT or Physics.\n  \n- For **\"Механика и математическое моделирование\" (01.03.03)**:\n  - Required: Russian language + Math + Informatika/ICT.\n\n### Faculty of Informatics and Computing Science (ФИТ)\nFor the Faculty of Informatics and Computing Science (ФИТ), the required subjects are:\n- **Русский язык**: Mandatory.\n- **Математика (профильная)**: Mandatory.\n- **Additional subject**: Depending on the chosen profile, either *физику* or *информатику/ИКТ*.\n\n#### Example of Required Passing Score\n- For the **direction \"09.03.01 «Информатика и вычислительная техника»\"**:\n  - Minimum total score ~ **267** for budget form in 2025.\n\n### Conclusion\nBoth faculties require **Russian language** and **mastery-level mathematics (professional)**. However, the additional subject differs based on the selected profile:\n- **ММФ** allows choosing between *physics* or *informatics/ICT*.\n- **ФИТ** mandates *either physics or informatics/ICT*, depending on the profile.\n\n### References\n### References\n- [1] Document Chunk: “# Факультет механико‑математический (ММФ) НГУ”\n- [2] Document Chunk: “# ФИТ — Факультет информационных технологий НГУ”\n\nThese documents provide detailed information regarding the entrance requirements for these faculties.",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Сравни какие предметы на ЕГЭ нужны для ММФ и ФИТ",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "ЕГЭ, Математический факультет (ММФ), Факультет информационных технологий (ФИТ)",
+      "ll_keywords": "Предметы ЕГЭ, Русский язык, Математика профильная, Информатика, Физика",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1772551121,
+    "update_time": 1772551121,
+    "_id": "hybrid:query:90a4299dff44054180d5bda27d8e8ddf"
   }
 }

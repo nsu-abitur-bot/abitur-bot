@@ -43,13 +43,13 @@ def test_unknown_provider_raises(monkeypatch):
         factory.get_llm_provider()
 
 
-def test_default_provider_is_gigachat(monkeypatch):
+def test_default_provider_is_cerebras(monkeypatch):
     monkeypatch.delenv("LLM_PROVIDER", raising=False)
-    monkeypatch.setenv("GIGACHAT_API_KEY", "fake_key")
+    monkeypatch.setenv("CEREBRAS_API_KEY", "fake_key")
 
     provider = factory.get_llm_provider()
 
-    assert type(provider).__name__ == "GigaChatProvider"
+    assert type(provider).__name__ == "CerebrasProvider"
 
 
 def test_get_cerebras_provider(monkeypatch):

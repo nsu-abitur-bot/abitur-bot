@@ -12,14 +12,14 @@ def get_llm_provider() -> BaseLLMProvider:
     """Создаёт LLM провайдер на основе переменной окружения LLM_PROVIDER.
 
     Поддерживаемые значения:
-        - "gigachat" (по умолчанию)
-        - "cerebras"
+        - "cerebras" (по умолчанию)
+        - "gigachat"
     """
     global _provider_instance
     if _provider_instance is not None:
         return _provider_instance
 
-    provider_name = os.getenv("LLM_PROVIDER", "gigachat").lower()
+    provider_name = os.getenv("LLM_PROVIDER", "cerebras").lower()
 
     if provider_name == "gigachat":
         from llm.providers.gigachat import GigaChatProvider

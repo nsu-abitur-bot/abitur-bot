@@ -31,24 +31,34 @@ class CerebrasProvider(BaseLLMProvider):
                 "Пожалуйста, настройте её для использования провайдера Cerebras."
             )
 
-        self.model_name = os.getenv("CEREBRAS_MODEL", "llama-3.3-70b")
+        self.model_name = os.getenv("CEREBRAS_MODEL", "gpt-oss-120b")
         self.max_completion_tokens = int(
             os.getenv("CEREBRAS_MAX_COMPLETION_TOKENS", "1024")
         )
         self.temperature = float(os.getenv("CEREBRAS_TEMPERATURE", "0.2"))
         self.top_p = float(os.getenv("CEREBRAS_TOP_P", "1"))
+        self.timeout_seconds = float(os.getenv("CEREBRAS_TIMEOUT_SECONDS", "60"))
+        self.max_retries = int(os.getenv("CEREBRAS_MAX_RETRIES", "2"))
 
         Cerebras = _load_cerebras_class()
-        self.client = Cerebras(api_key=api_key)
+        self.client = Cerebras(
+            api_key=api_key,
+            timeout=self.timeout_seconds,
+            max_retries=self.max_retries,
+        )
         logger.info(
-            "Cerebras провайдер инициализирован (модель: %s)",
+            "Cerebras провайдер инициализирован (модель: %s, timeout: %ss, retries: %s)",
             self.model_name,
+            self.timeout_seconds,
+            self.max_retries,
         )
 
     async def generate(self, messages: List[BaseMessage]) -> str:
-        cerebras_messages = [self._to_cerebras_message(message) for message in messages]
+        cerebras_messages: Any = [
+            self._to_cerebras_message(message) for message in messages
+        ]
 
-        completion = await asyncio.to_thread(
+        completion: Any = await asyncio.to_thread(
             self.client.chat.completions.create,
             messages=cerebras_messages,
             model=self.model_name,
@@ -56,6 +66,7 @@ class CerebrasProvider(BaseLLMProvider):
             temperature=self.temperature,
             top_p=self.top_p,
             stream=False,
+            timeout=self.timeout_seconds,
         )
 
         content: Any = completion.choices[0].message.content
