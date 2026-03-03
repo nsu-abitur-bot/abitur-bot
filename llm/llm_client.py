@@ -117,7 +117,7 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             faq_matcher = get_faq_matcher()
             faq_answer = faq_matcher.match(message)
             if faq_answer:
-                logger.info(f"FAQ match found, skipping LLM call")
+                logger.info("FAQ match found, skipping LLM call")
                 await redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
