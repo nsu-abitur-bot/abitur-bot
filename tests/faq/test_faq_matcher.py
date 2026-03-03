@@ -62,7 +62,7 @@ def faq_yaml(tmp_path: Path) -> Path:
 @pytest.fixture
 def matcher(faq_yaml: Path) -> FAQMatcher:
     """Создаёт FAQMatcher с тестовыми данными."""
-    return FAQMatcher(faq_path=faq_yaml, threshold=0.75)
+    return FAQMatcher(faq_path=faq_yaml, threshold=0.80)
 
 
 # ── Тесты ─────────────────────────────────────────────────────────────
@@ -145,6 +145,11 @@ class TestFAQMatcherMatching:
         result = matcher.match("asdfghjkl qwerty")
         assert result is None
 
+    def test_no_match_vague_question(self, matcher: FAQMatcher):
+        """Размытый вопрос 'Что есть в НГУ' не должен ложно срабатывать."""
+        result = matcher.match("Что есть в НГУ")
+        assert result is None
+
 
 class TestFAQMatcherWithNoisyInput:
     """Тесты сопоставления с 'грязным' вводом — приветствия, префиксы."""
@@ -201,7 +206,7 @@ class TestFAQMatcherThreshold:
         assert result is not None
 
     def test_threshold_property(self, matcher: FAQMatcher):
-        assert matcher.threshold == 0.75
+        assert matcher.threshold == 0.80
         matcher.threshold = 0.90
         assert matcher.threshold == 0.90
 
@@ -210,7 +215,7 @@ class TestFAQMatcherReload:
     """Тесты перезагрузки FAQ."""
 
     def test_reload_updates_data(self, faq_yaml: Path):
-        m = FAQMatcher(faq_path=faq_yaml, threshold=0.75)
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.80)
         assert m.size == 12
 
         # Добавляем новый FAQ
