@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from db.redis_client import RedisClient
+from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
 from rag.retriever import search_similar
 
@@ -54,7 +55,20 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             session_id, {"role": "user", "content": message}
         )
 
-        # 2. Ищем релевантный контекст в векторной базе данных
+        # 2. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
+        try:
+            faq_matcher = get_faq_matcher()
+            faq_answer = faq_matcher.match(message)
+            if faq_answer:
+                logger.info(f"FAQ match found, skipping LLM call")
+                await redis_client.add_message(
+                    session_id, {"role": "assistant", "content": faq_answer}
+                )
+                return faq_answer
+        except Exception as e:
+            logger.warning(f"FAQ matcher error: {e}")
+
+        # 3. Ищем релевантный контекст в векторной базе данных
         try:
             similar_docs = search_similar(message, k=3)
             context = "\n\n".join([doc.page_content for doc in similar_docs])
