@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from db.redis_client import RedisClient
+from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
 from rag.retriever import query_graph
 
@@ -111,7 +112,20 @@ async def ask_local_llm(message: str, session_id: str) -> str:
         # 1. Сначала сохраняем сообщение пользователя в историю
         await redis_client.add_message(session_id, {"role": "user", "content": message})
 
-        # 2. Получаем контекст из LightRAG
+        # 2. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
+        try:
+            faq_matcher = get_faq_matcher()
+            faq_answer = faq_matcher.match(message)
+            if faq_answer:
+                logger.info("FAQ match found, skipping LLM call")
+                await redis_client.add_message(
+                    session_id, {"role": "assistant", "content": faq_answer}
+                )
+                return faq_answer
+        except Exception as e:
+            logger.warning(f"FAQ matcher error: {e}")
+
+        # 3. Получаем контекст из LightRAG
         try:
             rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
             rag_context = await query_graph(rag_query)
@@ -121,7 +135,7 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             logger.warning(f"LightRAG query error: {e}")
             rag_context = "База знаний временно недоступна."
 
-        # 3. Формируем сообщения и отправляем в LLM провайдер (Cerebras по умолчанию)
+        # 4. Формируем сообщения и отправляем в LLM провайдер (Cerebras по умолчанию)
         try:
             system_prompt = SYSTEM_PROMPT_BASE.format(context=rag_context)
             messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
