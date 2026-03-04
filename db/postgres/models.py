@@ -1,7 +1,15 @@
 from datetime import UTC, datetime
 from typing import List, Optional
 
-from sqlalchemy import BigInteger, Boolean, DateTime, ForeignKey, Index, Integer, String
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
 
@@ -24,15 +32,17 @@ class User(Base):
 
     # Это user_id из телеграмма
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
-    snils_id: Mapped[Optional[str]] = mapped_column(String(14), nullable=True)
+    applicant_id: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
     ratings: Mapped[List["UserRating"]] = relationship(
         "UserRating", back_populates="user", cascade="all, delete-orphan"
     )
 
+    __table_args__ = (Index("idx_user_applicant_id", "applicant_id"),)
+
     def __repr__(self) -> str:
-        return f"<User(user_id={self.user_id}, snils_id='{self.snils_id}')>"
+        return f"<User(user_id={self.user_id}, applicant_id='{self.applicant_id}')>"
 
 
 class Leaderboard(Base):
@@ -79,6 +89,10 @@ class UserRating(Base):
         String(36), ForeignKey("leaderboard.id"), primary_key=True
     )
     place: Mapped[int] = mapped_column(Integer)
+    competition_type: Mapped[str] = mapped_column(
+        String(200), default="", server_default=""
+    )
+    status: Mapped[str] = mapped_column(String(100), default="", server_default="")
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=timestamp,
@@ -91,4 +105,9 @@ class UserRating(Base):
     )
 
     def __repr__(self) -> str:
-        return f"<UserRating(user_id={self.user_id}, leaderboard_id='{self.leaderboard_id}', place={self.place})>"  # noqa: E501
+        return (
+            f"<UserRating(user_id={self.user_id}, "
+            f"leaderboard_id='{self.leaderboard_id}', "
+            f"place={self.place}, competition_type='{self.competition_type}', "
+            f"status='{self.status}')>"
+        )

@@ -7,7 +7,21 @@ load_dotenv()
 
 
 def get_database_url() -> str:
-    """Получение URL подключения к базе данных."""
+    """Получение URL подключения к базе данных.
+
+    Если задана переменная DATABASE_URL — использует её напрямую
+    (при необходимости нормализует схему: postgresql:// → postgresql+asyncpg://).
+    Иначе собирает URL из отдельных DB_* переменных.
+    """
+    database_url = os.getenv("DATABASE_URL")
+    if database_url:
+        # Нормализуем схему: оба варианта (postgresql и postgresql+asyncpg) допустимы
+        if database_url.startswith("postgresql://"):
+            database_url = database_url.replace(
+                "postgresql://", "postgresql+asyncpg://", 1
+            )
+        return database_url
+
     host = os.getenv("DB_HOST", "localhost")
     port = os.getenv("DB_PORT", "5432")
     user = os.getenv("DB_USER", "postgres")

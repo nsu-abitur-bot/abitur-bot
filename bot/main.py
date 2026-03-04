@@ -22,12 +22,7 @@ bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
 dp = Dispatcher()
 
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
-logging.getLogger("llm.llm_client").setLevel(logging.DEBUG)
-logging.getLogger("db.redis_client").setLevel(logging.DEBUG)
 
 
 def get_session_id(message: Message) -> str:
@@ -57,6 +52,7 @@ async def cmd_start(message: Message):
         return
     chat_id = str(message.chat.id)
     user_id = message.from_user.id
+    session_id = get_session_id(message)
 
     async with AsyncSessionLocal() as session:
         user_service = UserService(session)
@@ -68,30 +64,31 @@ async def cmd_start(message: Message):
         else:
             logger.info(f"Пользователь {user_id} уже существует в БД")
 
-    await bot.send_message(
-        chat_id,
-        "Привет! Используйте /track, /untrack и /reset",
-        parse_mode=ParseMode.MARKDOWN,
-    )
+    # Сбрасываем флаг ожидания applicant_id на случай зависшего состояния
+    redis_client = await get_redis_client()
+    await redis_client.set_awaiting_applicant_id(session_id, False)
+
+    await bot.send_message(chat_id, "Привет! Используйте /track, /untrack и /reset")
 
 
 @dp.message(Command("track"))
 async def cmd_track(message: Message):
-    """Обработчик /track: переводим сессию в ожидание СНИЛС."""
+    """Обработчик /track: переводим сессию в ожидание идентификатора абитуриента."""
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
     session_id = get_session_id(message)
 
     redis_client = await get_redis_client()
-    await redis_client.set_awaiting_snils(session_id, True)
+    await redis_client.set_awaiting_applicant_id(session_id, True)
 
-    await bot.send_message(chat_id, "Укажите свой СНИЛС")
+    await bot.send_message(chat_id, "Укажите свой идентификатор абитуриента")
 
 
 @dp.message(Command("untrack"))
 async def cmd_untrack(message: Message):
-    """Обработчик /untrack: удаляем состояние сессии и СНИЛС из БД."""
+    """Обработчик /untrack: удаляем состояние сессии и идентификатор
+    абитуриента из БД."""
     if not message.from_user:
         return
     chat_id = str(message.chat.id)
@@ -100,14 +97,16 @@ async def cmd_untrack(message: Message):
 
     async with AsyncSessionLocal() as session:
         user_service = UserService(session)
-        updated = await user_service.update_snils(user_id, None)
+        updated = await user_service.update_applicant_id(user_id, None)
         if updated:
-            logger.info(f"СНИЛС пользователя {user_id} удален из БД")
+            logger.info(f"Идентификатор пользователя {user_id} удален из БД")
         else:
-            logger.warning(f"Пользователь {user_id} не найден в БД для удаления СНИЛС")
+            logger.warning(
+                f"Пользователь {user_id} не найден в БД для удаления идентификатора"
+            )
 
     redis_client = await get_redis_client()
-    await redis_client.set_awaiting_snils(session_id, False)
+    await redis_client.set_awaiting_applicant_id(session_id, False)
     await bot.send_message(chat_id, "Отслеживание прекращено")
 
 
@@ -132,7 +131,7 @@ async def cmd_reset(message: Message):
 
 @dp.message()
 async def handle_message(message: Message):
-    """Обычные сообщения: сохраняем СНИЛС или шлём в LLM."""
+    """Обычные сообщения: сохраняем идентификатор абитуриента или шлём в LLM."""
     if not message.from_user:
         return
 
@@ -146,24 +145,56 @@ async def handle_message(message: Message):
     logger.info(f"Сообщение от {user_name} в чате {chat_id}: {user_text}")
 
     redis_client = await get_redis_client()
-    is_awaiting = await redis_client.is_awaiting_snils(session_id)
+    is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
 
-    # Если ожидали СНИЛС — сохраняем его
+    # Если ожидали идентификатор абитуриента — сохраняем его
     if is_awaiting:
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             user_id = message.from_user.id
 
-            updated = await user_service.update_snils(user_id, user_text)
-            if updated:
-                logger.info(f"СНИЛС пользователя {user_id} обновлен в БД: {user_text}")
-                await redis_client.set_awaiting_snils(session_id, False)
-                await bot.send_message(chat_id, "СНИЛС записан")
-            else:
-                logger.error(f"Не удалось обновить СНИЛС для пользователя {user_id}")
+            # Убедимся, что пользователь существует в БД
+            # (на случай если /start не вызывался)
+            existing_user = await user_service.get_user(user_id)
+            if not existing_user:
+                await user_service.create_user(user_id)
+                logger.info(f"Пользователь {user_id} создан автоматически при /track")
+
+            # Валидация формата applicant_id (макс 7 символов)
+            if len(user_text) > 7:
                 await bot.send_message(
                     chat_id,
-                    "Ошибка при сохранении СНИЛС.",
+                    (
+                        "Идентификатор должен быть не длиннее 7 символов. "
+                        "Попробуйте еще раз."
+                    ),
+                )
+                return
+
+            if not user_text.strip():
+                await bot.send_message(
+                    chat_id,
+                    "Идентификатор не может быть пустым. Попробуйте еще раз.",
+                )
+                return
+
+            updated = await user_service.update_applicant_id(user_id, user_text)
+            if updated:
+                logger.info(
+                    f"Идентификатор пользователя {user_id} обновлен в БД: {user_text}"
+                )
+                await redis_client.set_awaiting_applicant_id(session_id, False)
+                await bot.send_message(chat_id, "Идентификатор записан")
+            else:
+                logger.error(
+                    f"Не удалось обновить идентификатор для пользователя {user_id}"
+                )
+                await bot.send_message(
+                    chat_id,
+                    (
+                        "Ошибка при сохранении идентификатора. "
+                        "Проверьте формат и попробуйте снова."
+                    ),
                 )
         return
 
