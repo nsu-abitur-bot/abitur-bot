@@ -10,7 +10,7 @@ def get_database_url() -> str:
     """Получение URL подключения к базе данных.
 
     Если задана переменная DATABASE_URL — использует её напрямую
-    (при необходимости приводит asyncpg -> asyncpg, это основной режим).
+    (при необходимости нормализует схему: postgresql:// → postgresql+asyncpg://).
     Иначе собирает URL из отдельных DB_* переменных.
     """
     database_url = os.getenv("DATABASE_URL")
