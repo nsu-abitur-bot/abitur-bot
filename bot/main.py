@@ -1,3 +1,4 @@
+from aiogram.enums import ParseMode
 import asyncio
 import logging
 from os import getenv
@@ -202,7 +203,7 @@ async def handle_message(message: Message):
     response = await ask_local_llm(formatted_message, session_id=session_id)
 
     if response:
-        await bot.send_message(chat_id, response)
+        await bot.send_message(chat_id, response, parse_mode=ParseMode.HTML)
 
 
 async def main():

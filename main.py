@@ -2,7 +2,7 @@ import asyncio
 import logging
 
 from bot.main import main as bot_main
-from parser.baza_to_rag import parse_baza_and_save_to_vectorstore
+from parser.baza_to_rag import parse_baza_and_save_to_memory
 
 logging.basicConfig(
     level=logging.INFO,
@@ -16,9 +16,10 @@ async def main():
 
     # TODO сделать миграции перед парсингом
 
-    logger.info("=== Инициализация векторной базы данных ===")
+    # Сначала парсим и сохраняем данные в графовую память
+    logger.info("=== Инициализация графовой памяти ===")
     try:
-        await asyncio.to_thread(parse_baza_and_save_to_vectorstore)
+        await asyncio.to_thread(parse_baza_and_save_to_memory)
     except Exception as e:
         logger.error(f"Ошибка при парсинге и сохранении данных: {e}")
         logger.info("Продолжаем запуск бота...")

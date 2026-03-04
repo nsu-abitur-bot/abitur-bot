@@ -1,4 +1,4 @@
-"""Модуль для парсинга факультетов НГУ и сохранения данных в ChromaDB."""
+"""Модуль для парсинга факультетов НГУ и сохранения данных в графовую память."""
 
 import logging
 
@@ -9,8 +9,8 @@ from rag.loader import add_texts
 logger = logging.getLogger(__name__)
 
 
-def parse_and_save_to_vectorstore():
-    """Парсит все факультеты из конфигурации и сохраняет данные в ChromaDB."""
+def parse_and_save_to_memory():
+    """Парсит все факультеты из конфигурации и сохраняет данные в графовую память."""
     logger.info("Начало парсинга факультетов НГУ...")
 
     config = get_parser_config()
