@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "ruff",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.30.0",
     "aiogram",
     "python-dotenv",
     "httpx",
