@@ -8,9 +8,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import User
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
 
 
@@ -21,11 +18,11 @@ class UserService:
         self.session = session
 
     async def create_user(
-        self, user_id: int, snils: Optional[str] = None
+        self, user_id: int, applicant_id: Optional[str] = None
     ) -> Optional[User]:
         """Создать нового пользователя."""
         try:
-            user = User(user_id=user_id, snils_id=snils)
+            user = User(user_id=user_id, applicant_id=applicant_id)
             self.session.add(user)
             await self.session.commit()
             await self.session.refresh(user)
@@ -34,7 +31,8 @@ class UserService:
         except IntegrityError as e:
             await self.session.rollback()
             logger.warning(
-                f"Пользователь {user_id} уже существует или SNILS {snils} занят: {e}"
+                f"Не удалось создать пользователя {user_id} из-за "
+                f"нарушения ограничения БД: {e}"
             )
             return None
         except Exception as e:
@@ -58,21 +56,26 @@ class UserService:
             logger.error(f"Ошибка получения пользователя {user_id}: {e}")
             return None
 
-    async def get_user_by_snils(self, snils: str) -> Optional[User]:
-        """Получить пользователя по SNILS."""
+    async def get_users_by_applicant_id(self, applicant_id: str) -> List[User]:
+        """Получить всех пользователей по идентификатору абитуриента.
+
+        Возвращает список пользователей, т.к. несколько пользователей
+        могут быть подписаны на один applicant_id.
+        """
         try:
             result = await self.session.execute(
-                select(User).where(User.snils_id == snils)
+                select(User).where(User.applicant_id == applicant_id)
             )
-            user = result.scalar_one_or_none()
-            if user:
-                logger.debug(f"Пользователь со SNILS {snils} найден")
-            else:
-                logger.debug(f"Пользователь со SNILS {snils} не найден")
-            return user
+            users = list(result.scalars().all())
+            logger.debug(
+                f"Найдено {len(users)} пользователей с applicant_id {applicant_id}"
+            )
+            return users
         except Exception as e:
-            logger.error(f"Ошибка получения пользователя по SNILS {snils}: {e}")
-            return None
+            logger.error(
+                f"Ошибка получения пользователей по applicant_id {applicant_id}: {e}"
+            )
+            return []
 
     async def get_all_users(self) -> List[User]:
         """Получить всех пользователей."""
@@ -156,8 +159,10 @@ class UserService:
                 "all_time": 0,
             }
 
-    async def update_snils(self, user_id: int, new_snils: Optional[str]) -> bool:
-        """Обновить SNILS пользователя."""
+    async def update_applicant_id(
+        self, user_id: int, new_applicant_id: Optional[str]
+    ) -> bool:
+        """Обновить идентификатор абитуриента."""
         try:
             result = await self.session.execute(
                 select(User).where(User.user_id == user_id)
@@ -165,20 +170,26 @@ class UserService:
             user = result.scalar_one_or_none()
 
             if not user:
-                logger.warning(f"Пользователь {user_id} не найден для обновления SNILS")
+                logger.warning(
+                    f"Пользователь {user_id} не найден для обновления applicant_id"
+                )
                 return False
 
-            user.snils_id = new_snils
+            user.applicant_id = new_applicant_id
             await self.session.commit()
-            logger.info(f"SNILS пользователя {user_id} обновлен на {new_snils}")
+            logger.info(
+                f"applicant_id пользователя {user_id} обновлен на {new_applicant_id}"
+            )
             return True
-        except IntegrityError:
+        except IntegrityError as e:
             await self.session.rollback()
-            logger.warning(f"SNILS {new_snils} уже используется")
+            logger.warning(
+                f"Ошибка обновления applicant_id для пользователя {user_id}: {e}"
+            )
             return False
         except Exception as e:
             await self.session.rollback()
-            logger.error(f"Ошибка обновления SNILS пользователя {user_id}: {e}")
+            logger.error(f"Ошибка обновления applicant_id пользователя {user_id}: {e}")
             return False
 
     async def delete_user(self, user_id: int) -> bool:

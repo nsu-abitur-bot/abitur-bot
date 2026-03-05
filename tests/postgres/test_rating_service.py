@@ -56,7 +56,7 @@ async def test_create_or_update_user_rating(session: AsyncSession):
     rating_service = RatingService(session)
 
     # Создаём пользователя
-    await user_service.create_user(user_id=123456, snils="123-456-789 00")
+    await user_service.create_user(user_id=123456, applicant_id="1234567")
 
     # Создаём рейтинг
     leaderboard = await rating_service.get_or_create_leaderboard(
@@ -83,7 +83,7 @@ async def test_get_user_ratings(session: AsyncSession):
     rating_service = RatingService(session)
 
     # Создаём пользователя
-    await user_service.create_user(user_id=123456, snils="123-456-789 00")
+    await user_service.create_user(user_id=123456, applicant_id="1234567")
 
     # Создаём несколько рейтингов
     leaderboard1 = await rating_service.get_or_create_leaderboard(
@@ -112,7 +112,7 @@ async def test_delete_user_rating(session: AsyncSession):
     rating_service = RatingService(session)
 
     # Создаём пользователя и рейтинг
-    await user_service.create_user(user_id=123456, snils="123-456-789 00")
+    await user_service.create_user(user_id=123456, applicant_id="1234567")
     leaderboard = await rating_service.get_or_create_leaderboard(
         url="https://example.com/ratings"
     )

@@ -1,9 +1,6 @@
 **Основные команды миграций:**
 
 ```bash
-# Перейти в папку db для работы с миграциями
-cd db
-
 # Инициализация alembic
 uv run alembic init alembic
 
@@ -30,38 +27,29 @@ uv run alembic upgrade head --sql
 
 # Проверить соответствие моделей и БД
 uv run alembic check
-
-# Вернуться в корень после работы с миграциями
-cd ..
 ```
 
 **Полезные команды для разработки:**
 
 ```bash
 # Сбросить БД и применить все миграции заново
-cd db
 uv run alembic downgrade base
 uv run alembic upgrade head
-cd ..
 
 # Создать миграцию с пустым файлом (для ручных изменений)
-cd db
 uv run alembic revision -m "Manual changes"
-cd ..
 ```
 
 ## Работа с миграциями - быстрая справка
 
 | Действие | Команда |
 |----------|---------|
-| Создать миграцию | `cd db && uv run alembic revision --autogenerate -m "Message"` |
-| Применить миграции | `cd db && uv run alembic upgrade head` |
-| Откатить миграцию | `cd db && uv run alembic downgrade -1` |
-| Текущая версия | `cd db && uv run alembic current` |
-| История миграций | `cd db && uv run alembic history --verbose` |
-| Сбросить БД | `cd db && uv run alembic downgrade base` |
-
-**Важно:** Всегда переходите в папку `db` перед выполнением команд alembic, так как `alembic.ini` находится там.
+| Создать миграцию | `uv run alembic revision --autogenerate -m "Message"` |
+| Применить миграции | `uv run alembic upgrade head` |
+| Откатить миграцию | `uv run alembic downgrade -1` |
+| Текущая версия | `uv run alembic current` |
+| История миграций | `uv run alembic history --verbose` |
+| Сбросить БД | `uv run alembic downgrade base` |
 
 ## Примеры изменения схемы БД
 
@@ -76,10 +64,8 @@ class User(Base):
 
 2. Создайте и примените миграцию:
 ```bash
-cd db
 uv run alembic revision --autogenerate -m "Add is_active field to User"
 uv run alembic upgrade head
-cd ..
 ```
 
 ### Создание новой таблицы
@@ -87,8 +73,6 @@ cd ..
 1. Добавьте новую модель в `db/postgres/models.py`
 2. Создайте миграцию:
 ```bash
-cd db
 uv run alembic revision --autogenerate -m "Add new table"
 uv run alembic upgrade head
-cd ..
 ```

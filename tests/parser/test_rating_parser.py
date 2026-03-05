@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from db.postgres.dto import RatingEntry
 from parser.rating_parser import (
-    RatingEntry,
     _extract_entries,
     _extract_params_from_url,
     _get_csrf_token,
