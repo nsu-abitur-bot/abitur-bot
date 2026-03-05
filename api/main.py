@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,10 +17,13 @@ class UserCountStatsResponse(BaseModel):
 app = FastAPI(title="Abitur API")
 
 
-@app.get("/api/v1/users/count", response_model=UserCountStatsResponse)
-async def get_users_count(
+@app.get("/api/v1/users/count-stats", response_model=UserCountStatsResponse)
+async def get_users_count_stats(
     session: AsyncSession = Depends(get_session),
 ) -> UserCountStatsResponse:
     service = UserService(session)
-    stats = await service.get_user_count_stats()
+    try:
+        stats = await service.get_user_count_stats()
+    except Exception:
+        raise HTTPException(status_code=503, detail="Database unavailable")
     return UserCountStatsResponse(**stats)
