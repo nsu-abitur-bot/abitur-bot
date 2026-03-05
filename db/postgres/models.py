@@ -39,7 +39,10 @@ class User(Base):
         "UserRating", back_populates="user", cascade="all, delete-orphan"
     )
 
-    __table_args__ = (Index("idx_user_applicant_id", "applicant_id"),)
+    __table_args__ = (
+        Index("idx_user_applicant_id", "applicant_id"),
+        Index("idx_user_created_at", "created_at"),
+    )
 
     def __repr__(self) -> str:
         return f"<User(user_id={self.user_id}, applicant_id='{self.applicant_id}')>"

@@ -151,13 +151,7 @@ class UserService:
             }
         except Exception as e:
             logger.error(f"Ошибка получения статистики пользователей: {e}")
-            return {
-                "day": 0,
-                "week": 0,
-                "month": 0,
-                "year": 0,
-                "all_time": 0,
-            }
+            raise
 
     async def update_applicant_id(
         self, user_id: int, new_applicant_id: Optional[str]
