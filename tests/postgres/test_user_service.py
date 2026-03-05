@@ -3,8 +3,11 @@
 """
 
 import pytest
+from datetime import UTC, datetime, timedelta
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.postgres.models import User
 from db.postgres.services.user import UserService
 
 
@@ -160,3 +163,78 @@ async def test_delete_user(session: AsyncSession):
     # Проверяем что пользователь удалён
     user = await service.get_user(user_id=123456)
     assert user is None
+
+
+@pytest.mark.asyncio
+async def test_get_user_count_stats_empty(session: AsyncSession):
+    """Тест статистики при отсутствии пользователей."""
+    service = UserService(session)
+
+    stats = await service.get_user_count_stats()
+    assert stats == {"day": 0, "week": 0, "month": 0, "year": 0, "all_time": 0}
+
+
+@pytest.mark.asyncio
+async def test_get_user_count_stats_all_recent(session: AsyncSession):
+    """Тест: только что созданные пользователи попадают во все периоды."""
+    service = UserService(session)
+
+    await service.create_user(user_id=111111, applicant_id="AAA1111")
+    await service.create_user(user_id=222222, applicant_id="BBB2222")
+
+    stats = await service.get_user_count_stats()
+    assert stats["day"] == 2
+    assert stats["week"] == 2
+    assert stats["month"] == 2
+    assert stats["year"] == 2
+    assert stats["all_time"] == 2
+
+
+@pytest.mark.asyncio
+async def test_get_user_count_stats_old_user_excluded_from_day(
+    session: AsyncSession,
+):
+    """Тест: пользователь созданный 2 дня назад не попадает в статистику за день."""
+    service = UserService(session)
+
+    # Создаём пользователя
+    user = await service.create_user(user_id=111111, applicant_id="AAA1111")
+    assert user is not None
+
+    # Сдвигаем created_at на 2 дня назад (но в пределах недели)
+    now = datetime.now(UTC).replace(tzinfo=None)
+    two_days_ago = now - timedelta(days=2)
+    await session.execute(
+        update(User).where(User.user_id == 111111).values(created_at=two_days_ago)
+    )
+    await session.commit()
+
+    stats = await service.get_user_count_stats()
+    assert stats["day"] == 0
+    assert stats["week"] == 1
+    assert stats["month"] == 1
+    assert stats["year"] == 1
+    assert stats["all_time"] == 1
+
+
+@pytest.mark.asyncio
+async def test_get_user_count_stats_boundary_365_days(session: AsyncSession):
+    """Тест: пользователь созданный более 365 дней назад не попадает в 'year'."""
+    service = UserService(session)
+
+    user = await service.create_user(user_id=111111, applicant_id="AAA1111")
+    assert user is not None
+
+    now = datetime.now(UTC).replace(tzinfo=None)
+    over_year_ago = now - timedelta(days=366)
+    await session.execute(
+        update(User).where(User.user_id == 111111).values(created_at=over_year_ago)
+    )
+    await session.commit()
+
+    stats = await service.get_user_count_stats()
+    assert stats["day"] == 0
+    assert stats["week"] == 0
+    assert stats["month"] == 0
+    assert stats["year"] == 0
+    assert stats["all_time"] == 1

@@ -1,4 +1,5 @@
 import logging
+from datetime import UTC, datetime, timedelta
 from typing import List, Optional
 
 from sqlalchemy import func, select
@@ -57,7 +58,7 @@ class UserService:
 
     async def get_users_by_applicant_id(self, applicant_id: str) -> List[User]:
         """Получить всех пользователей по идентификатору абитуриента.
-        
+
         Возвращает список пользователей, т.к. несколько пользователей
         могут быть подписаны на один applicant_id.
         """
@@ -112,6 +113,45 @@ class UserService:
         except Exception as e:
             logger.error(f"Ошибка подсчета пользователей: {e}")
             return 0
+
+    async def get_user_count_stats(self) -> dict[str, int]:
+        """Получить количество пользователей за разные периоды."""
+        try:
+            now = datetime.now(UTC).replace(tzinfo=None)
+            day_ago = now - timedelta(days=1)
+            week_ago = now - timedelta(weeks=1)
+            month_ago = now - timedelta(days=30)
+            year_ago = now - timedelta(days=365)
+
+            result = await self.session.execute(
+                select(
+                    func.count(User.user_id)
+                    .filter(User.created_at >= day_ago)
+                    .label("day"),
+                    func.count(User.user_id)
+                    .filter(User.created_at >= week_ago)
+                    .label("week"),
+                    func.count(User.user_id)
+                    .filter(User.created_at >= month_ago)
+                    .label("month"),
+                    func.count(User.user_id)
+                    .filter(User.created_at >= year_ago)
+                    .label("year"),
+                    func.count(User.user_id).label("all_time"),
+                )
+            )
+
+            row = result.one()
+            return {
+                "day": int(row.day or 0),
+                "week": int(row.week or 0),
+                "month": int(row.month or 0),
+                "year": int(row.year or 0),
+                "all_time": int(row.all_time or 0),
+            }
+        except Exception as e:
+            logger.error(f"Ошибка получения статистики пользователей: {e}")
+            raise
 
     async def update_applicant_id(
         self, user_id: int, new_applicant_id: Optional[str]
