@@ -371,7 +371,7 @@
     }
   },
   "doc-cfd472ee57fd3194a813bd459e180520": {
-    "status": "processing",
+    "status": "processed",
     "chunks_count": 4,
     "chunks_list": [
       "chunk-4d7baa35292f96136444f7a5a61101d6",
@@ -382,11 +382,106 @@
     "content_summary": "# База знаний: Факультет естественных наук (ФЕН) НГУ\n\n## Общая информация\n\n- **Университет:** Новосибирский государственный университет (НГУ).\n- **Статус:** Один из ведущих естественнонаучных факультетов России. Входит в ТОП-250 мировых рейтингов QS ...",
     "content_length": 3580,
     "created_at": "2026-03-06T07:14:30.165970+00:00",
-    "updated_at": "2026-03-06T07:14:30.191195+00:00",
+    "updated_at": "2026-03-06T07:32:05.001877+00:00",
     "file_path": "unknown_source",
     "track_id": "insert_20260306_141430_911e1ba9",
     "metadata": {
-      "processing_start_time": 1772781270
+      "processing_start_time": 1772782325,
+      "processing_end_time": 1772793525
+    }
+  },
+  "doc-792b341e9daa07a13ef6716715d8b5f0": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-f770ddb7e51fee95425ff844bfdc98b8",
+      "chunk-0f21d87be4022f8d57f2c963432f1238",
+      "chunk-cfacd2043e29c7ccff571179280f3d5a"
+    ],
+    "content_summary": "# Справка по образовательной программе: Мехатроника и робототехника (НГУ)\n\n## Общая информация\n\n- **Название программы:** Мехатроника и робототехника\n- **Профиль (специализация):** Искусственный интеллект / Deep Robotics\n- **Уровень образования:** Ба...",
+    "content_length": 2880,
+    "created_at": "2026-03-06T07:37:33.874866+00:00",
+    "updated_at": "2026-03-06T07:37:33.881212+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_143733_159b2622",
+    "metadata": {
+      "processing_start_time": 1772782653,
+      "processing_end_time": 1772782653
+    }
+  },
+  "doc-5c3f7d0b8dd7f886f0aadb56497ed31f": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-2f4c2bfa4d10852f39aa8937c0ab4d6c",
+      "chunk-83fc93231de4e3b9f0b113ab1e3f5f83",
+      "chunk-7827ca947d3e2592e39c0f0a42ddbc9d"
+    ],
+    "content_summary": "# База знаний: Физический факультет НГУ (ФФ НГУ)\n\n## 1. Общая информация\n\nФизический факультет Новосибирского государственного университета — один из ведущих центров подготовки физиков-исследователей в России. Обучение неразрывно связано с научной де...",
+    "content_length": 3341,
+    "created_at": "2026-03-06T07:38:11.394228+00:00",
+    "updated_at": "2026-03-06T07:38:11.401244+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_143811_04650dc9",
+    "metadata": {
+      "processing_start_time": 1772782691,
+      "processing_end_time": 1772782691
+    }
+  },
+  "doc-f6013537b41781eb87a7fe69849a7648": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-3d4f92ab5f75f082568cfcc732398256",
+      "chunk-a9e943e7d72e37195243ce1f4ee719dc",
+      "chunk-2d39bc5c644fa2064a4e776acaea5bae"
+    ],
+    "content_summary": "# База знаний: Институт медицины и медицинских технологий НГУ\n\n## Общая информация\n\nИнститут медицины и медицинских технологий НГУ — это современный научно-образовательный центр, объединяющий классическое медицинское образование с передовыми достижен...",
+    "content_length": 2612,
+    "created_at": "2026-03-06T07:38:28.114802+00:00",
+    "updated_at": "2026-03-06T07:38:28.122910+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_143828_404a95d3",
+    "metadata": {
+      "processing_start_time": 1772782708,
+      "processing_end_time": 1772782708
+    }
+  },
+  "doc-398a091175e17a21d20802e0fc983453": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-bd790e20220d2a438d127c8e4c0b2a9c",
+      "chunk-2f627b49b77d4f97da8273eca2ddd8a6"
+    ],
+    "content_summary": "Новосибирский государственный университет (НГУ) — обзор\nНовосибирский государственный университет — крупный российский исследовательский университет в Академгородке Новосибирска, ориентированный на интеграцию образования и науки и раннее вовлечение с...",
+    "content_length": 1780,
+    "created_at": "2026-03-06T07:38:59.378578+00:00",
+    "updated_at": "2026-03-06T07:38:59.383923+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_143859_83f491e3",
+    "metadata": {
+      "processing_start_time": 1772782739,
+      "processing_end_time": 1772782739
+    }
+  },
+  "doc-da1176c033c82768b985ffd6a7e78092": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-3676af23e118c46b0cfe0887c6e4f166",
+      "chunk-2c876c1bd49ceeabaf34799e8ee3360c",
+      "chunk-09a6eb9be811fd133fffb703965ade56"
+    ],
+    "content_summary": "# Гуманитарный институт Новосибирского государственного университета (ГИ НГУ)\n\n## Общая информация\n\n**Гуманитарный институт (ГИ)** — одно из крупнейших подразделений Новосибирского государственного университета, объединившее в себе традиции классичес...",
+    "content_length": 3460,
+    "created_at": "2026-03-06T07:39:16.345909+00:00",
+    "updated_at": "2026-03-06T07:39:16.351546+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_143916_8754ccb6",
+    "metadata": {
+      "processing_start_time": 1772782756,
+      "processing_end_time": 1772782756
     }
   }
 }
