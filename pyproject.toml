@@ -16,7 +16,6 @@ dependencies = [
     "pyyaml>=6.0.3",
     "redis>=7.0.1",
     "langchain-community>=0.3.0",
-    "sentence-transformers>=5.1.1",
     "langchain-huggingface>=0.1.0",
     "chromadb>=1.2.1",
     "langchain-chroma>=0.1.0",

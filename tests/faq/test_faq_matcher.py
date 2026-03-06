@@ -8,6 +8,38 @@ import yaml
 from faq.faq_matcher import FAQMatcher, clean_user_input
 
 
+class FakeEmbeddings:
+    _ALPHABET = "абвгдеёжзийклмнопрстуфхцчшщьыъэюяabcdefghijklmnopqrstuvwxyz0123456789"
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return [self._encode(text) for text in texts]
+
+    def _encode(self, text: str) -> list[float]:
+        t = text.lower()
+
+        char_counts = [float(t.count(ch)) for ch in self._ALPHABET]
+
+        faculty = any(k in t for k in ["факультет", "институт"])
+        dorm = any(k in t for k in ["общежит", "проживан", "стоит жить"])
+        exams = any(k in t for k in ["егэ", "фит", "информат", "физик", "математ"])
+        founded = any(k in t for k in ["основан", "появил", "каком году", "когда"])
+        location = any(
+            k in t for k in ["где", "город", "находит", "академгород", "новосибир"]
+        )
+        generic_ngu = "нгу" in t
+
+        topic_features = [
+            2.0 if faculty else 0.0,
+            2.0 if dorm else 0.0,
+            2.0 if exams else 0.0,
+            2.0 if founded else 0.0,
+            2.0 if location else 0.0,
+            1.0 if generic_ngu else 0.0,
+        ]
+
+        return char_counts + topic_features
+
+
 # ── Фикстура: временный YAML-файл с FAQ ──────────────────────────────
 
 SAMPLE_FAQ = {
@@ -62,7 +94,7 @@ def faq_yaml(tmp_path: Path) -> Path:
 @pytest.fixture
 def matcher(faq_yaml: Path) -> FAQMatcher:
     """Создаёт FAQMatcher с тестовыми данными."""
-    return FAQMatcher(faq_path=faq_yaml, threshold=0.80)
+    return FAQMatcher(faq_path=faq_yaml, threshold=0.80, embedder=FakeEmbeddings())
 
 
 # ── Тесты ─────────────────────────────────────────────────────────────
@@ -72,7 +104,10 @@ class TestCleanUserInput:
     """Тесты очистки пользовательского ввода."""
 
     def test_strips_from_prefix(self):
-        assert clean_user_input("[from Максим] когда появился НГУ?") == "когда появился НГУ?"
+        assert (
+            clean_user_input("[from Максим] когда появился НГУ?")
+            == "когда появился НГУ?"
+        )
 
     def test_strips_greeting(self):
         assert clean_user_input("привет, когда появился НГУ?") == "когда появился НГУ?"
@@ -105,11 +140,13 @@ class TestFAQMatcherLoading:
     def test_empty_file(self, tmp_path: Path):
         faq_file = tmp_path / "empty.yaml"
         faq_file.write_text("faq: []", encoding="utf-8")
-        m = FAQMatcher(faq_path=faq_file)
+        m = FAQMatcher(faq_path=faq_file, embedder=FakeEmbeddings())
         assert m.size == 0
 
     def test_missing_file(self, tmp_path: Path):
-        m = FAQMatcher(faq_path=tmp_path / "nonexistent.yaml")
+        m = FAQMatcher(
+            faq_path=tmp_path / "nonexistent.yaml", embedder=FakeEmbeddings()
+        )
         assert m.size == 0
         assert m.match("любой вопрос") is None
 
@@ -195,13 +232,13 @@ class TestFAQMatcherThreshold:
     """Тесты порога сходства."""
 
     def test_high_threshold_rejects(self, faq_yaml: Path):
-        m = FAQMatcher(faq_path=faq_yaml, threshold=0.99)
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.99, embedder=FakeEmbeddings())
         # Даже перефразированный вопрос не пройдёт при пороге 0.99
         result = m.match("В НГУ какие факультеты бывают?")
         assert result is None
 
     def test_low_threshold_accepts_more(self, faq_yaml: Path):
-        m = FAQMatcher(faq_path=faq_yaml, threshold=0.50)
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.50, embedder=FakeEmbeddings())
         result = m.match("Что есть в НГУ?")
         assert result is not None
 
@@ -215,7 +252,7 @@ class TestFAQMatcherReload:
     """Тесты перезагрузки FAQ."""
 
     def test_reload_updates_data(self, faq_yaml: Path):
-        m = FAQMatcher(faq_path=faq_yaml, threshold=0.80)
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.80, embedder=FakeEmbeddings())
         assert m.size == 12
 
         # Добавляем новый FAQ

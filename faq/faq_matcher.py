@@ -1,7 +1,7 @@
 """
 FAQ Matcher — модуль для поиска готовых ответов на типовые вопросы.
 
-Использует ту же embedding-модель (all-MiniLM-L6-v2), что и RAG,
+Использует embeddings через GigaChat API
 и косинусное сходство для определения, подходит ли заготовленный ответ.
 
 Если сходство вопроса пользователя с одним из FAQ-вопросов
@@ -10,13 +10,14 @@ FAQ Matcher — модуль для поиска готовых ответов �
 """
 
 import logging
+import os
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Protocol
 
 import numpy as np
 import yaml
-from sentence_transformers import SentenceTransformer
+from langchain_gigachat.embeddings import GigaChatEmbeddings
 
 logger = logging.getLogger(__name__)
 
@@ -28,12 +29,31 @@ SIMILARITY_THRESHOLD = 0.90
 # Слова-паразиты / приветствия, которые не несут смысловой нагрузки
 # и мешают семантическому сопоставлению с FAQ.
 _FILLER_WORDS = [
-    "привет", "здравствуйте", "здравствуй", "добрый день",
-    "добрый вечер", "доброе утро", "хай", "хей", "hello", "hi",
-    "подскажи", "подскажите", "скажи", "скажите",
-    "расскажи", "расскажите", "ответь", "ответьте",
-    "пожалуйста", "плз", "плиз",
-    "а ", "ну ", "так ", "вот ",
+    "привет",
+    "здравствуйте",
+    "здравствуй",
+    "добрый день",
+    "добрый вечер",
+    "доброе утро",
+    "хай",
+    "хей",
+    "hello",
+    "hi",
+    "подскажи",
+    "подскажите",
+    "скажи",
+    "скажите",
+    "расскажи",
+    "расскажите",
+    "ответь",
+    "ответьте",
+    "пожалуйста",
+    "плз",
+    "плиз",
+    "а ",
+    "ну ",
+    "так ",
+    "вот ",
 ]
 
 # Паттерн для удаления префикса [from username]
@@ -55,13 +75,14 @@ def clean_user_input(text: str) -> str:
     lower = text.lower()
     for filler in _FILLER_WORDS:
         if lower.startswith(filler):
-            text = text[len(filler):]
+            text = text[len(filler) :]
             lower = text.lower()
 
     # Убираем ведущие запятые, точки, пробелы
     text = text.lstrip(" ,.:;!?-—")
 
     return text.strip()
+
 
 # Путь к файлу с FAQ-данными
 FAQ_DATA_PATH = Path(__file__).parent / "faq_data.yaml"
@@ -94,11 +115,14 @@ class FAQMatcher:
         self,
         faq_path: Optional[Path] = None,
         threshold: float = SIMILARITY_THRESHOLD,
-        model_name: str = "all-MiniLM-L6-v2",
+        embedding_model_name: str = "Embeddings",
+        embedder: Optional["EmbeddingClient"] = None,
     ):
         self._threshold = threshold
         self._faq_path = faq_path or FAQ_DATA_PATH
-        self._model = SentenceTransformer(model_name)
+        self._embedding_model_name = embedding_model_name
+
+        self._embedder = embedder or self._create_gigachat_embedder()
 
         # Загружаем FAQ
         self._questions: list[str] = []  # все формулировки (question + aliases)
@@ -107,8 +131,29 @@ class FAQMatcher:
 
         self._load_faq()
 
+    def _create_gigachat_embedder(self) -> Optional["EmbeddingClient"]:
+        credentials = os.getenv("GIGACHAT_CREDENTIALS") or os.getenv("GIGACHAT_API_KEY")
+        if not credentials:
+            logger.warning(
+                "GIGACHAT_CREDENTIALS или GIGACHAT_API_KEY не установлены. "
+                "FAQ semantic matching отключен."
+            )
+            return None
+
+        scope = os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
+        return GigaChatEmbeddings(
+            credentials=credentials,
+            scope=scope,
+            model=self._embedding_model_name,
+            verify_ssl_certs=False,
+        )
+
     def _load_faq(self) -> None:
         """Загружает FAQ из YAML и вычисляет embeddings."""
+        if self._embedder is None:
+            logger.warning("FAQ embedder не инициализирован, FAQ matching отключен")
+            return
+
         if not self._faq_path.exists():
             logger.warning(f"FAQ file not found: {self._faq_path}")
             return
@@ -141,11 +186,13 @@ class FAQMatcher:
                     self._answers.append(answer)
 
         if self._questions:
-            self._embeddings = self._model.encode(
-                self._questions, normalize_embeddings=True
+            vectors = np.array(
+                self._embedder.embed_documents(self._questions), dtype=float
             )
+            norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+            self._embeddings = vectors / np.maximum(norms, 1e-10)
             logger.info(
-                f"FAQ loaded: {len(faq_items)} entries, "
+                f"FAQ loaded via GigaChat embeddings: {len(faq_items)} entries, "
                 f"{len(self._questions)} total phrases"
             )
         else:
@@ -176,9 +223,11 @@ class FAQMatcher:
         logger.debug(f"FAQ input cleaned: '{user_question}' → '{cleaned}'")
 
         # Вычисляем embedding очищенного вопроса
-        query_embedding = self._model.encode(
-            cleaned, normalize_embeddings=True
-        )
+        if self._embedder is None:
+            return None
+
+        query_vec = np.array(self._embedder.embed_documents([cleaned])[0], dtype=float)
+        query_embedding = query_vec / max(float(np.linalg.norm(query_vec)), 1e-10)
 
         # Косинусное сходство со всеми FAQ-фразами
         similarities = _cosine_similarity(query_embedding, self._embeddings)
@@ -219,6 +268,10 @@ class FAQMatcher:
     def size(self) -> int:
         """Количество FAQ-фраз (question + aliases)."""
         return len(self._questions)
+
+
+class EmbeddingClient(Protocol):
+    def embed_documents(self, texts: list[str]) -> list[list[float]]: ...
 
 
 # ── Singleton ────────────────────────────────────────────────────────────
