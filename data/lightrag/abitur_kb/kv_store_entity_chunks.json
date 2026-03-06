@@ -78,10 +78,11 @@
     "chunk_ids": [
       "chunk-688c0fd847257d42c90181b4478949e1",
       "chunk-681b87b5ddf40fbbc0a67227a216a8c4",
-      "chunk-a035eeb7895b7dadfd008f91646edee8"
+      "chunk-a035eeb7895b7dadfd008f91646edee8",
+      "chunk-b465d7cca52d8827f04039160075b090"
     ],
-    "count": 3,
-    "update_time": 1766315012,
+    "count": 4,
+    "update_time": 1772779902,
     "_id": "Physics"
   },
   "Geography": {
@@ -120,10 +121,11 @@
       "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714",
       "chunk-28bc70cf65a5203fe96b88628708441b",
       "chunk-00319a41a425f6d6ec4233df0775ae96",
-      "chunk-46485aa8f930407871791b8e3c225998"
+      "chunk-46485aa8f930407871791b8e3c225998",
+      "chunk-b465d7cca52d8827f04039160075b090"
     ],
-    "count": 8,
-    "update_time": 1766318397,
+    "count": 9,
+    "update_time": 1772779903,
     "_id": "Russian Language"
   },
   "Educational Program": {
@@ -139,10 +141,12 @@
     "chunk_ids": [
       "chunk-688c0fd847257d42c90181b4478949e1",
       "chunk-28bc70cf65a5203fe96b88628708441b",
-      "chunk-00319a41a425f6d6ec4233df0775ae96"
+      "chunk-00319a41a425f6d6ec4233df0775ae96",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916",
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
     ],
-    "count": 3,
-    "update_time": 1766317920,
+    "count": 5,
+    "update_time": 1772780866,
     "_id": "Entrance Exams"
   },
   "Pass Rates": {
@@ -210,39 +214,39 @@
   },
   "SMBA (Student to Master of Business Administration)": {
     "chunk_ids": [
-      "chunk-d6781e5c3865e757f2db65d0434d0315"
+      "chunk-d6781e5c3865e757f2db65d0434d0315",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
     ],
-    "count": 1,
-    "create_time": 1766314411,
-    "update_time": 1766314411,
+    "count": 2,
+    "update_time": 1772779353,
     "_id": "SMBA (Student to Master of Business Administration)"
   },
   "Case Club NSU": {
     "chunk_ids": [
-      "chunk-d6781e5c3865e757f2db65d0434d0315"
+      "chunk-d6781e5c3865e757f2db65d0434d0315",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
     ],
-    "count": 1,
-    "create_time": 1766314412,
-    "update_time": 1766314412,
+    "count": 2,
+    "update_time": 1772779354,
     "_id": "Case Club NSU"
   },
   "Financial Club NSU": {
     "chunk_ids": [
-      "chunk-d6781e5c3865e757f2db65d0434d0315"
+      "chunk-d6781e5c3865e757f2db65d0434d0315",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
     ],
-    "count": 1,
-    "create_time": 1766314413,
-    "update_time": 1766314413,
+    "count": 2,
+    "update_time": 1772779355,
     "_id": "Financial Club NSU"
   },
   "Future Professional NSU": {
     "chunk_ids": [
       "chunk-d6781e5c3865e757f2db65d0434d0315",
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
     ],
-    "count": 2,
-    "create_time": 1766314414,
-    "update_time": 1766314414,
+    "count": 3,
+    "update_time": 1772779356,
     "_id": "Future Professional NSU"
   },
   "Club «Kvant»": {
@@ -256,11 +260,11 @@
   },
   "Leonid Shles": {
     "chunk_ids": [
-      "chunk-07d1fb64c3ee5a648dad5f619523b0ca"
+      "chunk-07d1fb64c3ee5a648dad5f619523b0ca",
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
     ],
-    "count": 1,
-    "create_time": 1766314416,
-    "update_time": 1766314416,
+    "count": 2,
+    "update_time": 1772779322,
     "_id": "Leonid Shles"
   },
   "Club «Geya»": {
@@ -319,20 +323,20 @@
   },
   "International Students Club": {
     "chunk_ids": [
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
     ],
-    "count": 1,
-    "create_time": 1766314433,
-    "update_time": 1766314433,
+    "count": 2,
+    "update_time": 1772779362,
     "_id": "International Students Club"
   },
   "Scientific Picnic": {
     "chunk_ids": [
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
     ],
-    "count": 1,
-    "create_time": 1766314434,
-    "update_time": 1766314434,
+    "count": 2,
+    "update_time": 1772779344,
     "_id": "Scientific Picnic"
   },
   "Volunteerism": {
@@ -346,20 +350,20 @@
   },
   "Student Movements": {
     "chunk_ids": [
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
     ],
-    "count": 1,
-    "create_time": 1766314446,
-    "update_time": 1766314446,
+    "count": 2,
+    "update_time": 1772779346,
     "_id": "Student Movements"
   },
   "Startup Studio": {
     "chunk_ids": [
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
     ],
-    "count": 1,
-    "create_time": 1766314458,
-    "update_time": 1766314458,
+    "count": 2,
+    "update_time": 1772779347,
     "_id": "Startup Studio"
   },
   "Public Discussions": {
@@ -373,20 +377,20 @@
   },
   "Intellectual Freedom": {
     "chunk_ids": [
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
     ],
-    "count": 1,
-    "create_time": 1766314460,
-    "update_time": 1766314460,
+    "count": 2,
+    "update_time": 1772779348,
     "_id": "Intellectual Freedom"
   },
   "Self-Organization": {
     "chunk_ids": [
-      "chunk-e2ced4912d75885cf341fcdfd11a122e"
+      "chunk-e2ced4912d75885cf341fcdfd11a122e",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
     ],
-    "count": 1,
-    "create_time": 1766314461,
-    "update_time": 1766314461,
+    "count": 2,
+    "update_time": 1772779349,
     "_id": "Self-Organization"
   },
   "дух студенчества": {
@@ -440,10 +444,20 @@
       "chunk-3c2048cbd8ab15bf77f8ce857685327f",
       "chunk-41b36f387ee21bd85d1d5642ee853719",
       "chunk-a3d6a8b784f4b3587c2e289eeda2d55e",
-      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+      "chunk-40c4dad280d9f13d93d64edb2d86f788",
+      "chunk-1a5402055951e8d54d469a3cebbfc97a",
+      "chunk-aa94440482207198e1a94b6746f1803e",
+      "chunk-0d58c6ab3a7182fec5879e381a537083",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22",
+      "chunk-7834c0568e49191de930f90be1807b6b",
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916",
+      "chunk-529d82ff29451a356cdb38d5fb98bd33",
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
     ],
-    "count": 5,
-    "update_time": 1766318222,
+    "count": 15,
+    "update_time": 1772781218,
     "_id": "Novosibirsk State University"
   },
   "Sanuzla": {
@@ -502,11 +516,11 @@
   },
   "Identity Document": {
     "chunk_ids": [
-      "chunk-37ecb1276d31ad335d59969f4e30c068"
+      "chunk-37ecb1276d31ad335d59969f4e30c068",
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
     ],
-    "count": 1,
-    "create_time": 1766314646,
-    "update_time": 1766314646,
+    "count": 2,
+    "update_time": 1772779602,
     "_id": "Identity Document"
   },
   "Storage Area": {
@@ -566,10 +580,12 @@
   "NSU": {
     "chunk_ids": [
       "chunk-3b8a582a931fd705ae3e7a3007566a85",
-      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+      "chunk-31701c0391c5c80fb014bf4ec2c31618",
+      "chunk-7834c0568e49191de930f90be1807b6b",
+      "chunk-ddcef96986201d45e53c49db3bb62169"
     ],
-    "count": 2,
-    "update_time": 1766314746,
+    "count": 4,
+    "update_time": 1772779886,
     "_id": "NSU"
   },
   "Academic City": {
@@ -593,29 +609,30 @@
   },
   "Living Rooms": {
     "chunk_ids": [
-      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+      "chunk-3b8a582a931fd705ae3e7a3007566a85",
+      "chunk-7834c0568e49191de930f90be1807b6b"
     ],
-    "count": 1,
-    "create_time": 1766314662,
-    "update_time": 1766314662,
+    "count": 2,
+    "update_time": 1772779589,
     "_id": "Living Rooms"
   },
   "Kitchen Blocks": {
     "chunk_ids": [
-      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+      "chunk-3b8a582a931fd705ae3e7a3007566a85",
+      "chunk-7834c0568e49191de930f90be1807b6b"
     ],
-    "count": 1,
-    "create_time": 1766314663,
-    "update_time": 1766314663,
+    "count": 2,
+    "update_time": 1772779590,
     "_id": "Kitchen Blocks"
   },
   "Campus": {
     "chunk_ids": [
-      "chunk-3b8a582a931fd705ae3e7a3007566a85"
+      "chunk-3b8a582a931fd705ae3e7a3007566a85",
+      "chunk-7834c0568e49191de930f90be1807b6b",
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
     ],
-    "count": 1,
-    "create_time": 1766314664,
-    "update_time": 1766314664,
+    "count": 3,
+    "update_time": 1772779919,
     "_id": "Campus"
   },
   "Internet": {
@@ -728,11 +745,11 @@
   },
   "Psychology": {
     "chunk_ids": [
-      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+      "chunk-31701c0391c5c80fb014bf4ec2c31618",
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
     ],
-    "count": 1,
-    "create_time": 1766314757,
-    "update_time": 1766314757,
+    "count": 2,
+    "update_time": 1772781221,
     "_id": "Psychology"
   },
   "Leчебное дело": {
@@ -764,11 +781,11 @@
   },
   "Русский язык": {
     "chunk_ids": [
-      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+      "chunk-31701c0391c5c80fb014bf4ec2c31618",
+      "chunk-fe653e943cbfd78500fb12df97178912"
     ],
-    "count": 1,
-    "create_time": 1766314761,
-    "update_time": 1766314761,
+    "count": 2,
+    "update_time": 1772780872,
     "_id": "Русский язык"
   },
   "Химия": {
@@ -791,11 +808,11 @@
   },
   "Обществознание": {
     "chunk_ids": [
-      "chunk-31701c0391c5c80fb014bf4ec2c31618"
+      "chunk-31701c0391c5c80fb014bf4ec2c31618",
+      "chunk-fe653e943cbfd78500fb12df97178912"
     ],
-    "count": 1,
-    "create_time": 1766314765,
-    "update_time": 1766314765,
+    "count": 2,
+    "update_time": 1772780874,
     "_id": "Обществознание"
   },
   "psychical health research": {
@@ -854,11 +871,13 @@
   },
   "Akademgorodok": {
     "chunk_ids": [
-      "chunk-681b87b5ddf40fbbc0a67227a216a8c4"
+      "chunk-681b87b5ddf40fbbc0a67227a216a8c4",
+      "chunk-7834c0568e49191de930f90be1807b6b",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916",
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
     ],
-    "count": 1,
-    "create_time": 1766314967,
-    "update_time": 1766314967,
+    "count": 4,
+    "update_time": 1772780881,
     "_id": "Akademgorodok"
   },
   "Artificial Intelligence": {
@@ -883,10 +902,11 @@
     "chunk_ids": [
       "chunk-681b87b5ddf40fbbc0a67227a216a8c4",
       "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714",
-      "chunk-00319a41a425f6d6ec4233df0775ae96"
+      "chunk-00319a41a425f6d6ec4233df0775ae96",
+      "chunk-ddcef96986201d45e53c49db3bb62169"
     ],
-    "count": 3,
-    "update_time": 1766317863,
+    "count": 4,
+    "update_time": 1772779889,
     "_id": "Mathematics"
   },
   "Mechanics": {
@@ -936,11 +956,11 @@
   },
   "Fundamental Mathematics Research Group": {
     "chunk_ids": [
-      "chunk-a035eeb7895b7dadfd008f91646edee8"
+      "chunk-a035eeb7895b7dadfd008f91646edee8",
+      "chunk-ddcef96986201d45e53c49db3bb62169"
     ],
-    "count": 1,
-    "create_time": 1766315014,
-    "update_time": 1766315014,
+    "count": 2,
+    "update_time": 1772779890,
     "_id": "Fundamental Mathematics Research Group"
   },
   "Mathematical Modelling": {
@@ -1118,10 +1138,12 @@
   "Bachelor's Degree Program": {
     "chunk_ids": [
       "chunk-96824a0b7bedfff01e1e931021742836",
-      "chunk-41b36f387ee21bd85d1d5642ee853719"
+      "chunk-41b36f387ee21bd85d1d5642ee853719",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-b4951a804582e8ead40e48ff068044f3"
     ],
-    "count": 2,
-    "update_time": 1766318004,
+    "count": 4,
+    "update_time": 1772781199,
     "_id": "Bachelor's Degree Program"
   },
   "Programmatic Engineering and Computer Science": {
@@ -1135,11 +1157,12 @@
   },
   "Bachelor's Degree": {
     "chunk_ids": [
-      "chunk-e2976471c53db5fbb9c437e851fe7def"
+      "chunk-e2976471c53db5fbb9c437e851fe7def",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
     ],
-    "count": 1,
-    "create_time": 1766315322,
-    "update_time": 1766315322,
+    "count": 3,
+    "update_time": 1772780247,
     "_id": "Bachelor's Degree"
   },
   "Science Institutes": {
@@ -1180,11 +1203,12 @@
   },
   "Faculty": {
     "chunk_ids": [
-      "chunk-e2976471c53db5fbb9c437e851fe7def"
+      "chunk-e2976471c53db5fbb9c437e851fe7def",
+      "chunk-b97b86b652b248e46791037ab79eca96",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
     ],
-    "count": 1,
-    "create_time": 1766316382,
-    "update_time": 1766316382,
+    "count": 3,
+    "update_time": 1772780309,
     "_id": "Faculty"
   },
   "000 рублей": {
@@ -1406,20 +1430,20 @@
   },
   "Budget Places": {
     "chunk_ids": [
-      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714",
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
     ],
-    "count": 1,
-    "create_time": 1766317136,
-    "update_time": 1766317136,
+    "count": 2,
+    "update_time": 1772780860,
     "_id": "Budget Places"
   },
   "Paid Places": {
     "chunk_ids": [
-      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714",
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
     ],
-    "count": 1,
-    "create_time": 1766317137,
-    "update_time": 1766317137,
+    "count": 2,
+    "update_time": 1772780861,
     "_id": "Paid Places"
   },
   "Statistics": {
@@ -1433,11 +1457,11 @@
   },
   "Programming": {
     "chunk_ids": [
-      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714"
+      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
     ],
-    "count": 1,
-    "create_time": 1766317140,
-    "update_time": 1766317140,
+    "count": 2,
+    "update_time": 1772780275,
     "_id": "Programming"
   },
   "State Funding": {
@@ -2155,11 +2179,12 @@
   },
   "Master's Degree Program": {
     "chunk_ids": [
-      "chunk-41b36f387ee21bd85d1d5642ee853719"
+      "chunk-41b36f387ee21bd85d1d5642ee853719",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-b4951a804582e8ead40e48ff068044f3"
     ],
-    "count": 1,
-    "create_time": 1766318006,
-    "update_time": 1766318006,
+    "count": 3,
+    "update_time": 1772781200,
     "_id": "Master's Degree Program"
   },
   "Entrance Requirements": {
@@ -2200,11 +2225,11 @@
   },
   "Graduates": {
     "chunk_ids": [
-      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
+      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2",
+      "chunk-b4951a804582e8ead40e48ff068044f3"
     ],
-    "count": 1,
-    "create_time": 1766318015,
-    "update_time": 1766318015,
+    "count": 2,
+    "update_time": 1772781239,
     "_id": "Graduates"
   },
   "M. A. Lavrentiev": {
@@ -2246,11 +2271,11 @@
   },
   "Geology and Geophysics Faculty": {
     "chunk_ids": [
-      "chunk-40c4dad280d9f13d93d64edb2d86f788"
+      "chunk-40c4dad280d9f13d93d64edb2d86f788",
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
     ],
-    "count": 1,
-    "create_time": 1766318163,
-    "update_time": 1766318163,
+    "count": 2,
+    "update_time": 1772779333,
     "_id": "Geology and Geophysics Faculty"
   },
   "Economic Faculty": {
@@ -2549,5 +2574,2835 @@
     "create_time": 1766318512,
     "update_time": 1766318512,
     "_id": "creative contest"
+  },
+  "NSU+ Scholarship": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a",
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 2,
+    "create_time": 1772778974,
+    "update_time": 1772778974,
+    "_id": "NSU+ Scholarship"
+  },
+  "Student/Teacher Personal Account": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a",
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 2,
+    "create_time": 1772778974,
+    "update_time": 1772778974,
+    "_id": "Student/Teacher Personal Account"
+  },
+  "NSUNet Wi-Fi": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a",
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 2,
+    "create_time": 1772778975,
+    "update_time": 1772778975,
+    "_id": "NSUNet Wi-Fi"
+  },
+  "Electronic Library": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a",
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 2,
+    "create_time": 1772778975,
+    "update_time": 1772778975,
+    "_id": "Electronic Library"
+  },
+  "NSU Virtual Environment": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a",
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 2,
+    "create_time": 1772778976,
+    "update_time": 1772778976,
+    "_id": "NSU Virtual Environment"
+  },
+  "Geology-Geophysics Department": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a"
+    ],
+    "count": 1,
+    "create_time": 1772778976,
+    "update_time": 1772778976,
+    "_id": "Geology-Geophysics Department"
+  },
+  "NSU Technical Support Email": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a"
+    ],
+    "count": 1,
+    "create_time": 1772778978,
+    "update_time": 1772778978,
+    "_id": "NSU Technical Support Email"
+  },
+  "\"Abiturient GGF NSU\" VK Community": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a"
+    ],
+    "count": 1,
+    "create_time": 1772778979,
+    "update_time": 1772778979,
+    "_id": "\"Abiturient GGF NSU\" VK Community"
+  },
+  "Geology-Geophysics Department Website": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a"
+    ],
+    "count": 1,
+    "create_time": 1772778979,
+    "update_time": 1772778979,
+    "_id": "Geology-Geophysics Department Website"
+  },
+  "Technical Support Email": {
+    "chunk_ids": [
+      "chunk-1a5402055951e8d54d469a3cebbfc97a"
+    ],
+    "count": 1,
+    "create_time": 1772778980,
+    "update_time": 1772778980,
+    "_id": "Technical Support Email"
+  },
+  "Geological And Geophysical Faculty": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778980,
+    "update_time": 1772778980,
+    "_id": "Geological And Geophysical Faculty"
+  },
+  "V.A. Vernikovsky": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778981,
+    "update_time": 1772778981,
+    "_id": "V.A. Vernikovsky"
+  },
+  "Department Of General And Regional Geology": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778982,
+    "update_time": 1772778982,
+    "_id": "Department Of General And Regional Geology"
+  },
+  "Department Of Geophysics": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778983,
+    "update_time": 1772778983,
+    "_id": "Department Of Geophysics"
+  },
+  "Department Of Mineralogy And Geochemistry": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778983,
+    "update_time": 1772778983,
+    "_id": "Department Of Mineralogy And Geochemistry"
+  },
+  "Department Of Historical Geology And Paleontology": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778983,
+    "update_time": 1772778983,
+    "_id": "Department Of Historical Geology And Paleontology"
+  },
+  "Department Of Petrography And Geology Of Ore Deposits": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778984,
+    "update_time": 1772778984,
+    "_id": "Department Of Petrography And Geology Of Ore Deposits"
+  },
+  "Department Of Geology Of Oil And Gas Deposits": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778985,
+    "update_time": 1772778985,
+    "_id": "Department Of Geology Of Oil And Gas Deposits"
+  },
+  "Bachelor's And Specialist's Degree": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e"
+    ],
+    "count": 1,
+    "create_time": 1772778986,
+    "update_time": 1772778986,
+    "_id": "Bachelor's And Specialist's Degree"
+  },
+  "Master's Degree": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 3,
+    "update_time": 1772780247,
+    "_id": "Master's Degree"
+  },
+  "Postgraduate Studies": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 3,
+    "update_time": 1772780248,
+    "_id": "Postgraduate Studies"
+  },
+  "Novosibirsk": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916",
+      "chunk-027a28f4cdd37c9fe76191601a9a6185",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 5,
+    "update_time": 1772781209,
+    "_id": "Novosibirsk"
+  },
+  "Pirogova Street, 1": {
+    "chunk_ids": [
+      "chunk-aa94440482207198e1a94b6746f1803e",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 2,
+    "update_time": 1772781209,
+    "_id": "Pirogova Street, 1"
+  },
+  "Siberian Branch Of The Russian Academy Of Sciences": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96",
+      "chunk-b465d7cca52d8827f04039160075b090",
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 4,
+    "update_time": 1772781198,
+    "_id": "Siberian Branch Of The Russian Academy Of Sciences"
+  },
+  "Scientific And Educational Center 'Evolution Of The Earth'": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778990,
+    "update_time": 1772778990,
+    "_id": "Scientific And Educational Center 'Evolution Of The Earth'"
+  },
+  "Journal 'Geology And Geophysics'": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778991,
+    "update_time": 1772778991,
+    "_id": "Journal 'Geology And Geophysics'"
+  },
+  "Russian Science Foundation": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778992,
+    "update_time": 1772778992,
+    "_id": "Russian Science Foundation"
+  },
+  "Siberian Geological Olympiad For Schoolchildren": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778993,
+    "update_time": 1772778993,
+    "_id": "Siberian Geological Olympiad For Schoolchildren"
+  },
+  "NSU Geoschool": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778993,
+    "update_time": 1772778993,
+    "_id": "NSU Geoschool"
+  },
+  "Summer Geoschool": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778994,
+    "update_time": 1772778994,
+    "_id": "Summer Geoschool"
+  },
+  "Project 'Petrophysics'": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778994,
+    "update_time": 1772778994,
+    "_id": "Project 'Petrophysics'"
+  },
+  "Project 'Crystal Growth'": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778995,
+    "update_time": 1772778995,
+    "_id": "Project 'Crystal Growth'"
+  },
+  "NSU Electronic Library": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778996,
+    "update_time": 1772778996,
+    "_id": "NSU Electronic Library"
+  },
+  "Faculty Of Geology And Geophysics": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778997,
+    "update_time": 1772778997,
+    "_id": "Faculty Of Geology And Geophysics"
+  },
+  "Scientific And Educational Center \"Evolution Of The Earth\"": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778997,
+    "update_time": 1772778997,
+    "_id": "Scientific And Educational Center \"Evolution Of The Earth\""
+  },
+  "Journal \"Geology And Geophysics\"": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778998,
+    "update_time": 1772778998,
+    "_id": "Journal \"Geology And Geophysics\""
+  },
+  "Project \"Petrophysics\"": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772778998,
+    "update_time": 1772778998,
+    "_id": "Project \"Petrophysics\""
+  },
+  "Project \"Crystal Growth\"": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772779000,
+    "update_time": 1772779000,
+    "_id": "Project \"Crystal Growth\""
+  },
+  "Wi-Fi NSUNet": {
+    "chunk_ids": [
+      "chunk-b97b86b652b248e46791037ab79eca96"
+    ],
+    "count": 1,
+    "create_time": 1772779000,
+    "update_time": 1772779000,
+    "_id": "Wi-Fi NSUNet"
+  },
+  "Kvant Club": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779321,
+    "update_time": 1772779321,
+    "_id": "Kvant Club"
+  },
+  "Kapustnik": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779324,
+    "update_time": 1772779324,
+    "_id": "Kapustnik"
+  },
+  "KVN NSU Team": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779325,
+    "update_time": 1772779325,
+    "_id": "KVN NSU Team"
+  },
+  "Geya Club": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779326,
+    "update_time": 1772779326,
+    "_id": "Geya Club"
+  },
+  "Glum Club": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779328,
+    "update_time": 1772779328,
+    "_id": "Glum Club"
+  },
+  "Russian Student Detachments": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779329,
+    "update_time": 1772779329,
+    "_id": "Russian Student Detachments"
+  },
+  "Sinergiya Detachment": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779331,
+    "update_time": 1772779331,
+    "_id": "Sinergiya Detachment"
+  },
+  "Sintez Detachment": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779331,
+    "update_time": 1772779331,
+    "_id": "Sintez Detachment"
+  },
+  "Zolotoye Secheniye Detachment": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779332,
+    "update_time": 1772779332,
+    "_id": "Zolotoye Secheniye Detachment"
+  },
+  "Physics Faculty": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779333,
+    "update_time": 1772779333,
+    "_id": "Physics Faculty"
+  },
+  "Humanities Faculty": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779334,
+    "update_time": 1772779334,
+    "_id": "Humanities Faculty"
+  },
+  "Faculty of Journalism": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779335,
+    "update_time": 1772779335,
+    "_id": "Faculty of Journalism"
+  },
+  "Kapustniki": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779335,
+    "update_time": 1772779335,
+    "_id": "Kapustniki"
+  },
+  "Kvn Nsu Team": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779336,
+    "update_time": 1772779336,
+    "_id": "Kvn Nsu Team"
+  },
+  "Sinergiya": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779337,
+    "update_time": 1772779337,
+    "_id": "Sinergiya"
+  },
+  "Sintez": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779337,
+    "update_time": 1772779337,
+    "_id": "Sintez"
+  },
+  "Zolotoe Sechenie": {
+    "chunk_ids": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083"
+    ],
+    "count": 1,
+    "create_time": 1772779338,
+    "update_time": 1772779338,
+    "_id": "Zolotoe Sechenie"
+  },
+  "Foreign Students Club": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779339,
+    "update_time": 1772779339,
+    "_id": "Foreign Students Club"
+  },
+  "Speaking Clubs": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 2,
+    "create_time": 1772779339,
+    "update_time": 1772779339,
+    "_id": "Speaking Clubs"
+  },
+  "Concerts": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 2,
+    "create_time": 1772779340,
+    "update_time": 1772779340,
+    "_id": "Concerts"
+  },
+  "Picnics": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 2,
+    "create_time": 1772779340,
+    "update_time": 1772779340,
+    "_id": "Picnics"
+  },
+  "Cultural Evenings": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 2,
+    "create_time": 1772779341,
+    "update_time": 1772779341,
+    "_id": "Cultural Evenings"
+  },
+  "Themed Parties": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779342,
+    "update_time": 1772779342,
+    "_id": "Themed Parties"
+  },
+  "Language Clubs": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779343,
+    "update_time": 1772779343,
+    "_id": "Language Clubs"
+  },
+  "Cultural Activities": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779343,
+    "update_time": 1772779343,
+    "_id": "Cultural Activities"
+  },
+  "Student Initiatives": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779344,
+    "update_time": 1772779344,
+    "_id": "Student Initiatives"
+  },
+  "Volunteering": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779345,
+    "update_time": 1772779345,
+    "_id": "Volunteering"
+  },
+  "Historical And Social Clubs": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779347,
+    "update_time": 1772779347,
+    "_id": "Historical And Social Clubs"
+  },
+  "Spirit Of Studenthood": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779348,
+    "update_time": 1772779348,
+    "_id": "Spirit Of Studenthood"
+  },
+  "Historical And Public Clubs": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779350,
+    "update_time": 1772779350,
+    "_id": "Historical And Public Clubs"
+  },
+  "Youth Policy": {
+    "chunk_ids": [
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "count": 1,
+    "create_time": 1772779351,
+    "update_time": 1772779351,
+    "_id": "Youth Policy"
+  },
+  "Педагогический Отряд «Ез»": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779351,
+    "update_time": 1772779351,
+    "_id": "Педагогический Отряд «Ез»"
+  },
+  "Строительный Отряд «Золотое Сечение» им. Б.В. Войцеховского": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779352,
+    "update_time": 1772779352,
+    "_id": "Строительный Отряд «Золотое Сечение» им. Б.В. Войцеховского"
+  },
+  "Штаб Студенческих Отрядов НГУ": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779352,
+    "update_time": 1772779352,
+    "_id": "Штаб Студенческих Отрядов НГУ"
+  },
+  "Экономический Факультет НГУ": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779354,
+    "update_time": 1772779354,
+    "_id": "Экономический Факультет НГУ"
+  },
+  "Международный Студенческий Клуб (International Students Club, InterClub)": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779356,
+    "update_time": 1772779356,
+    "_id": "Международный Студенческий Клуб (International Students Club, InterClub)"
+  },
+  "НГУ": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779357,
+    "update_time": 1772779357,
+    "_id": "НГУ"
+  },
+  "Студенческие Отряды": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779358,
+    "update_time": 1772779358,
+    "_id": "Студенческие Отряды"
+  },
+  "Курс SMBA": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779359,
+    "update_time": 1772779359,
+    "_id": "Курс SMBA"
+  },
+  "Мероприятия InterClub": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779359,
+    "update_time": 1772779359,
+    "_id": "Мероприятия InterClub"
+  },
+  "Student To Master Of Business Administration": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779360,
+    "update_time": 1772779360,
+    "_id": "Student To Master Of Business Administration"
+  },
+  "Case Club Nsu": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779360,
+    "update_time": 1772779360,
+    "_id": "Case Club Nsu"
+  },
+  "Financial Club Nsu": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779361,
+    "update_time": 1772779361,
+    "_id": "Financial Club Nsu"
+  },
+  "Future Professional Nsu": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779362,
+    "update_time": 1772779362,
+    "_id": "Future Professional Nsu"
+  },
+  "Nsu Faculty Of Economics": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779407,
+    "update_time": 1772779407,
+    "_id": "Nsu Faculty Of Economics"
+  },
+  "Nsu": {
+    "chunk_ids": [
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15"
+    ],
+    "count": 1,
+    "create_time": 1772779412,
+    "update_time": 1772779412,
+    "_id": "Nsu"
+  },
+  "Future": {
+    "chunk_ids": [
+      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
+    ],
+    "count": 1,
+    "create_time": 1772779572,
+    "update_time": 1772779572,
+    "_id": "Future"
+  },
+  "Structure": {
+    "chunk_ids": [
+      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
+    ],
+    "count": 1,
+    "create_time": 1772779572,
+    "update_time": 1772779572,
+    "_id": "Structure"
+  },
+  "Applicants": {
+    "chunk_ids": [
+      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
+    ],
+    "count": 1,
+    "create_time": 1772779580,
+    "update_time": 1772779580,
+    "_id": "Applicants"
+  },
+  "Students": {
+    "chunk_ids": [
+      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
+    ],
+    "count": 1,
+    "create_time": 1772779580,
+    "update_time": 1772779580,
+    "_id": "Students"
+  },
+  "Future Structural Change": {
+    "chunk_ids": [
+      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
+    ],
+    "count": 1,
+    "create_time": 1772779582,
+    "update_time": 1772779582,
+    "_id": "Future Structural Change"
+  },
+  "Student Dormitories": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779589,
+    "update_time": 1772779589,
+    "_id": "Student Dormitories"
+  },
+  "NSU Network": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779591,
+    "update_time": 1772779591,
+    "_id": "NSU Network"
+  },
+  "Accommodation Cost": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779591,
+    "update_time": 1772779591,
+    "_id": "Accommodation Cost"
+  },
+  "Apartment Rental": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779592,
+    "update_time": 1772779592,
+    "_id": "Apartment Rental"
+  },
+  "Three-Person Rooms": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779593,
+    "update_time": 1772779593,
+    "_id": "Three-Person Rooms"
+  },
+  "Block": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779594,
+    "update_time": 1772779594,
+    "_id": "Block"
+  },
+  "Common Recreation Areas": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779594,
+    "update_time": 1772779594,
+    "_id": "Common Recreation Areas"
+  },
+  "Two-Person Rooms": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779595,
+    "update_time": 1772779595,
+    "_id": "Two-Person Rooms"
+  },
+  "NSU Network (nsunet)": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779596,
+    "update_time": 1772779596,
+    "_id": "NSU Network (nsunet)"
+  },
+  "Campus Facilities": {
+    "chunk_ids": [
+      "chunk-7834c0568e49191de930f90be1807b6b"
+    ],
+    "count": 1,
+    "create_time": 1772779597,
+    "update_time": 1772779597,
+    "_id": "Campus Facilities"
+  },
+  "Dormitory": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 2,
+    "update_time": 1772780272,
+    "_id": "Dormitory"
+  },
+  "Double Room": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779598,
+    "update_time": 1772779598,
+    "_id": "Double Room"
+  },
+  "Shared Kitchen": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779599,
+    "update_time": 1772779599,
+    "_id": "Shared Kitchen"
+  },
+  "Shared Rest Area": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779599,
+    "update_time": 1772779599,
+    "_id": "Shared Rest Area"
+  },
+  "First-Year Student": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779601,
+    "update_time": 1772779601,
+    "_id": "First-Year Student"
+  },
+  "Non-Resident Student": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779601,
+    "update_time": 1772779601,
+    "_id": "Non-Resident Student"
+  },
+  "Residential Premises Lease Agreement": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779602,
+    "update_time": 1772779602,
+    "_id": "Residential Premises Lease Agreement"
+  },
+  "Luggage Storage Area": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779603,
+    "update_time": 1772779603,
+    "_id": "Luggage Storage Area"
+  },
+  "Akademgorodok Campus": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779603,
+    "update_time": 1772779603,
+    "_id": "Akademgorodok Campus"
+  },
+  "Student Campus Dining Halls": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779605,
+    "update_time": 1772779605,
+    "_id": "Student Campus Dining Halls"
+  },
+  "Campus Laundry": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779605,
+    "update_time": 1772779605,
+    "_id": "Campus Laundry"
+  },
+  "Dormitory No. 1A": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779606,
+    "update_time": 1772779606,
+    "_id": "Dormitory No. 1A"
+  },
+  "Dormitory No. 1B": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779606,
+    "update_time": 1772779606,
+    "_id": "Dormitory No. 1B"
+  },
+  "Hotel": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779607,
+    "update_time": 1772779607,
+    "_id": "Hotel"
+  },
+  "Academic Town": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779608,
+    "update_time": 1772779608,
+    "_id": "Academic Town"
+  },
+  "Student Canteens": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779609,
+    "update_time": 1772779609,
+    "_id": "Student Canteens"
+  },
+  "Laundry": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779609,
+    "update_time": 1772779609,
+    "_id": "Laundry"
+  },
+  "Student": {
+    "chunk_ids": [
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b"
+    ],
+    "count": 1,
+    "create_time": 1772779637,
+    "update_time": 1772779637,
+    "_id": "Student"
+  },
+  "Mechanico-Mathematical Faculty Of NSU": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779886,
+    "update_time": 1772779886,
+    "_id": "Mechanico-Mathematical Faculty Of NSU"
+  },
+  "Bachelor's Degree Programs": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779888,
+    "update_time": 1772779888,
+    "_id": "Bachelor's Degree Programs"
+  },
+  "Deferred Choice System": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779888,
+    "update_time": 1772779888,
+    "_id": "Deferred Choice System"
+  },
+  "Applied Mathematics And Informatics": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779891,
+    "update_time": 1772779891,
+    "_id": "Applied Mathematics And Informatics"
+  },
+  "Engineering School: Artificial Intelligence And Applied Engineering": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779891,
+    "update_time": 1772779891,
+    "_id": "Engineering School: Artificial Intelligence And Applied Engineering"
+  },
+  "Mechanics And Mathematical Modeling": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779892,
+    "update_time": 1772779892,
+    "_id": "Mechanics And Mathematical Modeling"
+  },
+  "Mathematical Methods And Information Technologies In Mechanics": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169",
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 2,
+    "create_time": 1772779892,
+    "update_time": 1772779892,
+    "_id": "Mathematical Methods And Information Technologies In Mechanics"
+  },
+  "Mathematics And Computer": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779894,
+    "update_time": 1772779894,
+    "_id": "Mathematics And Computer"
+  },
+  "6th Place In Russia": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779894,
+    "update_time": 1772779894,
+    "_id": "6th Place In Russia"
+  },
+  "Top-200 In QS World University Rankings": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779895,
+    "update_time": 1772779895,
+    "_id": "Top-200 In QS World University Rankings"
+  },
+  "Tuition Cost 2025-2026": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779896,
+    "update_time": 1772779896,
+    "_id": "Tuition Cost 2025-2026"
+  },
+  "Research Group Of Fundamental Mathematics": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779897,
+    "update_time": 1772779897,
+    "_id": "Research Group Of Fundamental Mathematics"
+  },
+  "QS World University Rankings": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779897,
+    "update_time": 1772779897,
+    "_id": "QS World University Rankings"
+  },
+  "Tuition Fee 2025-2026": {
+    "chunk_ids": [
+      "chunk-ddcef96986201d45e53c49db3bb62169"
+    ],
+    "count": 1,
+    "create_time": 1772779898,
+    "update_time": 1772779898,
+    "_id": "Tuition Fee 2025-2026"
+  },
+  "System Programming": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779898,
+    "update_time": 1772779898,
+    "_id": "System Programming"
+  },
+  "Mathematics And Mechanics. PMI": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779899,
+    "update_time": 1772779899,
+    "_id": "Mathematics And Mechanics. PMI"
+  },
+  "Mathematics And Computer Science": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779899,
+    "update_time": 1772779899,
+    "_id": "Mathematics And Computer Science"
+  },
+  "Admission Campaign 2025": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779900,
+    "update_time": 1772779900,
+    "_id": "Admission Campaign 2025"
+  },
+  "Mathematics (Profile)": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779901,
+    "update_time": 1772779901,
+    "_id": "Mathematics (Profile)"
+  },
+  "Computer Science": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779901,
+    "update_time": 1772779901,
+    "_id": "Computer Science"
+  },
+  "Secondary Vocational Education (SPO)": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779903,
+    "update_time": 1772779903,
+    "_id": "Secondary Vocational Education (SPO)"
+  },
+  "Higher Mathematics": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779904,
+    "update_time": 1772779904,
+    "_id": "Higher Mathematics"
+  },
+  "Computer Sciences": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779905,
+    "update_time": 1772779905,
+    "_id": "Computer Sciences"
+  },
+  "Siberian Branch Of The Russian Academy Of Sciences (SO RAN)": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779905,
+    "update_time": 1772779905,
+    "_id": "Siberian Branch Of The Russian Academy Of Sciences (SO RAN)"
+  },
+  "Yandex": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090",
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 2,
+    "update_time": 1772780897,
+    "_id": "Yandex"
+  },
+  "Sber": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270",
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 3,
+    "update_time": 1772780895,
+    "_id": "Sber"
+  },
+  "VK": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779908,
+    "update_time": 1772779908,
+    "_id": "VK"
+  },
+  "Schlumberger": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779908,
+    "update_time": 1772779908,
+    "_id": "Schlumberger"
+  },
+  "Oil And Gas Sector": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779909,
+    "update_time": 1772779909,
+    "_id": "Oil And Gas Sector"
+  },
+  "World-Class Research Centers": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779910,
+    "update_time": 1772779910,
+    "_id": "World-Class Research Centers"
+  },
+  "Mechanics And Mathematics Faculty (MMF)": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779910,
+    "update_time": 1772779910,
+    "_id": "Mechanics And Mathematics Faculty (MMF)"
+  },
+  "Educational Process": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779911,
+    "update_time": 1772779911,
+    "_id": "Educational Process"
+  },
+  "Mechanics And Mathematics Faculty": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779912,
+    "update_time": 1772779912,
+    "_id": "Mechanics And Mathematics Faculty"
+  },
+  "Secondary Professional Education": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779913,
+    "update_time": 1772779913,
+    "_id": "Secondary Professional Education"
+  },
+  "High-Tech Industry": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779913,
+    "update_time": 1772779913,
+    "_id": "High-Tech Industry"
+  },
+  "Mathematical Models": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090"
+    ],
+    "count": 1,
+    "create_time": 1772779914,
+    "update_time": 1772779914,
+    "_id": "Mathematical Models"
+  },
+  "Heuristic Methods": {
+    "chunk_ids": [
+      "chunk-b465d7cca52d8827f04039160075b090",
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 2,
+    "create_time": 1772779915,
+    "update_time": 1772779915,
+    "_id": "Heuristic Methods"
+  },
+  "Unique Competencies Development": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779916,
+    "update_time": 1772779916,
+    "_id": "Unique Competencies Development"
+  },
+  "Ability To Extract Essential Information": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779916,
+    "update_time": 1772779916,
+    "_id": "Ability To Extract Essential Information"
+  },
+  "Argumentation And Logical Reasoning Skill": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779917,
+    "update_time": 1772779917,
+    "_id": "Argumentation And Logical Reasoning Skill"
+  },
+  "Ability To Work In Non-Standard Situations": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779918,
+    "update_time": 1772779918,
+    "_id": "Ability To Work In Non-Standard Situations"
+  },
+  "Extracurricular Life And Infrastructure": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779919,
+    "update_time": 1772779919,
+    "_id": "Extracurricular Life And Infrastructure"
+  },
+  "Podcast \"#мысмехмата\"": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779920,
+    "update_time": 1772779920,
+    "_id": "Podcast \"#мысмехмата\""
+  },
+  "Student Media": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779920,
+    "update_time": 1772779920,
+    "_id": "Student Media"
+  },
+  "Faculty Football Team": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779921,
+    "update_time": 1772779921,
+    "_id": "Faculty Football Team"
+  },
+  "Scholarships": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779921,
+    "update_time": 1772779921,
+    "_id": "Scholarships"
+  },
+  "Special Programs For Olympiad Winners": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779923,
+    "update_time": 1772779923,
+    "_id": "Special Programs For Olympiad Winners"
+  },
+  "Special Programs For First-Year Students With High Unified State Exam Scores": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779923,
+    "update_time": 1772779923,
+    "_id": "Special Programs For First-Year Students With High Unified State Exam Scores"
+  },
+  "Podcast \"#mysmehmata\"": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779924,
+    "update_time": 1772779924,
+    "_id": "Podcast \"#mysmehmata\""
+  },
+  "Scholarship Programs": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779924,
+    "update_time": 1772779924,
+    "_id": "Scholarship Programs"
+  },
+  "Modern Dormitories": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779925,
+    "update_time": 1772779925,
+    "_id": "Modern Dormitories"
+  },
+  "Sports Sections": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "count": 1,
+    "create_time": 1772779925,
+    "update_time": 1772779925,
+    "_id": "Sports Sections"
+  },
+  "Unified State Exam": {
+    "chunk_ids": [
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916",
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 4,
+    "update_time": 1772780860,
+    "_id": "Unified State Exam"
+  },
+  "Faculty Of Information Technology": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 2,
+    "create_time": 1772780238,
+    "update_time": 1772780238,
+    "_id": "Faculty Of Information Technology"
+  },
+  "Pirogova Street 1": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780240,
+    "update_time": 1772780240,
+    "_id": "Pirogova Street 1"
+  },
+  "Postgraduate Program": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 2,
+    "update_time": 1772781202,
+    "_id": "Postgraduate Program"
+  },
+  "Database Systems Laboratory": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780243,
+    "update_time": 1772780243,
+    "_id": "Database Systems Laboratory"
+  },
+  "SberLab-NSU": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 2,
+    "create_time": 1772780243,
+    "update_time": 1772780243,
+    "_id": "SberLab-NSU"
+  },
+  "Postgres Professional": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 2,
+    "create_time": 1772780244,
+    "update_time": 1772780244,
+    "_id": "Postgres Professional"
+  },
+  "Dissertation Council For Technical Sciences": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780245,
+    "update_time": 1772780245,
+    "_id": "Dissertation Council For Technical Sciences"
+  },
+  "Informatics And Computer Engineering": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780246,
+    "update_time": 1772780246,
+    "_id": "Informatics And Computer Engineering"
+  },
+  "Laboratories And Centers": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780248,
+    "update_time": 1772780248,
+    "_id": "Laboratories And Centers"
+  },
+  "Database Management Systems Laboratory": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 2,
+    "create_time": 1772780249,
+    "update_time": 1772780249,
+    "_id": "Database Management Systems Laboratory"
+  },
+  "Sberlab-Ngu": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780250,
+    "update_time": 1772780250,
+    "_id": "Sberlab-Ngu"
+  },
+  "Institutes Of The Siberian Branch Of The Russian Academy Of Sciences": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780251,
+    "update_time": 1772780251,
+    "_id": "Institutes Of The Siberian Branch Of The Russian Academy Of Sciences"
+  },
+  "It Companies": {
+    "chunk_ids": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb"
+    ],
+    "count": 1,
+    "create_time": 1772780251,
+    "update_time": 1772780251,
+    "_id": "It Companies"
+  },
+  "Лаборатория СУБД": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780252,
+    "update_time": 1772780252,
+    "_id": "Лаборатория СУБД"
+  },
+  "СберЛаб-НГУ": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780253,
+    "update_time": 1772780253,
+    "_id": "СберЛаб-НГУ"
+  },
+  "Лаборатория разработки ПО и систем на кристалле": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780253,
+    "update_time": 1772780253,
+    "_id": "Лаборатория разработки ПО и систем на кристалле"
+  },
+  "Учебно-исследовательская лаборатория ЦФТ": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780254,
+    "update_time": 1772780254,
+    "_id": "Учебно-исследовательская лаборатория ЦФТ"
+  },
+  "Центр Финансовых Технологий (ЦФТ)": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780255,
+    "update_time": 1772780255,
+    "_id": "Центр Финансовых Технологий (ЦФТ)"
+  },
+  "Лаборатория «Инжевика»": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780255,
+    "update_time": 1772780255,
+    "_id": "Лаборатория «Инжевика»"
+  },
+  "Сбер": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780256,
+    "update_time": 1772780256,
+    "_id": "Сбер"
+  },
+  "Т-Образование (Тинькофф)": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780257,
+    "update_time": 1772780257,
+    "_id": "Т-Образование (Тинькофф)"
+  },
+  "Зимний хакатон СберЛаб-НГУ": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780257,
+    "update_time": 1772780257,
+    "_id": "Зимний хакатон СберЛаб-НГУ"
+  },
+  "Олимпиады по программированию": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780258,
+    "update_time": 1772780258,
+    "_id": "Олимпиады по программированию"
+  },
+  "Международная научная студенческая конференция (МНСК)": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780259,
+    "update_time": 1772780259,
+    "_id": "Международная научная студенческая конференция (МНСК)"
+  },
+  "Вестник НГУ (Серия: ИТ)": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780259,
+    "update_time": 1772780259,
+    "_id": "Вестник НГУ (Серия: ИТ)"
+  },
+  "Летняя научно-олимпиадная школа «Сигма»": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780260,
+    "update_time": 1772780260,
+    "_id": "Летняя научно-олимпиадная школа «Сигма»"
+  },
+  "ЕГЭ": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270",
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 2,
+    "update_time": 1772780870,
+    "_id": "ЕГЭ"
+  },
+  "Software and System-on-Chip Development Laboratory": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780262,
+    "update_time": 1772780262,
+    "_id": "Software and System-on-Chip Development Laboratory"
+  },
+  "CFT Educational and Research Laboratory": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780262,
+    "update_time": 1772780262,
+    "_id": "CFT Educational and Research Laboratory"
+  },
+  "Inzhevika Laboratory": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780263,
+    "update_time": 1772780263,
+    "_id": "Inzhevika Laboratory"
+  },
+  "CFT": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780264,
+    "update_time": 1772780264,
+    "_id": "CFT"
+  },
+  "T-Education": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780265,
+    "update_time": 1772780265,
+    "_id": "T-Education"
+  },
+  "Winter Hackathon SberLab-NSU": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780266,
+    "update_time": 1772780266,
+    "_id": "Winter Hackathon SberLab-NSU"
+  },
+  "Programming Olympiads": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780266,
+    "update_time": 1772780266,
+    "_id": "Programming Olympiads"
+  },
+  "International Scientific Student Conference": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780267,
+    "update_time": 1772780267,
+    "_id": "International Scientific Student Conference"
+  },
+  "NSU Bulletin (IT Series)": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780268,
+    "update_time": 1772780268,
+    "_id": "NSU Bulletin (IT Series)"
+  },
+  "Sigma Summer Scientific and Olympiad School": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780269,
+    "update_time": 1772780269,
+    "_id": "Sigma Summer Scientific and Olympiad School"
+  },
+  "Sigma Summer Scientific And Olympiad School": {
+    "chunk_ids": [
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 1,
+    "create_time": 1772780270,
+    "update_time": 1772780270,
+    "_id": "Sigma Summer Scientific And Olympiad School"
+  },
+  "Library Resources": {
+    "chunk_ids": [
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 1,
+    "create_time": 1772780273,
+    "update_time": 1772780273,
+    "_id": "Library Resources"
+  },
+  "NSUNet": {
+    "chunk_ids": [
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 1,
+    "create_time": 1772780273,
+    "update_time": 1772780273,
+    "_id": "NSUNet"
+  },
+  "IT Education": {
+    "chunk_ids": [
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 1,
+    "create_time": 1772780274,
+    "update_time": 1772780274,
+    "_id": "IT Education"
+  },
+  "Summer Scientific And Olympiad School Sigma": {
+    "chunk_ids": [
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "count": 1,
+    "create_time": 1772780276,
+    "update_time": 1772780276,
+    "_id": "Summer Scientific And Olympiad School Sigma"
+  },
+  "Факультет": {
+    "chunk_ids": [
+      "chunk-bff5f872bf8300f62d80f59e3ab58270"
+    ],
+    "count": 1,
+    "create_time": 1772780302,
+    "update_time": 1772780302,
+    "_id": "Факультет"
+  },
+  "Faculty Of Economics NSU": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780786,
+    "update_time": 1772780786,
+    "_id": "Faculty Of Economics NSU"
+  },
+  "Mission": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780848,
+    "update_time": 1772780848,
+    "_id": "Mission"
+  },
+  "Mathematical Preparation": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780849,
+    "update_time": 1772780849,
+    "_id": "Mathematical Preparation"
+  },
+  "Data Analysis": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780849,
+    "update_time": 1772780849,
+    "_id": "Data Analysis"
+  },
+  "Python": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780850,
+    "update_time": 1772780850,
+    "_id": "Python"
+  },
+  "R": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780850,
+    "update_time": 1772780850,
+    "_id": "R"
+  },
+  "SQL": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780852,
+    "update_time": 1772780852,
+    "_id": "SQL"
+  },
+  "Russian Academy Of Sciences": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780852,
+    "update_time": 1772780852,
+    "_id": "Russian Academy Of Sciences"
+  },
+  "Business Companies": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780853,
+    "update_time": 1772780853,
+    "_id": "Business Companies"
+  },
+  "Real Sector": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780853,
+    "update_time": 1772780853,
+    "_id": "Real Sector"
+  },
+  "Industrial Partners": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780854,
+    "update_time": 1772780854,
+    "_id": "Industrial Partners"
+  },
+  "Superjob": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780854,
+    "update_time": 1772780854,
+    "_id": "Superjob"
+  },
+  "Average Graduate Salary": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780856,
+    "update_time": 1772780856,
+    "_id": "Average Graduate Salary"
+  },
+  "Novosibirsk Billionaires": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780856,
+    "update_time": 1772780856,
+    "_id": "Novosibirsk Billionaires"
+  },
+  "Bachelor's Program Economics": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780856,
+    "update_time": 1772780856,
+    "_id": "Bachelor's Program Economics"
+  },
+  "Economic-Mathematical Modeling": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780857,
+    "update_time": 1772780857,
+    "_id": "Economic-Mathematical Modeling"
+  },
+  "Forecasting": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780858,
+    "update_time": 1772780858,
+    "_id": "Forecasting"
+  },
+  "Financial Sphere Analysis": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780858,
+    "update_time": 1772780858,
+    "_id": "Financial Sphere Analysis"
+  },
+  "Ekonometric Models": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780859,
+    "update_time": 1772780859,
+    "_id": "Ekonometric Models"
+  },
+  "Tuition Fee": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780862,
+    "update_time": 1772780862,
+    "_id": "Tuition Fee"
+  },
+  "Bachelor's Program Management": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780862,
+    "update_time": 1772780862,
+    "_id": "Bachelor's Program Management"
+  },
+  "Project Management": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780863,
+    "update_time": 1772780863,
+    "_id": "Project Management"
+  },
+  "Strategic Leadership": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780864,
+    "update_time": 1772780864,
+    "_id": "Strategic Leadership"
+  },
+  "Faculty Of Economics Nsu": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780864,
+    "update_time": 1772780864,
+    "_id": "Faculty Of Economics Nsu"
+  },
+  "Bachelor's Degree Program In Economics": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780865,
+    "update_time": 1772780865,
+    "_id": "Bachelor's Degree Program In Economics"
+  },
+  "Bachelor's Degree Program In Management": {
+    "chunk_ids": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33"
+    ],
+    "count": 1,
+    "create_time": 1772780866,
+    "update_time": 1772780866,
+    "_id": "Bachelor's Degree Program In Management"
+  },
+  "Менеджмент": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780867,
+    "update_time": 1772780867,
+    "_id": "Менеджмент"
+  },
+  "Социология": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780868,
+    "update_time": 1772780868,
+    "_id": "Социология"
+  },
+  "Юриспруденция": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780868,
+    "update_time": 1772780868,
+    "_id": "Юриспруденция"
+  },
+  "Бизнес-информатика": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780870,
+    "update_time": 1772780870,
+    "_id": "Бизнес-информатика"
+  },
+  "Математика (профиль)": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780872,
+    "update_time": 1772780872,
+    "_id": "Математика (профиль)"
+  },
+  "История": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780874,
+    "update_time": 1772780874,
+    "_id": "История"
+  },
+  "Информатика": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780875,
+    "update_time": 1772780875,
+    "_id": "Информатика"
+  },
+  "Иностранный язык": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780875,
+    "update_time": 1772780875,
+    "_id": "Иностранный язык"
+  },
+  "SPSS": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780876,
+    "update_time": 1772780876,
+    "_id": "SPSS"
+  },
+  "VAAL": {
+    "chunk_ids": [
+      "chunk-fe653e943cbfd78500fb12df97178912"
+    ],
+    "count": 1,
+    "create_time": 1772780877,
+    "update_time": 1772780877,
+    "_id": "VAAL"
+  },
+  "World Bank": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185",
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 2,
+    "create_time": 1772780878,
+    "update_time": 1772780878,
+    "_id": "World Bank"
+  },
+  "International Monetary Fund": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185",
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 2,
+    "create_time": 1772780878,
+    "update_time": 1772780878,
+    "_id": "International Monetary Fund"
+  },
+  "Partner Companies": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "count": 1,
+    "create_time": 1772780879,
+    "update_time": 1772780879,
+    "_id": "Partner Companies"
+  },
+  "Education.nsu.ru/economics": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "count": 1,
+    "create_time": 1772780879,
+    "update_time": 1772780879,
+    "_id": "Education.nsu.ru/economics"
+  },
+  "Open Lectures": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "count": 1,
+    "create_time": 1772780881,
+    "update_time": 1772780881,
+    "_id": "Open Lectures"
+  },
+  "Master Classes": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "count": 1,
+    "create_time": 1772780882,
+    "update_time": 1772780882,
+    "_id": "Master Classes"
+  },
+  "Meetings With Alumni": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "count": 1,
+    "create_time": 1772780883,
+    "update_time": 1772780883,
+    "_id": "Meetings With Alumni"
+  },
+  "Economics Program": {
+    "chunk_ids": [
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "count": 1,
+    "create_time": 1772780883,
+    "update_time": 1772780883,
+    "_id": "Economics Program"
+  },
+  "Mathematical Analysis": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780884,
+    "update_time": 1772780884,
+    "_id": "Mathematical Analysis"
+  },
+  "Linear Algebra": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780885,
+    "update_time": 1772780885,
+    "_id": "Linear Algebra"
+  },
+  "Probability Theory": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780886,
+    "update_time": 1772780886,
+    "_id": "Probability Theory"
+  },
+  "Mathematical Statistics": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780886,
+    "update_time": 1772780886,
+    "_id": "Mathematical Statistics"
+  },
+  "Methods Of Optimal Solutions": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780887,
+    "update_time": 1772780887,
+    "_id": "Methods Of Optimal Solutions"
+  },
+  "Differential Equations": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780887,
+    "update_time": 1772780887,
+    "_id": "Differential Equations"
+  },
+  "Programming In Python And R": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780888,
+    "update_time": 1772780888,
+    "_id": "Programming In Python And R"
+  },
+  "Machine Learning": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780889,
+    "update_time": 1772780889,
+    "_id": "Machine Learning"
+  },
+  "Econometrics": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780890,
+    "update_time": 1772780890,
+    "_id": "Econometrics"
+  },
+  "Digital Marketing": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780890,
+    "update_time": 1772780890,
+    "_id": "Digital Marketing"
+  },
+  "Neuromarketing": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780891,
+    "update_time": 1772780891,
+    "_id": "Neuromarketing"
+  },
+  "Databases (SQL)": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780891,
+    "update_time": 1772780891,
+    "_id": "Databases (SQL)"
+  },
+  "Working In 1C": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780892,
+    "update_time": 1772780892,
+    "_id": "Working In 1C"
+  },
+  "Audit In The Practice Of International Companies": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780893,
+    "update_time": 1772780893,
+    "_id": "Audit In The Practice Of International Companies"
+  },
+  "Analysis Of Financial Statements": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780894,
+    "update_time": 1772780894,
+    "_id": "Analysis Of Financial Statements"
+  },
+  "Accounting And Management Accounting": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780894,
+    "update_time": 1772780894,
+    "_id": "Accounting And Management Accounting"
+  },
+  "Organization Of The Central Bank's Activities": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780895,
+    "update_time": 1772780895,
+    "_id": "Organization Of The Central Bank's Activities"
+  },
+  "Alfa-Bank": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780896,
+    "update_time": 1772780896,
+    "_id": "Alfa-Bank"
+  },
+  "Ministry Of Digital Development": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780898,
+    "update_time": 1772780898,
+    "_id": "Ministry Of Digital Development"
+  },
+  "Government Of The Russian Federation": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780898,
+    "update_time": 1772780898,
+    "_id": "Government Of The Russian Federation"
+  },
+  "Summer Internships": {
+    "chunk_ids": [
+      "chunk-2b7be3df769ed4360e4edc749f19785d"
+    ],
+    "count": 1,
+    "create_time": 1772780899,
+    "update_time": 1772780899,
+    "_id": "Summer Internships"
+  },
+  "Institute": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781198,
+    "update_time": 1772781198,
+    "_id": "Institute"
+  },
+  "V. Zelman College Of Medicine": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781199,
+    "update_time": 1772781199,
+    "_id": "V. Zelman College Of Medicine"
+  },
+  "Residency Program": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781200,
+    "update_time": 1772781200,
+    "_id": "Residency Program"
+  },
+  "Simulation Centers": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781202,
+    "update_time": 1772781202,
+    "_id": "Simulation Centers"
+  },
+  "Modern Diagnostic Equipment": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781203,
+    "update_time": 1772781203,
+    "_id": "Modern Diagnostic Equipment"
+  },
+  "Department Of Fundamental Medicine": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781203,
+    "update_time": 1772781203,
+    "_id": "Department Of Fundamental Medicine"
+  },
+  "Department Of Surgery": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 2,
+    "create_time": 1772781204,
+    "update_time": 1772781204,
+    "_id": "Department Of Surgery"
+  },
+  "Department Of Therapy": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 2,
+    "create_time": 1772781204,
+    "update_time": 1772781204,
+    "_id": "Department Of Therapy"
+  },
+  "Department Of Obstetrics And Gynecology": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 2,
+    "create_time": 1772781205,
+    "update_time": 1772781205,
+    "_id": "Department Of Obstetrics And Gynecology"
+  },
+  "Department Of Personality Psychology": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 2,
+    "create_time": 1772781205,
+    "update_time": 1772781205,
+    "_id": "Department Of Personality Psychology"
+  },
+  "Leading Medical Centers": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781207,
+    "update_time": 1772781207,
+    "_id": "Leading Medical Centers"
+  },
+  "Biomedical Startups": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781207,
+    "update_time": 1772781207,
+    "_id": "Biomedical Startups"
+  },
+  "Research Institutes": {
+    "chunk_ids": [
+      "chunk-b4951a804582e8ead40e48ff068044f3"
+    ],
+    "count": 1,
+    "create_time": 1772781207,
+    "update_time": 1772781207,
+    "_id": "Research Institutes"
+  },
+  "Institute Of Fundamental Medicine": {
+    "chunk_ids": [
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 1,
+    "create_time": 1772781208,
+    "update_time": 1772781208,
+    "_id": "Institute Of Fundamental Medicine"
+  },
+  "Official Website": {
+    "chunk_ids": [
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 1,
+    "create_time": 1772781210,
+    "update_time": 1772781210,
+    "_id": "Official Website"
+  },
+  "Novosibirsk State University (NSU)": {
+    "chunk_ids": [
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "count": 1,
+    "create_time": 1772781211,
+    "update_time": 1772781211,
+    "_id": "Novosibirsk State University (NSU)"
+  },
+  "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781211,
+    "update_time": 1772781211,
+    "_id": "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)"
+  },
+  "Новосибирский государственный университет (НГУ)": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781212,
+    "update_time": 1772781212,
+    "_id": "Новосибирский государственный университет (НГУ)"
+  },
+  "Владимир Зельман": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781213,
+    "update_time": 1772781213,
+    "_id": "Владимир Зельман"
+  },
+  "Лечебное дело (Специалитет)": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781213,
+    "update_time": 1772781213,
+    "_id": "Лечебное дело (Специалитет)"
+  },
+  "Психология (Бакалавриат и Магистратура)": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781214,
+    "update_time": 1772781214,
+    "_id": "Психология (Бакалавриат и Магистратура)"
+  },
+  "Ординатура": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781214,
+    "update_time": 1772781214,
+    "_id": "Ординатура"
+  },
+  "Врач-исследователь": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781215,
+    "update_time": 1772781215,
+    "_id": "Врач-исследователь"
+  },
+  "Сибирское отделение РАН": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781216,
+    "update_time": 1772781216,
+    "_id": "Сибирское отделение РАН"
+  },
+  "Новосибирск": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781216,
+    "update_time": 1772781216,
+    "_id": "Новосибирск"
+  },
+  "Institute Of Medicine And Psychology Named After V. Zelman": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781217,
+    "update_time": 1772781217,
+    "_id": "Institute Of Medicine And Psychology Named After V. Zelman"
+  },
+  "Vladimir Zelman": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781218,
+    "update_time": 1772781218,
+    "_id": "Vladimir Zelman"
+  },
+  "Physician-Researcher": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781219,
+    "update_time": 1772781219,
+    "_id": "Physician-Researcher"
+  },
+  "Research Institutes Of The Siberian Branch Of The Russian Academy Of Sciences": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781220,
+    "update_time": 1772781220,
+    "_id": "Research Institutes Of The Siberian Branch Of The Russian Academy Of Sciences"
+  },
+  "Medical Clinics Of Novosibirsk": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781220,
+    "update_time": 1772781220,
+    "_id": "Medical Clinics Of Novosibirsk"
+  },
+  "General Medicine": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781221,
+    "update_time": 1772781221,
+    "_id": "General Medicine"
+  },
+  "Residency": {
+    "chunk_ids": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701"
+    ],
+    "count": 1,
+    "create_time": 1772781222,
+    "update_time": 1772781222,
+    "_id": "Residency"
   }
 }

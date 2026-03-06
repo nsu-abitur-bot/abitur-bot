@@ -1090,5 +1090,1365 @@
     "create_time": 1766318623,
     "update_time": 1766318623,
     "_id": "doc-33f1967fb39b26fe26a7a2ecabc46492"
+  },
+  "doc-9b9ec559cacdaa1122f6506e11cf7921": {
+    "relation_pairs": [
+      [
+        "Faculty Of Geology And Geophysics",
+        "Journal \"Geology And Geophysics\""
+      ],
+      [
+        "Faculty",
+        "Project 'Petrophysics'"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "NSU Virtual Environment",
+        "Novosibirsk State University"
+      ],
+      [
+        "Department Of General And Regional Geology",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Geological And Geophysical Faculty",
+        "Novosibirsk State University"
+      ],
+      [
+        "Bachelor's And Specialist's Degree",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Siberian Geological Olympiad For Schoolchildren"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Summer Geoschool"
+      ],
+      [
+        "Department Of Geophysics",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Project \"Crystal Growth\""
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Project \"Petrophysics\""
+      ],
+      [
+        "Faculty",
+        "Scientific And Educational Center 'Evolution Of The Earth'"
+      ],
+      [
+        "\"Abiturient GGF NSU\" VK Community",
+        "Geology-Geophysics Department"
+      ],
+      [
+        "Faculty",
+        "Journal 'Geology And Geophysics'"
+      ],
+      [
+        "Faculty",
+        "NSU Geoschool"
+      ],
+      [
+        "Faculty",
+        "Russian Science Foundation"
+      ],
+      [
+        "Department Of Petrography And Geology Of Ore Deposits",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Department Of Geology Of Oil And Gas Deposits",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Department Of Mineralogy And Geochemistry",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Department Of Historical Geology And Paleontology",
+        "Geological And Geophysical Faculty"
+      ],
+      [
+        "Geological And Geophysical Faculty",
+        "Novosibirsk"
+      ],
+      [
+        "Geological And Geophysical Faculty",
+        "Postgraduate Studies"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Scientific And Educational Center \"Evolution Of The Earth\""
+      ],
+      [
+        "Geology-Geophysics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty",
+        "Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "Electronic Library",
+        "Novosibirsk State University"
+      ],
+      [
+        "Geology-Geophysics Department",
+        "NSU Technical Support Email"
+      ],
+      [
+        "Geological And Geophysical Faculty",
+        "Pirogova Street, 1"
+      ],
+      [
+        "Geological And Geophysical Faculty",
+        "V.A. Vernikovsky"
+      ],
+      [
+        "Faculty",
+        "Siberian Geological Olympiad For Schoolchildren"
+      ],
+      [
+        "Faculty",
+        "Project 'Crystal Growth'"
+      ],
+      [
+        "Faculty",
+        "Summer Geoschool"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "NSU Geoschool"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Russian Science Foundation"
+      ],
+      [
+        "NSUNet Wi-Fi",
+        "Novosibirsk State University"
+      ],
+      [
+        "NSU+ Scholarship",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty",
+        "NSU+ Scholarship"
+      ],
+      [
+        "Geological And Geophysical Faculty",
+        "Master's Degree"
+      ],
+      [
+        "Novosibirsk State University",
+        "Student/Teacher Personal Account"
+      ]
+    ],
+    "count": 40,
+    "create_time": 1772779049,
+    "update_time": 1772779049,
+    "_id": "doc-9b9ec559cacdaa1122f6506e11cf7921"
+  },
+  "doc-ebb83bd6a75699042a89496a62e3127d": {
+    "relation_pairs": [
+      [
+        "Russian Student Detachments",
+        "Zolotoye Secheniye Detachment"
+      ],
+      [
+        "International Students Club",
+        "Picnics"
+      ],
+      [
+        "Glum Club",
+        "Humanities Faculty"
+      ],
+      [
+        "Geya Club",
+        "Novosibirsk State University"
+      ],
+      [
+        "Novosibirsk State University",
+        "Russian Student Detachments"
+      ],
+      [
+        "Student Initiatives",
+        "Youth Policy"
+      ],
+      [
+        "SMBA (Student to Master of Business Administration)",
+        "Экономический Факультет НГУ"
+      ],
+      [
+        "Case Club Nsu",
+        "Nsu Faculty Of Economics"
+      ],
+      [
+        "Faculty of Journalism",
+        "Glum Club"
+      ],
+      [
+        "International Students Club",
+        "Nsu"
+      ],
+      [
+        "Student Initiatives",
+        "Volunteering"
+      ],
+      [
+        "Kapustnik",
+        "Kvant Club"
+      ],
+      [
+        "Historical And Public Clubs",
+        "Novosibirsk State University"
+      ],
+      [
+        "Педагогический Отряд «Ез»",
+        "Студенческие Отряды"
+      ],
+      [
+        "Financial Club NSU",
+        "Экономический Факультет НГУ"
+      ],
+      [
+        "Historical And Social Clubs",
+        "Spirit Of Studenthood"
+      ],
+      [
+        "Foreign Students Club",
+        "Picnics"
+      ],
+      [
+        "Historical And Social Clubs",
+        "Self-Organization"
+      ],
+      [
+        "International Students Club",
+        "Speaking Clubs"
+      ],
+      [
+        "Nsu Faculty Of Economics",
+        "Student To Master Of Business Administration"
+      ],
+      [
+        "Международный Студенческий Клуб (International Students Club, InterClub)",
+        "НГУ"
+      ],
+      [
+        "Financial Club Nsu",
+        "Nsu Faculty Of Economics"
+      ],
+      [
+        "Russian Student Detachments",
+        "Sintez"
+      ],
+      [
+        "Novosibirsk State University",
+        "Youth Policy"
+      ],
+      [
+        "Student Initiatives",
+        "Student Movements"
+      ],
+      [
+        "Cultural Activities",
+        "Foreign Students Club"
+      ],
+      [
+        "Historical And Social Clubs",
+        "Novosibirsk State University"
+      ],
+      [
+        "Kvant Club",
+        "Novosibirsk State University"
+      ],
+      [
+        "Foreign Students Club",
+        "Themed Parties"
+      ],
+      [
+        "Foreign Students Club",
+        "Speaking Clubs"
+      ],
+      [
+        "Glum Club",
+        "Novosibirsk State University"
+      ],
+      [
+        "Kvant Club",
+        "Kvn Nsu Team"
+      ],
+      [
+        "Cultural Evenings",
+        "Foreign Students Club"
+      ],
+      [
+        "Kapustniki",
+        "Kvant Club"
+      ],
+      [
+        "Russian Student Detachments",
+        "Sintez Detachment"
+      ],
+      [
+        "Студенческие Отряды",
+        "Штаб Студенческих Отрядов НГУ"
+      ],
+      [
+        "Russian Student Detachments",
+        "Sinergiya Detachment"
+      ],
+      [
+        "Future Professional NSU",
+        "Экономический Факультет НГУ"
+      ],
+      [
+        "Concerts",
+        "Foreign Students Club"
+      ],
+      [
+        "Case Club NSU",
+        "Экономический Факультет НГУ"
+      ],
+      [
+        "KVN NSU Team",
+        "Kvant Club"
+      ],
+      [
+        "Cultural Evenings",
+        "International Students Club"
+      ],
+      [
+        "Kvant Club",
+        "Physics Faculty"
+      ],
+      [
+        "Russian Student Detachments",
+        "Sinergiya"
+      ],
+      [
+        "Foreign Students Club",
+        "Novosibirsk State University"
+      ],
+      [
+        "Historical And Social Clubs",
+        "Intellectual Freedom"
+      ],
+      [
+        "Foreign Students Club",
+        "Language Clubs"
+      ],
+      [
+        "Международный Студенческий Клуб (International Students Club, InterClub)",
+        "Мероприятия InterClub"
+      ],
+      [
+        "Novosibirsk State University",
+        "Scientific Picnic"
+      ],
+      [
+        "Строительный Отряд «Золотое Сечение» им. Б.В. Войцеховского",
+        "Студенческие Отряды"
+      ],
+      [
+        "Russian Student Detachments",
+        "Zolotoe Sechenie"
+      ],
+      [
+        "Novosibirsk State University",
+        "Student Initiatives"
+      ],
+      [
+        "Concerts",
+        "International Students Club"
+      ],
+      [
+        "Future Professional Nsu",
+        "Nsu Faculty Of Economics"
+      ],
+      [
+        "Kvant Club",
+        "Leonid Shles"
+      ],
+      [
+        "Startup Studio",
+        "Student Initiatives"
+      ],
+      [
+        "Geology and Geophysics Faculty",
+        "Geya Club"
+      ]
+    ],
+    "count": 57,
+    "create_time": 1772779420,
+    "update_time": 1772779420,
+    "_id": "doc-ebb83bd6a75699042a89496a62e3127d"
+  },
+  "doc-d0441b2e32f37311842db63f8d7676db": {
+    "relation_pairs": [
+      [
+        "Dormitory No. 1A",
+        "Novosibirsk State University"
+      ],
+      [
+        "Future",
+        "Structure"
+      ],
+      [
+        "Accommodation Cost",
+        "Student Dormitories"
+      ],
+      [
+        "Dormitory No. 1B",
+        "Hotel"
+      ],
+      [
+        "Block",
+        "Student Dormitories"
+      ],
+      [
+        "Dormitory No. 1A",
+        "Hotel"
+      ],
+      [
+        "Akademgorodok",
+        "Student Dormitories"
+      ],
+      [
+        "Dormitory",
+        "First-Year Student"
+      ],
+      [
+        "Campus Facilities",
+        "Student Dormitories"
+      ],
+      [
+        "Residential Premises Lease Agreement",
+        "Student"
+      ],
+      [
+        "Applicants",
+        "Future"
+      ],
+      [
+        "Student Dormitories",
+        "Two-Person Rooms"
+      ],
+      [
+        "Dormitory",
+        "Shared Kitchen"
+      ],
+      [
+        "Common Recreation Areas",
+        "Student Dormitories"
+      ],
+      [
+        "Dormitory",
+        "Shared Rest Area"
+      ],
+      [
+        "Future",
+        "Students"
+      ],
+      [
+        "Dormitory",
+        "Non-Resident Student"
+      ],
+      [
+        "NSU Network (nsunet)",
+        "Student Dormitories"
+      ],
+      [
+        "Akademgorodok Campus",
+        "Student Campus Dining Halls"
+      ],
+      [
+        "Campus",
+        "Student Dormitories"
+      ],
+      [
+        "NSU",
+        "Student Dormitories"
+      ],
+      [
+        "Academic Town",
+        "Novosibirsk State University"
+      ],
+      [
+        "Living Rooms",
+        "Student Dormitories"
+      ],
+      [
+        "Dormitory No. 1B",
+        "Novosibirsk State University"
+      ],
+      [
+        "Kitchen Blocks",
+        "Student Dormitories"
+      ],
+      [
+        "NSU Network",
+        "Student Dormitories"
+      ],
+      [
+        "Student Dormitories",
+        "Three-Person Rooms"
+      ],
+      [
+        "Novosibirsk State University",
+        "Student Dormitories"
+      ],
+      [
+        "Akademgorodok Campus",
+        "Campus Laundry"
+      ],
+      [
+        "Dormitory",
+        "Novosibirsk State University"
+      ],
+      [
+        "Akademgorodok",
+        "Apartment Rental"
+      ],
+      [
+        "Akademgorodok Campus",
+        "Dormitory"
+      ],
+      [
+        "Dormitory",
+        "Double Room"
+      ],
+      [
+        "Identity Document",
+        "Student"
+      ],
+      [
+        "Dormitory",
+        "Luggage Storage Area"
+      ]
+    ],
+    "count": 35,
+    "create_time": 1772779648,
+    "update_time": 1772779648,
+    "_id": "doc-d0441b2e32f37311842db63f8d7676db"
+  },
+  "doc-e8c69e36ca3dc64fbf135d84f0c7ba9e": {
+    "relation_pairs": [
+      [
+        "Bachelor's Degree Programs",
+        "Mechanico-Mathematical Faculty Of NSU"
+      ],
+      [
+        "Mechanics And Mathematics Faculty",
+        "VK"
+      ],
+      [
+        "Applied Mathematics And Informatics",
+        "Mechanico-Mathematical Faculty Of NSU"
+      ],
+      [
+        "Applied Mathematics And Informatics",
+        "Bachelor's Degree Programs"
+      ],
+      [
+        "Mathematics And Computer Science",
+        "Mechanics And Mathematics Faculty"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Russian Language"
+      ],
+      [
+        "Extracurricular Life And Infrastructure",
+        "Faculty Football Team"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "Siberian Branch Of The Russian Academy Of Sciences (SO RAN)"
+      ],
+      [
+        "Extracurricular Life And Infrastructure",
+        "Scholarships"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "World-Class Research Centers"
+      ],
+      [
+        "Applied Mathematics And Informatics",
+        "Engineering School: Artificial Intelligence And Applied Engineering"
+      ],
+      [
+        "Argumentation And Logical Reasoning Skill",
+        "Unique Competencies Development"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Physics"
+      ],
+      [
+        "NSU",
+        "Top-200 In QS World University Rankings"
+      ],
+      [
+        "Extracurricular Life And Infrastructure",
+        "Student Media"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "Schlumberger"
+      ],
+      [
+        "Mechanics And Mathematics Faculty",
+        "Yandex"
+      ],
+      [
+        "Bachelor's Degree Programs",
+        "Mathematics And Computer"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Computer Science"
+      ],
+      [
+        "6th Place In Russia",
+        "Mechanico-Mathematical Faculty Of NSU"
+      ],
+      [
+        "NSU",
+        "QS World University Rankings"
+      ],
+      [
+        "Mathematics",
+        "Mechanico-Mathematical Faculty Of NSU"
+      ],
+      [
+        "Bachelor's Degree Programs",
+        "Deferred Choice System"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Secondary Professional Education"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Mathematics (Profile)"
+      ],
+      [
+        "Deferred Choice System",
+        "Mechanico-Mathematical Faculty Of NSU"
+      ],
+      [
+        "Ability To Work In Non-Standard Situations",
+        "Unique Competencies Development"
+      ],
+      [
+        "Mathematics",
+        "Research Group Of Fundamental Mathematics"
+      ],
+      [
+        "Heuristic Methods",
+        "Unique Competencies Development"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "Oil And Gas Sector"
+      ],
+      [
+        "Campus",
+        "Extracurricular Life And Infrastructure"
+      ],
+      [
+        "Bachelor's Degree Programs",
+        "Mechanics And Mathematical Modeling"
+      ],
+      [
+        "Scholarships",
+        "Special Programs For First-Year Students With High Unified State Exam Scores"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "Sber"
+      ],
+      [
+        "Educational Process",
+        "Mechanics And Mathematics Faculty (MMF)"
+      ],
+      [
+        "Mechanico-Mathematical Faculty Of NSU",
+        "Mechanics And Mathematical Modeling"
+      ],
+      [
+        "Mechanics And Mathematics Faculty",
+        "Schlumberger"
+      ],
+      [
+        "Computer Sciences",
+        "Secondary Vocational Education (SPO)"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Mathematics And Mechanics. PMI"
+      ],
+      [
+        "Mathematics And Computer",
+        "Mechanico-Mathematical Faculty Of NSU"
+      ],
+      [
+        "Higher Mathematics",
+        "Secondary Vocational Education (SPO)"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "VK"
+      ],
+      [
+        "Scholarships",
+        "Special Programs For Olympiad Winners"
+      ],
+      [
+        "Extracurricular Life And Infrastructure",
+        "Podcast \"#мысмехмата\""
+      ],
+      [
+        "Mathematics And Computer Science",
+        "System Programming"
+      ],
+      [
+        "Bachelor's Degree Programs",
+        "Mathematics"
+      ],
+      [
+        "High-Tech Industry",
+        "Mathematics And Computer Science"
+      ],
+      [
+        "Mathematics And Mechanics. PMI",
+        "Mechanics And Mathematics Faculty"
+      ],
+      [
+        "Mechanico-Mathematical Faculty Of NSU",
+        "NSU"
+      ],
+      [
+        "Admission Campaign 2025",
+        "Mathematics And Computer Science"
+      ],
+      [
+        "Ability To Extract Essential Information",
+        "Unique Competencies Development"
+      ],
+      [
+        "Mechanics And Mathematics Faculty",
+        "Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "Mechanics And Mathematics Faculty (MMF)",
+        "Yandex"
+      ],
+      [
+        "Mechanico-Mathematical Faculty Of NSU",
+        "Tuition Cost 2025-2026"
+      ],
+      [
+        "Russian Language",
+        "Secondary Vocational Education (SPO)"
+      ],
+      [
+        "Fundamental Mathematics Research Group",
+        "Mathematics"
+      ],
+      [
+        "Mechanics And Mathematics Faculty",
+        "Sber"
+      ],
+      [
+        "Mathematical Methods And Information Technologies In Mechanics",
+        "Mechanics And Mathematical Modeling"
+      ]
+    ],
+    "count": 58,
+    "create_time": 1772779988,
+    "update_time": 1772779988,
+    "_id": "doc-e8c69e36ca3dc64fbf135d84f0c7ba9e"
+  },
+  "doc-6d9651fac8080057a2e945880af6b9d2": {
+    "relation_pairs": [
+      [
+        "Faculty Of Information Technology",
+        "SberLab-NSU"
+      ],
+      [
+        "IT Education",
+        "Programming"
+      ],
+      [
+        "Database Management Systems Laboratory",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Факультет",
+        "Центр Финансовых Технологий (ЦФТ)"
+      ],
+      [
+        "Database Systems Laboratory",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Faculty",
+        "Sigma Summer Scientific and Olympiad School"
+      ],
+      [
+        "Bachelor's Degree",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Akademgorodok",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty",
+        "NSU Bulletin (IT Series)"
+      ],
+      [
+        "Faculty",
+        "International Scientific Student Conference"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Informatics And Computer Engineering"
+      ],
+      [
+        "Postgres Professional",
+        "Лаборатория СУБД"
+      ],
+      [
+        "Bachelor's Degree",
+        "Unified State Exam"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Institutes Of The Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "Учебно-исследовательская лаборатория ЦФТ",
+        "Центр Финансовых Технологий (ЦФТ)"
+      ],
+      [
+        "Bachelor's Degree Program",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Dissertation Council For Technical Sciences",
+        "Postgraduate Program"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Master's Degree"
+      ],
+      [
+        "Database Management Systems Laboratory",
+        "Postgres Professional"
+      ],
+      [
+        "Database Systems Laboratory",
+        "Postgres Professional"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "It Companies"
+      ],
+      [
+        "Faculty",
+        "Programming Olympiads"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Unified State Exam"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "IT Education"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Novosibirsk State University"
+      ],
+      [
+        "Entrance Exams",
+        "Postgraduate Studies"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Summer Scientific And Olympiad School Sigma"
+      ],
+      [
+        "Зимний хакатон СберЛаб-НГУ",
+        "СберЛаб-НГУ"
+      ],
+      [
+        "SberLab-NSU",
+        "Winter Hackathon SberLab-NSU"
+      ],
+      [
+        "Т-Образование (Тинькофф)",
+        "Факультет"
+      ],
+      [
+        "Сбер",
+        "Факультет"
+      ],
+      [
+        "Faculty",
+        "Sber"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Laboratories And Centers"
+      ],
+      [
+        "Faculty",
+        "Postgres Professional"
+      ],
+      [
+        "CFT",
+        "Faculty"
+      ],
+      [
+        "Novosibirsk",
+        "Novosibirsk State University"
+      ],
+      [
+        "Dormitory",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Sber",
+        "SberLab-NSU"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Library Resources"
+      ],
+      [
+        "Faculty",
+        "T-Education"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Novosibirsk"
+      ],
+      [
+        "Postgres Professional",
+        "Факультет"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Master's Degree Program"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Postgraduate Program"
+      ],
+      [
+        "Dissertation Council For Technical Sciences",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Pirogova Street 1"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Postgraduate Studies"
+      ],
+      [
+        "Entrance Exams",
+        "Master's Degree"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "NSUNet"
+      ],
+      [
+        "Faculty Of Information Technology",
+        "Sberlab-Ngu"
+      ],
+      [
+        "Akademgorodok",
+        "Faculty Of Information Technology"
+      ],
+      [
+        "Novosibirsk State University",
+        "Sigma Summer Scientific And Olympiad School"
+      ]
+    ],
+    "count": 53,
+    "create_time": 1772780332,
+    "update_time": 1772780332,
+    "_id": "doc-6d9651fac8080057a2e945880af6b9d2"
+  },
+  "doc-79f29e4fba2b04e12bb9daaf1f44a494": {
+    "relation_pairs": [
+      [
+        "Economics Program",
+        "Education.nsu.ru/economics"
+      ],
+      [
+        "Economics Program",
+        "Open Lectures"
+      ],
+      [
+        "Akademgorodok",
+        "Economics Program"
+      ],
+      [
+        "Bachelor's Degree Program In Economics",
+        "Budget Places"
+      ],
+      [
+        "Bachelor's Degree Program In Economics",
+        "Faculty Of Economics Nsu"
+      ],
+      [
+        "Обществознание",
+        "Юриспруденция"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Mission"
+      ],
+      [
+        "Менеджмент",
+        "Русский язык"
+      ],
+      [
+        "Bachelor's Program Economics",
+        "Economic-Mathematical Modeling"
+      ],
+      [
+        "ЕГЭ",
+        "Менеджмент"
+      ],
+      [
+        "Business Companies",
+        "Faculty Of Economics NSU"
+      ],
+      [
+        "Faculty Of Economics Nsu",
+        "Novosibirsk State University"
+      ],
+      [
+        "Менеджмент",
+        "Обществознание"
+      ],
+      [
+        "Faculty Of Economics Nsu",
+        "Russian Academy Of Sciences"
+      ],
+      [
+        "Data Analysis",
+        "Faculty Of Economics NSU"
+      ],
+      [
+        "Обществознание",
+        "Социология"
+      ],
+      [
+        "Data Analysis",
+        "SQL"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Novosibirsk Billionaires"
+      ],
+      [
+        "Математика (профиль)",
+        "Менеджмент"
+      ],
+      [
+        "Average Graduate Salary",
+        "Faculty Of Economics NSU"
+      ],
+      [
+        "Bachelor's Degree Program In Management",
+        "Faculty Of Economics Nsu"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Real Sector"
+      ],
+      [
+        "Bachelor's Degree Program In Economics",
+        "Paid Places"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Mathematical Preparation"
+      ],
+      [
+        "Economics Program",
+        "Meetings With Alumni"
+      ],
+      [
+        "Industrial Partners",
+        "Real Sector"
+      ],
+      [
+        "VAAL",
+        "Социология"
+      ],
+      [
+        "Economics Program",
+        "Master Classes"
+      ],
+      [
+        "Faculty Of Economics Nsu",
+        "Novosibirsk Billionaires"
+      ],
+      [
+        "Bachelor's Degree Program In Economics",
+        "Entrance Exams"
+      ],
+      [
+        "Economics Program",
+        "Novosibirsk"
+      ],
+      [
+        "Economics Program",
+        "Partner Companies"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Superjob"
+      ],
+      [
+        "ЕГЭ",
+        "Юриспруденция"
+      ],
+      [
+        "Bachelor's Degree Program In Economics",
+        "Tuition Fee"
+      ],
+      [
+        "Data Analysis",
+        "Python"
+      ],
+      [
+        "ЕГЭ",
+        "Социология"
+      ],
+      [
+        "Faculty Of Economics Nsu",
+        "Superjob"
+      ],
+      [
+        "Data Analysis",
+        "R"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Russian Academy Of Sciences"
+      ],
+      [
+        "Faculty Of Economics NSU",
+        "Novosibirsk State University"
+      ],
+      [
+        "SPSS",
+        "Социология"
+      ],
+      [
+        "Bachelor's Program Economics",
+        "Faculty Of Economics NSU"
+      ]
+    ],
+    "count": 43,
+    "create_time": 1772780955,
+    "update_time": 1772780955,
+    "_id": "doc-79f29e4fba2b04e12bb9daaf1f44a494"
+  },
+  "doc-9f870f25828b70a88c0a97ce6a39bbcc": {
+    "relation_pairs": [
+      [
+        "General Medicine",
+        "Institute Of Medicine And Psychology Named After V. Zelman"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Novosibirsk State University"
+      ],
+      [
+        "Department Of Surgery",
+        "Institute Of Fundamental Medicine"
+      ],
+      [
+        "Novosibirsk",
+        "Pirogova Street, 1"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Vladimir Zelman"
+      ],
+      [
+        "Bachelor's Degree Program",
+        "Institute"
+      ],
+      [
+        "Institute",
+        "Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "Graduates",
+        "Research Institutes"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Medical Clinics Of Novosibirsk"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Physician-Researcher"
+      ],
+      [
+        "Graduates",
+        "Leading Medical Centers"
+      ],
+      [
+        "Department Of Personality Psychology",
+        "Institute"
+      ],
+      [
+        "Institute Of Fundamental Medicine",
+        "Pirogova Street, 1"
+      ],
+      [
+        "Department Of Therapy",
+        "Institute Of Fundamental Medicine"
+      ],
+      [
+        "Department Of Obstetrics And Gynecology",
+        "Institute Of Fundamental Medicine"
+      ],
+      [
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)",
+        "Лечебное дело (Специалитет)"
+      ],
+      [
+        "Владимир Зельман",
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)"
+      ],
+      [
+        "Врач-исследователь",
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)"
+      ],
+      [
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)",
+        "Новосибирск"
+      ],
+      [
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)",
+        "Новосибирский государственный университет (НГУ)"
+      ],
+      [
+        "Institute",
+        "Master's Degree Program"
+      ],
+      [
+        "Institute",
+        "Modern Diagnostic Equipment"
+      ],
+      [
+        "Institute",
+        "Postgraduate Program"
+      ],
+      [
+        "Institute",
+        "Simulation Centers"
+      ],
+      [
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)",
+        "Психология (Бакалавриат и Магистратура)"
+      ],
+      [
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)",
+        "Ординатура"
+      ],
+      [
+        "Department Of Fundamental Medicine",
+        "Institute"
+      ],
+      [
+        "Department Of Surgery",
+        "Institute"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Residency"
+      ],
+      [
+        "Biomedical Startups",
+        "Graduates"
+      ],
+      [
+        "Institute",
+        "Residency Program"
+      ],
+      [
+        "Department Of Personality Psychology",
+        "Institute Of Fundamental Medicine"
+      ],
+      [
+        "Institute",
+        "V. Zelman College Of Medicine"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Research Institutes Of The Siberian Branch Of The Russian Academy Of Sciences"
+      ],
+      [
+        "Institute Of Medicine And Psychology Named After V. Zelman",
+        "Psychology"
+      ],
+      [
+        "Институт медицины и психологии им. В. Зельмана (ИМП НГУ)",
+        "Сибирское отделение РАН"
+      ],
+      [
+        "Institute Of Fundamental Medicine",
+        "Novosibirsk State University (NSU)"
+      ],
+      [
+        "Department Of Therapy",
+        "Institute"
+      ],
+      [
+        "Department Of Obstetrics And Gynecology",
+        "Institute"
+      ],
+      [
+        "Institute Of Fundamental Medicine",
+        "Official Website"
+      ]
+    ],
+    "count": 40,
+    "create_time": 1772781269,
+    "update_time": 1772781269,
+    "_id": "doc-9f870f25828b70a88c0a97ce6a39bbcc"
   }
 }

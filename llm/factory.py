@@ -12,14 +12,15 @@ def get_llm_provider() -> BaseLLMProvider:
     """Создаёт LLM провайдер на основе переменной окружения LLM_PROVIDER.
 
     Поддерживаемые значения:
-        - "cerebras" (по умолчанию)
+        - "deepseek" (по умолчанию)
+        - "cerebras"
         - "gigachat"
     """
     global _provider_instance
     if _provider_instance is not None:
         return _provider_instance
 
-    provider_name = os.getenv("LLM_PROVIDER", "cerebras").lower()
+    provider_name = os.getenv("LLM_PROVIDER", "deepseek").lower()
 
     if provider_name == "gigachat":
         from llm.providers.gigachat import GigaChatProvider
@@ -29,10 +30,14 @@ def get_llm_provider() -> BaseLLMProvider:
         from llm.providers.cerebras import CerebrasProvider
 
         _provider_instance = CerebrasProvider()
+    elif provider_name == "deepseek":
+        from llm.providers.deepseek import DeepSeekProvider
+
+        _provider_instance = DeepSeekProvider()
     else:
         raise ValueError(
             f"Неизвестный LLM провайдер: '{provider_name}'. "
-            f"Допустимые значения: gigachat, cerebras"
+            f"Допустимые значения: deepseek, cerebras, gigachat"
         )
 
     logger.info("LLM провайдер инициализирован: %s", provider_name)

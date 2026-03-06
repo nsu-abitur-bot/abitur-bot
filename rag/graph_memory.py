@@ -7,7 +7,8 @@ from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
 
-from llm.gigachat_graph_adapters import GigaChatEmbedding, GigaChatLLM
+from llm.deepseek_graph_adapters import DeepSeekLLM
+from llm.gigachat_graph_adapters import GigaChatEmbedding
 
 load_dotenv()
 
@@ -21,21 +22,21 @@ GRAPH_QUERY_MODES: frozenset = frozenset(
 class GraphMemory:
     """
     Async manager for LightRAG graph memory.
-    Uses GigaChat via LangChain for LLM and embeddings.
+    Uses DeepSeek for LLM and GigaChat for embeddings.
     """
 
     def __init__(
         self,
         credentials: Optional[str] = None,
         scope: str = "GIGACHAT_API_PERS",
-        model_name: str = "GigaChat",
+        model_name: str = "deepseek-chat",
         embedding_model_name: str = "Embeddings",
     ) -> None:
+        # GigaChat credentials for embeddings
         self.credentials: Optional[str] = credentials or os.getenv(
             "GIGACHAT_CREDENTIALS"
         )
         if not self.credentials:
-            # Fallback to GIGACHAT_API_KEY if CREDENTIALS not set
             self.credentials = os.getenv("GIGACHAT_API_KEY")
 
         if not self.credentials:
@@ -44,7 +45,7 @@ class GraphMemory:
             )
 
         self.scope: str = scope or os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
-        self.model_name: str = model_name or os.getenv("GIGACHAT_MODEL", "GigaChat-max")
+        self.model_name: str = model_name or os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
         self.embedding_model_name = embedding_model_name
 
         self._graphs: Dict[str, LightRAG] = {}
@@ -69,9 +70,7 @@ class GraphMemory:
         workspace_path = self._get_workspace_path(graph_id)
 
         try:
-            llm_adapter = GigaChatLLM(
-                credentials=self.credentials,
-                scope=self.scope,
+            llm_adapter = DeepSeekLLM(
                 model=self.model_name,
             )
 

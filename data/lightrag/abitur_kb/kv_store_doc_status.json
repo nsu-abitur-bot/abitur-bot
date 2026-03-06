@@ -235,5 +235,158 @@
       "processing_start_time": 1766318298,
       "processing_end_time": 1766318623
     }
+  },
+  "doc-9b9ec559cacdaa1122f6506e11cf7921": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-aa94440482207198e1a94b6746f1803e",
+      "chunk-b97b86b652b248e46791037ab79eca96",
+      "chunk-1a5402055951e8d54d469a3cebbfc97a"
+    ],
+    "content_summary": "# База знаний: Геолого-геофизический факультет НГУ (ГГФ)\n\n## Общая информация\n\n**Геолого-геофизический факультет (ГГФ)** — один из ведущих факультетов Новосибирского государственного университета, обеспечивающий подготовку специалистов в области геол...",
+    "content_length": 2792,
+    "created_at": "2026-03-06T06:30:04.174419+00:00",
+    "updated_at": "2026-03-06T06:37:29.756560+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_133004_d3256175",
+    "metadata": {
+      "processing_start_time": 1772778604,
+      "processing_end_time": 1772779049
+    }
+  },
+  "doc-ebb83bd6a75699042a89496a62e3127d": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-0d58c6ab3a7182fec5879e381a537083",
+      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15",
+      "chunk-b0c0788d56bf6ead94f10669696b1b22"
+    ],
+    "content_summary": "Клубы и кружки НГУ 1. Клуб «Квант»\n• Это юмористический клуб физического факультета НГУ. ￼\n• Основан 19 мая 1968 года Леонидом Шлесом. ￼\n• «Квант» проводит ежегодные капустники — юмористические студенческие вечера, традиционно весной. ￼\n• Среди други...",
+    "content_length": 3245,
+    "created_at": "2026-03-06T06:37:29.906424+00:00",
+    "updated_at": "2026-03-06T06:43:40.074157+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_133729_a3630522",
+    "metadata": {
+      "processing_start_time": 1772779049,
+      "processing_end_time": 1772779420
+    }
+  },
+  "doc-d0441b2e32f37311842db63f8d7676db": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-7834c0568e49191de930f90be1807b6b",
+      "chunk-3d74b50c933d24d32754ba9493cd5e8b",
+      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
+    ],
+    "content_summary": "# Проживание и общежития (НГУ)\n\n1. Общая информация\n   - Студенты НГУ имеют возможность проживать в университетских общежитиях, расположенных в Академгородке. ￼\n   - Общежития находятся примерно в 10 минутах ходьбы от университетских корпусов. ￼\n   -...",
+    "content_length": 2310,
+    "created_at": "2026-03-06T06:43:40.665880+00:00",
+    "updated_at": "2026-03-06T06:47:28.665957+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_134340_d06b846f",
+    "metadata": {
+      "processing_start_time": 1772779420,
+      "processing_end_time": 1772779648
+    }
+  },
+  "doc-e8c69e36ca3dc64fbf135d84f0c7ba9e": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-ddcef96986201d45e53c49db3bb62169",
+      "chunk-b465d7cca52d8827f04039160075b090",
+      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
+    ],
+    "content_summary": "# База знаний: Механико-математический факультет НГУ (ММФ)\n\n## Общая информация\n\nМеханико-математический факультет НГУ — ведущий центр подготовки специалистов, способных проводить научные исследования и разработки для глобальных технологических компа...",
+    "content_length": 3156,
+    "created_at": "2026-03-06T06:47:28.905483+00:00",
+    "updated_at": "2026-03-06T06:53:08.040673+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_134728_4c7a1644",
+    "metadata": {
+      "processing_start_time": 1772779648,
+      "processing_end_time": 1772779988
+    }
+  },
+  "doc-6d9651fac8080057a2e945880af6b9d2": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-4b5212b42d4fdb329d220e300038f8eb",
+      "chunk-bff5f872bf8300f62d80f59e3ab58270",
+      "chunk-71d3f7098ee5d3b86e0310de336d4916"
+    ],
+    "content_summary": "# База знаний: Факультет информационных технологий (ФИТ) НГУ\n\n## 1. Общая информация\n\n**Факультет информационных технологий (ФИТ)** — один из ведущих факультетов Новосибирского государственного университета, специализирующийся на подготовке высококва...",
+    "content_length": 3151,
+    "created_at": "2026-03-06T06:53:08.245514+00:00",
+    "updated_at": "2026-03-06T06:58:52.148122+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_135308_d29f3a5c",
+    "metadata": {
+      "processing_start_time": 1772779988,
+      "processing_end_time": 1772780332
+    }
+  },
+  "doc-79f29e4fba2b04e12bb9daaf1f44a494": {
+    "status": "processed",
+    "chunks_count": 4,
+    "chunks_list": [
+      "chunk-529d82ff29451a356cdb38d5fb98bd33",
+      "chunk-fe653e943cbfd78500fb12df97178912",
+      "chunk-2b7be3df769ed4360e4edc749f19785d",
+      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+    ],
+    "content_summary": "# База знаний: Экономический факультет НГУ (ЭФ НГУ)\n\n## 1. Общая информация\n\n- **Учреждение:** Новосибирский государственный университет (НГУ).\n- **Миссия:** Подготовка специалистов мирового уровня через сочетание сильной математической базы, анализа...",
+    "content_length": 3765,
+    "created_at": "2026-03-06T06:58:52.388332+00:00",
+    "updated_at": "2026-03-06T07:09:15.974474+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_135852_758d5728",
+    "metadata": {
+      "processing_start_time": 1772780332,
+      "processing_end_time": 1772780955
+    }
+  },
+  "doc-9f870f25828b70a88c0a97ce6a39bbcc": {
+    "status": "processed",
+    "chunks_count": 3,
+    "chunks_list": [
+      "chunk-dae165f18dcbab047fc85ffcc2874701",
+      "chunk-b4951a804582e8ead40e48ff068044f3",
+      "chunk-359a6e4d5090ea78d678280a133c0aa1"
+    ],
+    "content_summary": "# Институт медицины и психологии им. В. Зельмана (ИМП НГУ)\n\n## Общая информация\n\n**Институт медицины и психологии им. В. Зельмана (ИМП)** — структурное подразделение Новосибирского государственного университета (НГУ), занимающееся подготовкой врачей-...",
+    "content_length": 2854,
+    "created_at": "2026-03-06T07:09:16.221443+00:00",
+    "updated_at": "2026-03-06T07:14:29.885870+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_140916_ecbfa0f0",
+    "metadata": {
+      "processing_start_time": 1772780956,
+      "processing_end_time": 1772781269
+    }
+  },
+  "doc-cfd472ee57fd3194a813bd459e180520": {
+    "status": "processing",
+    "chunks_count": 4,
+    "chunks_list": [
+      "chunk-4d7baa35292f96136444f7a5a61101d6",
+      "chunk-ebfa4e8a6ebe9c01c8f634da1c8d61e7",
+      "chunk-2e9806bcc3fe0701b952348d9eb601ab",
+      "chunk-3c82caceac1f90deb6ecdeb6eb804561"
+    ],
+    "content_summary": "# База знаний: Факультет естественных наук (ФЕН) НГУ\n\n## Общая информация\n\n- **Университет:** Новосибирский государственный университет (НГУ).\n- **Статус:** Один из ведущих естественнонаучных факультетов России. Входит в ТОП-250 мировых рейтингов QS ...",
+    "content_length": 3580,
+    "created_at": "2026-03-06T07:14:30.165970+00:00",
+    "updated_at": "2026-03-06T07:14:30.191195+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260306_141430_911e1ba9",
+    "metadata": {
+      "processing_start_time": 1772781270
+    }
   }
 }
