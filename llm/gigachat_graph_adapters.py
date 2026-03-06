@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class GigaChatLLM:
     def __init__(
         self,
-        credentials: str,
+        credentials: Optional[str] = None,
         scope: str = "GIGACHAT_API_PERS",
         model: str = "GigaChat",
     ):
@@ -46,7 +46,7 @@ class GigaChatLLM:
 class GigaChatEmbedding:
     def __init__(
         self,
-        credentials: str,
+        credentials: Optional[str] = None,
         scope: str = "GIGACHAT_API_PERS",
         model: str = "Embeddings",
         embedding_dim: int = 1024,
