@@ -9,6 +9,7 @@ from sqlalchemy import (
     Index,
     Integer,
     String,
+    Text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -37,6 +38,9 @@ class User(Base):
 
     ratings: Mapped[List["UserRating"]] = relationship(
         "UserRating", back_populates="user", cascade="all, delete-orphan"
+    )
+    messages: Mapped[List["Message"]] = relationship(
+        "Message", back_populates="user", cascade="all, delete-orphan"
     )
 
     __table_args__ = (
@@ -113,4 +117,35 @@ class UserRating(Base):
             f"leaderboard_id='{self.leaderboard_id}', "
             f"place={self.place}, competition_type='{self.competition_type}', "
             f"status='{self.status}')>"
+        )
+
+
+class Message(Base):
+    """Сообщения пользователей и ответы бота."""
+
+    __tablename__ = "message"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("user.user_id"), nullable=False
+    )
+    session_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    user_text: Mapped[str] = mapped_column(Text, nullable=False)
+    bot_response: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+
+    user: Mapped["User"] = relationship("User", back_populates="messages")
+
+    __table_args__ = (
+        Index("idx_message_user_id", "user_id"),
+        Index("idx_message_session_id", "session_id"),
+        Index("idx_message_created_at", "created_at"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<Message(id='{self.id}', user_id={self.user_id}, "
+            f"session_id='{self.session_id}')>"
         )
