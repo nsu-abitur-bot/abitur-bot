@@ -76,16 +76,11 @@ class MessageService:
             )
             return []
 
-    async def get_all_messages(
-        self, limit: int = 50, offset: int = 0
-    ) -> List[Message]:
+    async def get_all_messages(self, limit: int = 50, offset: int = 0) -> List[Message]:
         """Получает все сообщения с пагинацией."""
         try:
             result = await self.session.execute(
-                select(Message)
-                .order_by(Message.created_at)
-                .limit(limit)
-                .offset(offset)
+                select(Message).order_by(Message.created_at).limit(limit).offset(offset)
             )
             return list(result.scalars().all())
         except Exception as e:

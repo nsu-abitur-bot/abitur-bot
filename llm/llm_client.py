@@ -147,9 +147,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
                 if user_id:
-                    await _save_message_to_pg(
-                        user_id, session_id, message, faq_answer
-                    )
+                    await _save_message_to_pg(user_id, session_id, message, faq_answer)
                 return faq_answer
         except Exception as e:
             logger.warning(f"FAQ matcher error: {e}")
