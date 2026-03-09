@@ -10,7 +10,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from db.redis_client import RedisClient
 from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
-from rag.retriever import query_graph
+from rag.retriever import query_graph_with_sources
 
 load_dotenv()
 
@@ -131,11 +131,13 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             logger.warning(f"FAQ matcher error: {e}")
 
         # 3. Получаем контекст из LightRAG
+        rag_sources: list[str] = []
         try:
             rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
-            rag_context = await query_graph(rag_query)
+            rag_context, rag_sources = await query_graph_with_sources(rag_query)
             if not rag_context or rag_context.startswith("Error executing query"):
                 rag_context = "Релевантный контекст из базы знаний не найден."
+                rag_sources = []
         except Exception as e:
             logger.warning(f"LightRAG query error: {e}")
             rag_context = "База знаний временно недоступна."
@@ -165,6 +167,13 @@ async def ask_local_llm(message: str, session_id: str) -> str:
 
             if not content:
                 content = "Ответ не найден"
+
+            if rag_sources:
+                sources_html = "\n\n<b>Источники:</b>"
+                for src in rag_sources:
+                    safe = escape(src)
+                    sources_html += f'\n<a href="{safe}">{safe}</a>'
+                content += sources_html
         except Exception as e:
             logger.warning(f"Provider generation error: {e}")
             content = "LLM временно недоступна."

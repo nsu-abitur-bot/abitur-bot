@@ -2,7 +2,6 @@ import asyncio
 import logging
 
 from bot.main import main as bot_main
-from parser.baza_to_rag import parse_baza_and_save_to_memory
 
 logging.basicConfig(
     level=logging.INFO,
@@ -15,14 +14,6 @@ async def main():
     """Запускает парсинг данных и bot."""
 
     # TODO сделать миграции перед парсингом
-
-    # Сначала парсим и сохраняем данные в графовую память
-    logger.info("=== Инициализация графовой памяти ===")
-    try:
-        await asyncio.to_thread(parse_baza_and_save_to_memory)
-    except Exception as e:
-        logger.error(f"Ошибка при парсинге и сохранении данных: {e}")
-        logger.info("Продолжаем запуск бота...")
 
     logger.info("=== Запуск бота ===")
     bot_task = asyncio.create_task(bot_main())

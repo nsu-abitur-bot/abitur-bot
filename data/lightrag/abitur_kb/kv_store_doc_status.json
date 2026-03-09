@@ -1,487 +1,222 @@
 {
-  "doc-688c0fd847257d42c90181b4478949e1": {
+  "https://education.nsu.ru/freshmen": {
     "status": "processed",
     "chunks_count": 1,
     "chunks_list": [
-      "chunk-688c0fd847257d42c90181b4478949e1"
+      "chunk-7ac667fa190f012d8ed66e7ef36a4acd"
     ],
-    "content_summary": "Геолого-геофизический факультет (ГГФ) НГУ\n\t1.\tОбщая информация\nГГФ готовит специалистов в геологии и геофизике, предлагая сильную научную программу и практическую подготовку.  ￼\n\t2.\tНаправления / специализации\nВ рамках направления «Геология» студенты...",
-    "content_length": 918,
-    "created_at": "2025-12-21T10:51:28.727699+00:00",
-    "updated_at": "2025-12-21T10:52:45.786747+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_175128_8d5d8a35",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n\nИсточник: https://education.nsu.ru/freshmen\n\n# Общежития и проживание в НГУ\n\n## Кратко\nНа официальной русской странице для первокурсников НГУ общежития прямо указаны...",
+    "content_length": 1163,
+    "created_at": "2026-03-09T15:58:44.764110+00:00",
+    "updated_at": "2026-03-09T15:58:55.720295+00:00",
+    "file_path": "https://education.nsu.ru/freshmen",
+    "track_id": "insert_20260309_225844_c6649806",
     "metadata": {
-      "processing_start_time": 1766314288,
-      "processing_end_time": 1766314365
+      "processing_start_time": 1773071924,
+      "processing_end_time": 1773071935
     }
   },
-  "doc-53eba8718e75c17146513afba80eb7ee": {
+  "https://education.nsu.ru/economics/": {
     "status": "processed",
     "chunks_count": 4,
     "chunks_list": [
-      "chunk-07d1fb64c3ee5a648dad5f619523b0ca",
-      "chunk-d6781e5c3865e757f2db65d0434d0315",
-      "chunk-e2ced4912d75885cf341fcdfd11a122e",
-      "chunk-c6fecf6389cdf3166e89adb484dae3b6"
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340",
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3",
+      "chunk-00684bcbeac969b103e950778cd091c8"
     ],
-    "content_summary": "Клубы и кружки НГУ\n\t1.\tКлуб «Квант»\n\t•\tЭто юмористический клуб физического факультета НГУ.  ￼\n\t•\tОснован 19 мая 1968 года Леонидом Шлесом.  ￼\n\t•\t«Квант» проводит ежегодные капустники — юмористические студенческие вечера, традиционно весной.  ￼\n\t•\tСре...",
-    "content_length": 3309,
-    "created_at": "2025-12-21T10:52:45.802787+00:00",
-    "updated_at": "2025-12-21T10:56:27.667348+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_175245_475282b8",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ЭФ** — Экономический факультет\n\nИсточник: https://education.nsu.ru/economics/\n\n# Экономический факультет НГУ\n\n## Кратко\nЭкономический факультет НГУ ведёт набор на...",
+    "content_length": 3797,
+    "created_at": "2026-03-09T15:58:55.746342+00:00",
+    "updated_at": "2026-03-09T15:59:56.183531+00:00",
+    "file_path": "https://education.nsu.ru/economics/",
+    "track_id": "insert_20260309_225855_3128c774",
     "metadata": {
-      "processing_start_time": 1766314365,
-      "processing_end_time": 1766314587
+      "processing_start_time": 1773071935,
+      "processing_end_time": 1773071996
     }
   },
-  "doc-bd2f568b9e1af22816c86ec4eb6770a6": {
+  "https://education.nsu.ru/promo/naturalsciences/": {
     "status": "processed",
     "chunks_count": 2,
     "chunks_list": [
-      "chunk-3b8a582a931fd705ae3e7a3007566a85",
-      "chunk-37ecb1276d31ad335d59969f4e30c068"
+      "chunk-8b0c6015b6de3a66da4ef7370457193b",
+      "chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0"
     ],
-    "content_summary": "# Проживание и общежития (НГУ)\n\n1. Общая информация\n\n   - Студенты НГУ имеют возможность проживать в университетских общежитиях, расположенных в Академгородке. ￼\n   - Общежития находятся примерно в 10 минутах ходьбы от университетских корпусов. ￼\n   ...",
-    "content_length": 2238,
-    "created_at": "2025-12-21T10:56:27.712597+00:00",
-    "updated_at": "2025-12-21T10:58:44.321747+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_175627_f8ac2ee2",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФЕН** — Факультет естественных наук\n\nИсточник: https://education.nsu.ru/promo/naturalsciences/\n\n# Факультет естественных наук НГУ\n\n## Кратко\nДля бакалавров на ФЕН...",
+    "content_length": 1276,
+    "created_at": "2026-03-09T15:59:56.214728+00:00",
+    "updated_at": "2026-03-09T16:00:42.457023+00:00",
+    "file_path": "https://education.nsu.ru/promo/naturalsciences/",
+    "track_id": "insert_20260309_225956_2bf00834",
     "metadata": {
-      "processing_start_time": 1766314587,
-      "processing_end_time": 1766314724
+      "processing_start_time": 1773071996,
+      "processing_end_time": 1773072042
     }
   },
-  "doc-31701c0391c5c80fb014bf4ec2c31618": {
+  "https://education.nsu.ru/physics": {
     "status": "processed",
     "chunks_count": 2,
     "chunks_list": [
-      "chunk-31701c0391c5c80fb014bf4ec2c31618",
-      "chunk-d31291ed3714cbfcb940521fe0faf0b6"
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792",
+      "chunk-99a916192d9790255de414734f0ec4c7"
     ],
-    "content_summary": "Институт медицины и психологии им. В. Зельмана (ИМПЗ) НГУ\n\t1.\tОбщая информация\nИнститут медицины и психологии имени В. Зельмана — медицинско-психологическое подразделение НГУ, где готовят врачей и психологов.  ￼\n\t2.\tНаправления / профили\n\t•\tЛечебное ...",
-    "content_length": 1131,
-    "created_at": "2025-12-21T10:58:44.358041+00:00",
-    "updated_at": "2025-12-21T11:01:05.477918+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_175844_fd2a0ab6",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФФ** — Физический факультет\n\nИсточник: https://education.nsu.ru/physics\n\n# Физический факультет НГУ\n\n## Кратко\nФизический факультет НГУ ведёт набор на бакалавриат...",
+    "content_length": 1337,
+    "created_at": "2026-03-09T16:00:42.490438+00:00",
+    "updated_at": "2026-03-09T16:01:19.535377+00:00",
+    "file_path": "https://education.nsu.ru/physics",
+    "track_id": "insert_20260309_230042_3e376380",
     "metadata": {
-      "processing_start_time": 1766314724,
-      "processing_end_time": 1766314865
+      "processing_start_time": 1773072042,
+      "processing_end_time": 1773072079
     }
   },
-  "doc-5b89994a7ab8748ecce9a8e321f19f62": {
+  "https://education.nsu.ru/information-technologies/": {
     "status": "processed",
     "chunks_count": 3,
     "chunks_list": [
-      "chunk-681b87b5ddf40fbbc0a67227a216a8c4",
-      "chunk-a035eeb7895b7dadfd008f91646edee8",
-      "chunk-b4055224d550d9110efe1e2fa145e03c"
+      "chunk-32f4c90785bd76a509285165dddc852d",
+      "chunk-b6d2a7fd88178e86b5d144a751ef7e12",
+      "chunk-730e570516ec9e7b29e2a113360804e7"
     ],
-    "content_summary": "# Факультет механико‑математический (ММФ) НГУ\n\n1. Общая информация\n\nФакультет механико‑математический (ММФ) НГУ предлагает подготовку по направлениям математики, прикладной математики и информатики, механики и математического моделирования. ￼\nОсобенн...",
-    "content_length": 2484,
-    "created_at": "2025-12-21T11:01:05.516597+00:00",
-    "updated_at": "2025-12-21T11:07:29.971456+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_180105_325c1c8b",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФИТ** — Факультет информационных технологий\n- **ИВТ** — Информатика и вычислительная техника\n- **КНИС** — Компьютерные науки и системотехника\n- **ПИиКН** — Програ...",
+    "content_length": 3270,
+    "created_at": "2026-03-09T16:01:19.652935+00:00",
+    "updated_at": "2026-03-09T16:02:21.953990+00:00",
+    "file_path": "https://education.nsu.ru/information-technologies/",
+    "track_id": "insert_20260309_230119_4ecd1785",
     "metadata": {
-      "processing_start_time": 1766314865,
-      "processing_end_time": 1766315249
+      "processing_start_time": 1773072079,
+      "processing_end_time": 1773072141
     }
   },
-  "doc-ab554c1a0b9a187935a1265714dcc638": {
+  "https://education.nsu.ru/promo/geology": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2",
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ГГФ** — Геолого-геофизический факультет\n\nИсточник: https://education.nsu.ru/promo/geology\n\n# Геолого-геофизический факультет НГУ\n\n## Кратко\nГГФ НГУ ведёт набор на...",
+    "content_length": 1726,
+    "created_at": "2026-03-09T16:02:22.027132+00:00",
+    "updated_at": "2026-03-09T16:20:00.622086+00:00",
+    "file_path": "https://education.nsu.ru/promo/geology",
+    "track_id": "insert_20260309_230222_5742942c",
+    "metadata": {
+      "processing_start_time": 1773073128,
+      "processing_end_time": 1773073200
+    }
+  },
+  "https://education.nsu.ru/philology": {
     "status": "processed",
     "chunks_count": 3,
     "chunks_list": [
-      "chunk-96824a0b7bedfff01e1e931021742836",
-      "chunk-e2976471c53db5fbb9c437e851fe7def",
-      "chunk-da86e6c882df15e442a222d2a8151b98"
+      "chunk-70d981a062109160f8c4b5c8544a24b3",
+      "chunk-8955a170522e0bf84bbe9f5ac556f4ef",
+      "chunk-93490e1ad1c3238bcbdfd6e340da6e52"
     ],
-    "content_summary": "# ФИТ — Факультет информационных технологий НГУ\n\n1. Общая информация\n\nФакультет информационных технологий НГУ осуществляет подготовку специалистов по направлению 09.03.01 «Информатика и вычислительная техника» с профилями, например, «Компьютерные нау...",
-    "content_length": 2494,
-    "created_at": "2025-12-21T11:07:30.025398+00:00",
-    "updated_at": "2025-12-21T11:36:40.373539+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_180730_1606e919",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ГИ** — Гуманитарный институт\n- **ФиПЛ** — Фундаментальная и прикладная лингвистика\n\nИсточники: https://education.nsu.ru/philology, https://education.nsu.ru/histor...",
+    "content_length": 3195,
+    "created_at": "2026-03-09T16:17:29.941580+00:00",
+    "updated_at": "2026-03-09T16:20:59.738495+00:00",
+    "file_path": "https://education.nsu.ru/philology, https://education.nsu.ru/history, https://education.nsu.ru/linguistics, https://education.nsu.ru/oriental_studies/, https://education.nsu.ru/journalism, https://education.nsu.ru/foreign_languages/",
+    "track_id": "insert_20260309_231729_96bb80b0",
     "metadata": {
-      "processing_start_time": 1766315250,
-      "processing_end_time": 1766317000
+      "processing_start_time": 1773073128,
+      "processing_end_time": 1773073259
     }
   },
-  "doc-3d39e2340d46fb1483cba2f664490c81": {
+  "https://education.nsu.ru/ppl_philosophy/": {
     "status": "processed",
     "chunks_count": 2,
     "chunks_list": [
-      "chunk-bb0ebf4eb1e54439f1b32cb8c8f17714",
-      "chunk-134b04ed8f5bc457339155536f87ac47"
+      "chunk-c56c150d380e777182ed5ed960dfd308",
+      "chunk-976d7f84b250266bda6e1205b368f85b"
     ],
-    "content_summary": "# Экономический факультет (ЭФ) НГУ\n\n1. Общая информация\n\nЭкономический факультет НГУ предлагает сильную экономико‑математическую подготовку: студенты изучают экономическое моделирование, статистику, математику и программирование с первого курса.\nНа ф...",
-    "content_length": 2590,
-    "created_at": "2025-12-21T11:36:40.430957+00:00",
-    "updated_at": "2025-12-21T11:45:34.227724+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_183640_bf215fe5",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ИФП** — Институт философии и права\n\nИсточники: https://education.nsu.ru/ppl_philosophy/, https://education.nsu.ru/ppl_law/\n\n# Институт философии и права НГУ\n\n## К...",
+    "content_length": 1570,
+    "created_at": "2026-03-09T16:20:59.851113+00:00",
+    "updated_at": "2026-03-09T16:21:40.069254+00:00",
+    "file_path": "https://education.nsu.ru/ppl_philosophy/, https://education.nsu.ru/ppl_law/",
+    "track_id": "insert_20260309_232059_fee03bc4",
     "metadata": {
-      "processing_start_time": 1766317000,
-      "processing_end_time": 1766317534
+      "processing_start_time": 1773073259,
+      "processing_end_time": 1773073300
     }
   },
-  "doc-db2e55d178159415215bcd4904b8b2ce": {
+  "https://education.nsu.ru/mechatronics": {
     "status": "processed",
     "chunks_count": 2,
     "chunks_list": [
-      "chunk-28bc70cf65a5203fe96b88628708441b",
-      "chunk-4c4044d3c14949df01a3373e809e35f1"
+      "chunk-005abd6ba3006ed416989746ff36c3ca",
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
     ],
-    "content_summary": "Институт философии и права (ИФП) НГУ\n\t1.\tОбщая информация\nИнститут философии и права НГУ сочетает гуманитарное образование (философия) с правовыми дисциплинами.  ￼\n\t2.\tНаправления / профили\n\t•\tФилософия: социальная философия, теория познания, этика и...",
-    "content_length": 1348,
-    "created_at": "2025-12-21T11:45:34.295312+00:00",
-    "updated_at": "2025-12-21T11:48:54.935098+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_184534_bd21e725",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ИИР** — Институт интеллектуальной робототехники\n\nИсточники: https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai\n\n# Институт интеллектуальной робото...",
+    "content_length": 2443,
+    "created_at": "2026-03-09T16:21:40.154820+00:00",
+    "updated_at": "2026-03-09T16:22:36.005151+00:00",
+    "file_path": "https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai",
+    "track_id": "insert_20260309_232140_2325f690",
     "metadata": {
-      "processing_start_time": 1766317534,
-      "processing_end_time": 1766317734
+      "processing_start_time": 1773073300,
+      "processing_end_time": 1773073356
     }
   },
-  "doc-00e2123d531f62b9a37e343676f875d1": {
+  "https://education.nsu.ru/psychology": {
     "status": "processed",
-    "chunks_count": 2,
+    "chunks_count": 1,
     "chunks_list": [
-      "chunk-3c2048cbd8ab15bf77f8ce857685327f",
-      "chunk-845bc0163713ed9dd04f99f1bf1a978a"
+      "chunk-d23061a4545b6cb88f8c1cde2ebd4452"
     ],
-    "content_summary": "Факультет естественных наук (ФЕН) НГУ\n\t1.\tОбщая информация\nФакультет естественных наук — один из базовых факультетов НГУ, объединяющий программы по биологии, химии, геонаукам, биотехнологиям и смежным дисциплинам. Исторически ФЕН был одним из первых ...",
-    "content_length": 1607,
-    "created_at": "2025-12-21T11:48:55.004147+00:00",
-    "updated_at": "2025-12-21T11:50:36.562781+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_184855_4c956c67",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ИММТ** — Институт медицины и медицинских технологий\n\nИсточник: https://education.nsu.ru/psychology\n\n# Институт медицины и медицинских технологий НГУ\n\n## Кратко\nДл...",
+    "content_length": 1154,
+    "created_at": "2026-03-09T16:22:36.071842+00:00",
+    "updated_at": "2026-03-09T16:22:42.380596+00:00",
+    "file_path": "https://education.nsu.ru/psychology",
+    "track_id": "insert_20260309_232236_d5532fa3",
     "metadata": {
-      "processing_start_time": 1766317735,
-      "processing_end_time": 1766317836
+      "processing_start_time": 1773073356,
+      "processing_end_time": 1773073362
     }
   },
-  "doc-be8d967796b76307acdd17f303876039": {
-    "status": "processed",
-    "chunks_count": 2,
-    "chunks_list": [
-      "chunk-00319a41a425f6d6ec4233df0775ae96",
-      "chunk-b6fa5d3637fe3cef882531bd33600d83"
-    ],
-    "content_summary": "Институт интеллектуальной робототехники НГУ\n\t1.\tОбщая информация\nИнститут интеллектуальной робототехники — междисциплинарное подразделение, фокусируясь на робототехнике, машинном обучении и ИИ. (на сайте НГУ / в презентации программ)  ￼\n\t2.\tНаправлен...",
-    "content_length": 1295,
-    "created_at": "2025-12-21T11:50:36.633898+00:00",
-    "updated_at": "2025-12-21T11:52:37.365004+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_185036_e481d9fb",
-    "metadata": {
-      "processing_start_time": 1766317836,
-      "processing_end_time": 1766317957
-    }
-  },
-  "doc-c57b2d1adad253702d08e357c8a89810": {
-    "status": "processed",
-    "chunks_count": 2,
-    "chunks_list": [
-      "chunk-41b36f387ee21bd85d1d5642ee853719",
-      "chunk-62ad4fdd4fbc3f7a90e519ad9e0e46f2"
-    ],
-    "content_summary": "Физический факультет (ФФ) НГУ\n\t1.\tОбщая информация\nФизический факультет НГУ готовит научные и инженерные кадры в широком спектре физических специальностей: фундаментальная и прикладная физика, экспериментальные и теоретические направления, оптика, фи...",
-    "content_length": 2013,
-    "created_at": "2025-12-21T11:52:37.438387+00:00",
-    "updated_at": "2025-12-21T11:54:47.081967+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_185237_b1503af6",
-    "metadata": {
-      "processing_start_time": 1766317957,
-      "processing_end_time": 1766318087
-    }
-  },
-  "doc-16eabb1868f968b4c0bcaf47849bf268": {
-    "status": "processed",
-    "chunks_count": 2,
-    "chunks_list": [
-      "chunk-a3d6a8b784f4b3587c2e289eeda2d55e",
-      "chunk-40c4dad280d9f13d93d64edb2d86f788"
-    ],
-    "content_summary": "Новосибирский государственный университет (НГУ) — обзор\nНовосибирский государственный университет — крупный российский исследовательский университет в Академгородке Новосибирска, ориентированный на интеграцию образования и науки и раннее вовлечение с...",
-    "content_length": 1794,
-    "created_at": "2025-12-21T11:54:47.161597+00:00",
-    "updated_at": "2025-12-21T11:58:18.178870+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_185447_e77b92e9",
-    "metadata": {
-      "processing_start_time": 1766318087,
-      "processing_end_time": 1766318298
-    }
-  },
-  "doc-33f1967fb39b26fe26a7a2ecabc46492": {
-    "status": "processed",
-    "chunks_count": 2,
-    "chunks_list": [
-      "chunk-46485aa8f930407871791b8e3c225998",
-      "chunk-32c7596eb4e5f166095ea1b8b80c3de9"
-    ],
-    "content_summary": "Гуманитарный институт НГУ\n\t1.\tОбщая информация\nГуманитарный институт НГУ охватывает широкий спектр гуманитарных дисциплин: историю, филологию, лингвистику, журналистику и др.  ￼\n\t2.\tНаправления / профили\n\t•\tИстория (всеобщая, отечественная).  ￼\n\t•\tФи...",
-    "content_length": 1308,
-    "created_at": "2025-12-21T11:58:18.269228+00:00",
-    "updated_at": "2025-12-21T12:03:43.086886+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20251221_185818_a8d837c8",
-    "metadata": {
-      "processing_start_time": 1766318298,
-      "processing_end_time": 1766318623
-    }
-  },
-  "doc-9b9ec559cacdaa1122f6506e11cf7921": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-aa94440482207198e1a94b6746f1803e",
-      "chunk-b97b86b652b248e46791037ab79eca96",
-      "chunk-1a5402055951e8d54d469a3cebbfc97a"
-    ],
-    "content_summary": "# База знаний: Геолого-геофизический факультет НГУ (ГГФ)\n\n## Общая информация\n\n**Геолого-геофизический факультет (ГГФ)** — один из ведущих факультетов Новосибирского государственного университета, обеспечивающий подготовку специалистов в области геол...",
-    "content_length": 2792,
-    "created_at": "2026-03-06T06:30:04.174419+00:00",
-    "updated_at": "2026-03-06T06:37:29.756560+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_133004_d3256175",
-    "metadata": {
-      "processing_start_time": 1772778604,
-      "processing_end_time": 1772779049
-    }
-  },
-  "doc-ebb83bd6a75699042a89496a62e3127d": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-0d58c6ab3a7182fec5879e381a537083",
-      "chunk-5b4a9f6c9140482f2ed7bbcfa793af15",
-      "chunk-b0c0788d56bf6ead94f10669696b1b22"
-    ],
-    "content_summary": "Клубы и кружки НГУ 1. Клуб «Квант»\n• Это юмористический клуб физического факультета НГУ. ￼\n• Основан 19 мая 1968 года Леонидом Шлесом. ￼\n• «Квант» проводит ежегодные капустники — юмористические студенческие вечера, традиционно весной. ￼\n• Среди други...",
-    "content_length": 3245,
-    "created_at": "2026-03-06T06:37:29.906424+00:00",
-    "updated_at": "2026-03-06T06:43:40.074157+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_133729_a3630522",
-    "metadata": {
-      "processing_start_time": 1772779049,
-      "processing_end_time": 1772779420
-    }
-  },
-  "doc-d0441b2e32f37311842db63f8d7676db": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-7834c0568e49191de930f90be1807b6b",
-      "chunk-3d74b50c933d24d32754ba9493cd5e8b",
-      "chunk-3f1414a14cf4dab19220d20f97fe4c1a"
-    ],
-    "content_summary": "# Проживание и общежития (НГУ)\n\n1. Общая информация\n   - Студенты НГУ имеют возможность проживать в университетских общежитиях, расположенных в Академгородке. ￼\n   - Общежития находятся примерно в 10 минутах ходьбы от университетских корпусов. ￼\n   -...",
-    "content_length": 2310,
-    "created_at": "2026-03-06T06:43:40.665880+00:00",
-    "updated_at": "2026-03-06T06:47:28.665957+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_134340_d06b846f",
-    "metadata": {
-      "processing_start_time": 1772779420,
-      "processing_end_time": 1772779648
-    }
-  },
-  "doc-e8c69e36ca3dc64fbf135d84f0c7ba9e": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-ddcef96986201d45e53c49db3bb62169",
-      "chunk-b465d7cca52d8827f04039160075b090",
-      "chunk-8ad1721f8f1afc66aa5902ac20f6fe1d"
-    ],
-    "content_summary": "# База знаний: Механико-математический факультет НГУ (ММФ)\n\n## Общая информация\n\nМеханико-математический факультет НГУ — ведущий центр подготовки специалистов, способных проводить научные исследования и разработки для глобальных технологических компа...",
-    "content_length": 3156,
-    "created_at": "2026-03-06T06:47:28.905483+00:00",
-    "updated_at": "2026-03-06T06:53:08.040673+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_134728_4c7a1644",
-    "metadata": {
-      "processing_start_time": 1772779648,
-      "processing_end_time": 1772779988
-    }
-  },
-  "doc-6d9651fac8080057a2e945880af6b9d2": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-4b5212b42d4fdb329d220e300038f8eb",
-      "chunk-bff5f872bf8300f62d80f59e3ab58270",
-      "chunk-71d3f7098ee5d3b86e0310de336d4916"
-    ],
-    "content_summary": "# База знаний: Факультет информационных технологий (ФИТ) НГУ\n\n## 1. Общая информация\n\n**Факультет информационных технологий (ФИТ)** — один из ведущих факультетов Новосибирского государственного университета, специализирующийся на подготовке высококва...",
-    "content_length": 3151,
-    "created_at": "2026-03-06T06:53:08.245514+00:00",
-    "updated_at": "2026-03-06T06:58:52.148122+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_135308_d29f3a5c",
-    "metadata": {
-      "processing_start_time": 1772779988,
-      "processing_end_time": 1772780332
-    }
-  },
-  "doc-79f29e4fba2b04e12bb9daaf1f44a494": {
+  "https://education.nsu.ru/mathematics": {
     "status": "processed",
     "chunks_count": 4,
     "chunks_list": [
-      "chunk-529d82ff29451a356cdb38d5fb98bd33",
-      "chunk-fe653e943cbfd78500fb12df97178912",
-      "chunk-2b7be3df769ed4360e4edc749f19785d",
-      "chunk-027a28f4cdd37c9fe76191601a9a6185"
+      "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
+      "chunk-a7f4022f82d6e0bd59c16dadc8ded9df",
+      "chunk-56c035070f61cf4d5594c834da698ea7",
+      "chunk-5d96525dc0a8e5f1a4d134623a3bf446"
     ],
-    "content_summary": "# База знаний: Экономический факультет НГУ (ЭФ НГУ)\n\n## 1. Общая информация\n\n- **Учреждение:** Новосибирский государственный университет (НГУ).\n- **Миссия:** Подготовка специалистов мирового уровня через сочетание сильной математической базы, анализа...",
-    "content_length": 3765,
-    "created_at": "2026-03-06T06:58:52.388332+00:00",
-    "updated_at": "2026-03-06T07:09:15.974474+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_135852_758d5728",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ММФ** — Механико-математический факультет\n- **ПМИ** — Прикладная математика и информатика\n- **МКН** — Математика и компьютерные науки\n\nИсточник: https://education...",
+    "content_length": 3569,
+    "created_at": "2026-03-09T16:22:42.452670+00:00",
+    "updated_at": "2026-03-09T16:24:19.096515+00:00",
+    "file_path": "https://education.nsu.ru/mathematics",
+    "track_id": "insert_20260309_232242_8ab9f167",
     "metadata": {
-      "processing_start_time": 1772780332,
-      "processing_end_time": 1772780955
+      "processing_start_time": 1773073362,
+      "processing_end_time": 1773073459
     }
   },
-  "doc-9f870f25828b70a88c0a97ce6a39bbcc": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-dae165f18dcbab047fc85ffcc2874701",
-      "chunk-b4951a804582e8ead40e48ff068044f3",
-      "chunk-359a6e4d5090ea78d678280a133c0aa1"
-    ],
-    "content_summary": "# Институт медицины и психологии им. В. Зельмана (ИМП НГУ)\n\n## Общая информация\n\n**Институт медицины и психологии им. В. Зельмана (ИМП)** — структурное подразделение Новосибирского государственного университета (НГУ), занимающееся подготовкой врачей-...",
-    "content_length": 2854,
-    "created_at": "2026-03-06T07:09:16.221443+00:00",
-    "updated_at": "2026-03-06T07:14:29.885870+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_140916_ecbfa0f0",
-    "metadata": {
-      "processing_start_time": 1772780956,
-      "processing_end_time": 1772781269
-    }
-  },
-  "doc-cfd472ee57fd3194a813bd459e180520": {
-    "status": "processed",
-    "chunks_count": 4,
-    "chunks_list": [
-      "chunk-4d7baa35292f96136444f7a5a61101d6",
-      "chunk-ebfa4e8a6ebe9c01c8f634da1c8d61e7",
-      "chunk-2e9806bcc3fe0701b952348d9eb601ab",
-      "chunk-3c82caceac1f90deb6ecdeb6eb804561"
-    ],
-    "content_summary": "# База знаний: Факультет естественных наук (ФЕН) НГУ\n\n## Общая информация\n\n- **Университет:** Новосибирский государственный университет (НГУ).\n- **Статус:** Один из ведущих естественнонаучных факультетов России. Входит в ТОП-250 мировых рейтингов QS ...",
-    "content_length": 3580,
-    "created_at": "2026-03-06T07:14:30.165970+00:00",
-    "updated_at": "2026-03-06T07:32:05.001877+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_141430_911e1ba9",
-    "metadata": {
-      "processing_start_time": 1772782325,
-      "processing_end_time": 1772793525
-    }
-  },
-  "doc-792b341e9daa07a13ef6716715d8b5f0": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-f770ddb7e51fee95425ff844bfdc98b8",
-      "chunk-0f21d87be4022f8d57f2c963432f1238",
-      "chunk-cfacd2043e29c7ccff571179280f3d5a"
-    ],
-    "content_summary": "# Справка по образовательной программе: Мехатроника и робототехника (НГУ)\n\n## Общая информация\n\n- **Название программы:** Мехатроника и робототехника\n- **Профиль (специализация):** Искусственный интеллект / Deep Robotics\n- **Уровень образования:** Ба...",
-    "content_length": 2880,
-    "created_at": "2026-03-06T07:37:33.874866+00:00",
-    "updated_at": "2026-03-06T07:37:33.881212+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_143733_159b2622",
-    "metadata": {
-      "processing_start_time": 1772782653,
-      "processing_end_time": 1772782653
-    }
-  },
-  "doc-5c3f7d0b8dd7f886f0aadb56497ed31f": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-2f4c2bfa4d10852f39aa8937c0ab4d6c",
-      "chunk-83fc93231de4e3b9f0b113ab1e3f5f83",
-      "chunk-7827ca947d3e2592e39c0f0a42ddbc9d"
-    ],
-    "content_summary": "# База знаний: Физический факультет НГУ (ФФ НГУ)\n\n## 1. Общая информация\n\nФизический факультет Новосибирского государственного университета — один из ведущих центров подготовки физиков-исследователей в России. Обучение неразрывно связано с научной де...",
-    "content_length": 3341,
-    "created_at": "2026-03-06T07:38:11.394228+00:00",
-    "updated_at": "2026-03-06T07:38:11.401244+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_143811_04650dc9",
-    "metadata": {
-      "processing_start_time": 1772782691,
-      "processing_end_time": 1772782691
-    }
-  },
-  "doc-f6013537b41781eb87a7fe69849a7648": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-3d4f92ab5f75f082568cfcc732398256",
-      "chunk-a9e943e7d72e37195243ce1f4ee719dc",
-      "chunk-2d39bc5c644fa2064a4e776acaea5bae"
-    ],
-    "content_summary": "# База знаний: Институт медицины и медицинских технологий НГУ\n\n## Общая информация\n\nИнститут медицины и медицинских технологий НГУ — это современный научно-образовательный центр, объединяющий классическое медицинское образование с передовыми достижен...",
-    "content_length": 2612,
-    "created_at": "2026-03-06T07:38:28.114802+00:00",
-    "updated_at": "2026-03-06T07:38:28.122910+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_143828_404a95d3",
-    "metadata": {
-      "processing_start_time": 1772782708,
-      "processing_end_time": 1772782708
-    }
-  },
-  "doc-398a091175e17a21d20802e0fc983453": {
+  "https://education.nsu.ru/": {
     "status": "processed",
     "chunks_count": 2,
     "chunks_list": [
-      "chunk-bd790e20220d2a438d127c8e4c0b2a9c",
-      "chunk-2f627b49b77d4f97da8273eca2ddd8a6"
+      "chunk-3e0187d85fefff382fc2d89e5a6a1039",
+      "chunk-edc9c271aedbda6bad0945f4c21a258f"
     ],
-    "content_summary": "Новосибирский государственный университет (НГУ) — обзор\nНовосибирский государственный университет — крупный российский исследовательский университет в Академгородке Новосибирска, ориентированный на интеграцию образования и науки и раннее вовлечение с...",
-    "content_length": 1780,
-    "created_at": "2026-03-06T07:38:59.378578+00:00",
-    "updated_at": "2026-03-06T07:38:59.383923+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_143859_83f491e3",
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ММФ** — Механико-математический факультет\n- **ФФ** — Физический факультет\n- **ФЕН** — Факультет естественных наук\n- **ФИТ** — Факультет информационных технологий\n...",
+    "content_length": 2250,
+    "created_at": "2026-03-09T16:24:19.176234+00:00",
+    "updated_at": "2026-03-09T16:24:55.467400+00:00",
+    "file_path": "https://education.nsu.ru/",
+    "track_id": "insert_20260309_232419_52daa34d",
     "metadata": {
-      "processing_start_time": 1772782739,
-      "processing_end_time": 1772782739
-    }
-  },
-  "doc-da1176c033c82768b985ffd6a7e78092": {
-    "status": "processed",
-    "chunks_count": 3,
-    "chunks_list": [
-      "chunk-3676af23e118c46b0cfe0887c6e4f166",
-      "chunk-2c876c1bd49ceeabaf34799e8ee3360c",
-      "chunk-09a6eb9be811fd133fffb703965ade56"
-    ],
-    "content_summary": "# Гуманитарный институт Новосибирского государственного университета (ГИ НГУ)\n\n## Общая информация\n\n**Гуманитарный институт (ГИ)** — одно из крупнейших подразделений Новосибирского государственного университета, объединившее в себе традиции классичес...",
-    "content_length": 3460,
-    "created_at": "2026-03-06T07:39:16.345909+00:00",
-    "updated_at": "2026-03-06T07:39:16.351546+00:00",
-    "file_path": "unknown_source",
-    "track_id": "insert_20260306_143916_8754ccb6",
-    "metadata": {
-      "processing_start_time": 1772782756,
-      "processing_end_time": 1772782756
+      "processing_start_time": 1773073459,
+      "processing_end_time": 1773073495
     }
   }
 }

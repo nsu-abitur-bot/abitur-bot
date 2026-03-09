@@ -115,10 +115,20 @@ class GraphMemory:
 
         return rag
 
-    async def save(self, graph_id: str, text: str) -> bool:
+    async def save(
+        self,
+        graph_id: str,
+        text: str,
+        source_id: Optional[str] = None,
+        file_paths_str: Optional[str] = None,
+    ) -> bool:
         try:
             rag = await self._get_or_create_graph(graph_id)
-            await rag.ainsert(text)
+            await rag.ainsert(
+                text,
+                ids=source_id,
+                file_paths=file_paths_str or source_id,
+            )
             return True
         except Exception as e:
             logger.error(f"Error inserting text into graph {graph_id}: {e}")
@@ -137,6 +147,30 @@ class GraphMemory:
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}"
+
+    async def query_with_sources(
+        self,
+        graph_id: str,
+        question: str,
+        mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
+    ) -> tuple[str, list[str]]:
+        try:
+            rag = await self._get_or_create_graph(graph_id)
+            result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
+            answer = result.get("llm_response", {}).get("content", "") or ""
+            references = result.get("data", {}).get("references", [])
+            seen: set[str] = set()
+            sources: list[str] = []
+            for ref in references:
+                for url in (ref.get("file_path", "") or "").split(","):
+                    url = url.strip()
+                    if url and url not in seen:
+                        seen.add(url)
+                        sources.append(url)
+            return str(answer), sources
+        except Exception as e:
+            logger.error(f"Error querying graph {graph_id}: {e}")
+            return f"Error executing query: {str(e)}", []
 
     async def cleanup(self, graph_id: Optional[str] = None) -> None:
         """

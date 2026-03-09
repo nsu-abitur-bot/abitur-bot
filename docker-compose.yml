@@ -10,6 +10,7 @@ services:
       # - LM_API_URL=http://host.docker.internal:1234/v1
     volumes:
       - ./chroma_db:/app/chroma_db
+      - ./data:/app/data
     depends_on:
       - redis
       - postgres

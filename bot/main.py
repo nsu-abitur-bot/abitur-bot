@@ -1,10 +1,10 @@
-from aiogram.enums import ParseMode
 import asyncio
 import logging
 from os import getenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
