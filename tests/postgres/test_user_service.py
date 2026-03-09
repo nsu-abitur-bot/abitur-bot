@@ -2,8 +2,9 @@
 Тесты для UserService.
 """
 
-import pytest
 from datetime import UTC, datetime, timedelta
+
+import pytest
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 

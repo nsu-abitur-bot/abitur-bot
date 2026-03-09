@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.routes.faq import router as faq_router
 from db.postgres.db import get_session
 from db.postgres.services.user import UserService
 
@@ -15,6 +16,9 @@ class UserCountStatsResponse(BaseModel):
 
 
 app = FastAPI(title="Abitur API")
+
+# Регистрируем роутер FAQ
+app.include_router(faq_router, prefix="/api/v1")
 
 
 @app.get("/api/v1/users/count-stats", response_model=UserCountStatsResponse)
