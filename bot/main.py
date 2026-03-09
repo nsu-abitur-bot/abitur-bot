@@ -200,7 +200,9 @@ async def handle_message(message: Message):
 
     # Пересылаем сообщение локальной модели LLM
     await bot.send_chat_action(chat_id, "typing")
-    response = await ask_local_llm(formatted_message, session_id=session_id)
+    response = await ask_local_llm(
+        formatted_message, session_id=session_id, user_id=message.from_user.id
+    )
 
     if response:
         await bot.send_message(chat_id, response, parse_mode=ParseMode.HTML)
