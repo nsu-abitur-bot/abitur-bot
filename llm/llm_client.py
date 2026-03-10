@@ -36,7 +36,8 @@ SYSTEM_PROMPT_BASE = """
 
 Если информации недостаточно, ответь по общим знаниям о НГУ
 и честно укажи, что данных мало.
-"""
+
+{sources_hint}"""
 
 LIGHTRAG_FORMAT_HINT = (
     "Верни ответ в Telegram-совместимом HTML без Markdown. "
@@ -138,13 +139,45 @@ async def ask_local_llm(message: str, session_id: str) -> str:
             if not rag_context or rag_context.startswith("Error executing query"):
                 rag_context = "Релевантный контекст из базы знаний не найден."
                 rag_sources = []
+            else:
+                # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
+                # чтобы LLM использовала только те URL, что мы передадим явно.
+                # 1. Блок «Источники: ...» до конца текста
+                rag_context = re.sub(
+                    r"\n{0,2}Источники?:[\s\S]*$",
+                    "",
+                    rag_context,
+                    flags=re.IGNORECASE,
+                )
+                # 2. «Источник информации (https://...)"
+                rag_context = re.sub(
+                    r"\s*Источник\s+информации\s*\([^)]*\)",
+                    "",
+                    rag_context,
+                    flags=re.IGNORECASE,
+                )
+                # 3. Нумерованные ссылки «[N] https://..."
+                rag_context = re.sub(
+                    r"\n*\[\d+\]\s+https?://\S+",
+                    "",
+                    rag_context,
+                )
+                rag_context = rag_context.strip()
         except Exception as e:
             logger.warning(f"LightRAG query error: {e}")
             rag_context = "База знаний временно недоступна."
 
         # 4. Формируем сообщения и отправляем в LLM провайдер (Cerebras по умолчанию)
         try:
-            system_prompt = SYSTEM_PROMPT_BASE.format(context=rag_context)
+            if rag_sources:
+                safe_url = escape(rag_sources[0])
+                sources_hint = (
+                    f'Если уместно, упомяни в конце ответа официальный сайт: '
+                    f'<a href="{safe_url}">{safe_url}</a>'
+                )
+            else:
+                sources_hint = ""
+            system_prompt = SYSTEM_PROMPT_BASE.format(context=rag_context, sources_hint=sources_hint)
             messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
             # Добавляем историю переписки
@@ -167,13 +200,6 @@ async def ask_local_llm(message: str, session_id: str) -> str:
 
             if not content:
                 content = "Ответ не найден"
-
-            if rag_sources:
-                sources_html = "\n\n<b>Источники:</b>"
-                for src in rag_sources:
-                    safe = escape(src)
-                    sources_html += f'\n<a href="{safe}">{safe}</a>'
-                content += sources_html
         except Exception as e:
             logger.warning(f"Provider generation error: {e}")
             content = "LLM временно недоступна."

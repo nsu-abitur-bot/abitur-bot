@@ -159,15 +159,16 @@ class GraphMemory:
             result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
             answer = result.get("llm_response", {}).get("content", "") or ""
             references = result.get("data", {}).get("references", [])
-            seen: set[str] = set()
-            sources: list[str] = []
+            first_source: str = ""
             for ref in references:
                 for url in (ref.get("file_path", "") or "").split(","):
                     url = url.strip()
-                    if url and url not in seen:
-                        seen.add(url)
-                        sources.append(url)
-            return str(answer), sources
+                    if url:
+                        first_source = url
+                        break
+                if first_source:
+                    break
+            return str(answer), ([first_source] if first_source else [])
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
