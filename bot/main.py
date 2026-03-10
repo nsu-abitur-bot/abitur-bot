@@ -1,10 +1,12 @@
 import asyncio
 import logging
+import re
 from os import getenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
@@ -205,7 +207,11 @@ async def handle_message(message: Message):
     )
 
     if response:
-        await bot.send_message(chat_id, response, parse_mode=ParseMode.HTML)
+        try:
+            await bot.send_message(chat_id, response, parse_mode=ParseMode.HTML)
+        except TelegramBadRequest:
+            plain = re.sub(r"<[^>]+>", "", response)
+            await bot.send_message(chat_id, plain)
 
 
 async def main():
