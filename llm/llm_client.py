@@ -7,6 +7,8 @@ from typing import Optional
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
+from db.postgres.db import AsyncSessionLocal
+from db.postgres.services.message import MessageService
 from db.redis_client import RedisClient
 from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
@@ -104,12 +106,30 @@ async def get_redis_client() -> RedisClient:
     return _redis_client
 
 
-async def ask_local_llm(message: str, session_id: str) -> str:
+async def _save_message_to_pg(
+    user_id: int, session_id: str, user_text: str, bot_response: str
+) -> None:
+    """Сохраняет пару вопрос/ответ в PostgreSQL."""
+    try:
+        async with AsyncSessionLocal() as db_session:
+            service = MessageService(db_session)
+            await service.create_message(
+                user_id=user_id,
+                session_id=session_id,
+                user_text=user_text,
+                bot_response=bot_response,
+            )
+    except Exception as e:
+        logger.error(f"Ошибка сохранения сообщения в PostgreSQL: {e}")
+
+
+async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
     """
     message - сообщение от пользователя
     session_id - идентификатор переписки,
     используется для получения и сохранения истории переписки (контекста)
     между пользователем и ассистентом
+    user_id - идентификатор пользователя Telegram для сохранения в БД
     """
 
     try:
@@ -127,6 +147,8 @@ async def ask_local_llm(message: str, session_id: str) -> str:
                 await redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
+                if user_id:
+                    await _save_message_to_pg(user_id, session_id, message, faq_answer)
                 return faq_answer
         except Exception as e:
             logger.warning(f"FAQ matcher error: {e}")
@@ -208,6 +230,10 @@ async def ask_local_llm(message: str, session_id: str) -> str:
         await redis_client.add_message(
             session_id, {"role": "assistant", "content": content}
         )
+
+        # Сохраняем в PostgreSQL
+        if user_id:
+            await _save_message_to_pg(user_id, session_id, message, content)
 
         return content
 
