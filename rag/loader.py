@@ -1,11 +1,67 @@
 import asyncio
 import logging
+import threading
 
 from rag.graph_memory import get_graph_memory
 
 logger = logging.getLogger(__name__)
 
 DEFAULT_GRAPH_ID = "abitur_kb"
+
+
+async def add_texts_async(
+    texts: list[str],
+    graph_id: str = DEFAULT_GRAPH_ID,
+    source_ids: list[str] | None = None,
+    file_paths: list[str] | None = None,
+) -> int:
+    """Асинхронно добавляет тексты в графовую память.
+
+    Args:
+        texts: Список текстов для добавления.
+        graph_id: ID графа для сохранения данных.
+        source_ids: URL-идентификаторы документов (для дедупликации).
+        file_paths: Строки со всеми URL источниками каждого документа.
+
+    Returns:
+        Количество успешно сохраненных текстов.
+    """
+    if not texts:
+        logger.warning("Список текстов пуст, нечего добавлять")
+        return 0
+
+    logger.info(f"Добавление {len(texts)} текстов в графовую память...")
+
+    graph_memory = get_graph_memory()
+    saved_count = 0
+
+    try:
+        for i, text in enumerate(texts):
+            if not text or not text.strip():
+                continue
+
+            source_id = source_ids[i] if source_ids and i < len(source_ids) else None
+            file_path = (
+                file_paths[i] if file_paths and i < len(file_paths) else source_id
+            )
+
+            # LightRAG handles chunking internally
+            saved = await graph_memory.save(
+                graph_id,
+                text,
+                source_id=source_id,
+                file_paths_str=file_path,
+            )
+            if saved:
+                saved_count += 1
+    finally:
+        # Ensure storages are finalized to persist data
+        await graph_memory.cleanup(graph_id)
+
+    logger.info(
+        f"Тексты добавлены в графовую память: успешно {saved_count} из {len(texts)}"
+    )
+    return saved_count
 
 
 def add_texts(
@@ -20,38 +76,37 @@ def add_texts(
         source_ids: URL-идентификаторы документов (для дедупликации)
         file_paths: Строки со всеми URL источниками каждого документа (для цитирования)
     """
-    if not texts:
-        logger.warning("Список текстов пуст, нечего добавлять")
-        return
-
-    logger.info(f"Добавление {len(texts)} текстов в графовую память...")
-
-    graph_memory = get_graph_memory()
-
-    async def _save_all():
-        try:
-            for i, text in enumerate(texts):
-                if not text or not text.strip():
-                    continue
-                source_id = (
-                    source_ids[i] if source_ids and i < len(source_ids) else None
-                )
-                file_path = (
-                    file_paths[i] if file_paths and i < len(file_paths) else source_id
-                )
-                # LightRAG handles chunking internally
-                await graph_memory.save(
-                    DEFAULT_GRAPH_ID,
-                    text,
-                    source_id=source_id,
-                    file_paths_str=file_path,
-                )
-        finally:
-            # Ensure storages are finalized to persist data
-            await graph_memory.cleanup(DEFAULT_GRAPH_ID)
+    coro = add_texts_async(
+        texts,
+        graph_id=DEFAULT_GRAPH_ID,
+        source_ids=source_ids,
+        file_paths=file_paths,
+    )
 
     try:
-        asyncio.run(_save_all())
+        try:
+            asyncio.get_running_loop()
+            has_running_loop = True
+        except RuntimeError:
+            has_running_loop = False
+
+        if has_running_loop:
+            error: list[BaseException] = []
+
+            def _runner() -> None:
+                try:
+                    asyncio.run(coro)
+                except BaseException as exc:  # noqa: BLE001
+                    error.append(exc)
+
+            thread = threading.Thread(target=_runner, daemon=True)
+            thread.start()
+            thread.join()
+            if error:
+                raise error[0]
+        else:
+            asyncio.run(coro)
+
         logger.info("Тексты успешно добавлены в графовую память")
     except Exception as e:
         logger.error(f"Ошибка добавления текстов в графовую память: {e}")

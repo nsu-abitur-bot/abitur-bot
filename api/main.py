@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.routes.faq import router as faq_router
+from api.routes.rag import router as rag_router
 from db.postgres.db import get_session
 from db.postgres.services.message import MessageService
 from db.postgres.services.user import UserService
@@ -32,6 +33,7 @@ app = FastAPI(title="Abitur API")
 
 # Регистрируем роутер FAQ
 app.include_router(faq_router, prefix="/api/v1")
+app.include_router(rag_router, prefix="/api/v1")
 
 
 @app.get("/api/v1/users/count-stats", response_model=UserCountStatsResponse)
