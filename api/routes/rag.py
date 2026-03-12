@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 
 from api.schemas.rag import RagUploadResponse
 from api.services.rag_upload import RagUploadService
@@ -16,14 +16,13 @@ def get_rag_upload_service() -> RagUploadService:
 )
 async def upload_documents_to_rag(
     files: list[UploadFile] = File(..., description="Файлы для индексации в RAG"),
-    graph_id: str = Query(DEFAULT_GRAPH_ID, description="ID графа LightRAG"),
     service: RagUploadService = Depends(get_rag_upload_service),
 ) -> RagUploadResponse:
     if not files:
         raise HTTPException(status_code=400, detail="No files provided")
 
     try:
-        results = await service.ingest_files(files=files, graph_id=graph_id)
+        results = await service.ingest_files(files=files, graph_id=DEFAULT_GRAPH_ID)
     except Exception:
         raise HTTPException(status_code=503, detail="RAG ingestion unavailable")
 
@@ -31,7 +30,6 @@ async def upload_documents_to_rag(
     skipped_count = len(results) - indexed_count
 
     return RagUploadResponse(
-        graph_id=graph_id,
         accepted_formats=service.accepted_formats,
         indexed_count=indexed_count,
         skipped_count=skipped_count,

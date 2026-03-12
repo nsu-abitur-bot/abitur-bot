@@ -9,7 +9,6 @@ class UploadedDocumentResult(BaseModel):
 
 
 class RagUploadResponse(BaseModel):
-    graph_id: str = Field(..., description="ID графа в LightRAG")
     accepted_formats: list[str] = Field(
         ..., description="Поддерживаемые расширения файлов"
     )

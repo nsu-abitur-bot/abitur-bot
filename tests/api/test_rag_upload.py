@@ -34,7 +34,6 @@ class TestRagUploadEndpoint:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["graph_id"] == "abitur_kb"
         assert data["indexed_count"] == 1
         assert data["skipped_count"] == 0
         assert data["results"][0]["filename"] == "example.md"
