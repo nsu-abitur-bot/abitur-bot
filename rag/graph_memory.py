@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
 from lightrag import LightRAG, QueryParam
@@ -8,6 +8,7 @@ from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
 
 from llm.gigachat_graph_adapters import GigaChatEmbedding, GigaChatLLM
+from llm.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 
 load_dotenv()
 
@@ -21,7 +22,8 @@ GRAPH_QUERY_MODES: frozenset = frozenset(
 class GraphMemory:
     """
     Async manager for LightRAG graph memory.
-    Uses GigaChat for LLM and embeddings.
+    Uses GigaChat or OpenAI for LLM and embeddings
+    (controlled by LIGHTRAG_LLM_PROVIDER).
     """
 
     def __init__(
@@ -40,7 +42,8 @@ class GraphMemory:
 
         if not self.credentials:
             logger.warning(
-                "GIGACHAT_CREDENTIALS or GIGACHAT_API_KEY environment variable is not set."
+                "GIGACHAT_CREDENTIALS or GIGACHAT_API_KEY "
+                "environment variable is not set."
             )
 
         self.scope: str = scope or os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
@@ -69,17 +72,36 @@ class GraphMemory:
         workspace_path = self._get_workspace_path(graph_id)
 
         try:
-            llm_adapter = GigaChatLLM(
-                credentials=self.credentials,
-                scope=self.scope,
-                model=self.model_name,
-            )
+            graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gigachat").lower()
 
-            embedding_adapter = GigaChatEmbedding(
-                credentials=self.credentials,
-                scope=self.scope,
-                model=self.embedding_model_name,
-            )
+            if graph_llm_provider == "openai":
+                openai_api_key = os.getenv("OPENAI_API_KEY", "")
+                if not openai_api_key:
+                    raise RuntimeError(
+                        "LIGHTRAG_LLM_PROVIDER=openai, но OPENAI_API_KEY не установлен."
+                    )
+                llm_adapter: Any = OpenAILLM(
+                    api_key=openai_api_key,
+                    model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
+                )
+                embedding_adapter: Any = OpenAIEmbedding(
+                    api_key=openai_api_key,
+                    model=os.getenv(
+                        "OPENAI_GRAPH_EMBEDDING_MODEL",
+                        "text-embedding-3-small",
+                    ),
+                )
+            else:
+                llm_adapter = GigaChatLLM(
+                    credentials=self.credentials,
+                    scope=self.scope,
+                    model=self.model_name,
+                )
+                embedding_adapter = GigaChatEmbedding(
+                    credentials=self.credentials,
+                    scope=self.scope,
+                    model=self.embedding_model_name,
+                )
 
             @wrap_embedding_func_with_attrs(
                 embedding_dim=embedding_adapter.embedding_dim
