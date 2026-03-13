@@ -9,6 +9,7 @@ services:
       # If running LLM on host machine (e.g. LM Studio), use http://host.docker.internal:1234/v1
       # - LM_API_URL=http://host.docker.internal:1234/v1
     volumes:
+      - ./faq:/app/faq
       - ./chroma_db:/app/chroma_db
       - ./data:/app/data
     depends_on:
