@@ -1,7 +1,7 @@
 """
 FAQ Matcher — модуль для поиска готовых ответов на типовые вопросы.
 
-Использует embeddings через GigaChat API
+Использует embeddings через текущий LLM provider
 и косинусное сходство для определения, подходит ли заготовленный ответ.
 
 Если сходство вопроса пользователя с одним из FAQ-вопросов
@@ -18,6 +18,9 @@ from typing import Optional, Protocol
 import numpy as np
 import yaml
 from langchain_gigachat.embeddings import GigaChatEmbeddings
+from langchain_openai import OpenAIEmbeddings
+
+from llm.factory import get_llm_provider
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +125,7 @@ class FAQMatcher:
         self._faq_path = faq_path or FAQ_DATA_PATH
         self._embedding_model_name = embedding_model_name
 
-        self._embedder = embedder or self._create_gigachat_embedder()
+        self._embedder = embedder or self._create_embedder()
 
         # Загружаем FAQ
         self._questions: list[str] = []  # все формулировки (question + aliases)
@@ -131,22 +134,66 @@ class FAQMatcher:
 
         self._load_faq()
 
-    def _create_gigachat_embedder(self) -> Optional["EmbeddingClient"]:
-        credentials = os.getenv("GIGACHAT_CREDENTIALS") or os.getenv("GIGACHAT_API_KEY")
-        if not credentials:
+    def _create_embedder(self) -> Optional["EmbeddingClient"]:
+        try:
+            provider = get_llm_provider()
+            provider_name = provider.__class__.__name__.lower()
+        except Exception as exc:
             logger.warning(
-                "GIGACHAT_CREDENTIALS или GIGACHAT_API_KEY не установлены. "
-                "FAQ semantic matching отключен."
+                "Не удалось инициализировать LLM provider для FAQ embeddings: %s. "
+                "FAQ semantic matching отключен.",
+                exc,
             )
             return None
 
-        scope = os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
-        return GigaChatEmbeddings(
-            credentials=credentials,
-            scope=scope,
-            model=self._embedding_model_name,
-            verify_ssl_certs=False,
+        if "gigachat" in provider_name:
+            credentials = os.getenv("GIGACHAT_CREDENTIALS") or os.getenv(
+                "GIGACHAT_API_KEY"
+            )
+            if not credentials:
+                logger.warning(
+                    "GIGACHAT_CREDENTIALS или GIGACHAT_API_KEY не установлены. "
+                    "FAQ semantic matching отключен."
+                )
+                return None
+
+            scope = os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
+            return GigaChatEmbeddings(
+                credentials=credentials,
+                scope=scope,
+                model=self._embedding_model_name,
+                verify_ssl_certs=False,
+            )
+
+        if "openai" in provider_name:
+            api_key = os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                logger.warning(
+                    "OPENAI_API_KEY не установлен. FAQ semantic matching отключен."
+                )
+                return None
+
+            model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+            return OpenAIEmbeddings(api_key=api_key, model=model)
+
+        if "deepseek" in provider_name:
+            api_key = os.getenv("DEEPSEEK_API_KEY")
+            if not api_key:
+                logger.warning(
+                    "DEEPSEEK_API_KEY не установлен. FAQ semantic matching отключен."
+                )
+                return None
+
+            base_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+            model = os.getenv("DEEPSEEK_EMBEDDING_MODEL", "deepseek-embedding")
+            return OpenAIEmbeddings(api_key=api_key, model=model, base_url=base_url)
+
+        logger.warning(
+            "LLM provider '%s' не поддерживает embeddings для FAQ. "
+            "FAQ semantic matching отключен.",
+            provider_name,
         )
+        return None
 
     def _load_faq(self) -> None:
         """Загружает FAQ из YAML и вычисляет embeddings."""
