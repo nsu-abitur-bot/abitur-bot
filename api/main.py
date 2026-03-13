@@ -1,7 +1,9 @@
+import os
 from datetime import datetime
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -30,6 +32,19 @@ class MessageResponse(BaseModel):
 
 
 app = FastAPI(title="Abitur API")
+
+cors_origins_env = os.getenv("CORS_ALLOW_ORIGINS", "*")
+cors_origins = [
+    origin.strip() for origin in cors_origins_env.split(",") if origin.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Регистрируем роутер FAQ
 app.include_router(faq_router, prefix="/api/v1")
