@@ -3,12 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from api.schemas.faq import FaqItem, FaqListResponse
 from api.services.faq import FaqService
 
-router = APIRouter(
-    prefix="/faq",
-    tags=["FAQ Management"]
-)
+router = APIRouter(prefix="/faq", tags=["FAQ Management"])
 
-# Зависимость для получения сервиса (в будущем можно добавить кэширование / DI container)
+
+# Зависимость для получения сервиса (в будущем: кэширование / DI container)
 def get_faq_service() -> FaqService:
     return FaqService()
 
@@ -22,7 +20,7 @@ def get_all_faqs(service: FaqService = Depends(get_faq_service)):
 
 @router.post("", response_model=FaqItem, status_code=201, summary="Создать FAQ")
 def create_faq(item: FaqItem, service: FaqService = Depends(get_faq_service)):
-    """Создает новый вопрос FAQ и автоматически применяет его для новых запросов к боту."""
+    """Создает новый вопрос FAQ и автоматически применяет для новых запросов к боту."""
     try:
         created = service.create(item)
         return created
@@ -31,13 +29,17 @@ def create_faq(item: FaqItem, service: FaqService = Depends(get_faq_service)):
 
 
 @router.put("/{index}", response_model=FaqItem, summary="Обновить FAQ по индексу")
-def update_faq(index: int, item: FaqItem, service: FaqService = Depends(get_faq_service)):
+def update_faq(
+    index: int, item: FaqItem, service: FaqService = Depends(get_faq_service)
+):
     """Обновляет существующий FAQ элемент по его позиции (индексу) в списке."""
     try:
         updated = service.update(index, item)
         return updated
     except IndexError:
-        raise HTTPException(status_code=404, detail=f"FAQ item at index {index} not found")
+        raise HTTPException(
+            status_code=404, detail=f"FAQ item at index {index} not found"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -48,6 +50,8 @@ def delete_faq(index: int, service: FaqService = Depends(get_faq_service)):
     try:
         service.delete(index)
     except IndexError:
-        raise HTTPException(status_code=404, detail=f"FAQ item at index {index} not found")
+        raise HTTPException(
+            status_code=404, detail=f"FAQ item at index {index} not found"
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
