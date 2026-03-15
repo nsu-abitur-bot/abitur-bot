@@ -19,13 +19,15 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT_BASE = """
-Ты дружелюбный помощник для абитуриентов НГУ (Новосибирский государственный университет).
+Ты дружелюбный помощник для абитуриентов НГУ (Новосибирский
+государственный университет).
 Твоя основная задача — отвечать на вопросы об университете и поступлении.
 
 Правила:
-- Если пользователь здоровается или пишет нейтральную фразу — ответь коротко и дружелюбно,
-  затем предложи задать вопрос об НГУ.
-- Если вопрос не связан с НГУ — вежливо скажи, что специализируешься только на НГУ.
+- Если пользователь здоровается или пишет нейтральную фразу —
+  ответь коротко и дружелюбно, затем предложи задать вопрос об НГУ.
+- Если вопрос не связан с НГУ — вежливо скажи, что специализируешься
+  только на НГУ.
 - Отвечай коротко, без лишних слов.
 
 Форматируй ответ в HTML для Telegram.
@@ -194,12 +196,14 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
             if rag_sources:
                 safe_url = escape(rag_sources[0])
                 sources_hint = (
-                    f'Если уместно, упомяни в конце ответа официальный сайт: '
+                    f"Если уместно, упомяни в конце ответа официальный сайт: "
                     f'<a href="{safe_url}">{safe_url}</a>'
                 )
             else:
                 sources_hint = ""
-            system_prompt = SYSTEM_PROMPT_BASE.format(context=rag_context, sources_hint=sources_hint)
+            system_prompt = SYSTEM_PROMPT_BASE.format(
+                context=rag_context, sources_hint=sources_hint
+            )
             messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
             # Добавляем историю переписки

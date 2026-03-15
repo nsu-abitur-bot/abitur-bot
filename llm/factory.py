@@ -16,6 +16,7 @@ def get_llm_provider() -> BaseLLMProvider:
         - "cerebras"
         - "deepseek"
         - "openai"
+        - "gemini"
     """
     global _provider_instance
     if _provider_instance is not None:
@@ -39,10 +40,14 @@ def get_llm_provider() -> BaseLLMProvider:
         from llm.providers.openai import OpenAIProvider
 
         _provider_instance = OpenAIProvider()
+    elif provider_name == "gemini":
+        from llm.providers.gemini import GeminiProvider
+
+        _provider_instance = GeminiProvider()
     else:
         raise ValueError(
             f"Неизвестный LLM провайдер: '{provider_name}'. "
-            f"Допустимые значения: gigachat, cerebras, deepseek, openai"
+            f"Допустимые значения: gigachat, cerebras, deepseek, openai, gemini"
         )
 
     logger.info("LLM провайдер инициализирован: %s", provider_name)

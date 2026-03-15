@@ -7,6 +7,7 @@ from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
 
+from llm.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.gigachat_graph_adapters import GigaChatEmbedding, GigaChatLLM
 from llm.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 
@@ -89,6 +90,25 @@ class GraphMemory:
                     model=os.getenv(
                         "OPENAI_GRAPH_EMBEDDING_MODEL",
                         "text-embedding-3-small",
+                    ),
+                )
+            elif graph_llm_provider == "gemini":
+                gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+                if not gemini_api_key:
+                    raise RuntimeError(
+                        "LIGHTRAG_LLM_PROVIDER=gemini, но GEMINI_API_KEY не установлен."
+                    )
+                llm_adapter: Any = GeminiLLM(
+                    api_key=gemini_api_key,
+                    model=os.getenv(
+                        "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
+                    ),
+                )
+                embedding_adapter: Any = GeminiEmbedding(
+                    api_key=gemini_api_key,
+                    model=os.getenv(
+                        "GEMINI_GRAPH_EMBEDDING_MODEL",
+                        "gemini-embedding-2-preview",
                     ),
                 )
             else:
@@ -181,16 +201,13 @@ class GraphMemory:
             result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
             answer = result.get("llm_response", {}).get("content", "") or ""
             references = result.get("data", {}).get("references", [])
-            first_source: str = ""
+            sources_set = set()
             for ref in references:
                 for url in (ref.get("file_path", "") or "").split(","):
                     url = url.strip()
                     if url:
-                        first_source = url
-                        break
-                if first_source:
-                    break
-            return str(answer), ([first_source] if first_source else [])
+                        sources_set.add(url)
+            return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
