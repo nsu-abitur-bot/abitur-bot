@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi import UploadFile
 
 from api.schemas.rag import UploadedDocumentResult
+from parser.baza_to_rag import _extract_sources
 from rag.loader import add_texts_async
 
 SUPPORTED_EXTENSIONS = {
@@ -99,8 +100,16 @@ class RagUploadService:
                 )
                 continue
 
-            enriched_text = f"Source: {filename}\n\n{prepared}"
-            saved_count = await add_texts_async([enriched_text], graph_id=graph_id)
+            source_id, file_paths_str = _extract_sources(prepared, fallback=filename)
+
+            # Передаем подготовленный текст и извлеченные ID/источники в RAG
+            saved_count = await add_texts_async(
+                [prepared],
+                graph_id=graph_id,
+                source_ids=[source_id],
+                file_paths=[file_paths_str],
+            )
+
             if saved_count == 0:
                 results.append(
                     UploadedDocumentResult(

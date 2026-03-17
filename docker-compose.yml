@@ -5,12 +5,13 @@ services:
       - .env
     environment:
       - REDIS_URL=redis://redis:6379/0
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/abitur
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
+      - DB_HOST=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
       # If running LLM on host machine (e.g. LM Studio), use http://host.docker.internal:1234/v1
       # - LM_API_URL=http://host.docker.internal:1234/v1
     volumes:
       - ./faq:/app/faq
-      - ./chroma_db:/app/chroma_db
       - ./data:/app/data
     depends_on:
       - redis
@@ -24,9 +25,14 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@postgres:5432/abitur
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
+      - DB_HOST=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
     ports:
       - "8000:8000"
+    volumes:
+      - ./faq:/app/faq
+      - ./data:/app/data
     depends_on:
       - postgres
     extra_hosts:
@@ -44,9 +50,9 @@ services:
     image: postgres:15-alpine
     restart: always
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-abitur}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-abitur}
     ports:
       - "5432:5432"
     volumes:

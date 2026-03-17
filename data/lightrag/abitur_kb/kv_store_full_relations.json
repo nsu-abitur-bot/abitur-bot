@@ -1,1198 +1,174 @@
 {
-  "https://education.nsu.ru/freshmen": {
-    "relation_pairs": [
-      [
-        "Академгородок",
-        "НГУ"
-      ],
-      [
-        "медицинские учреждения",
-        "первокурсники"
-      ],
-      [
-        "общежития",
-        "первокурсники"
-      ]
-    ],
-    "count": 3,
-    "create_time": 1773071935,
-    "update_time": 1773071935,
-    "_id": "https://education.nsu.ru/freshmen"
-  },
-  "https://education.nsu.ru/economics/": {
-    "relation_pairs": [
-      [
-        "Экономический факультет",
-        "социология"
-      ],
-      [
-        "Foundations of Informatics and Programming",
-        "R-Based Data Analysis"
-      ],
-      [
-        "Macroeconomics I and II",
-        "Microeconomics I and II"
-      ],
-      [
-        "Programming Courses Starting from First Year",
-        "Strong Economic-Mathematical Foundation"
-      ],
-      [
-        "Экономический факультет",
-        "стоимость"
-      ],
-      [
-        "Экономический факультет",
-        "бюджетные места"
-      ],
-      [
-        "Career Clubs and Internships",
-        "Scholarships and Special Programs for Freshmen"
-      ],
-      [
-        "Theory of Games",
-        "Theory of Industrial Markets"
-      ],
-      [
-        "Auditing",
-        "Economic Firm Theory"
-      ],
-      [
-        "Differential Equations",
-        "Optimization Methods"
-      ],
-      [
-        "Экономический факультет",
-        "бизнес-информатика"
-      ],
-      [
-        "Corporate Finance",
-        "Financial Markets and Financial Institutions"
-      ],
-      [
-        "Applied Data Analysis Using Programming Languages",
-        "Econometrics"
-      ],
-      [
-        "Экономический факультет",
-        "экономика"
-      ],
-      [
-        "Economics and Finance",
-        "Macroeconomics I and II"
-      ],
-      [
-        "Digital Transformation",
-        "Strategic Management in IT"
-      ],
-      [
-        "Courses and Lectures from Employers",
-        "Individual Educational Pathways"
-      ],
-      [
-        "Analysis of Financial Statements",
-        "Audit in International Company Practice"
-      ],
-      [
-        "Новосибирский государственный университет",
-        "Экономический факультет"
-      ],
-      [
-        "Economics and Finance",
-        "Microeconomics I and II"
-      ],
-      [
-        "Экономический факультет",
-        "менеджмент"
-      ],
-      [
-        "Business Models and IT Projects",
-        "IT and Analysis of Data"
-      ],
-      [
-        "Economics and Finance",
-        "Theory"
-      ],
-      [
-        "Business and Management",
-        "Business and Management Tasks"
-      ],
-      [
-        "Law Degree (Economic Activity)",
-        "Legal Studies"
-      ],
-      [
-        "Business Informatics",
-        "Information Technology"
-      ],
-      [
-        "Probability Theory",
-        "Statistical Methods"
-      ],
-      [
-        "Social Sciences",
-        "Sociology"
-      ],
-      [
-        "Microeconomics I and II",
-        "Microeconomics II"
-      ],
-      [
-        "Digital Marketing Communications",
-        "Neuromarketing"
-      ],
-      [
-        "Banking Activities in Russia",
-        "Central Bank Operations"
-      ],
-      [
-        "Экономический факультет",
-        "юриспруденция"
-      ],
-      [
-        "Accountancy and Management Accounting",
-        "Introduction to Machine Learning"
-      ],
-      [
-        "Linear Algebra",
-        "Mathematical Analysis"
-      ]
-    ],
-    "count": 34,
-    "create_time": 1773071996,
-    "update_time": 1773071996,
-    "_id": "https://education.nsu.ru/economics/"
-  },
-  "https://education.nsu.ru/promo/naturalsciences/": {
-    "relation_pairs": [
-      [
-        "Academic Linkage with Akademgorodok",
-        "ФЕН"
-      ],
-      [
-        "Student Life",
-        "ФЕН"
-      ],
-      [
-        "Stipend Programs",
-        "ФЕН"
-      ],
-      [
-        "Campus Accommodation",
-        "ФЕН"
-      ],
-      [
-        "Research and Technological Environment",
-        "ФЕН"
-      ],
-      [
-        "Physics",
-        "ФЕН"
-      ],
-      [
-        "Chemistry",
-        "ФЕН"
-      ],
-      [
-        "Sports Facilities",
-        "ФЕН"
-      ],
-      [
-        "НГУ",
-        "ФЕН"
-      ],
-      [
-        "Mathematics",
-        "ФЕН"
-      ],
-      [
-        "Fundamental Natural Science Education",
-        "ФЕН"
-      ]
-    ],
-    "count": 11,
-    "create_time": 1773072042,
-    "update_time": 1773072042,
-    "_id": "https://education.nsu.ru/promo/naturalsciences/"
-  },
-  "https://education.nsu.ru/physics": {
-    "relation_pairs": [
-      [
-        "ЕГЭ",
-        "Программа «Физика»"
-      ],
-      [
-        "Программа «Физика»",
-        "Физический факультет"
-      ],
-      [
-        "Itiya",
-        "student life"
-      ],
-      [
-        "Itiya",
-        "sport"
-      ],
-      [
-        "Физический факультет",
-        "научно-исследовательские институты"
-      ],
-      [
-        "Программа «Физика»",
-        "стипендии"
-      ],
-      [
-        "Новосибирский государственный университет",
-        "Физический факультет"
-      ],
-      [
-        "Программа «Физика»",
-        "бюджетные места"
-      ]
-    ],
-    "count": 8,
-    "create_time": 1773072079,
-    "update_time": 1773072079,
-    "_id": "https://education.nsu.ru/physics"
-  },
   "https://education.nsu.ru/information-technologies/": {
     "relation_pairs": [
       [
-        "ЕГЭ",
-        "Математика"
+        "FIT NSU",
+        "VK"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Physics"
+        "FIT",
+        "NSU"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "PGLab NGU-Postgres Professional"
+        "FIT",
+        "SberLab-NSU"
       ],
       [
-        "residence hall",
-        "общежития"
+        "FIT NSU",
+        "Tinkoff"
       ],
       [
-        "education institution",
-        "факультет"
+        "FIT NSU",
+        "Yandex"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "ShifT NGU-CFT"
+        "Informatics And Computer Engineering",
+        "Software Engineering And Computer Science"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Higher Mathematics"
+        "PGLab NSU-Postgres Professional Laboratory",
+        "Postgres Professional"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Laboratory СберЛаб-НГУ"
+        "Computer Science And System Engineering",
+        "Informatics And Computer Engineering"
       ],
       [
-        "ЕГЭ",
-        "Русский язык"
+        "FIT NSU",
+        "Postgres Professional"
       ],
       [
-        "faculty members",
-        "студенты"
+        "FIT",
+        "PGLab NSU-Postgres Professional"
       ],
       [
-        "organization",
-        "Тинькофф"
+        "FIT",
+        "SberLab-NSU Laboratory"
       ],
       [
-        "Компьютерные науки и системотехника",
-        "Факультет информационных технологий"
+        "FIT",
+        "SHIFT NSU-CFT"
       ],
       [
-        "Computer Science",
-        "Faculty of Informatics and Telecommunications"
+        "Computer Science and Systems Engineering",
+        "FIT"
       ],
       [
-        "VK",
-        "organization"
+        "Faculty Of Information Technologies",
+        "Informatics And Computer Engineering"
       ],
       [
-        "campus facilities",
-        "инфраструктура"
+        "FIT",
+        "Scholarship Programs"
       ],
       [
-        "informatics",
-        "базовые знания"
+        "FIT NSU",
+        "SberLab-NSU Laboratory"
       ],
       [
-        "ЕГЭ",
-        "Информатика или физика"
+        "IVT",
+        "PIiKN"
       ],
       [
-        "Новосибирский государственный университет",
-        "Факультет информационных технологий"
+        "IVT",
+        "KNIS"
       ],
       [
-        "organization",
-        "Сбер"
+        "Sber",
+        "SberLab-NSU Laboratory"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Laboratory PGLab НГУ–Postgres Professional"
+        "CFT",
+        "SHIFT NSU-CFT Laboratory"
       ],
       [
-        "Программная инженерия и компьютерные науки",
-        "Факультет информационных технологий"
+        "FIT",
+        "SBRAS"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Laboratory ШИФТ НГУ–ЦФТ"
+        "FIT",
+        "IVT"
       ],
       [
-        "Информатика и вычислительная техника",
-        "Факультет информационных технологий"
+        "FIT",
+        "SO RAN"
       ],
       [
-        "organization",
-        "компании партнёрства «СибАкадемСофт»"
+        "Curriculum Topics",
+        "FIT"
       ],
       [
-        "laboratory",
-        "organization"
+        "FIT",
+        "PGLab NSU-Postgres Professional Laboratory"
       ],
       [
-        "organization",
-        "ЦФТ"
+        "Faculty Of Information Technologies",
+        "Novosibirsk State University"
       ],
       [
-        "ЕГЭ",
-        "Физические основы информатики/компьютерные науки"
+        "FIT",
+        "SHIFT NSU-CFT Laboratory"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Russian Language"
+        "FIT NSU",
+        "SibAcademSoft"
       ],
       [
-        "Postgres Professional",
-        "organization"
+        "Bachelor's Degree",
+        "FIT"
       ],
       [
-        "organization",
-        "Яндекс"
+        "FIT NSU",
+        "PGLab NSU-Postgres Professional Laboratory"
       ],
       [
-        "location",
-        "кампус"
+        "CFT",
+        "FIT NSU"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "Informatics and Information Technology"
+        "FIT NSU",
+        "SHIFT NSU-CFT Laboratory"
       ],
       [
-        "Faculty of Informatics and Telecommunications",
-        "SberLab-NGU"
-      ],
-      [
-        "degree",
-        "бакалавриат"
+        "FIT NSU",
+        "Sber"
       ]
     ],
-    "count": 34,
-    "create_time": 1773072141,
-    "update_time": 1773072141,
+    "count": 33,
+    "create_time": 1773577743,
+    "update_time": 1773577743,
     "_id": "https://education.nsu.ru/information-technologies/"
   },
-  "https://education.nsu.ru/promo/geology": {
+  "https://education.nsu.ru/freshmen": {
     "relation_pairs": [
       [
-        "Living Arrangements",
-        "Student Accommodation"
+        "Medical Services",
+        "NSU"
       ],
       [
-        "Petroleum Industry",
-        "Work with Natural Resources"
-      ],
-      [
-        "геология",
-        "специализация"
-      ],
-      [
-        "Geology",
-        "Mineral Resources"
-      ],
-      [
-        "Career Development",
-        "Employer Connections"
-      ],
-      [
-        "Geological Processes",
-        "Geology"
-      ],
-      [
-        "бакалавриат",
-        "специализация"
-      ],
-      [
-        "Earth Structure",
-        "Geology"
-      ],
-      [
-        "Physical Fitness",
+        "NSU",
         "Sports Facilities"
       ],
       [
-        "геофизические методы поиска полезных ископаемых",
-        "метод"
-      ],
-      [
-        "геохимия",
-        "специализация"
-      ],
-      [
-        "Exchange Programs",
-        "International Collaboration"
-      ],
-      [
-        "Field Trips and Expeditions",
-        "Practical Learning"
-      ],
-      [
-        "Geochemistry",
-        "Geological Processes"
-      ],
-      [
-        "Geochemistry",
-        "Mineral Resources"
-      ],
-      [
-        "Research Sharing",
-        "Scientific Conferences"
-      ],
-      [
-        "нефть и газ",
-        "специализация"
-      ],
-      [
-        "Social Activities",
-        "Student Life"
-      ],
-      [
-        "Financial Aid",
-        "First Year Scholarships"
-      ],
-      [
-        "ГГФ",
-        "бакалавриат"
-      ],
-      [
-        "геофизика",
-        "специализация"
-      ],
-      [
-        "ГГФ",
-        "НГУ"
-      ],
-      [
-        "Earth Structure",
-        "Geochemistry"
-      ]
-    ],
-    "count": 23,
-    "create_time": 1773073200,
-    "update_time": 1773073200,
-    "_id": "https://education.nsu.ru/promo/geology"
-  },
-  "https://education.nsu.ru/philology": {
-    "relation_pairs": [
-      [
-        "entrance_requirement",
-        "literature"
-      ],
-      [
-        "social sciences",
-        "Обществознание"
-      ],
-      [
-        "Fundamental'naya i Prikladnaya Lingvistika",
-        "Gumanitarny Institut"
-      ],
-      [
-        "journalism_and_media",
-        "study_subject"
-      ],
-      [
-        "languages and literatures",
-        "Языки и литературы стран Азии и Африки"
-      ],
-      [
-        "Gumanitarny Institut",
-        "Inostrannye Yazyki"
-      ],
-      [
-        "history_of_russian_literature",
-        "optional_course"
-      ],
-      [
-        "research",
-        "Исследование языка"
-      ],
-      [
-        "history",
-        "История"
-      ],
-      [
-        "education",
-        "Русский язык"
-      ],
-      [
-        "humanities",
-        "Гуманитарная подготовка"
-      ],
-      [
-        "communication",
-        "Журналистика"
-      ],
-      [
-        "study",
-        "Литература"
-      ],
-      [
-        "linguistics",
-        "study_subject"
-      ],
-      [
-        "computer science",
-        "Информатика"
-      ],
-      [
-        "mathematical methods",
-        "Математические методы описания языка"
-      ],
-      [
-        "culture",
-        "История культуры и духовной жизни"
-      ],
-      [
-        "Filologiya",
-        "Gumanitarny Institut"
-      ],
-      [
-        "foreign language",
-        "Иностранный язык"
-      ],
-      [
-        "history",
-        "Всемирный исторический процесс"
-      ],
-      [
-        "history",
-        "История древнего мира и средних веков"
-      ],
-      [
-        "entrance_requirement",
-        "russian_language"
-      ],
-      [
-        "creative_test",
-        "entrance_requirement"
-      ],
-      [
-        "regional history",
-        "История стран Азии и Африки"
-      ],
-      [
-        "analysis",
-        "Лингвистический анализ"
-      ],
-      [
-        "formality",
-        "Формальная подготовка"
-      ],
-      [
-        "entrance exams",
-        "ЕГЭ"
-      ],
-      [
-        "discipline",
-        "Археология и этнография"
-      ],
-      [
-        "assessment",
-        "Творческое испытание"
-      ],
-      [
-        "Gumanitarny Institut",
-        "Journalistika"
-      ],
-      [
-        "Gumanitarny Institut",
-        "Istoriya"
-      ],
-      [
-        "Gumanitarny Institut",
-        "NSU"
-      ],
-      [
-        "Gumanitarny Institut",
-        "Vostokovedenie i Afrikanistica"
-      ],
-      [
-        "foreign_language",
-        "required_study"
-      ]
-    ],
-    "count": 34,
-    "create_time": 1773073259,
-    "update_time": 1773073259,
-    "_id": "https://education.nsu.ru/philology"
-  },
-  "https://education.nsu.ru/ppl_philosophy/": {
-    "relation_pairs": [
-      [
-        "Bachelor's Program",
-        "Legal Analysis"
-      ],
-      [
-        "Bachelor's Program",
-        "Work with Legal Documents"
-      ],
-      [
-        "IFP Pages",
-        "Stipend Programs"
-      ],
-      [
-        "Русский язык",
-        "Философия"
-      ],
-      [
-        "Институт философии и права",
-        "Философия"
-      ],
-      [
-        "legal analysis",
-        "students"
-      ],
-      [
-        "Иностранный язык",
-        "Философия"
-      ],
-      [
-        "Институт философии и права",
-        "Новосибирский государственный университет"
-      ],
-      [
-        "Обществознание",
-        "Философия"
-      ],
-      [
-        "campus",
-        "student life"
-      ],
-      [
-        "Общественные науки",
-        "Философия"
-      ],
-      [
-        "Философия",
-        "Философские дисциплины"
-      ],
-      [
-        "freshmen",
-        "stipend programs"
-      ],
-      [
-        "Bachelor's Program",
-        "Preparation for Legal Work"
-      ],
-      [
-        "История",
-        "Философия"
-      ],
-      [
-        "preparing for legal profession",
-        "students"
-      ],
-      [
-        "Правовые дисциплины",
-        "Юриспруденция"
-      ],
-      [
-        "Novosibirsk State University",
-        "program"
-      ],
-      [
-        "Институт философии и права",
-        "Юриспруденция"
-      ],
-      [
-        "dormitories",
-        "students"
-      ],
-      [
-        "students",
-        "work with legal documents"
-      ],
-      [
-        "Bachelor's Program",
-        "Legal Disciplines"
-      ],
-      [
-        "Campus Life",
-        "Novosibirsk State University"
-      ],
-      [
-        "official page",
-        "program"
-      ],
-      [
-        "Novosibirsk State University",
-        "Student Housing"
-      ],
-      [
-        "Bachelor's Program",
-        "Novosibirsk State University"
-      ]
-    ],
-    "count": 26,
-    "create_time": 1773073300,
-    "update_time": 1773073300,
-    "_id": "https://education.nsu.ru/ppl_philosophy/"
-  },
-  "https://education.nsu.ru/mechatronics": {
-    "relation_pairs": [
-      [
-        "Прикладной искусственный интеллект",
-        "моделирование робототехнических систем"
-      ],
-      [
-        "ИИР",
-        "Прикладной искусственный интеллект"
-      ],
-      [
-        "deep_machine_learning",
-        "mobile_applications"
-      ],
-      [
-        "physics",
-        "russian_language"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "объектно-ориентированное программирование на C++ и Python"
-      ],
-      [
-        "Прикладной искусственный интеллект",
-        "современные методы глубокого машинного обучения"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "алгебра и анализ"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "виртуальная и дополненная реальность"
-      ],
-      [
-        "modeling_robototehnicheskikh_sistem",
-        "robototehnika"
-      ],
-      [
-        "budget_places",
-        "paid_places"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "компьютерные сети"
-      ],
-      [
-        "Прикладной искусственный интеллект",
-        "робототехника"
-      ],
-      [
-        "ИИР",
-        "НГУ"
-      ],
-      [
-        "ИИР",
-        "Мехатроника и робототехника"
-      ],
-      [
-        "Прикладной искусственный интеллект",
-        "мобильные приложения"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "системы интернет вещей"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "операционные системы"
-      ],
-      [
-        "freshman_students",
-        "stipendialnye_programmy"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "программирование"
-      ],
-      [
-        "Прикладной искусственный интеллект",
-        "разработка программно-аппаратных комплексов"
-      ],
-      [
-        "residence_halls",
-        "student_life"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "искусственный интеллект"
-      ],
-      [
-        "project_work",
-        "super_computer_center"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "программирование микроконтроллеров"
-      ],
-      [
-        "informatics_and_ict",
-        "math"
-      ],
-      [
-        "Мехатроника и робототехника",
-        "дискретная математика и математическая логика"
-      ],
-      [
-        "advanced_foreign_language",
-        "programming_solutions"
-      ],
-      [
-        "industrial_partners",
-        "students_projects"
-      ],
-      [
-        "Прикладной искусственный интеллект",
-        "цифровая обработка сигналов"
-      ],
-      [
-        "digital_processing_signals",
-        "no-apparatnykh_kompleksov"
-      ]
-    ],
-    "count": 30,
-    "create_time": 1773073356,
-    "update_time": 1773073356,
-    "_id": "https://education.nsu.ru/mechatronics"
-  },
-  "https://education.nsu.ru/psychology": {
-    "relation_pairs": [
-      [
         "NSU",
-        "Psychology"
+        "Student Resources"
       ],
       [
-        "IMMT",
-        "Psychology"
-      ],
-      [
-        "IMMT",
-        "NSU"
-      ]
-    ],
-    "count": 3,
-    "create_time": 1773073362,
-    "update_time": 1773073362,
-    "_id": "https://education.nsu.ru/psychology"
-  },
-  "https://education.nsu.ru/mathematics": {
-    "relation_pairs": [
-      [
-        "Students",
-        "студенческая жизнь"
-      ],
-      [
-        "Budget Places",
-        "Mathematics and Computer Science"
-      ],
-      [
-        "Mathematics and Computer Sciences",
-        "Research Group in Fundamental Mathematics"
-      ],
-      [
-        "EГЭ Informatics/Physics/Russian Language",
-        "Mathematics and Computer Sciences"
-      ],
-      [
-        "First Two Courses",
-        "Mathematics and Computer Science"
-      ],
-      [
-        "Cost Per Semester",
-        "Mathematics and Computer Science"
-      ],
-      [
-        "Mathematical Methods and Information Technology in Mechanics",
-        "Mathematics and Computer Sciences"
-      ],
-      [
-        "Fundamental Mathematics",
-        "Mathematics and Computer Science"
-      ],
-      [
-        "Employers and Partners",
-        "Mathematics and Computer Science"
-      ],
-      [
-        "Математика и компьютерные науки",
-        "Механико-математический факультет"
-      ],
-      [
-        "Engineering School \"Artificial Intelligence and Applied Engineering\"",
-        "Mathematics and Computer Sciences"
-      ],
-      [
-        "Engineering School \"Artificial Intelligence and Applied Engineering\"",
-        "EГЭ Informatics/Physics/Russian Language"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Specialization Choices"
-      ],
-      [
-        "Students",
-        "научная специализация"
-      ],
-      [
-        "students",
-        "студенческая жизнь"
-      ],
-      [
-        "Механико-математический факультет",
-        "Новосибирский государственный университет"
-      ],
-      [
-        "EГЭ Mathematics",
-        "Mathematics and Computer Sciences"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Scientific Specialization Opportunities"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "System Programming"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Mechanics and Mathematical Modeling"
-      ],
-      [
-        "Механико-математический факультет",
-        "Прикладная математика и информатика"
-      ],
-      [
-        "Budget Places",
-        "Mathematical Methods and Information Technology in Mechanics"
-      ],
-      [
-        "Механико-математический факультет",
-        "исследовательская группа фундаментальной математики"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Sports Facilities"
-      ],
-      [
-        "students",
-        "научная специализация"
-      ],
-      [
-        "Budget Places",
-        "Research Group in Fundamental Mathematics"
-      ],
-      [
-        "Students",
-        "спорт"
-      ],
-      [
-        "EГЭ Mathematics",
-        "Mathematical Methods and Information Technology in Mechanics"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Practice Placements"
-      ],
-      [
-        "Students",
-        "общежития"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Stipend Programs"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Student Accommodation"
-      ],
-      [
-        "EГЭ Mathematics",
-        "Research Group in Fundamental Mathematics"
-      ],
-      [
-        "Математические методы и информационные технологии в механике",
-        "Механико-математический факультет"
-      ],
-      [
-        "students",
-        "спорт"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Paid Places"
-      ],
-      [
-        "Инженерная школа «Искусственный интеллект и прикладной инжиниринг»",
-        "Механико-математический факультет"
-      ],
-      [
-        "Mathematics and Computer Science",
-        "Research and Engineering Tracks"
-      ],
-      [
-        "Applied Mathematics and Informatics",
-        "Mathematics and Computer Science"
-      ],
-      [
-        "Механико-математический факультет",
-        "Системное программирование"
-      ],
-      [
-        "Mathematical Methods and Information Technology in Mechanics",
-        "Paid Places"
-      ],
-      [
-        "Paid Places",
-        "Research Group in Fundamental Mathematics"
-      ],
-      [
-        "students",
-        "общежития"
-      ],
-      [
-        "Budget Places",
-        "Engineering School \"Artificial Intelligence and Applied Engineering\""
-      ],
-      [
-        "Engineering School \"Artificial Intelligence and Applied Engineering\"",
-        "Paid Places"
-      ]
-    ],
-    "count": 45,
-    "create_time": 1773073459,
-    "update_time": 1773073459,
-    "_id": "https://education.nsu.ru/mathematics"
-  },
-  "https://education.nsu.ru/": {
-    "relation_pairs": [
-      [
-        "Mechanico-Mathematical Faculty",
-        "NSU"
-      ],
-      [
-        "Geology and Geophysics Faculty",
-        "NSU"
-      ],
-      [
-        "Bachelor Programs",
-        "Economics"
-      ],
-      [
-        "Bachelor Programs",
-        "Computer Science"
-      ],
-      [
-        "Mathematical Faculty",
-        "Novosibirsk State University"
-      ],
-      [
-        "Humanitarian Institute",
-        "NSU"
-      ],
-      [
-        "Bachelor Programs",
-        "Western Studies and African Studies"
-      ],
-      [
-        "Bachelor Programs",
-        "Foreign Languages"
-      ],
-      [
-        "Faculty of Natural Sciences",
-        "NSU"
-      ],
-      [
-        "Medical and Medical Technologies Institute",
-        "NSU"
-      ],
-      [
-        "Bachelor Programs",
-        "Novosibirsk State University"
-      ],
-      [
-        "Bachelor Programs",
-        "Informatics and Computer Engineering"
-      ],
-      [
-        "Bachelor Programs",
-        "Philosophy"
-      ],
-      [
-        "NSU",
-        "Physical Faculty"
-      ],
-      [
-        "Bachelor Programs",
-        "Journalism"
-      ],
-      [
-        "Economic Faculty",
-        "Novosibirsk State University"
-      ],
-      [
-        "Economic Faculty",
+        "Akademgorodok",
         "NSU"
       ],
       [
         "NSU",
-        "Philosophy and Law Institute"
+        "Student Support Services"
       ],
       [
-        "Information Technology Faculty",
+        "Dormitories",
         "NSU"
-      ],
-      [
-        "Institute of Intelligent Robotics",
-        "Novosibirsk State University"
-      ],
-      [
-        "Bachelor Programs",
-        "History"
-      ],
-      [
-        "Institute of Intelligent Robotics",
-        "NSU"
-      ],
-      [
-        "Bachelor Programs",
-        "Psychology"
-      ],
-      [
-        "Faculty of Natural Sciences",
-        "Novosibirsk State University"
       ]
     ],
-    "count": 24,
-    "create_time": 1773073495,
-    "update_time": 1773073495,
-    "_id": "https://education.nsu.ru/"
+    "count": 6,
+    "create_time": 1773586732,
+    "update_time": 1773586732,
+    "_id": "https://education.nsu.ru/freshmen"
   }
 }
