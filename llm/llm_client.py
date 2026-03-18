@@ -19,27 +19,26 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT_BASE = """
-Ты дружелюбный помощник для абитуриентов НГУ (Новосибирский
-государственный университет).
-Твоя основная задача — отвечать на вопросы об университете и поступлении.
+Ты — официальный дружелюбный помощник-бот для абитуриентов НГУ
+(Новосибирский государственный университет).
 
-Правила:
-- Если пользователь здоровается или пишет нейтральную фразу —
-  ответь коротко и дружелюбно, затем предложи задать вопрос об НГУ.
-- Если вопрос не связан с НГУ — вежливо скажи, что специализируешься
-  только на НГУ.
-- Отвечай коротко, без лишних слов.
+Правила поведения:
+1. Имя и легкий диалог: Если пользователь здоровается или говорит о себе (например,
+   называет своё имя), обязательно используй историю переписки, чтобы поддержать
+   беседу и обратиться по имени.
+2. Вопросы об НГУ: Ищи фактическую информацию ИСКЛЮЧИТЕЛЬНО в блоке
+   "Контекст из базы знаний" ниже. Если ответа там нет, ответь по общим знаниям
+   об НГУ, но предупреди, что точных данных нет.
+3. Оффтоп: Если вопрос вообще не про НГУ и не является поддержанием диалога,
+   вежливо скажи, что ты консультируешь только по вопросам НГУ.
+4. Отвечай коротко, без лишней воды. Структурируй абзацы.
 
-Форматируй ответ в HTML для Telegram.
+Форматирование в HTML (для Telegram):
 Разрешены только теги: <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.
-Не используй Markdown.
+Не используй Markdown (**жирный** или *курсив*). Оборачивай жирный шрифт в <b>.
 
-Используй следующую информацию из базы знаний для ответа на вопрос пользователя:
-
+Контекст из базы знаний об НГУ:
 {context}
-
-Если информации недостаточно, ответь по общим знаниям о НГУ
-и честно укажи, что данных мало.
 
 {sources_hint}"""
 
@@ -155,15 +154,53 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         except Exception as e:
             logger.warning(f"FAQ matcher error: {e}")
 
-        # 3. Получаем контекст из LightRAG
-        rag_sources: list[str] = []
+        # 3. Быстрая проверка на необходимость RAG
+        # (чтобы экономить вызовы графа для "привет", "как дела" и пр.)
+        need_rag = True
         try:
-            rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
-            rag_context, rag_sources = await query_graph_with_sources(rag_query)
-            if not rag_context or rag_context.startswith("Error executing query"):
-                rag_context = "Релевантный контекст из базы знаний не найден."
-                rag_sources = []
-            else:
+            intent_prompt = (
+                "Ты — маршрутизатор. Определи, нужно ли искать информацию "
+                "в базе знаний НГУ, чтобы ответить на сообщение пользователя.\n"
+                "Ответь ТОЛЬКО 'YES', если вопрос касается НГУ, учебы, "
+                "поступления, общежитий, или любых фактов.\n"
+                "Ответь ТОЛЬКО 'NO', если это простое приветствие, разговор "
+                "на отвлеченные темы (chit-chat), "
+                "вопрос о собеседнике, или благодарность.\n"
+                "Не пиши ничего кроме 'YES' или 'NO'."
+            )
+            intent_messages: list[BaseMessage] = [
+                SystemMessage(content=intent_prompt),
+                HumanMessage(content=message),
+            ]
+            intent_provider = get_llm_provider()
+            intent_response = await intent_provider.generate(intent_messages)
+            intent_response = (
+                re.sub(r"<think>.*?</think>", "", intent_response, flags=re.DOTALL)
+                .strip()
+                .upper()
+            )
+            if "NO" in intent_response:
+                need_rag = False
+                logger.info(f"Skipping RAG for conversational query: {message}")
+        except Exception as e:
+            logger.warning(
+                f"Intent classification error: {e}, falling back to full RAG"
+            )
+
+        # 4. Получаем контекст из LightRAG (если нужно)
+        rag_sources: list[str] = []
+        rag_context = ""
+        if need_rag:
+            try:
+                rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
+                rag_context_raw, rag_sources = await query_graph_with_sources(rag_query)
+                if not rag_context_raw or rag_context_raw.startswith(
+                    "Error executing query"
+                ):
+                    rag_context = "Релевантный контекст из базы знаний не найден."
+                    rag_sources = []
+                else:
+                    rag_context = rag_context_raw
                 # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
                 # чтобы LLM использовала только те URL, что мы передадим явно.
                 # 1. Блок «Источники: ...» до конца текста
@@ -187,17 +224,26 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     rag_context,
                 )
                 rag_context = rag_context.strip()
-        except Exception as e:
-            logger.warning(f"LightRAG query error: {e}")
-            rag_context = "База знаний временно недоступна."
+            except Exception as e:
+                logger.warning(f"LightRAG query error: {e}")
+                rag_context = "База знаний временно недоступна."
 
         # 4. Формируем сообщения и отправляем в LLM провайдер (Cerebras по умолчанию)
         try:
             if rag_sources:
-                safe_url = escape(rag_sources[0])
+                links_text = "\n".join([f"- {escape(url)}" for url in rag_sources[:5]])
                 sources_hint = (
-                    f"Если уместно, упомяни в конце ответа официальный сайт: "
-                    f'<a href="{safe_url}">{safe_url}</a>'
+                    "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
+                    "ЕСЛИ ты использовал информацию из блока 'Контекст' для ответа, "
+                    "внимательно просмотри список доступных ссылок ниже. Выбери из них ТОЛЬКО те (обычно 1-2 штуки), "
+                    "которые непосредственно относятся к твоему ответу (например, если вопрос про ФИТ - бери ссылку ФИТ, если про общежития - соответствующую).\n"
+                    "Затем обязательно добавь в самый конец своего ответа выбранные ссылки в следующем формате:\n\n"
+                    "<b>Источники:</b>\n"
+                    '<a href="URL_1">URL_1</a>\n'
+                    '<a href="URL_2">URL_2</a>\n\n'
+                    "(Но если ты просто здороваешься, говоришь на отвлеченные темы или не нашел ответа в Контексте - блок 'Источники:' ВООБЩЕ НЕ добавляй!)\n\n"
+                    "СПИСОК ДОСТУПНЫХ ССЫЛОК ИЗ БАЗЫ ЗНАНИЙ (выбери подходящие):\n"
+                    f"{links_text}"
                 )
             else:
                 sources_hint = ""
@@ -215,7 +261,12 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 if role == "user":
                     messages.append(HumanMessage(content=entry_content))
                 elif role == "assistant":
-                    messages.append(AIMessage(content=entry_content))
+                    # Очищаем старые ответы от блока с источниками,
+                    # чтобы они не сбивали с толку LLM при ответе на новый вопрос
+                    entry_clean = re.sub(
+                        r"<b>Источники:</b>[\s\S]*", "", entry_content
+                    ).strip()
+                    messages.append(AIMessage(content=entry_clean))
 
             provider = get_llm_provider()
             content = await provider.generate(messages)
