@@ -34,5 +34,43 @@
       "processing_start_time": 1773586720,
       "processing_end_time": 1773586732
     }
+  },
+  "https://education.nsu.ru/": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-3e0187d85fefff382fc2d89e5a6a1039",
+      "chunk-edc9c271aedbda6bad0945f4c21a258f"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ММФ** — Механико-математический факультет\n- **ФФ** — Физический факультет\n- **ФЕН** — Факультет естественных наук\n- **ФИТ** — Факультет информационных технологий\n...",
+    "content_length": 2250,
+    "created_at": "2026-03-17T05:14:21.022802+00:00",
+    "updated_at": "2026-03-17T05:14:51.229851+00:00",
+    "file_path": "https://education.nsu.ru/",
+    "track_id": "insert_20260317_051421_d2046d17",
+    "metadata": {
+      "processing_start_time": 1773724461,
+      "processing_end_time": 1773724491
+    }
+  },
+  "https://education.nsu.ru/mathematics": {
+    "status": "processed",
+    "chunks_count": 4,
+    "chunks_list": [
+      "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
+      "chunk-a7f4022f82d6e0bd59c16dadc8ded9df",
+      "chunk-56c035070f61cf4d5594c834da698ea7",
+      "chunk-5d96525dc0a8e5f1a4d134623a3bf446"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ММФ** — Механико-математический факультет\n- **ПМИ** — Прикладная математика и информатика\n- **МКН** — Математика и компьютерные науки\n\nИсточник: https://education...",
+    "content_length": 3569,
+    "created_at": "2026-03-18T14:52:02.856523+00:00",
+    "updated_at": "2026-03-18T14:53:00.939350+00:00",
+    "file_path": "https://education.nsu.ru/mathematics",
+    "track_id": "insert_20260318_145202_f80c2902",
+    "metadata": {
+      "processing_start_time": 1773845522,
+      "processing_end_time": 1773845580
+    }
   }
 }

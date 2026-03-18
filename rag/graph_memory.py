@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
@@ -52,6 +53,7 @@ class GraphMemory:
         self.embedding_model_name = embedding_model_name
 
         self._graphs: Dict[str, LightRAG] = {}
+        self._graph_last_mtime: Dict[str, float] = {}
 
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
@@ -66,9 +68,28 @@ class GraphMemory:
         os.makedirs(path, exist_ok=True)
         return path
 
+    def _get_latest_mtime(self, graph_id: str) -> float:
+        """Получает время последнего изменения хранилища (документов) для графа."""
+        workspace_path = self._get_workspace_path(graph_id)
+        # Проверяем файл статуса документов, который обновляется при загрузке новых файлов
+        status_file = os.path.join(workspace_path, "kv_store_doc_status.json")
+        try:
+            return os.path.getmtime(status_file)
+        except OSError:
+            return 0.0
+
     async def _get_or_create_graph(self, graph_id: str) -> LightRAG:
-        if graph_id in self._graphs:
+        latest_mtime = self._get_latest_mtime(graph_id)
+        current_mtime = self._graph_last_mtime.get(graph_id, -1.0)
+
+        # Если граф уже загружен и файлы на диске не изменились — возвращаем кэш
+        if graph_id in self._graphs and latest_mtime <= current_mtime:
             return self._graphs[graph_id]
+
+        if graph_id in self._graphs:
+            logger.info(
+                f"Обнаружено обновление файлов графа {graph_id}. Перезагрузка..."
+            )
 
         workspace_path = self._get_workspace_path(graph_id)
 
@@ -149,6 +170,9 @@ class GraphMemory:
             await initialize_pipeline_status()
 
             self._graphs[graph_id] = rag
+            # Обновляем время загрузки, берем текущее максимальное время файлов или time.time()
+            # Установим текущее системное время с запасом
+            self._graph_last_mtime[graph_id] = max(latest_mtime, time.time())
             logger.info(f"Created async LightRAG instance for graph: {graph_id}")
 
         except Exception as e:
@@ -205,7 +229,7 @@ class GraphMemory:
             for ref in references:
                 for url in (ref.get("file_path", "") or "").split(","):
                     url = url.strip()
-                    if url:
+                    if url and url.startswith("http"):
                         sources_set.add(url)
             return str(answer), list(sources_set)
         except Exception as e:

@@ -170,5 +170,309 @@
     "create_time": 1773586732,
     "update_time": 1773586732,
     "_id": "https://education.nsu.ru/freshmen"
+  },
+  "https://education.nsu.ru/": {
+    "relation_pairs": [
+      [
+        "Institute of Medicine and Medical Technologies",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institut Intellektualnoy Robototekhniki",
+        "NGU"
+      ],
+      [
+        "Mechanics and Mathematics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Matematicheskiy Fakultet",
+        "NGU"
+      ],
+      [
+        "Department of Information Technologies",
+        "Novosibirsk State University"
+      ],
+      [
+        "Bachelor's Programs",
+        "NGU"
+      ],
+      [
+        "NGU",
+        "Student Resources"
+      ],
+      [
+        "Economics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institute of Intelligent Robotics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Humanities Institute",
+        "Novosibirsk State University"
+      ],
+      [
+        "Fakultet Yestestvennykh Nauk",
+        "NGU"
+      ],
+      [
+        "Faculty of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Ekonomicheskiy Fakultet",
+        "NGU"
+      ],
+      [
+        "Novosibirsk State University",
+        "Physics Department"
+      ],
+      [
+        "Novosibirsk State University",
+        "Student Services"
+      ],
+      [
+        "Department of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty of Mathematics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Bachelor's Degree Programs",
+        "Novosibirsk State University"
+      ],
+      [
+        "Geology and Geophysics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty of Economics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institute of Philosophy and Law",
+        "Novosibirsk State University"
+      ]
+    ],
+    "count": 21,
+    "create_time": 1773724491,
+    "update_time": 1773724491,
+    "_id": "https://education.nsu.ru/"
+  },
+  "https://education.nsu.ru/mathematics": {
+    "relation_pairs": [
+      [
+        "Mathematics And Computer Sciences",
+        "Mmf"
+      ],
+      [
+        "Mathematics and Computer Sciences",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "MMF",
+        "SO RAN"
+      ],
+      [
+        "MMF",
+        "System Programming"
+      ],
+      [
+        "First-Year Students",
+        "Sports"
+      ],
+      [
+        "MMF",
+        "Schlumberger"
+      ],
+      [
+        "CFT",
+        "MMF"
+      ],
+      [
+        "Mmf",
+        "So Ran"
+      ],
+      [
+        "Fundamental Mathematics Research Group",
+        "MMF"
+      ],
+      [
+        "Mmf",
+        "Sber"
+      ],
+      [
+        "Freshmen",
+        "Student Life"
+      ],
+      [
+        "Google",
+        "Mmf"
+      ],
+      [
+        "First-Year Students",
+        "Scientific Specialization"
+      ],
+      [
+        "Alfa-Bank",
+        "Mmf"
+      ],
+      [
+        "Mechanics Technologies",
+        "Mmf"
+      ],
+      [
+        "MMF",
+        "Mathematical Methods and Information Technologies in Mechanics"
+      ],
+      [
+        "2gis",
+        "Mmf"
+      ],
+      [
+        "Artificial Intelligence and Applied Engineering School",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "Google",
+        "MMF"
+      ],
+      [
+        "Alfa-Bank",
+        "MMF"
+      ],
+      [
+        "Dormitories",
+        "First-Year Students"
+      ],
+      [
+        "2GIS",
+        "MMF"
+      ],
+      [
+        "MMF",
+        "Mathematics and Computer Sciences"
+      ],
+      [
+        "Mathematics And Computer Sciences",
+        "Research Group Of Fundamental Mathematics"
+      ],
+      [
+        "Mmf",
+        "Yandex"
+      ],
+      [
+        "MMF",
+        "NSU"
+      ],
+      [
+        "Mathematical Methods And Information Technologies In Mechanics",
+        "Mathematics And Computer Sciences"
+      ],
+      [
+        "Dormitories",
+        "Freshmen"
+      ],
+      [
+        "Mathematical Methods And Information Technologies In Mechanics",
+        "Unified State Exam"
+      ],
+      [
+        "Engineering School Artificial Intelligence And Applied Engineering",
+        "Mathematics And Computer Sciences"
+      ],
+      [
+        "Engineering School of Artificial Intelligence and Applied Engineering",
+        "MMF"
+      ],
+      [
+        "MMF",
+        "Sber"
+      ],
+      [
+        "Intel",
+        "Mmf"
+      ],
+      [
+        "Microsoft",
+        "Mmf"
+      ],
+      [
+        "MMF",
+        "Yandex"
+      ],
+      [
+        "Engineering School Artificial Intelligence And Applied Engineering",
+        "Unified State Exam"
+      ],
+      [
+        "Intel",
+        "MMF"
+      ],
+      [
+        "Freshmen",
+        "Sports"
+      ],
+      [
+        "First-Year Students",
+        "Student Life"
+      ],
+      [
+        "Applied Mathematics and Informatics",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "Mathematics And Computer Sciences",
+        "System Programming"
+      ],
+      [
+        "Mechanics and Mathematics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "MMF",
+        "Microsoft"
+      ],
+      [
+        "MKN",
+        "MMF"
+      ],
+      [
+        "Cft",
+        "Mmf"
+      ],
+      [
+        "Freshmen",
+        "Scientific Specialization"
+      ],
+      [
+        "Mmf",
+        "Schlumberger"
+      ],
+      [
+        "MMF",
+        "PMI"
+      ],
+      [
+        "Fundamental Mathematics Research Group",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "MMF",
+        "Mechanics Technologies"
+      ],
+      [
+        "Research Group Of Fundamental Mathematics",
+        "Unified State Exam"
+      ]
+    ],
+    "count": 51,
+    "create_time": 1773845580,
+    "update_time": 1773845580,
+    "_id": "https://education.nsu.ru/mathematics"
   }
 }

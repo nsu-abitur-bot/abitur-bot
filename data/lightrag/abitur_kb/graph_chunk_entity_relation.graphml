@@ -27,10 +27,10 @@
     <node id="NSU">
       <data key="d0">NSU</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen</data>
-      <data key="d5">1773586727</data>
+      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845549</data>
       <data key="d6" />
     </node>
     <node id="SBRAS">
@@ -90,10 +90,10 @@
     <node id="SO RAN">
       <data key="d0">SO RAN</data>
       <data key="d1">organization</data>
-      <data key="d2">SO RAN (Siberian Branch of the Russian Academy of Sciences) is a network of research institutes that maintains professional connections with the faculty.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577725</data>
+      <data key="d2">SO RAN (Siberian Branch of the Russian Academy of Sciences) is a network of research institutes that maintains professional connections with the faculty.&lt;SEP&gt;A network of institutes that serves as a base for student internships.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845555</data>
       <data key="d6" />
     </node>
     <node id="SberLab-NSU Laboratory">
@@ -126,19 +126,19 @@
     <node id="CFT">
       <data key="d0">CFT</data>
       <data key="d1">organization</data>
-      <data key="d2">A partner and employer organization associated with the faculty.</data>
-      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577725</data>
+      <data key="d2">A partner and employer organization associated with the faculty.&lt;SEP&gt;A partner company and potential employer for graduates.</data>
+      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845557</data>
       <data key="d6" />
     </node>
     <node id="Sber">
       <data key="d0">Sber</data>
       <data key="d1">organization</data>
-      <data key="d2">A partner and employer organization associated with the faculty.</data>
-      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577726</data>
+      <data key="d2">A partner and employer organization associated with the faculty.&lt;SEP&gt;A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845556</data>
       <data key="d6" />
     </node>
     <node id="Postgres Professional">
@@ -171,10 +171,10 @@
     <node id="Yandex">
       <data key="d0">Yandex</data>
       <data key="d1">organization</data>
-      <data key="d2">A partner and employer organization associated with the faculty.</data>
-      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577727</data>
+      <data key="d2">A partner and employer organization associated with the faculty.&lt;SEP&gt;A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845556</data>
       <data key="d6" />
     </node>
     <node id="SibAcademSoft">
@@ -252,10 +252,10 @@
     <node id="Novosibirsk State University">
       <data key="d0">Novosibirsk State University</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.</data>
-      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577729</data>
+      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.</data>
+      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845551</data>
       <data key="d6" />
     </node>
     <node id="Faculty Of Information Technologies">
@@ -306,10 +306,10 @@
     <node id="Dormitories">
       <data key="d0">Dormitories</data>
       <data key="d1">artifact</data>
-      <data key="d2">Dormitories are part of the NSU campus infrastructure provided for student accommodation.</data>
-      <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd</data>
-      <data key="d4">https://education.nsu.ru/freshmen</data>
-      <data key="d5">1773586727</data>
+      <data key="d2">Dormitories are part of the NSU campus infrastructure provided for student accommodation.&lt;SEP&gt;Housing facilities provided by the university for student accommodation.</data>
+      <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d4">https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845554</data>
       <data key="d6" />
     </node>
     <node id="Sports Facilities">
@@ -324,10 +324,10 @@
     <node id="Student Resources">
       <data key="d0">Student Resources</data>
       <data key="d1">content</data>
-      <data key="d2">Student resources refer to the information provided to freshmen regarding health, safety, and student life.</data>
-      <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd</data>
-      <data key="d4">https://education.nsu.ru/freshmen</data>
-      <data key="d5">1773586728</data>
+      <data key="d2">Student resources refer to the information provided to freshmen regarding health, safety, and student life.&lt;SEP&gt;Information provided by the university regarding dormitories, sports, and student life.</data>
+      <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/</data>
+      <data key="d5">1773724479</data>
       <data key="d6" />
     </node>
     <node id="Medical Services">
@@ -346,6 +346,474 @@
       <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd</data>
       <data key="d4">https://education.nsu.ru/freshmen</data>
       <data key="d5">1773586728</data>
+      <data key="d6" />
+    </node>
+    <node id="Mechanics and Mathematics Department">
+      <data key="d0">Mechanics and Mathematics Department</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Mechanics and Mathematics Department is an academic subdivision of Novosibirsk State University.&lt;SEP&gt;The Mechanics and Mathematics Department is a faculty within Novosibirsk State University offering undergraduate programs in mathematics and computer science.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845551</data>
+      <data key="d6" />
+    </node>
+    <node id="Physics Department">
+      <data key="d0">Physics Department</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Physics Department is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724475</data>
+      <data key="d6" />
+    </node>
+    <node id="Department of Natural Sciences">
+      <data key="d0">Department of Natural Sciences</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Department of Natural Sciences is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724475</data>
+      <data key="d6" />
+    </node>
+    <node id="Department of Information Technologies">
+      <data key="d0">Department of Information Technologies</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Department of Information Technologies is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724476</data>
+      <data key="d6" />
+    </node>
+    <node id="Geology and Geophysics Department">
+      <data key="d0">Geology and Geophysics Department</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Geology and Geophysics Department is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724476</data>
+      <data key="d6" />
+    </node>
+    <node id="Economics Department">
+      <data key="d0">Economics Department</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Economics Department is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724477</data>
+      <data key="d6" />
+    </node>
+    <node id="Humanities Institute">
+      <data key="d0">Humanities Institute</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Humanities Institute is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724477</data>
+      <data key="d6" />
+    </node>
+    <node id="Institute of Medicine and Medical Technologies">
+      <data key="d0">Institute of Medicine and Medical Technologies</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Institute of Medicine and Medical Technologies is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724477</data>
+      <data key="d6" />
+    </node>
+    <node id="Institute of Intelligent Robotics">
+      <data key="d0">Institute of Intelligent Robotics</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Institute of Intelligent Robotics is an academic subdivision of Novosibirsk State University.&lt;SEP&gt;The Institute of Intelligent Robotics is an academic department within Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724477</data>
+      <data key="d6" />
+    </node>
+    <node id="Institute of Philosophy and Law">
+      <data key="d0">Institute of Philosophy and Law</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Institute of Philosophy and Law is an academic subdivision of Novosibirsk State University.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724477</data>
+      <data key="d6" />
+    </node>
+    <node id="Matematicheskiy Fakultet">
+      <data key="d0">Matematicheskiy Fakultet</data>
+      <data key="d1">organization</data>
+      <data key="d2">A faculty department focused on mathematics.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724478</data>
+      <data key="d6" />
+    </node>
+    <node id="Ekonomicheskiy Fakultet">
+      <data key="d0">Ekonomicheskiy Fakultet</data>
+      <data key="d1">organization</data>
+      <data key="d2">A faculty department focused on economics.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724478</data>
+      <data key="d6" />
+    </node>
+    <node id="Fakultet Yestestvennykh Nauk">
+      <data key="d0">Fakultet Yestestvennykh Nauk</data>
+      <data key="d1">organization</data>
+      <data key="d2">A faculty department focused on natural sciences.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724478</data>
+      <data key="d6" />
+    </node>
+    <node id="Institut Intellektualnoy Robototekhniki">
+      <data key="d0">Institut Intellektualnoy Robototekhniki</data>
+      <data key="d1">organization</data>
+      <data key="d2">An institute dedicated to the study and development of intelligent robotics.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724479</data>
+      <data key="d6" />
+    </node>
+    <node id="NGU">
+      <data key="d0">NGU</data>
+      <data key="d1">organization</data>
+      <data key="d2">A university that provides information on bachelor's programs, admissions, and student life.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724479</data>
+      <data key="d6" />
+    </node>
+    <node id="Bachelor's Programs">
+      <data key="d0">Bachelor's Programs</data>
+      <data key="d1">content</data>
+      <data key="d2">A collection of academic courses offered by the university, including philology, history, linguistics, and others.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724479</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty of Mathematics">
+      <data key="d0">Faculty of Mathematics</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Mathematics is an academic department within Novosibirsk State University.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724480</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty of Economics">
+      <data key="d0">Faculty of Economics</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Economics is an academic department within Novosibirsk State University.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724480</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty of Natural Sciences">
+      <data key="d0">Faculty of Natural Sciences</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Natural Sciences is an academic department within Novosibirsk State University.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724480</data>
+      <data key="d6" />
+    </node>
+    <node id="Bachelor's Degree Programs">
+      <data key="d0">Bachelor's Degree Programs</data>
+      <data key="d1">content</data>
+      <data key="d2">Bachelor's Degree Programs represent the academic courses offered by the university, including fields like philology, history, physics, and economics.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724480</data>
+      <data key="d6" />
+    </node>
+    <node id="Student Services">
+      <data key="d0">Student Services</data>
+      <data key="d1">concept</data>
+      <data key="d2">Student Services encompass information provided by the university regarding dormitories, sports, and student life.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d4">https://education.nsu.ru/</data>
+      <data key="d5">1773724481</data>
+      <data key="d6" />
+    </node>
+    <node id="MMF">
+      <data key="d0">MMF</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Mechanics and Mathematics Faculty is a department within NSU that offers undergraduate programs.&lt;SEP&gt;The faculty providing academic programs, scholarships, dormitories, and research opportunities.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845549</data>
+      <data key="d6" />
+    </node>
+    <node id="PMI">
+      <data key="d0">PMI</data>
+      <data key="d1">concept</data>
+      <data key="d2">Applied Mathematics and Informatics is an academic field and major offered by the Mechanics and Mathematics Faculty.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845549</data>
+      <data key="d6" />
+    </node>
+    <node id="MKN">
+      <data key="d0">MKN</data>
+      <data key="d1">concept</data>
+      <data key="d2">Mathematics and Computer Sciences is an academic field and major offered by the Mechanics and Mathematics Faculty.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845550</data>
+      <data key="d6" />
+    </node>
+    <node id="Engineering School of Artificial Intelligence and Applied Engineering">
+      <data key="d0">Engineering School of Artificial Intelligence and Applied Engineering</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic profile and track focused on AI and engineering within the faculty.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845550</data>
+      <data key="d6" />
+    </node>
+    <node id="Fundamental Mathematics Research Group">
+      <data key="d0">Fundamental Mathematics Research Group</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Fundamental Mathematics Research Group is a specialized research track within the Mechanics and Mathematics Department.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845550</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematical Methods and Information Technologies in Mechanics">
+      <data key="d0">Mathematical Methods and Information Technologies in Mechanics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Mathematical Methods and Information Technologies in Mechanics is a specialized academic profile offered by the department.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845550</data>
+      <data key="d6" />
+    </node>
+    <node id="System Programming">
+      <data key="d0">System Programming</data>
+      <data key="d1">concept</data>
+      <data key="d2">System Programming is a specialized academic profile offered by the department.&lt;SEP&gt;A specialized profile included within the Mathematics and Computer Sciences academic field.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845551</data>
+      <data key="d6" />
+    </node>
+    <node id="Applied Mathematics and Informatics">
+      <data key="d0">Applied Mathematics and Informatics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Applied Mathematics and Informatics is an undergraduate study direction offered by the Mechanics and Mathematics Department.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845552</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematics and Computer Sciences">
+      <data key="d0">Mathematics and Computer Sciences</data>
+      <data key="d1">concept</data>
+      <data key="d2">Mathematics and Computer Sciences is an undergraduate study direction offered by the Mechanics and Mathematics Department.&lt;SEP&gt;An academic program offering 12 state-funded spots and 4 paid spots at a cost of 105,000 rubles per semester, requiring exams in mathematics, informatics/physics, and Russian.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845552</data>
+      <data key="d6" />
+    </node>
+    <node id="Artificial Intelligence and Applied Engineering School">
+      <data key="d0">Artificial Intelligence and Applied Engineering School</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Artificial Intelligence and Applied Engineering School is an engineering program track offered by the Mechanics and Mathematics Department.</data>
+      <data key="d3">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845552</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematics And Computer Sciences">
+      <data key="d0">Mathematics And Computer Sciences</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic field of study offering 60 state-funded and 15 fee-paying positions, including the System Programming profile.&lt;SEP&gt;An academic program with 12 budget spots and 4 paid spots.</data>
+      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df&lt;SEP&gt;chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845552</data>
+      <data key="d6" />
+    </node>
+    <node id="Engineering School Artificial Intelligence And Applied Engineering">
+      <data key="d0">Engineering School Artificial Intelligence And Applied Engineering</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic unit offering 20 state-funded and 6 fee-paying positions, requiring an interview for admission.</data>
+      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845553</data>
+      <data key="d6" />
+    </node>
+    <node id="Research Group Of Fundamental Mathematics">
+      <data key="d0">Research Group Of Fundamental Mathematics</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic unit offering 20 state-funded and 6 fee-paying positions, requiring a portfolio competition and an interview.</data>
+      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845553</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematical Methods And Information Technologies In Mechanics">
+      <data key="d0">Mathematical Methods And Information Technologies In Mechanics</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic program offering 14 state-funded and 2 fee-paying positions, requiring a mathematics exam for admission.</data>
+      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845553</data>
+      <data key="d6" />
+    </node>
+    <node id="Unified State Exam">
+      <data key="d0">Unified State Exam</data>
+      <data key="d1">method</data>
+      <data key="d2">A standardized testing system used for university admissions, requiring subjects such as mathematics, informatics, physics, and Russian language.</data>
+      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845553</data>
+      <data key="d6" />
+    </node>
+    <node id="First-Year Students">
+      <data key="d0">First-Year Students</data>
+      <data key="d1">person</data>
+      <data key="d2">First-year students are the target group for university resources and opportunities.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845554</data>
+      <data key="d6" />
+    </node>
+    <node id="Sports">
+      <data key="d0">Sports</data>
+      <data key="d1">concept</data>
+      <data key="d2">Sports represent the athletic activities available to students.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845554</data>
+      <data key="d6" />
+    </node>
+    <node id="Student Life">
+      <data key="d0">Student Life</data>
+      <data key="d1">concept</data>
+      <data key="d2">Student life encompasses the extracurricular and social experiences available to students.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845554</data>
+      <data key="d6" />
+    </node>
+    <node id="Scientific Specialization">
+      <data key="d0">Scientific Specialization</data>
+      <data key="d1">method</data>
+      <data key="d2">Scientific specialization refers to the academic and research opportunities available to students.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845555</data>
+      <data key="d6" />
+    </node>
+    <node id="Freshmen">
+      <data key="d0">Freshmen</data>
+      <data key="d1">person</data>
+      <data key="d2">Students in their first year of study who are the target audience for university resources.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845555</data>
+      <data key="d6" />
+    </node>
+    <node id="Mechanics Technologies">
+      <data key="d0">Mechanics Technologies</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic program offering 14 state-funded spots and 2 paid spots at a cost of 105,000 rubles per semester, requiring exams in mathematics, informatics/physics, and Russian.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845555</data>
+      <data key="d6" />
+    </node>
+    <node id="Google">
+      <data key="d0">Google</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845556</data>
+      <data key="d6" />
+    </node>
+    <node id="Microsoft">
+      <data key="d0">Microsoft</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845556</data>
+      <data key="d6" />
+    </node>
+    <node id="Alfa-Bank">
+      <data key="d0">Alfa-Bank</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845557</data>
+      <data key="d6" />
+    </node>
+    <node id="2GIS">
+      <data key="d0">2GIS</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and potential employer for graduates.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845557</data>
+      <data key="d6" />
+    </node>
+    <node id="Intel">
+      <data key="d0">Intel</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845557</data>
+      <data key="d6" />
+    </node>
+    <node id="Schlumberger">
+      <data key="d0">Schlumberger</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845558</data>
+      <data key="d6" />
+    </node>
+    <node id="Mmf">
+      <data key="d0">Mmf</data>
+      <data key="d1">organization</data>
+      <data key="d2">The faculty (Mechanics and Mathematics Faculty) offering various academic programs and student support.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845558</data>
+      <data key="d6" />
+    </node>
+    <node id="So Ran">
+      <data key="d0">So Ran</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Siberian Branch of the Russian Academy of Sciences, which hosts student internships.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845558</data>
+      <data key="d6" />
+    </node>
+    <node id="2gis">
+      <data key="d0">2gis</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845558</data>
+      <data key="d6" />
+    </node>
+    <node id="Cft">
+      <data key="d0">Cft</data>
+      <data key="d1">organization</data>
+      <data key="d2">A partner company and employer for graduates of the faculty.</data>
+      <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d4">https://education.nsu.ru/mathematics</data>
+      <data key="d5">1773845559</data>
       <data key="d6" />
     </node>
     <edge source="FIT" target="NSU">
@@ -528,6 +996,24 @@
       <data key="d12">1773586731</data>
       <data key="d13" />
     </edge>
+    <edge source="NSU" target="MMF">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Faculty is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">affiliation,department</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845559</data>
+      <data key="d13" />
+    </edge>
+    <edge source="SO RAN" target="MMF">
+      <data key="d7">1.0</data>
+      <data key="d8">MMF students conduct internships at SO RAN institutes.</data>
+      <data key="d9">internship,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845570</data>
+      <data key="d13" />
+    </edge>
     <edge source="SberLab-NSU Laboratory" target="Sber">
       <data key="d7">1.0</data>
       <data key="d8">Sber is a partner organization involved in the SberLab-NSU Laboratory.</data>
@@ -591,6 +1077,15 @@
       <data key="d12">1773577738</data>
       <data key="d13" />
     </edge>
+    <edge source="CFT" target="MMF">
+      <data key="d7">1.0</data>
+      <data key="d8">CFT is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845574</data>
+      <data key="d13" />
+    </edge>
     <edge source="Sber" target="FIT NSU">
       <data key="d7">1.0</data>
       <data key="d8">Sber is a partner and employer for graduates of FIT NSU.</data>
@@ -598,6 +1093,24 @@
       <data key="d10">chunk-730e570516ec9e7b29e2a113360804e7</data>
       <data key="d11">https://education.nsu.ru/information-technologies/</data>
       <data key="d12">1773577738</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Sber" target="MMF">
+      <data key="d7">1.0</data>
+      <data key="d8">Sber is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845572</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Sber" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Sber is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845578</data>
       <data key="d13" />
     </edge>
     <edge source="Postgres Professional" target="FIT NSU">
@@ -636,6 +1149,24 @@
       <data key="d12">1773577740</data>
       <data key="d13" />
     </edge>
+    <edge source="Yandex" target="MMF">
+      <data key="d7">1.0</data>
+      <data key="d8">Yandex is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845571</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Yandex" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Yandex is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845576</data>
+      <data key="d13" />
+    </edge>
     <edge source="SibAcademSoft" target="FIT NSU">
       <data key="d7">1.0</data>
       <data key="d8">SibAcademSoft is a partner organization for FIT NSU.</data>
@@ -672,6 +1203,141 @@
       <data key="d12">1773577742</data>
       <data key="d13" />
     </edge>
+    <edge source="Novosibirsk State University" target="Mechanics and Mathematics Department">
+      <data key="d7">3.0</data>
+      <data key="d8">The Mechanics and Mathematics Department is a subdivision of Novosibirsk State University.&lt;SEP&gt;The Mechanics and Mathematics Department is a faculty belonging to Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,affiliation,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845562</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Physics Department">
+      <data key="d7">2.0</data>
+      <data key="d8">The Physics Department is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724482</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Department of Natural Sciences">
+      <data key="d7">2.0</data>
+      <data key="d8">The Department of Natural Sciences is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724482</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Department of Information Technologies">
+      <data key="d7">2.0</data>
+      <data key="d8">The Department of Information Technologies is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Geology and Geophysics Department">
+      <data key="d7">2.0</data>
+      <data key="d8">The Geology and Geophysics Department is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724483</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Economics Department">
+      <data key="d7">2.0</data>
+      <data key="d8">The Economics Department is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724484</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Humanities Institute">
+      <data key="d7">2.0</data>
+      <data key="d8">The Humanities Institute is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724484</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Institute of Medicine and Medical Technologies">
+      <data key="d7">2.0</data>
+      <data key="d8">The Institute of Medicine and Medical Technologies is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724485</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Institute of Intelligent Robotics">
+      <data key="d7">3.0</data>
+      <data key="d8">The Institute of Intelligent Robotics is a subdivision of Novosibirsk State University.&lt;SEP&gt;The Institute of Intelligent Robotics is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organization,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724485</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Institute of Philosophy and Law">
+      <data key="d7">2.0</data>
+      <data key="d8">The Institute of Philosophy and Law is a subdivision of Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724486</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Faculty of Mathematics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Mathematics is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">academic structure,organization</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724488</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Faculty of Economics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">academic structure,organization</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724489</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Faculty of Natural Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">academic structure,organization</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724489</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Bachelor's Degree Programs">
+      <data key="d7">1.0</data>
+      <data key="d8">Novosibirsk State University provides various bachelor's degree programs to prospective students.</data>
+      <data key="d9">curriculum,educational offering</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724490</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Student Services">
+      <data key="d7">1.0</data>
+      <data key="d8">Novosibirsk State University offers resources and information regarding student life and facilities.</data>
+      <data key="d9">student support,university resources</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724490</data>
+      <data key="d13" />
+    </edge>
     <edge source="Faculty Of Information Technologies" target="Informatics And Computer Engineering">
       <data key="d7">1.0</data>
       <data key="d8">The Faculty of Information Technologies offers an undergraduate degree program in Informatics and Computer Engineering.</data>
@@ -697,6 +1363,447 @@
       <data key="d10">chunk-9a82318078705ea1aaa12f147aec8f4f</data>
       <data key="d11">https://education.nsu.ru/information-technologies/</data>
       <data key="d12">1773577743</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dormitories" target="First-Year Students">
+      <data key="d7">1.0</data>
+      <data key="d8">First-year students have access to dormitories.</data>
+      <data key="d9">resource access,student services</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845566</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Dormitories" target="Freshmen">
+      <data key="d7">1.0</data>
+      <data key="d8">Freshmen have access to dormitories for housing.</data>
+      <data key="d9">resource access,student support</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845568</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Student Resources" target="NGU">
+      <data key="d7">1.0</data>
+      <data key="d8">NGU provides information on student life, dormitories, and sports.</data>
+      <data key="d9">student support</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724488</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mechanics and Mathematics Department" target="Applied Mathematics and Informatics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Department offers an undergraduate program in Applied Mathematics and Informatics.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845563</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mechanics and Mathematics Department" target="Mathematics and Computer Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Department offers an undergraduate program in Mathematics and Computer Sciences.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845563</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mechanics and Mathematics Department" target="Artificial Intelligence and Applied Engineering School">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Department hosts the Artificial Intelligence and Applied Engineering School track.</data>
+      <data key="d9">academic program,specialization</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845564</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mechanics and Mathematics Department" target="Fundamental Mathematics Research Group">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Department hosts the Fundamental Mathematics Research Group.</data>
+      <data key="d9">academic program,research</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845564</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Matematicheskiy Fakultet" target="NGU">
+      <data key="d7">1.0</data>
+      <data key="d8">Matematicheskiy Fakultet is a faculty department within NGU.</data>
+      <data key="d9">academic structure</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724486</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Ekonomicheskiy Fakultet" target="NGU">
+      <data key="d7">1.0</data>
+      <data key="d8">Ekonomicheskiy Fakultet is a faculty department within NGU.</data>
+      <data key="d9">academic structure</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724486</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Fakultet Yestestvennykh Nauk" target="NGU">
+      <data key="d7">1.0</data>
+      <data key="d8">Fakultet Yestestvennykh Nauk is a faculty department within NGU.</data>
+      <data key="d9">academic structure</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724487</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institut Intellektualnoy Robototekhniki" target="NGU">
+      <data key="d7">1.0</data>
+      <data key="d8">Institut Intellektualnoy Robototekhniki is an institute within NGU.</data>
+      <data key="d9">academic structure</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724487</data>
+      <data key="d13" />
+    </edge>
+    <edge source="NGU" target="Bachelor's Programs">
+      <data key="d7">1.0</data>
+      <data key="d8">NGU publishes and manages information regarding various bachelor's programs.</data>
+      <data key="d9">academic offering</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
+      <data key="d11">https://education.nsu.ru/</data>
+      <data key="d12">1773724488</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="PMI">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Faculty offers the Applied Mathematics and Informatics program.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845560</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="MKN">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mechanics and Mathematics Faculty offers the Mathematics and Computer Sciences program.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845560</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Engineering School of Artificial Intelligence and Applied Engineering">
+      <data key="d7">1.0</data>
+      <data key="d8">The Engineering School of Artificial Intelligence and Applied Engineering is a track offered by the faculty.</data>
+      <data key="d9">academic track,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845561</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Fundamental Mathematics Research Group">
+      <data key="d7">1.0</data>
+      <data key="d8">The Fundamental Mathematics Research Group is a track offered by the faculty.</data>
+      <data key="d9">academic track,research</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845561</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Mathematical Methods and Information Technologies in Mechanics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Mathematical Methods and Information Technologies in Mechanics is a profile offered by the faculty.</data>
+      <data key="d9">academic profile,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845562</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="System Programming">
+      <data key="d7">1.0</data>
+      <data key="d8">System Programming is a profile offered by the faculty.</data>
+      <data key="d9">academic profile,curriculum</data>
+      <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845562</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Mechanics Technologies">
+      <data key="d7">1.0</data>
+      <data key="d8">MMF offers the Mechanics Technologies program.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845569</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Mathematics and Computer Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">MMF offers the Mathematics and Computer Sciences program.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845570</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Google">
+      <data key="d7">1.0</data>
+      <data key="d8">Google is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845572</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Microsoft">
+      <data key="d7">1.0</data>
+      <data key="d8">Microsoft is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845572</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Alfa-Bank">
+      <data key="d7">1.0</data>
+      <data key="d8">Alfa-Bank is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845573</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="2GIS">
+      <data key="d7">1.0</data>
+      <data key="d8">2GIS is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845573</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Intel">
+      <data key="d7">1.0</data>
+      <data key="d8">Intel is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845574</data>
+      <data key="d13" />
+    </edge>
+    <edge source="MMF" target="Schlumberger">
+      <data key="d7">1.0</data>
+      <data key="d8">Schlumberger is a partner company and employer for MMF students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845575</data>
+      <data key="d13" />
+    </edge>
+    <edge source="System Programming" target="Mathematics And Computer Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">System Programming is a profile offered within the Mathematics and Computer Sciences program.</data>
+      <data key="d9">curriculum,specialization</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845564</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mathematics And Computer Sciences" target="Engineering School Artificial Intelligence And Applied Engineering">
+      <data key="d7">1.0</data>
+      <data key="d8">Both are academic tracks listed under the university's educational offerings.</data>
+      <data key="d9">academic structure,program classification</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845566</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mathematics And Computer Sciences" target="Research Group Of Fundamental Mathematics">
+      <data key="d7">1.0</data>
+      <data key="d8">Both are academic tracks listed under the university's educational offerings.</data>
+      <data key="d9">academic structure,program classification</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845566</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mathematics And Computer Sciences" target="Mathematical Methods And Information Technologies In Mechanics">
+      <data key="d7">1.0</data>
+      <data key="d8">Both are academic tracks listed under the university's educational offerings.</data>
+      <data key="d9">academic structure,program classification</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845566</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mathematics And Computer Sciences" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Mmf offers the Mathematics And Computer Sciences program.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845575</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Engineering School Artificial Intelligence And Applied Engineering" target="Unified State Exam">
+      <data key="d7">1.0</data>
+      <data key="d8">Admission to the Engineering School requires specific Unified State Exam subjects and an interview.</data>
+      <data key="d9">admission requirement</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845565</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Research Group Of Fundamental Mathematics" target="Unified State Exam">
+      <data key="d7">1.0</data>
+      <data key="d8">Admission to the Research Group requires specific Unified State Exam subjects, a portfolio, and an interview.</data>
+      <data key="d9">admission requirement</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845565</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mathematical Methods And Information Technologies In Mechanics" target="Unified State Exam">
+      <data key="d7">1.0</data>
+      <data key="d8">Admission to the program requires the mathematics Unified State Exam.</data>
+      <data key="d9">admission requirement</data>
+      <data key="d10">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845566</data>
+      <data key="d13" />
+    </edge>
+    <edge source="First-Year Students" target="Sports">
+      <data key="d7">1.0</data>
+      <data key="d8">First-year students have access to sports activities.</data>
+      <data key="d9">extracurricular activities,student engagement</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845567</data>
+      <data key="d13" />
+    </edge>
+    <edge source="First-Year Students" target="Student Life">
+      <data key="d7">1.0</data>
+      <data key="d8">First-year students have access to student life opportunities.</data>
+      <data key="d9">extracurricular activities,student engagement</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845567</data>
+      <data key="d13" />
+    </edge>
+    <edge source="First-Year Students" target="Scientific Specialization">
+      <data key="d7">1.0</data>
+      <data key="d8">First-year students have access to opportunities for scientific specialization.</data>
+      <data key="d9">academic opportunities,research</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845568</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Sports" target="Freshmen">
+      <data key="d7">1.0</data>
+      <data key="d8">Freshmen have access to sports programs.</data>
+      <data key="d9">resource access,student engagement</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845568</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Student Life" target="Freshmen">
+      <data key="d7">1.0</data>
+      <data key="d8">Freshmen have access to student life activities.</data>
+      <data key="d9">resource access,student engagement</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845569</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Scientific Specialization" target="Freshmen">
+      <data key="d7">1.0</data>
+      <data key="d8">Freshmen have access to opportunities for scientific specialization.</data>
+      <data key="d9">academic opportunity,career development</data>
+      <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845569</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mechanics Technologies" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Mmf offers the Mechanics Technologies program.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845575</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Google" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Google is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845577</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Microsoft" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Microsoft is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845577</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Alfa-Bank" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Alfa-Bank is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845578</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Intel" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Intel is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845579</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Schlumberger" target="Mmf">
+      <data key="d7">1.0</data>
+      <data key="d8">Schlumberger is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845580</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mmf" target="So Ran">
+      <data key="d7">1.0</data>
+      <data key="d8">Mmf students conduct internships at So Ran institutions.</data>
+      <data key="d9">internship,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845576</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mmf" target="2gis">
+      <data key="d7">1.0</data>
+      <data key="d8">2gis is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845579</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mmf" target="Cft">
+      <data key="d7">1.0</data>
+      <data key="d8">Cft is a partner and employer for Mmf students.</data>
+      <data key="d9">employment,partnership</data>
+      <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
+      <data key="d11">https://education.nsu.ru/mathematics</data>
+      <data key="d12">1773845580</data>
       <data key="d13" />
     </edge>
   </graph>
