@@ -108,5 +108,25 @@
       "processing_start_time": 1773902629,
       "processing_end_time": 1773902660
     }
+  },
+  "https://education.nsu.ru/economics/": {
+    "status": "processed",
+    "chunks_count": 4,
+    "chunks_list": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340",
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3",
+      "chunk-00684bcbeac969b103e950778cd091c8"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ЭФ** — Экономический факультет\n\nИсточник: https://education.nsu.ru/economics/\n\n# Экономический факультет НГУ\n\n## Кратко\nЭкономический факультет НГУ ведёт набор на...",
+    "content_length": 3797,
+    "created_at": "2026-03-19T07:24:37.924027+00:00",
+    "updated_at": "2026-03-19T07:25:11.407455+00:00",
+    "file_path": "https://education.nsu.ru/economics/",
+    "track_id": "insert_20260319_072437_7ea81f01",
+    "metadata": {
+      "processing_start_time": 1773905078,
+      "processing_end_time": 1773905111
+    }
   }
 }

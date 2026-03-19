@@ -27,10 +27,10 @@
     <node id="NSU">
       <data key="d0">NSU</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology</data>
-      <data key="d5">1773902644</data>
+      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Faculty of Economics.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905098</data>
       <data key="d6" />
     </node>
     <node id="SBRAS">
@@ -252,10 +252,10 @@
     <node id="Novosibirsk State University">
       <data key="d0">Novosibirsk State University</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.&lt;SEP&gt;Novosibirsk State University is a higher education institution that hosts the Physics Department.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Faculty of Geology and Geophysics.</data>
-      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology</data>
-      <data key="d5">1773902646</data>
+      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.&lt;SEP&gt;Novosibirsk State University is a higher education institution that hosts the Physics Department.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Faculty of Geology and Geophysics.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Faculty of Economics.</data>
+      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905100</data>
       <data key="d6" />
     </node>
     <node id="Faculty Of Information Technologies">
@@ -504,10 +504,10 @@
     <node id="Faculty of Economics">
       <data key="d0">Faculty of Economics</data>
       <data key="d1">organization</data>
-      <data key="d2">The Faculty of Economics is an academic department within Novosibirsk State University.</data>
-      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
-      <data key="d4">https://education.nsu.ru/</data>
-      <data key="d5">1773724480</data>
+      <data key="d2">The Faculty of Economics is an academic department within Novosibirsk State University.&lt;SEP&gt;The Faculty of Economics is a department within Novosibirsk State University offering various undergraduate programs.</data>
+      <data key="d3">chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d4">https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905098</data>
       <data key="d6" />
     </node>
     <node id="Faculty of Natural Sciences">
@@ -675,10 +675,10 @@
     <node id="First-Year Students">
       <data key="d0">First-Year Students</data>
       <data key="d1">person</data>
-      <data key="d2">First-year students are the target group for university resources and opportunities.</data>
-      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
-      <data key="d4">https://education.nsu.ru/mathematics</data>
-      <data key="d5">1773845554</data>
+      <data key="d2">First-year students are the target group for university resources and opportunities.&lt;SEP&gt;First-year students are individuals in their initial year of academic study.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446&lt;SEP&gt;chunk-00684bcbeac969b103e950778cd091c8</data>
+      <data key="d4">https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905100</data>
       <data key="d6" />
     </node>
     <node id="Sports">
@@ -1032,6 +1032,168 @@
       <data key="d5">1773902650</data>
       <data key="d6" />
     </node>
+    <node id="Economics and Finance">
+      <data key="d0">Economics and Finance</data>
+      <data key="d1">concept</data>
+      <data key="d2">A category of academic disciplines focused on economic theory, financial markets, and corporate accounting.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905096</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematics">
+      <data key="d0">Mathematics</data>
+      <data key="d1">concept</data>
+      <data key="d2">A category of academic disciplines providing the quantitative and analytical foundation for economic and data analysis.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905096</data>
+      <data key="d6" />
+    </node>
+    <node id="IT and Data Analysis">
+      <data key="d0">IT and Data Analysis</data>
+      <data key="d1">concept</data>
+      <data key="d2">A category of academic disciplines focused on programming, data science, and digital communication technologies.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905097</data>
+      <data key="d6" />
+    </node>
+    <node id="Practical Disciplines">
+      <data key="d0">Practical Disciplines</data>
+      <data key="d1">concept</data>
+      <data key="d2">A category of industry-oriented courses provided by corporate partners to bridge academic theory with professional practice.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905097</data>
+      <data key="d6" />
+    </node>
+    <node id="Bank of Russia">
+      <data key="d0">Bank of Russia</data>
+      <data key="d1">organization</data>
+      <data key="d2">The central bank of the Russian Federation, involved in educational programs regarding its organizational activities.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905097</data>
+      <data key="d6" />
+    </node>
+    <node id="EF">
+      <data key="d0">EF</data>
+      <data key="d1">organization</data>
+      <data key="d2">An educational faculty or institution that offers a curriculum including economics, mathematics, and IT.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905097</data>
+      <data key="d6" />
+    </node>
+    <node id="Individual Educational Trajectory">
+      <data key="d0">Individual Educational Trajectory</data>
+      <data key="d1">method</data>
+      <data key="d2">A personalized approach to learning offered by the institution to students.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905098</data>
+      <data key="d6" />
+    </node>
+    <node id="Career Clubs and Internships">
+      <data key="d0">Career Clubs and Internships</data>
+      <data key="d1">method</data>
+      <data key="d2">Professional development opportunities provided to students for career advancement.</data>
+      <data key="d3">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905098</data>
+      <data key="d6" />
+    </node>
+    <node id="Economics">
+      <data key="d0">Economics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Economics is an undergraduate program at the Faculty of Economics focusing on mathematical preparation, modeling, and data analysis.</data>
+      <data key="d3">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905099</data>
+      <data key="d6" />
+    </node>
+    <node id="Management">
+      <data key="d0">Management</data>
+      <data key="d1">concept</data>
+      <data key="d2">Management is an undergraduate program at the Faculty of Economics focusing on business tasks, leadership, and project management.&lt;SEP&gt;An academic field focusing on business tasks, leadership, teamwork, project management, and process management.</data>
+      <data key="d3">chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905099</data>
+      <data key="d6" />
+    </node>
+    <node id="Sociology">
+      <data key="d0">Sociology</data>
+      <data key="d1">concept</data>
+      <data key="d2">Sociology is an undergraduate program offered by the Faculty of Economics.&lt;SEP&gt;An academic field focusing on social trends, data collection methods, and research practices.</data>
+      <data key="d3">chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905099</data>
+      <data key="d6" />
+    </node>
+    <node id="Jurisprudence">
+      <data key="d0">Jurisprudence</data>
+      <data key="d1">concept</data>
+      <data key="d2">Jurisprudence is an undergraduate program offered by the Faculty of Economics.&lt;SEP&gt;An academic field specializing in legal support for economic activities, contract work, and legal expertise.</data>
+      <data key="d3">chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905099</data>
+      <data key="d6" />
+    </node>
+    <node id="Business Informatics">
+      <data key="d0">Business Informatics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Business Informatics is an undergraduate program offered by the Faculty of Economics.&lt;SEP&gt;An academic field focusing on information systems design, IT infrastructure management, and business process optimization.</data>
+      <data key="d3">chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905100</data>
+      <data key="d6" />
+    </node>
+    <node id="Economics And Finance">
+      <data key="d0">Economics And Finance</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic program covering microeconomics, macroeconomics, and economic theory.</data>
+      <data key="d3">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905101</data>
+      <data key="d6" />
+    </node>
+    <node id="SPSS">
+      <data key="d0">SPSS</data>
+      <data key="d1">artifact</data>
+      <data key="d2">A software tool used for the analysis of sociological data.</data>
+      <data key="d3">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905101</data>
+      <data key="d6" />
+    </node>
+    <node id="VAAL">
+      <data key="d0">VAAL</data>
+      <data key="d1">artifact</data>
+      <data key="d2">A software tool used for the analysis of sociological data.</data>
+      <data key="d3">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905101</data>
+      <data key="d6" />
+    </node>
+    <node id="Economic Activity">
+      <data key="d0">Economic Activity</data>
+      <data key="d3">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d2">The Jurisprudence program focuses on providing legal support for economic activities.</data>
+      <data key="d1">UNKNOWN</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905110</data>
+      <data key="d6" />
+    </node>
+    <node id="IT Infrastructure">
+      <data key="d0">IT Infrastructure</data>
+      <data key="d3">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d2">The Business Informatics program includes the study and management of IT infrastructure.</data>
+      <data key="d1">UNKNOWN</data>
+      <data key="d4">https://education.nsu.ru/economics/</data>
+      <data key="d5">1773905110</data>
+      <data key="d6" />
+    </node>
     <edge source="FIT" target="NSU">
       <data key="d7">2.0</data>
       <data key="d8">FIT is a faculty belonging to the Novosibirsk State University.&lt;SEP&gt;FIT is a faculty within NSU where teaching is conducted by university staff and industry experts.</data>
@@ -1237,6 +1399,15 @@
       <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
       <data key="d11">https://education.nsu.ru/promo/geology</data>
       <data key="d12">1773902650</data>
+      <data key="d13" />
+    </edge>
+    <edge source="NSU" target="Faculty of Economics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics is a department within NSU.</data>
+      <data key="d9">affiliation,department</data>
+      <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905105</data>
       <data key="d13" />
     </edge>
     <edge source="SO RAN" target="MMF">
@@ -1555,12 +1726,12 @@
       <data key="d13" />
     </edge>
     <edge source="Novosibirsk State University" target="Faculty of Economics">
-      <data key="d7">1.0</data>
-      <data key="d8">The Faculty of Economics is a department belonging to Novosibirsk State University.</data>
-      <data key="d9">academic structure,organization</data>
-      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
-      <data key="d11">https://education.nsu.ru/</data>
-      <data key="d12">1773724489</data>
+      <data key="d7">2.0</data>
+      <data key="d8">The Faculty of Economics is a department belonging to Novosibirsk State University.&lt;SEP&gt;The Faculty of Economics is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">academic structure,affiliation,department,organization</data>
+      <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905109</data>
       <data key="d13" />
     </edge>
     <edge source="Novosibirsk State University" target="Faculty of Natural Sciences">
@@ -1750,6 +1921,51 @@
       <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
       <data key="d11">https://education.nsu.ru/</data>
       <data key="d12">1773724488</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty of Economics" target="Economics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers an undergraduate program in Economics.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905106</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty of Economics" target="Management">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers an undergraduate program in Management.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905106</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty of Economics" target="Sociology">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers an undergraduate program in Sociology.</data>
+      <data key="d9">academic program</data>
+      <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905107</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty of Economics" target="Jurisprudence">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers an undergraduate program in Jurisprudence.</data>
+      <data key="d9">academic program</data>
+      <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905108</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty of Economics" target="Business Informatics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers an undergraduate program in Business Informatics.</data>
+      <data key="d9">academic program</data>
+      <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905108</data>
       <data key="d13" />
     </edge>
     <edge source="MMF" target="PMI">
@@ -2281,6 +2497,114 @@
       <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
       <data key="d11">https://education.nsu.ru/promo/geology</data>
       <data key="d12">1773902657</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Economics and Finance" target="EF">
+      <data key="d7">1.0</data>
+      <data key="d8">EF offers a comprehensive set of courses in economics and finance.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905102</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Mathematics" target="EF">
+      <data key="d7">1.0</data>
+      <data key="d8">EF provides a strong mathematical foundation through its core disciplines.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905102</data>
+      <data key="d13" />
+    </edge>
+    <edge source="IT and Data Analysis" target="EF">
+      <data key="d7">1.0</data>
+      <data key="d8">EF integrates programming and data analysis into its educational offerings.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905103</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Practical Disciplines" target="EF">
+      <data key="d7">1.0</data>
+      <data key="d8">EF collaborates with industry partners to offer practical, career-oriented courses.</data>
+      <data key="d9">curriculum,partnership</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905104</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Practical Disciplines" target="Bank of Russia">
+      <data key="d7">2.0</data>
+      <data key="d8">The Bank of Russia contributes to the practical discipline regarding the organization of its activities.&lt;SEP&gt;The Bank of Russia contributes to the practical curriculum by providing insights into its organizational activities.</data>
+      <data key="d9">education,educational partnership,industry expertise</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905104</data>
+      <data key="d13" />
+    </edge>
+    <edge source="EF" target="Individual Educational Trajectory">
+      <data key="d7">1.0</data>
+      <data key="d8">EF emphasizes the availability of individual educational trajectories for students.</data>
+      <data key="d9">academic policy,student support</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905104</data>
+      <data key="d13" />
+    </edge>
+    <edge source="EF" target="Career Clubs and Internships">
+      <data key="d7">1.0</data>
+      <data key="d8">EF provides students with access to career clubs and internship opportunities.</data>
+      <data key="d9">career development,student support</data>
+      <data key="d10">chunk-c9b5b9d86b0566576f7adcb53fe2aff3</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905105</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Management" target="Business Informatics">
+      <data key="d7">1.0</data>
+      <data key="d8">Management and Business Informatics both involve the study of business processes and models.</data>
+      <data key="d9">business models,process optimization</data>
+      <data key="d10">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905109</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Sociology" target="SPSS">
+      <data key="d7">1.0</data>
+      <data key="d8">Sociology students utilize SPSS for the analysis of sociological data.</data>
+      <data key="d9">data analysis,methodology</data>
+      <data key="d10">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905109</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Sociology" target="VAAL">
+      <data key="d7">1.0</data>
+      <data key="d8">Sociology students utilize VAAL for the analysis of sociological data.</data>
+      <data key="d9">data analysis,methodology</data>
+      <data key="d10">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905109</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jurisprudence" target="Economic Activity">
+      <data key="d7">1.0</data>
+      <data key="d8">The Jurisprudence program focuses on providing legal support for economic activities.</data>
+      <data key="d9">legal support,specialization</data>
+      <data key="d10">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905110</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Business Informatics" target="IT Infrastructure">
+      <data key="d7">1.0</data>
+      <data key="d8">The Business Informatics program includes the study and management of IT infrastructure.</data>
+      <data key="d9">management,technical focus</data>
+      <data key="d10">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
+      <data key="d11">https://education.nsu.ru/economics/</data>
+      <data key="d12">1773905110</data>
       <data key="d13" />
     </edge>
   </graph>

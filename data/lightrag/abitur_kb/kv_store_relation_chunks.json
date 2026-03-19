@@ -507,11 +507,11 @@
   },
   "Faculty of Economics<SEP>Novosibirsk State University": {
     "chunk_ids": [
-      "chunk-edc9c271aedbda6bad0945f4c21a258f"
+      "chunk-edc9c271aedbda6bad0945f4c21a258f",
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
     ],
-    "count": 1,
-    "create_time": 1773724489,
-    "update_time": 1773724489,
+    "count": 2,
+    "update_time": 1773905109,
     "_id": "Faculty of Economics<SEP>Novosibirsk State University"
   },
   "Faculty of Natural Sciences<SEP>Novosibirsk State University": {
@@ -1251,5 +1251,167 @@
     "create_time": 1773902659,
     "update_time": 1773902659,
     "_id": "Field Expeditions<SEP>GGF"
+  },
+  "EF<SEP>Economics and Finance": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905102,
+    "update_time": 1773905102,
+    "_id": "EF<SEP>Economics and Finance"
+  },
+  "EF<SEP>Mathematics": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905102,
+    "update_time": 1773905102,
+    "_id": "EF<SEP>Mathematics"
+  },
+  "EF<SEP>IT and Data Analysis": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905103,
+    "update_time": 1773905103,
+    "_id": "EF<SEP>IT and Data Analysis"
+  },
+  "EF<SEP>Practical Disciplines": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905104,
+    "update_time": 1773905104,
+    "_id": "EF<SEP>Practical Disciplines"
+  },
+  "Bank of Russia<SEP>Practical Disciplines": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905104,
+    "update_time": 1773905104,
+    "_id": "Bank of Russia<SEP>Practical Disciplines"
+  },
+  "EF<SEP>Individual Educational Trajectory": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905104,
+    "update_time": 1773905104,
+    "_id": "EF<SEP>Individual Educational Trajectory"
+  },
+  "Career Clubs and Internships<SEP>EF": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905105,
+    "update_time": 1773905105,
+    "_id": "Career Clubs and Internships<SEP>EF"
+  },
+  "Faculty of Economics<SEP>NSU": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905105,
+    "update_time": 1773905105,
+    "_id": "Faculty of Economics<SEP>NSU"
+  },
+  "Economics<SEP>Faculty of Economics": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905106,
+    "update_time": 1773905106,
+    "_id": "Economics<SEP>Faculty of Economics"
+  },
+  "Faculty of Economics<SEP>Management": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905106,
+    "update_time": 1773905106,
+    "_id": "Faculty of Economics<SEP>Management"
+  },
+  "Faculty of Economics<SEP>Sociology": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905107,
+    "update_time": 1773905107,
+    "_id": "Faculty of Economics<SEP>Sociology"
+  },
+  "Faculty of Economics<SEP>Jurisprudence": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905108,
+    "update_time": 1773905108,
+    "_id": "Faculty of Economics<SEP>Jurisprudence"
+  },
+  "Business Informatics<SEP>Faculty of Economics": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905108,
+    "update_time": 1773905108,
+    "_id": "Business Informatics<SEP>Faculty of Economics"
+  },
+  "SPSS<SEP>Sociology": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905109,
+    "update_time": 1773905109,
+    "_id": "SPSS<SEP>Sociology"
+  },
+  "Sociology<SEP>VAAL": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905109,
+    "update_time": 1773905109,
+    "_id": "Sociology<SEP>VAAL"
+  },
+  "Business Informatics<SEP>Management": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905109,
+    "update_time": 1773905109,
+    "_id": "Business Informatics<SEP>Management"
+  },
+  "Economic Activity<SEP>Jurisprudence": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905110,
+    "update_time": 1773905110,
+    "_id": "Economic Activity<SEP>Jurisprudence"
+  },
+  "Business Informatics<SEP>IT Infrastructure": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905110,
+    "update_time": 1773905110,
+    "_id": "Business Informatics<SEP>IT Infrastructure"
   }
 }

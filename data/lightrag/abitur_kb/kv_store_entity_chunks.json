@@ -17,10 +17,11 @@
       "chunk-7ac667fa190f012d8ed66e7ef36a4acd",
       "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
       "chunk-e90ee1508531a0d0286c1af7f4cc4792",
-      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+      "chunk-b99eada158dba358ec9c4bccd563a3d2",
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
     ],
-    "count": 6,
-    "update_time": 1773902644,
+    "count": 7,
+    "update_time": 1773905098,
     "_id": "NSU"
   },
   "SBRAS": {
@@ -246,10 +247,11 @@
       "chunk-edc9c271aedbda6bad0945f4c21a258f",
       "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
       "chunk-e90ee1508531a0d0286c1af7f4cc4792",
-      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+      "chunk-b99eada158dba358ec9c4bccd563a3d2",
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
     ],
-    "count": 6,
-    "update_time": 1773902646,
+    "count": 7,
+    "update_time": 1773905100,
     "_id": "Novosibirsk State University"
   },
   "Faculty Of Information Technologies": {
@@ -498,11 +500,11 @@
   },
   "Faculty of Economics": {
     "chunk_ids": [
-      "chunk-edc9c271aedbda6bad0945f4c21a258f"
+      "chunk-edc9c271aedbda6bad0945f4c21a258f",
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
     ],
-    "count": 1,
-    "create_time": 1773724480,
-    "update_time": 1773724480,
+    "count": 2,
+    "update_time": 1773905098,
     "_id": "Faculty of Economics"
   },
   "Faculty of Natural Sciences": {
@@ -673,11 +675,11 @@
   },
   "First-Year Students": {
     "chunk_ids": [
-      "chunk-5d96525dc0a8e5f1a4d134623a3bf446"
+      "chunk-5d96525dc0a8e5f1a4d134623a3bf446",
+      "chunk-00684bcbeac969b103e950778cd091c8"
     ],
-    "count": 1,
-    "create_time": 1773845554,
-    "update_time": 1773845554,
+    "count": 2,
+    "update_time": 1773905100,
     "_id": "First-Year Students"
   },
   "Sports": {
@@ -1031,5 +1033,171 @@
     "create_time": 1773902650,
     "update_time": 1773902650,
     "_id": "Field Expeditions"
+  },
+  "Economics and Finance": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905096,
+    "update_time": 1773905096,
+    "_id": "Economics and Finance"
+  },
+  "Mathematics": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905096,
+    "update_time": 1773905096,
+    "_id": "Mathematics"
+  },
+  "IT and Data Analysis": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905097,
+    "update_time": 1773905097,
+    "_id": "IT and Data Analysis"
+  },
+  "Practical Disciplines": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905097,
+    "update_time": 1773905097,
+    "_id": "Practical Disciplines"
+  },
+  "Bank of Russia": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905097,
+    "update_time": 1773905097,
+    "_id": "Bank of Russia"
+  },
+  "EF": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905097,
+    "update_time": 1773905097,
+    "_id": "EF"
+  },
+  "Individual Educational Trajectory": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905098,
+    "update_time": 1773905098,
+    "_id": "Individual Educational Trajectory"
+  },
+  "Career Clubs and Internships": {
+    "chunk_ids": [
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3"
+    ],
+    "count": 1,
+    "create_time": 1773905098,
+    "update_time": 1773905098,
+    "_id": "Career Clubs and Internships"
+  },
+  "Economics": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+    ],
+    "count": 1,
+    "create_time": 1773905099,
+    "update_time": 1773905099,
+    "_id": "Economics"
+  },
+  "Management": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 2,
+    "create_time": 1773905099,
+    "update_time": 1773905099,
+    "_id": "Management"
+  },
+  "Sociology": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 2,
+    "create_time": 1773905099,
+    "update_time": 1773905099,
+    "_id": "Sociology"
+  },
+  "Jurisprudence": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 2,
+    "create_time": 1773905099,
+    "update_time": 1773905099,
+    "_id": "Jurisprudence"
+  },
+  "Business Informatics": {
+    "chunk_ids": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 2,
+    "create_time": 1773905100,
+    "update_time": 1773905100,
+    "_id": "Business Informatics"
+  },
+  "Economics And Finance": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905101,
+    "update_time": 1773905101,
+    "_id": "Economics And Finance"
+  },
+  "SPSS": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905101,
+    "update_time": 1773905101,
+    "_id": "SPSS"
+  },
+  "VAAL": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905101,
+    "update_time": 1773905101,
+    "_id": "VAAL"
+  },
+  "Economic Activity": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905110,
+    "update_time": 1773905110,
+    "_id": "Economic Activity"
+  },
+  "IT Infrastructure": {
+    "chunk_ids": [
+      "chunk-cffa7dbe269afe324323fa0cb84ef340"
+    ],
+    "count": 1,
+    "create_time": 1773905110,
+    "update_time": 1773905110,
+    "_id": "IT Infrastructure"
   }
 }

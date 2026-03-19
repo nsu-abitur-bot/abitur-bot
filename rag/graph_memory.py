@@ -3,7 +3,6 @@ import logging
 import os
 import time
 from typing import Any, Dict, List, Literal, Optional
-from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from lightrag import LightRAG, QueryParam
@@ -85,24 +84,25 @@ class GraphMemory:
         latest_mtime: float = 0.0
         file_count: int = 0
 
-        # Учитываем время изменения и количество всех файлов в директории графа,
-        # чтобы любые изменения workspace (graphml/kv_store_*.json и др.)
-        # корректно инвалидировали кэш, включая удаление файлов.
-
+        # Используем более лёгкую метрику, чтобы не блокировать event loop:
+        # - mtime директории workspace
+        # - поверхностный обход содержимого через os.scandir без рекурсии
         try:
-            for root, _dirs, files in os.walk(workspace_path):
-                file_count += len(files)
-                for name in files:
-                    file_path = os.path.join(root, name)
+            latest_mtime = os.path.getmtime(workspace_path)
+            with os.scandir(workspace_path) as it:
+                for entry in it:
+                    if not entry.is_file() and not entry.is_dir():
+                        continue
+                    file_count += 1
                     try:
-                        mtime = os.path.getmtime(file_path)
+                        mtime = entry.stat().st_mtime
                         if mtime > latest_mtime:
                             latest_mtime = mtime
                     except OSError:
-                        # Игнорируем проблемы с отдельными файлами
+                        # Игнорируем проблемы с отдельными файлами/записями
                         continue
         except OSError:
-            # Если директория недоступна, считаем, что данных нет
+            # Если не удаётся просканировать директорию, используем только её mtime
             pass
         return latest_mtime, file_count
 
@@ -129,7 +129,7 @@ class GraphMemory:
                 if graph_id in self._graphs:
                     logger.info(
                         f"Обнаружено обновление файлов графа {graph_id}."
-                        + "Перезагрузка..."
+                        + " Перезагрузка..."
                     )
 
                     # Финализируем и удаляем старый экземпляр перед перезагрузкой
@@ -139,7 +139,7 @@ class GraphMemory:
                             await old_rag.finalize_storages()
                         except Exception as finalize_err:
                             logger.warning(
-                                "Ошибка при финализации предыдущего"
+                                "Ошибка при финализации предыдущего "
                                 + "экземпляра LightRAG "
                                 f"для графа {graph_id}: {finalize_err}"
                             )
@@ -148,93 +148,100 @@ class GraphMemory:
 
             workspace_path = self._get_workspace_path(graph_id)
 
-        try:
-            graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gigachat").lower()
+            try:
+                graph_llm_provider = os.getenv(
+                    "LIGHTRAG_LLM_PROVIDER", "gigachat"
+                ).lower()
 
-            if graph_llm_provider == "openai":
-                openai_api_key = os.getenv("OPENAI_API_KEY", "")
-                if not openai_api_key:
-                    raise RuntimeError(
-                        "LIGHTRAG_LLM_PROVIDER=openai, но OPENAI_API_KEY не установлен."
+                if graph_llm_provider == "openai":
+                    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+                    if not openai_api_key:
+                        raise RuntimeError(
+                            "LIGHTRAG_LLM_PROVIDER=openai,"
+                            + " но OPENAI_API_KEY не установлен."
+                        )
+                    llm_adapter: Any = OpenAILLM(
+                        api_key=openai_api_key,
+                        model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
                     )
-                llm_adapter: Any = OpenAILLM(
-                    api_key=openai_api_key,
-                    model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
-                )
-                embedding_adapter: Any = OpenAIEmbedding(
-                    api_key=openai_api_key,
-                    model=os.getenv(
-                        "OPENAI_GRAPH_EMBEDDING_MODEL",
-                        "text-embedding-3-small",
-                    ),
-                )
-            elif graph_llm_provider == "gemini":
-                gemini_api_key = os.getenv("GEMINI_API_KEY", "")
-                if not gemini_api_key:
-                    raise RuntimeError(
-                        "LIGHTRAG_LLM_PROVIDER=gemini, но GEMINI_API_KEY не установлен."
+                    embedding_adapter: Any = OpenAIEmbedding(
+                        api_key=openai_api_key,
+                        model=os.getenv(
+                            "OPENAI_GRAPH_EMBEDDING_MODEL",
+                            "text-embedding-3-small",
+                        ),
                     )
-                llm_adapter: Any = GeminiLLM(
-                    api_key=gemini_api_key,
-                    model=os.getenv(
-                        "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
-                    ),
+                elif graph_llm_provider == "gemini":
+                    gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+                    if not gemini_api_key:
+                        raise RuntimeError(
+                            "LIGHTRAG_LLM_PROVIDER=gemini,"
+                            + " но GEMINI_API_KEY не установлен."
+                        )
+                    llm_adapter: Any = GeminiLLM(
+                        api_key=gemini_api_key,
+                        model=os.getenv(
+                            "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
+                        ),
+                    )
+                    embedding_adapter: Any = GeminiEmbedding(
+                        api_key=gemini_api_key,
+                        model=os.getenv(
+                            "GEMINI_GRAPH_EMBEDDING_MODEL",
+                            "gemini-embedding-2-preview",
+                        ),
+                    )
+                else:
+                    llm_adapter = GigaChatLLM(
+                        credentials=self.credentials,
+                        scope=self.scope,
+                        model=self.model_name,
+                    )
+                    embedding_adapter = GigaChatEmbedding(
+                        credentials=self.credentials,
+                        scope=self.scope,
+                        model=self.embedding_model_name,
+                    )
+
+                @wrap_embedding_func_with_attrs(
+                    embedding_dim=embedding_adapter.embedding_dim
                 )
-                embedding_adapter: Any = GeminiEmbedding(
-                    api_key=gemini_api_key,
-                    model=os.getenv(
-                        "GEMINI_GRAPH_EMBEDDING_MODEL",
-                        "gemini-embedding-2-preview",
-                    ),
+                async def embedding_func(texts: List[str]) -> List[List[float]]:
+                    return await embedding_adapter(texts)
+
+                async def llm_model_func(prompt: str, **kwargs) -> str:
+                    return await llm_adapter(prompt, **kwargs)
+
+                embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
+                llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
+
+                rag = LightRAG(
+                    working_dir=workspace_path,
+                    llm_model_func=llm_model_func,
+                    embedding_func=embedding_func,
+                    chunk_token_size=400,
+                    chunk_overlap_token_size=50,
+                    embedding_func_max_async=embedding_workers,
+                    llm_model_max_async=llm_workers,
                 )
-            else:
-                llm_adapter = GigaChatLLM(
-                    credentials=self.credentials,
-                    scope=self.scope,
-                    model=self.model_name,
+
+                await rag.initialize_storages()
+                await initialize_pipeline_status()
+
+                self._graphs[graph_id] = rag
+                # Обновляем сигнатуру после инициализации,
+                # чтобы не триггерить перезагрузку
+                self._graph_signatures[graph_id] = self._get_workspace_signature(
+                    graph_id
                 )
-                embedding_adapter = GigaChatEmbedding(
-                    credentials=self.credentials,
-                    scope=self.scope,
-                    model=self.embedding_model_name,
-                )
+                self._last_disk_check[graph_id] = time.time()
+                logger.info(f"Created async LightRAG instance for graph: {graph_id}")
 
-            @wrap_embedding_func_with_attrs(
-                embedding_dim=embedding_adapter.embedding_dim
-            )
-            async def embedding_func(texts: List[str]) -> List[List[float]]:
-                return await embedding_adapter(texts)
+            except Exception as e:
+                logger.error(f"Error creating LightRAG instance for {graph_id}: {e}")
+                raise
 
-            async def llm_model_func(prompt: str, **kwargs) -> str:
-                return await llm_adapter(prompt, **kwargs)
-
-            embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
-            llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
-
-            rag = LightRAG(
-                working_dir=workspace_path,
-                llm_model_func=llm_model_func,
-                embedding_func=embedding_func,
-                chunk_token_size=400,
-                chunk_overlap_token_size=50,
-                embedding_func_max_async=embedding_workers,
-                llm_model_max_async=llm_workers,
-            )
-
-            await rag.initialize_storages()
-            await initialize_pipeline_status()
-
-            self._graphs[graph_id] = rag
-            # Обновляем сигнатуру после инициализации, чтобы не триггерить перезагрузку
-            self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
-            self._last_disk_check[graph_id] = time.time()
-            logger.info(f"Created async LightRAG instance for graph: {graph_id}")
-
-        except Exception as e:
-            logger.error(f"Error creating LightRAG instance for {graph_id}: {e}")
-            raise
-
-        return rag
+            return rag
 
     async def save(
         self,
@@ -286,14 +293,15 @@ class GraphMemory:
             result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
             answer = result.get("llm_response", {}).get("content", "") or ""
             references = result.get("data", {}).get("references", [])
-            sources_set = set()
+            sources_set: set[str] = set()
             for ref in references:
-                for url in (ref.get("file_path", "") or "").split(","):
-                    url = url.strip()
-                    if url:
-                        parsed = urlparse(url)
-                        if parsed.scheme in ("http", "https"):
-                            sources_set.add(url)
+                file_paths_value = ref.get("file_path", "") or ""
+                for source in file_paths_value.split(","):
+                    source = source.strip()
+                    if source:
+                        # Добавляем все непустые идентификаторы источников
+                        # (как URL, так и локальные имена файлов).
+                        sources_set.add(source)
             return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
