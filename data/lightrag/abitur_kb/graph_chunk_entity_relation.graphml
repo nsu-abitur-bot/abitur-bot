@@ -29,10 +29,10 @@
       <data key="d1">organization</data>
       <data key="d2">Novosibirsk State University (NSU) is a prominent higher education institution dedicated to providing comprehensive academic programs and infrastructure for its student body. As a center for learning and research, the university serves as the primary environment for the employment of diverse teaching staff and the facilitation of scholarly development.
 
-The university is organized into several specialized academic divisions, including the Faculty of Information Technology (FIT), which focuses on computing and digital sciences. Additionally, Novosibirsk State University hosts the Faculty of Economics and the Faculty of Natural Sciences, reflecting its broad commitment to both social and empirical disciplines. Through these various faculties, the institution maintains a robust academic framework designed to support students across a wide range of fields.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Institute of Intelligent Robotics.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-8b0c6015b6de3a66da4ef7370457193b&lt;SEP&gt;chunk-005abd6ba3006ed416989746ff36c3ca</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/&lt;SEP&gt;https://education.nsu.ru/promo/naturalsciences/&lt;SEP&gt;https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai</data>
-      <data key="d5">1773925872</data>
+The university is organized into several specialized academic divisions, including the Faculty of Information Technology (FIT), which focuses on computing and digital sciences. Additionally, Novosibirsk State University hosts the Faculty of Economics and the Faculty of Natural Sciences, reflecting its broad commitment to both social and empirical disciplines. Through these various faculties, the institution maintains a robust academic framework designed to support students across a wide range of fields.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Institute of Intelligent Robotics.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that hosts the Institute of Medicine and Medical Technology.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-8b0c6015b6de3a66da4ef7370457193b&lt;SEP&gt;chunk-005abd6ba3006ed416989746ff36c3ca&lt;SEP&gt;chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/&lt;SEP&gt;https://education.nsu.ru/promo/naturalsciences/&lt;SEP&gt;https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai&lt;SEP&gt;https://education.nsu.ru/psychology</data>
+      <data key="d5">1773930578</data>
       <data key="d6" />
     </node>
     <node id="SBRAS">
@@ -200,10 +200,10 @@ The university is organized into several specialized academic divisions, includi
     <node id="Scholarship Programs">
       <data key="d0">Scholarship Programs</data>
       <data key="d1">concept</data>
-      <data key="d2">Financial support programs available to first-year students at FIT.&lt;SEP&gt;Scholarship programs are financial aid opportunities available to first-year students at GGF.</data>
-      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-aef0f32e4f1eacec24ba604f99cead31</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/promo/geology</data>
-      <data key="d5">1773902649</data>
+      <data key="d2">Financial support programs available to first-year students at FIT.&lt;SEP&gt;Scholarship programs are financial aid opportunities available to first-year students at GGF.&lt;SEP&gt;Scholarship programs are financial aid opportunities available to first-year students at the university.</data>
+      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-aef0f32e4f1eacec24ba604f99cead31&lt;SEP&gt;chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/psychology</data>
+      <data key="d5">1773930579</data>
       <data key="d6" />
     </node>
     <node id="FIT NSU">
@@ -1380,6 +1380,42 @@ Novosibirsk State University offers a variety of bachelor's degree programs desi
       <data key="d5">1773925876</data>
       <data key="d6" />
     </node>
+    <node id="IMMT">
+      <data key="d0">IMMT</data>
+      <data key="d1">organization</data>
+      <data key="d2">IMMT is the Institute of Medicine and Medical Technology, a department within NSU that offers academic programs.</data>
+      <data key="d3">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d4">https://education.nsu.ru/psychology</data>
+      <data key="d5">1773930578</data>
+      <data key="d6" />
+    </node>
+    <node id="Psychology Program">
+      <data key="d0">Psychology Program</data>
+      <data key="d1">content</data>
+      <data key="d2">The Psychology program is a bachelor's degree curriculum offered by IMMT, focusing on the study of the human mind, consciousness, and behavior.</data>
+      <data key="d3">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d4">https://education.nsu.ru/psychology</data>
+      <data key="d5">1773930578</data>
+      <data key="d6" />
+    </node>
+    <node id="NSU Campus">
+      <data key="d0">NSU Campus</data>
+      <data key="d1">location</data>
+      <data key="d2">The NSU Campus provides facilities for students, including dormitories, sports activities, and general student life.</data>
+      <data key="d3">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d4">https://education.nsu.ru/psychology</data>
+      <data key="d5">1773930578</data>
+      <data key="d6" />
+    </node>
+    <node id="Entrance Exams">
+      <data key="d0">Entrance Exams</data>
+      <data key="d1">data</data>
+      <data key="d2">The entrance exams for the Psychology program include Biology, Social Studies, and Russian Language.</data>
+      <data key="d3">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d4">https://education.nsu.ru/psychology</data>
+      <data key="d5">1773930579</data>
+      <data key="d6" />
+    </node>
     <edge source="FIT" target="NSU">
       <data key="d7">2.0</data>
       <data key="d8">FIT is a faculty belonging to the Novosibirsk State University.&lt;SEP&gt;FIT is a faculty within NSU where teaching is conducted by university staff and industry experts.</data>
@@ -1614,6 +1650,24 @@ Novosibirsk State University offers a variety of bachelor's degree programs desi
       <data key="d12">1773925876</data>
       <data key="d13" />
     </edge>
+    <edge source="NSU" target="IMMT">
+      <data key="d7">1.0</data>
+      <data key="d8">IMMT is an institute operating under the structure of NSU.</data>
+      <data key="d9">Affiliation</data>
+      <data key="d10">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d11">https://education.nsu.ru/psychology</data>
+      <data key="d12">1773930579</data>
+      <data key="d13" />
+    </edge>
+    <edge source="NSU" target="NSU Campus">
+      <data key="d7">1.0</data>
+      <data key="d8">The NSU Campus is the physical location associated with NSU and its student life.</data>
+      <data key="d9">Facility Location</data>
+      <data key="d10">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d11">https://education.nsu.ru/psychology</data>
+      <data key="d12">1773930582</data>
+      <data key="d13" />
+    </edge>
     <edge source="SO RAN" target="MMF">
       <data key="d7">1.0</data>
       <data key="d8">MMF students conduct internships at SO RAN institutes.</data>
@@ -1801,6 +1855,15 @@ Novosibirsk State University offers a variety of bachelor's degree programs desi
       <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
       <data key="d11">https://education.nsu.ru/promo/geology</data>
       <data key="d12">1773902657</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Scholarship Programs" target="Psychology Program">
+      <data key="d7">1.0</data>
+      <data key="d8">Scholarship programs are available to students participating in the Psychology program.</data>
+      <data key="d9">financial support,student benefits</data>
+      <data key="d10">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d11">https://education.nsu.ru/psychology</data>
+      <data key="d12">1773930581</data>
       <data key="d13" />
     </edge>
     <edge source="IVT" target="PIiKN">
@@ -2998,6 +3061,33 @@ Novosibirsk State University offers a variety of bachelor's degree programs desi
       <data key="d10">chunk-b4ac97f7a1aa8630ad9621f1e2be89bf</data>
       <data key="d11">https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai</data>
       <data key="d12">1773925882</data>
+      <data key="d13" />
+    </edge>
+    <edge source="IMMT" target="Psychology Program">
+      <data key="d7">1.0</data>
+      <data key="d8">The Psychology program is an academic bachelor's degree offered by IMMT.</data>
+      <data key="d9">academic offering,curriculum</data>
+      <data key="d10">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d11">https://education.nsu.ru/psychology</data>
+      <data key="d12">1773930580</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Psychology Program" target="NSU Campus">
+      <data key="d7">1.0</data>
+      <data key="d8">Students enrolled in the Psychology program have access to the facilities and student life of the NSU Campus.</data>
+      <data key="d9">infrastructure,student life</data>
+      <data key="d10">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d11">https://education.nsu.ru/psychology</data>
+      <data key="d12">1773930581</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Psychology Program" target="Entrance Exams">
+      <data key="d7">1.0</data>
+      <data key="d8">Students must pass Biology, Social Studies, and Russian Language exams to enroll in the Psychology program.</data>
+      <data key="d9">Admission Requirement</data>
+      <data key="d10">chunk-d23061a4545b6cb88f8c1cde2ebd4452</data>
+      <data key="d11">https://education.nsu.ru/psychology</data>
+      <data key="d12">1773930582</data>
       <data key="d13" />
     </edge>
   </graph>

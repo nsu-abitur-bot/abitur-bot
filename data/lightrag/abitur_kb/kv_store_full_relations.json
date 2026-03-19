@@ -802,5 +802,37 @@
     "create_time": 1773925883,
     "update_time": 1773925883,
     "_id": "https://education.nsu.ru/mechatronics"
+  },
+  "https://education.nsu.ru/psychology": {
+    "relation_pairs": [
+      [
+        "Psychology Program",
+        "Scholarship Programs"
+      ],
+      [
+        "IMMT",
+        "Psychology Program"
+      ],
+      [
+        "Entrance Exams",
+        "Psychology Program"
+      ],
+      [
+        "IMMT",
+        "NSU"
+      ],
+      [
+        "NSU Campus",
+        "Psychology Program"
+      ],
+      [
+        "NSU",
+        "NSU Campus"
+      ]
+    ],
+    "count": 6,
+    "create_time": 1773930582,
+    "update_time": 1773930582,
+    "_id": "https://education.nsu.ru/psychology"
   }
 }

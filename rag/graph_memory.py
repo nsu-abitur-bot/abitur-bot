@@ -127,11 +127,12 @@ class GraphMemory:
         return latest_mtime, file_count
 
     async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
+        rag_to_finalize = None
+
         async with self._get_lock(graph_id):
             now = time.monotonic()
             check_disk = False
 
-            # Решаем, нужно ли проверять диск
             if graph_id not in self._graphs:
                 check_disk = True
             elif now - self._last_disk_check.get(graph_id, 0.0) > self._check_interval:
@@ -144,7 +145,9 @@ class GraphMemory:
 
                 # Если граф уже загружен и файлы на диске не изменились — возвращаем кэш
                 if graph_id in self._graphs and sig == current_sig:
-                    return self._graphs[graph_id]
+                    wrapper = self._graphs[graph_id]
+                    wrapper.usage_count += 1
+                    return wrapper
 
                 if graph_id in self._graphs:
                     logger.info(
@@ -152,29 +155,22 @@ class GraphMemory:
                         + " Перезагрузка..."
                     )
 
-                    # Финализируем старый экземпляр, если он никем не используется.
-                    # В противном случае помечаем его для финализации
-                    # после завершения всех запросов.
                     old_wrapper = self._graphs.pop(graph_id, None)
                     if old_wrapper is not None:
                         old_wrapper.marked_for_deletion = True
                         if old_wrapper.usage_count <= 0:
-                            try:
-                                await old_wrapper.rag.finalize_storages()
-                            except Exception as finalize_err:
-                                logger.warning(
-                                    "Ошибка при финализации предыдущего "
-                                    + "экземпляра LightRAG "
-                                    f"для графа {graph_id}: {finalize_err}"
-                                )
+                            rag_to_finalize = old_wrapper.rag
                         else:
                             logger.info(
                                 f"Отложена финализация графа {graph_id}"
-                                + " (в использовании: {old_wrapper.usage_count})"
+                                + f" (в использовании: {old_wrapper.usage_count})"
                             )
             elif graph_id in self._graphs:
-                return self._graphs[graph_id]
+                wrapper = self._graphs[graph_id]
+                wrapper.usage_count += 1
+                return wrapper
 
+            # Если мы тут, значит графа нет в словаре. Создаем.
             workspace_path = self._get_workspace_path(graph_id)
 
             try:
@@ -265,27 +261,50 @@ class GraphMemory:
                 self._graph_signatures[graph_id] = self._get_workspace_signature(
                     graph_id
                 )
-                self._last_disk_check[graph_id] = time.time()
+                self._last_disk_check[graph_id] = time.monotonic()
                 logger.info(f"Created async LightRAG instance for graph: {graph_id}")
+
+                # Инкрементируем использование сразу
+                wrapper.usage_count += 1
 
             except Exception as e:
                 logger.error(f"Error creating LightRAG instance for {graph_id}: {e}")
                 raise
 
-            return wrapper
+        # Вне лока финализируем старый граф, если он был удален и счетчик 0
+        if rag_to_finalize is not None:
+            try:
+                await rag_to_finalize.finalize_storages()
+            except Exception as finalize_err:
+                logger.warning(
+                    "Ошибка при финализации предыдущего " + "экземпляра LightRAG "
+                    f"для графа {graph_id}: {finalize_err}"
+                )
+
+        return wrapper
 
     @asynccontextmanager
     async def _use_graph(self, graph_id: str):
-        """Безопасно инкрементирует счетчик использования графа на время запроса."""
+        """Безопасно использует граф и декрементирует счетчик после
+        завершения запроса."""
+        # _get_or_create_graph теперь САМ инкрементирует usage_count под локом
+        # перед тем как вернуть.
+        # Это исключает race condition между получением и инкрементом.
         wrapper = await self._get_or_create_graph(graph_id)
-        wrapper.usage_count += 1
+
         try:
             yield wrapper.rag
         finally:
-            wrapper.usage_count -= 1
-            if wrapper.marked_for_deletion and wrapper.usage_count <= 0:
+            rag_to_finalize = None
+
+            # Декремент и решение о финализации также выполняем под тем же локом
+            async with self._get_lock(graph_id):
+                wrapper.usage_count -= 1
+                if wrapper.marked_for_deletion and wrapper.usage_count <= 0:
+                    rag_to_finalize = wrapper.rag
+            if rag_to_finalize is not None:
                 try:
-                    await wrapper.rag.finalize_storages()
+                    await rag_to_finalize.finalize_storages()
                     logger.info(f"Отложенная финализация графа завершена: {graph_id}")
                 except Exception as e:
                     logger.warning(f"Ошибка при отложенной финализации: {e}")
@@ -309,7 +328,7 @@ class GraphMemory:
                 self._graph_signatures[graph_id] = self._get_workspace_signature(
                     graph_id
                 )
-                self._last_disk_check[graph_id] = time.time()
+                self._last_disk_check[graph_id] = time.monotonic()
             return True
         except Exception as e:
             logger.error(f"Error inserting text into graph {graph_id}: {e}")
@@ -362,13 +381,43 @@ class GraphMemory:
             graph_id: ID конкретного графа или None для очистки всех графов.
         """
         try:
-            if graph_id and graph_id in self._graphs:
-                await self._graphs[graph_id].rag.finalize_storages()
-                logger.info(f"Хранилище финализировано для графа: {graph_id}")
-            elif not graph_id:
-                for wrapper in self._graphs.values():
+            if graph_id:
+                async with self._get_lock(graph_id):
+                    wrapper = self._graphs.pop(graph_id, None)
+                    if wrapper is not None:
+                        wrapper.marked_for_deletion = True
+                        if wrapper.usage_count > 0:
+                            logger.info(
+                                f"Отложена финализация графа {graph_id} при cleanup"
+                                + f" (в использовании: {wrapper.usage_count})"
+                            )
+                            wrapper = None
+
+                if wrapper is not None:
                     await wrapper.rag.finalize_storages()
-                    logger.info("Хранилище финализировано для графа (all cleanup)")
+                    logger.info(
+                        f"Хранилище финализировано и выгружено для графа: {graph_id}"
+                    )
+            else:
+                # Если graph_id не указан, очищаем все графы в словаре.
+                keys_to_clean = list(self._graphs.keys())
+                for gid in keys_to_clean:
+                    async with self._get_lock(gid):
+                        wrapper = self._graphs.pop(gid, None)
+                        if wrapper is not None:
+                            wrapper.marked_for_deletion = True
+                            if wrapper.usage_count > 0:
+                                logger.info(
+                                    f"Отложена финализация графа {gid} при cleanup"
+                                    + f" (в использовании: {wrapper.usage_count})"
+                                )
+                                wrapper = None
+                    if wrapper is not None:
+                        await wrapper.rag.finalize_storages()
+                        logger.info(
+                            "Хранилище финализировано и"
+                            + f" выгружено для графа: {gid}"
+                        )
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
 
