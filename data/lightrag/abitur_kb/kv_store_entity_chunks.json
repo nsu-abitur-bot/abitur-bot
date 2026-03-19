@@ -16,10 +16,11 @@
       "chunk-9a82318078705ea1aaa12f147aec8f4f",
       "chunk-7ac667fa190f012d8ed66e7ef36a4acd",
       "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
-      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792",
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
     ],
-    "count": 5,
-    "update_time": 1773896525,
+    "count": 6,
+    "update_time": 1773902644,
     "_id": "NSU"
   },
   "SBRAS": {
@@ -186,11 +187,11 @@
   },
   "Scholarship Programs": {
     "chunk_ids": [
-      "chunk-730e570516ec9e7b29e2a113360804e7"
+      "chunk-730e570516ec9e7b29e2a113360804e7",
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
     ],
-    "count": 1,
-    "create_time": 1773577727,
-    "update_time": 1773577727,
+    "count": 2,
+    "update_time": 1773902649,
     "_id": "Scholarship Programs"
   },
   "FIT NSU": {
@@ -244,10 +245,11 @@
       "chunk-3e0187d85fefff382fc2d89e5a6a1039",
       "chunk-edc9c271aedbda6bad0945f4c21a258f",
       "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
-      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792",
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
     ],
-    "count": 5,
-    "update_time": 1773896526,
+    "count": 6,
+    "update_time": 1773902646,
     "_id": "Novosibirsk State University"
   },
   "Faculty Of Information Technologies": {
@@ -848,5 +850,186 @@
     "create_time": 1773896527,
     "update_time": 1773896527,
     "_id": "Itia"
+  },
+  "GGF": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2",
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 2,
+    "create_time": 1773902644,
+    "update_time": 1773902644,
+    "_id": "GGF"
+  },
+  "Geology Program": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902644,
+    "update_time": 1773902644,
+    "_id": "Geology Program"
+  },
+  "Geophysics": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902644,
+    "update_time": 1773902644,
+    "_id": "Geophysics"
+  },
+  "Geochemistry": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902645,
+    "update_time": 1773902645,
+    "_id": "Geochemistry"
+  },
+  "Geology Specialization": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902645,
+    "update_time": 1773902645,
+    "_id": "Geology Specialization"
+  },
+  "Oil And Gas": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902646,
+    "update_time": 1773902646,
+    "_id": "Oil And Gas"
+  },
+  "Geophysics In Oil And Mining": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902646,
+    "update_time": 1773902646,
+    "_id": "Geophysics In Oil And Mining"
+  },
+  "Faculty of Geology and Geophysics": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902646,
+    "update_time": 1773902646,
+    "_id": "Faculty of Geology and Geophysics"
+  },
+  "Geology": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902646,
+    "update_time": 1773902646,
+    "_id": "Geology"
+  },
+  "Oil and Gas": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902647,
+    "update_time": 1773902647,
+    "_id": "Oil and Gas"
+  },
+  "Geophysics in Oilfield and Mining": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902647,
+    "update_time": 1773902647,
+    "_id": "Geophysics in Oilfield and Mining"
+  },
+  "Earth": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902647,
+    "update_time": 1773902647,
+    "_id": "Earth"
+  },
+  "Mineral Resources": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902647,
+    "update_time": 1773902647,
+    "_id": "Mineral Resources"
+  },
+  "Geological Processes": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902648,
+    "update_time": 1773902648,
+    "_id": "Geological Processes"
+  },
+  "Geological Exploration": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902648,
+    "update_time": 1773902648,
+    "_id": "Geological Exploration"
+  },
+  "Oil And Gas Industry": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902648,
+    "update_time": 1773902648,
+    "_id": "Oil And Gas Industry"
+  },
+  "Field Practices And Expeditions": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902649,
+    "update_time": 1773902649,
+    "_id": "Field Practices And Expeditions"
+  },
+  "Scientific Conferences": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902649,
+    "update_time": 1773902649,
+    "_id": "Scientific Conferences"
+  },
+  "Exchange Programs": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902649,
+    "update_time": 1773902649,
+    "_id": "Exchange Programs"
+  },
+  "Field Expeditions": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902650,
+    "update_time": 1773902650,
+    "_id": "Field Expeditions"
   }
 }

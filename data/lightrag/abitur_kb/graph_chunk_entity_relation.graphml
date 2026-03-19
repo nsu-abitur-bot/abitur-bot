@@ -27,10 +27,10 @@
     <node id="NSU">
       <data key="d0">NSU</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
-      <data key="d5">1773896525</data>
+      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902644</data>
       <data key="d6" />
     </node>
     <node id="SBRAS">
@@ -198,10 +198,10 @@
     <node id="Scholarship Programs">
       <data key="d0">Scholarship Programs</data>
       <data key="d1">concept</data>
-      <data key="d2">Financial support programs available to first-year students at FIT.</data>
-      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577727</data>
+      <data key="d2">Financial support programs available to first-year students at FIT.&lt;SEP&gt;Scholarship programs are financial aid opportunities available to first-year students at GGF.</data>
+      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902649</data>
       <data key="d6" />
     </node>
     <node id="FIT NSU">
@@ -252,10 +252,10 @@
     <node id="Novosibirsk State University">
       <data key="d0">Novosibirsk State University</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.&lt;SEP&gt;Novosibirsk State University is a higher education institution that hosts the Physics Department.</data>
-      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
-      <data key="d5">1773896526</data>
+      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.&lt;SEP&gt;Novosibirsk State University is a higher education institution that hosts the Physics Department.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Faculty of Geology and Geophysics.</data>
+      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902646</data>
       <data key="d6" />
     </node>
     <node id="Faculty Of Information Technologies">
@@ -852,6 +852,186 @@
       <data key="d5">1773896527</data>
       <data key="d6" />
     </node>
+    <node id="GGF">
+      <data key="d0">GGF</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Geology and Geophysics is a department within NSU that provides education in geological sciences.&lt;SEP&gt;The faculty (Geological-Geophysical Faculty) that provides education in geology, geochemistry, and resource management.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902644</data>
+      <data key="d6" />
+    </node>
+    <node id="Geology Program">
+      <data key="d0">Geology Program</data>
+      <data key="d1">concept</data>
+      <data key="d2">A unified undergraduate academic program at GGF NSU that allows students to choose a specialization after the first year.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902644</data>
+      <data key="d6" />
+    </node>
+    <node id="Geophysics">
+      <data key="d0">Geophysics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Geophysics is a specialization within the geology program focusing on the physical aspects of geological processes and Earth physics.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902644</data>
+      <data key="d6" />
+    </node>
+    <node id="Geochemistry">
+      <data key="d0">Geochemistry</data>
+      <data key="d1">concept</data>
+      <data key="d2">Geochemistry is a specialization offered by the Faculty of Geology and Geophysics.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902645</data>
+      <data key="d6" />
+    </node>
+    <node id="Geology Specialization">
+      <data key="d0">Geology Specialization</data>
+      <data key="d1">concept</data>
+      <data key="d2">A specialization focused on the study of the Earth's structure and geological processes.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902645</data>
+      <data key="d6" />
+    </node>
+    <node id="Oil And Gas">
+      <data key="d0">Oil And Gas</data>
+      <data key="d1">concept</data>
+      <data key="d2">A specialization focused on the study and management of hydrocarbon resources.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902646</data>
+      <data key="d6" />
+    </node>
+    <node id="Geophysics In Oil And Mining">
+      <data key="d0">Geophysics In Oil And Mining</data>
+      <data key="d1">concept</data>
+      <data key="d2">A specialization focused on applying geophysical methods to oil production and mining industries.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902646</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty of Geology and Geophysics">
+      <data key="d0">Faculty of Geology and Geophysics</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Geology and Geophysics is a department within Novosibirsk State University offering undergraduate programs in geology.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902646</data>
+      <data key="d6" />
+    </node>
+    <node id="Geology">
+      <data key="d0">Geology</data>
+      <data key="d1">concept</data>
+      <data key="d2">Geology is the academic program and field of study offered by the Faculty of Geology and Geophysics.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902646</data>
+      <data key="d6" />
+    </node>
+    <node id="Oil and Gas">
+      <data key="d0">Oil and Gas</data>
+      <data key="d1">concept</data>
+      <data key="d2">Oil and Gas is a specialization offered by the Faculty of Geology and Geophysics focusing on natural resources.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902647</data>
+      <data key="d6" />
+    </node>
+    <node id="Geophysics in Oilfield and Mining">
+      <data key="d0">Geophysics in Oilfield and Mining</data>
+      <data key="d1">concept</data>
+      <data key="d2">Geophysics in Oilfield and Mining is a specialized field of study within the geology program.</data>
+      <data key="d3">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902647</data>
+      <data key="d6" />
+    </node>
+    <node id="Earth">
+      <data key="d0">Earth</data>
+      <data key="d1">naturalobject</data>
+      <data key="d2">Earth is the subject of study regarding its structure and geological processes.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902647</data>
+      <data key="d6" />
+    </node>
+    <node id="Mineral Resources">
+      <data key="d0">Mineral Resources</data>
+      <data key="d1">naturalobject</data>
+      <data key="d2">Mineral resources are natural materials studied as part of the geological curriculum.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902647</data>
+      <data key="d6" />
+    </node>
+    <node id="Geological Processes">
+      <data key="d0">Geological Processes</data>
+      <data key="d1">concept</data>
+      <data key="d2">The physical and chemical mechanisms that shape the Earth's crust and interior.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902648</data>
+      <data key="d6" />
+    </node>
+    <node id="Geological Exploration">
+      <data key="d0">Geological Exploration</data>
+      <data key="d1">method</data>
+      <data key="d2">Geological exploration involves applied tasks related to finding and managing natural resources.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902648</data>
+      <data key="d6" />
+    </node>
+    <node id="Oil And Gas Industry">
+      <data key="d0">Oil And Gas Industry</data>
+      <data key="d1">organization</data>
+      <data key="d2">The oil and gas industry is a sector focused on the extraction and management of petroleum resources.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902648</data>
+      <data key="d6" />
+    </node>
+    <node id="Field Practices And Expeditions">
+      <data key="d0">Field Practices And Expeditions</data>
+      <data key="d1">event</data>
+      <data key="d2">Practical training activities conducted outside the university for students.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902649</data>
+      <data key="d6" />
+    </node>
+    <node id="Scientific Conferences">
+      <data key="d0">Scientific Conferences</data>
+      <data key="d1">event</data>
+      <data key="d2">Scientific conferences are academic gatherings where students and faculty participate.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902649</data>
+      <data key="d6" />
+    </node>
+    <node id="Exchange Programs">
+      <data key="d0">Exchange Programs</data>
+      <data key="d1">method</data>
+      <data key="d2">Educational initiatives allowing students to study at different institutions.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902649</data>
+      <data key="d6" />
+    </node>
+    <node id="Field Expeditions">
+      <data key="d0">Field Expeditions</data>
+      <data key="d1">event</data>
+      <data key="d2">Field expeditions are practical training activities conducted by the faculty.</data>
+      <data key="d3">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d4">https://education.nsu.ru/promo/geology</data>
+      <data key="d5">1773902650</data>
+      <data key="d6" />
+    </node>
     <edge source="FIT" target="NSU">
       <data key="d7">2.0</data>
       <data key="d8">FIT is a faculty belonging to the Novosibirsk State University.&lt;SEP&gt;FIT is a faculty within NSU where teaching is conducted by university staff and industry experts.</data>
@@ -1050,6 +1230,15 @@
       <data key="d12">1773896528</data>
       <data key="d13" />
     </edge>
+    <edge source="NSU" target="GGF">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF is a faculty within the Novosibirsk State University.</data>
+      <data key="d9">affiliation,department</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902650</data>
+      <data key="d13" />
+    </edge>
     <edge source="SO RAN" target="MMF">
       <data key="d7">1.0</data>
       <data key="d8">MMF students conduct internships at SO RAN institutes.</data>
@@ -1230,6 +1419,15 @@
       <data key="d12">1773896529</data>
       <data key="d13" />
     </edge>
+    <edge source="Scholarship Programs" target="GGF">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF offers scholarship programs specifically for first-year students.</data>
+      <data key="d9">financial support,student benefits</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902657</data>
+      <data key="d13" />
+    </edge>
     <edge source="IVT" target="PIiKN">
       <data key="d7">1.0</data>
       <data key="d8">PIiKN is one of the two specialization profiles available under the IVT program.</data>
@@ -1390,6 +1588,15 @@
       <data key="d10">chunk-edc9c271aedbda6bad0945f4c21a258f</data>
       <data key="d11">https://education.nsu.ru/</data>
       <data key="d12">1773724490</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Faculty of Geology and Geophysics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Geology and Geophysics is a department of Novosibirsk State University.</data>
+      <data key="d9">affiliation,department</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902653</data>
       <data key="d13" />
     </edge>
     <edge source="Faculty Of Information Technologies" target="Informatics And Computer Engineering">
@@ -1921,6 +2128,159 @@
       <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
       <data key="d11">https://education.nsu.ru/physics</data>
       <data key="d12">1773896531</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Geology Program">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF offers a unified undergraduate program in Geology.</data>
+      <data key="d9">academic offering,education</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902651</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Geological Exploration">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF provides training in the applied tasks of geological exploration.</data>
+      <data key="d9">academic curriculum,professional training</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902657</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Oil And Gas Industry">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF maintains connections with employers and companies in the oil and gas industry.</data>
+      <data key="d9">career development,industry connection</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902657</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Field Practices And Expeditions">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF organizes field practices and expeditions as part of its educational program.</data>
+      <data key="d9">curriculum,practical education</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902658</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Scientific Conferences">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF facilitates student participation in scientific conferences.</data>
+      <data key="d9">academic research,student engagement</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902658</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Exchange Programs">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF facilitates exchange programs for its students.</data>
+      <data key="d9">education,international cooperation</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902659</data>
+      <data key="d13" />
+    </edge>
+    <edge source="GGF" target="Field Expeditions">
+      <data key="d7">1.0</data>
+      <data key="d8">GGF organizes field expeditions as part of its practical training.</data>
+      <data key="d9">education,practical training</data>
+      <data key="d10">chunk-aef0f32e4f1eacec24ba604f99cead31</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902659</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology Program" target="Geophysics">
+      <data key="d7">1.0</data>
+      <data key="d8">Students in the Geology program can choose Geophysics as their specialization.</data>
+      <data key="d9">academic path,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902652</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology Program" target="Geochemistry">
+      <data key="d7">1.0</data>
+      <data key="d8">Students in the Geology program can choose Geochemistry as their specialization.</data>
+      <data key="d9">academic path,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902652</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology Program" target="Geology Specialization">
+      <data key="d7">1.0</data>
+      <data key="d8">Students in the Geology program can choose Geology as their specialization.</data>
+      <data key="d9">academic path,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902653</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology Program" target="Oil And Gas">
+      <data key="d7">1.0</data>
+      <data key="d8">Students in the Geology program can choose Oil and Gas as their specialization.</data>
+      <data key="d9">academic path,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902653</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology Program" target="Geophysics In Oil And Mining">
+      <data key="d7">1.0</data>
+      <data key="d8">Students in the Geology program can choose Geophysics in Oil and Mining as their specialization.</data>
+      <data key="d9">academic path,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902653</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geophysics" target="Geology">
+      <data key="d7">1.0</data>
+      <data key="d8">Geophysics is a specialization available within the Geology program.</data>
+      <data key="d9">academic field,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902655</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geochemistry" target="Geology">
+      <data key="d7">1.0</data>
+      <data key="d8">Geochemistry is a specialization available within the Geology program.</data>
+      <data key="d9">academic field,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902655</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty of Geology and Geophysics" target="Geology">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Geology and Geophysics offers an undergraduate program in Geology.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902654</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology" target="Oil and Gas">
+      <data key="d7">1.0</data>
+      <data key="d8">Oil and Gas is a specialization available within the Geology program.</data>
+      <data key="d9">academic field,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902656</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology" target="Geophysics in Oilfield and Mining">
+      <data key="d7">1.0</data>
+      <data key="d8">Geophysics in Oilfield and Mining is a specialization available within the Geology program.</data>
+      <data key="d9">academic field,specialization</data>
+      <data key="d10">chunk-b99eada158dba358ec9c4bccd563a3d2</data>
+      <data key="d11">https://education.nsu.ru/promo/geology</data>
+      <data key="d12">1773902657</data>
       <data key="d13" />
     </edge>
   </graph>

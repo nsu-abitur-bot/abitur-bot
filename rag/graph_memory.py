@@ -1,5 +1,7 @@
+import asyncio
 import logging
 import os
+import time
 from typing import Any, Dict, List, Literal, Optional
 from urllib.parse import urlparse
 
@@ -53,7 +55,10 @@ class GraphMemory:
         self.embedding_model_name = embedding_model_name
 
         self._graphs: Dict[str, LightRAG] = {}
-        self._graph_last_mtime: Dict[str, float] = {}
+        self._graph_signatures: Dict[str, tuple[float, int]] = {}
+        self._locks: Dict[str, asyncio.Lock] = {}
+        self._last_disk_check: Dict[str, float] = {}
+        self._check_interval: float = 2.0  # limit os.walk frequency
 
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
@@ -68,59 +73,80 @@ class GraphMemory:
         os.makedirs(path, exist_ok=True)
         return path
 
-    def _get_latest_mtime(self, graph_id: str) -> float:
-        """Получает время последнего изменения хранилища (документов) для графа."""
+    def _get_lock(self, graph_id: str) -> asyncio.Lock:
+        if graph_id not in self._locks:
+            self._locks[graph_id] = asyncio.Lock()
+        return self._locks[graph_id]
+
+    def _get_workspace_signature(self, graph_id: str) -> tuple[float, int]:
+        """Получает максимальное mtime и количество файлов для графа."""
         workspace_path = self._get_workspace_path(graph_id)
 
         latest_mtime: float = 0.0
+        file_count: int = 0
 
-        # Учитываем время изменения всех файлов в директории графа,
+        # Учитываем время изменения и количество всех файлов в директории графа,
         # чтобы любые изменения workspace (graphml/kv_store_*.json и др.)
-        # корректно инвалидацировали кэш.
+        # корректно инвалидировали кэш, включая удаление файлов.
 
         try:
             for root, _dirs, files in os.walk(workspace_path):
+                file_count += len(files)
                 for name in files:
                     file_path = os.path.join(root, name)
                     try:
                         mtime = os.path.getmtime(file_path)
+                        if mtime > latest_mtime:
+                            latest_mtime = mtime
                     except OSError:
-                        # Игнорируем проблемы с отдельными файлами,
-                        # продолжаем сканирование
+                        # Игнорируем проблемы с отдельными файлами
                         continue
-                    if mtime > latest_mtime:
-                        latest_mtime = mtime
         except OSError:
             # Если директория недоступна, считаем, что данных нет
-            return 0.0
-        return latest_mtime
+            pass
+        return latest_mtime, file_count
 
     async def _get_or_create_graph(self, graph_id: str) -> LightRAG:
-        latest_mtime = self._get_latest_mtime(graph_id)
-        current_mtime = self._graph_last_mtime.get(graph_id, -1.0)
+        async with self._get_lock(graph_id):
+            now = time.time()
+            check_disk = False
 
-        # Если граф уже загружен и файлы на диске не изменились — возвращаем кэш
-        if graph_id in self._graphs and latest_mtime <= current_mtime:
-            return self._graphs[graph_id]
+            # Решаем, нужно ли проверять диск
+            if graph_id not in self._graphs:
+                check_disk = True
+            elif now - self._last_disk_check.get(graph_id, 0.0) > self._check_interval:
+                check_disk = True
 
-        if graph_id in self._graphs:
-            logger.info(
-                f"Обнаружено обновление файлов графа {graph_id}. Перезагрузка..."
-            )
+            if check_disk:
+                sig = self._get_workspace_signature(graph_id)
+                self._last_disk_check[graph_id] = now
+                current_sig = self._graph_signatures.get(graph_id, (-1.0, -1))
 
-            # Финализируем и удаляем старый экземпляр перед перезагрузкой,
-            # чтобы избежать утечек ресурсов и неконсистентного состояния хранилищ.
-            old_rag = self._graphs.pop(graph_id, None)
-            if old_rag is not None:
-                try:
-                    await old_rag.finalize_storages()
-                except Exception as finalize_err:
-                    logger.warning(
-                        "Ошибка при финализации предыдущего экземпляра LightRAG "
-                        f"для графа {graph_id}: {finalize_err}"
+                # Если граф уже загружен и файлы на диске не изменились — возвращаем кэш
+                if graph_id in self._graphs and sig == current_sig:
+                    return self._graphs[graph_id]
+
+                if graph_id in self._graphs:
+                    logger.info(
+                        f"Обнаружено обновление файлов графа {graph_id}."
+                        + "Перезагрузка..."
                     )
 
-        workspace_path = self._get_workspace_path(graph_id)
+                    # Финализируем и удаляем старый экземпляр перед перезагрузкой
+                    old_rag = self._graphs.pop(graph_id, None)
+                    if old_rag is not None:
+                        try:
+                            await old_rag.finalize_storages()
+                        except Exception as finalize_err:
+                            logger.warning(
+                                "Ошибка при финализации предыдущего"
+                                + "экземпляра LightRAG "
+                                f"для графа {graph_id}: {finalize_err}"
+                            )
+            elif graph_id in self._graphs:
+                return self._graphs[graph_id]
+
+            workspace_path = self._get_workspace_path(graph_id)
 
         try:
             graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gigachat").lower()
@@ -199,8 +225,9 @@ class GraphMemory:
             await initialize_pipeline_status()
 
             self._graphs[graph_id] = rag
-            # Обновляем время загрузки, сохраняя фактическое максимальное mtime файлов
-            self._graph_last_mtime[graph_id] = latest_mtime
+            # Обновляем сигнатуру после инициализации, чтобы не триггерить перезагрузку
+            self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
+            self._last_disk_check[graph_id] = time.time()
             logger.info(f"Created async LightRAG instance for graph: {graph_id}")
 
         except Exception as e:
@@ -223,6 +250,12 @@ class GraphMemory:
                 ids=source_id,
                 file_paths=file_paths_str or source_id,
             )
+            # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
+            async with self._get_lock(graph_id):
+                self._graph_signatures[graph_id] = self._get_workspace_signature(
+                    graph_id
+                )
+                self._last_disk_check[graph_id] = time.time()
             return True
         except Exception as e:
             logger.error(f"Error inserting text into graph {graph_id}: {e}")

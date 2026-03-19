@@ -90,5 +90,23 @@
       "processing_start_time": 1773896515,
       "processing_end_time": 1773896532
     }
+  },
+  "https://education.nsu.ru/promo/geology": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2",
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ГГФ** — Геолого-геофизический факультет\n\nИсточник: https://education.nsu.ru/promo/geology\n\n# Геолого-геофизический факультет НГУ\n\n## Кратко\nГГФ НГУ ведёт набор на...",
+    "content_length": 1726,
+    "created_at": "2026-03-19T06:43:49.926340+00:00",
+    "updated_at": "2026-03-19T06:44:20.513462+00:00",
+    "file_path": "https://education.nsu.ru/promo/geology",
+    "track_id": "insert_20260319_064349_f3e9c0d9",
+    "metadata": {
+      "processing_start_time": 1773902629,
+      "processing_end_time": 1773902660
+    }
   }
 }

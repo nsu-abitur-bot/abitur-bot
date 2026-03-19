@@ -1071,5 +1071,185 @@
     "create_time": 1773896532,
     "update_time": 1773896532,
     "_id": "Itia<SEP>Student Life"
+  },
+  "GGF<SEP>NSU": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902650,
+    "update_time": 1773902650,
+    "_id": "GGF<SEP>NSU"
+  },
+  "GGF<SEP>Geology Program": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902651,
+    "update_time": 1773902651,
+    "_id": "GGF<SEP>Geology Program"
+  },
+  "Geology Program<SEP>Geophysics": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902652,
+    "update_time": 1773902652,
+    "_id": "Geology Program<SEP>Geophysics"
+  },
+  "Geochemistry<SEP>Geology Program": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902652,
+    "update_time": 1773902652,
+    "_id": "Geochemistry<SEP>Geology Program"
+  },
+  "Geology Program<SEP>Geology Specialization": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902653,
+    "update_time": 1773902653,
+    "_id": "Geology Program<SEP>Geology Specialization"
+  },
+  "Geology Program<SEP>Oil And Gas": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902653,
+    "update_time": 1773902653,
+    "_id": "Geology Program<SEP>Oil And Gas"
+  },
+  "Geology Program<SEP>Geophysics In Oil And Mining": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902653,
+    "update_time": 1773902653,
+    "_id": "Geology Program<SEP>Geophysics In Oil And Mining"
+  },
+  "Faculty of Geology and Geophysics<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902653,
+    "update_time": 1773902653,
+    "_id": "Faculty of Geology and Geophysics<SEP>Novosibirsk State University"
+  },
+  "Faculty of Geology and Geophysics<SEP>Geology": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902654,
+    "update_time": 1773902654,
+    "_id": "Faculty of Geology and Geophysics<SEP>Geology"
+  },
+  "Geology<SEP>Geophysics": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902655,
+    "update_time": 1773902655,
+    "_id": "Geology<SEP>Geophysics"
+  },
+  "Geochemistry<SEP>Geology": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902655,
+    "update_time": 1773902655,
+    "_id": "Geochemistry<SEP>Geology"
+  },
+  "Geology<SEP>Oil and Gas": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902656,
+    "update_time": 1773902656,
+    "_id": "Geology<SEP>Oil and Gas"
+  },
+  "Geology<SEP>Geophysics in Oilfield and Mining": {
+    "chunk_ids": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2"
+    ],
+    "count": 1,
+    "create_time": 1773902657,
+    "update_time": 1773902657,
+    "_id": "Geology<SEP>Geophysics in Oilfield and Mining"
+  },
+  "GGF<SEP>Geological Exploration": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902657,
+    "update_time": 1773902657,
+    "_id": "GGF<SEP>Geological Exploration"
+  },
+  "GGF<SEP>Oil And Gas Industry": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902657,
+    "update_time": 1773902657,
+    "_id": "GGF<SEP>Oil And Gas Industry"
+  },
+  "GGF<SEP>Scholarship Programs": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902657,
+    "update_time": 1773902657,
+    "_id": "GGF<SEP>Scholarship Programs"
+  },
+  "Field Practices And Expeditions<SEP>GGF": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902658,
+    "update_time": 1773902658,
+    "_id": "Field Practices And Expeditions<SEP>GGF"
+  },
+  "GGF<SEP>Scientific Conferences": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902658,
+    "update_time": 1773902658,
+    "_id": "GGF<SEP>Scientific Conferences"
+  },
+  "Exchange Programs<SEP>GGF": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902659,
+    "update_time": 1773902659,
+    "_id": "Exchange Programs<SEP>GGF"
+  },
+  "Field Expeditions<SEP>GGF": {
+    "chunk_ids": [
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "count": 1,
+    "create_time": 1773902659,
+    "update_time": 1773902659,
+    "_id": "Field Expeditions<SEP>GGF"
   }
 }

@@ -522,5 +522,93 @@
     "create_time": 1773896532,
     "update_time": 1773896532,
     "_id": "https://education.nsu.ru/physics"
+  },
+  "https://education.nsu.ru/promo/geology": {
+    "relation_pairs": [
+      [
+        "Field Practices And Expeditions",
+        "GGF"
+      ],
+      [
+        "Geochemistry",
+        "Geology"
+      ],
+      [
+        "Geology Program",
+        "Geology Specialization"
+      ],
+      [
+        "Geology",
+        "Geophysics"
+      ],
+      [
+        "Geology Program",
+        "Geophysics"
+      ],
+      [
+        "GGF",
+        "Geological Exploration"
+      ],
+      [
+        "Faculty of Geology and Geophysics",
+        "Geology"
+      ],
+      [
+        "GGF",
+        "Scientific Conferences"
+      ],
+      [
+        "Geology Program",
+        "Geophysics In Oil And Mining"
+      ],
+      [
+        "GGF",
+        "Scholarship Programs"
+      ],
+      [
+        "GGF",
+        "Oil And Gas Industry"
+      ],
+      [
+        "GGF",
+        "Geology Program"
+      ],
+      [
+        "Geology",
+        "Oil and Gas"
+      ],
+      [
+        "Geology",
+        "Geophysics in Oilfield and Mining"
+      ],
+      [
+        "Field Expeditions",
+        "GGF"
+      ],
+      [
+        "Geochemistry",
+        "Geology Program"
+      ],
+      [
+        "Exchange Programs",
+        "GGF"
+      ],
+      [
+        "Geology Program",
+        "Oil And Gas"
+      ],
+      [
+        "Faculty of Geology and Geophysics",
+        "Novosibirsk State University"
+      ],
+      [
+        "GGF",
+        "NSU"
+      ]
+    ],
+    "count": 20,
+    "create_time": 1773902660,
+    "update_time": 1773902660,
+    "_id": "https://education.nsu.ru/promo/geology"
   }
 }
