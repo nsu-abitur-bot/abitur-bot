@@ -227,5 +227,29 @@
     "create_time": 1773907603,
     "update_time": 1773907603,
     "_id": "https://education.nsu.ru/promo/naturalsciences/"
+  },
+  "https://education.nsu.ru/mechatronics": {
+    "entity_names": [
+      "Robotics",
+      "Hardware-Software Complexes",
+      "Practical Training",
+      "Lavrentyev Supercomputer Center",
+      "NSU",
+      "Curriculum",
+      "Institute Of Intelligent Robotics",
+      "Mobile Applications",
+      "Industrial Partners",
+      "Deep Machine Learning",
+      "Applied Artificial Intelligence",
+      "Novosibirsk State University",
+      "Digital Signal Processing",
+      "IIR",
+      "Machine Learning",
+      "Mechatronics And Robotics"
+    ],
+    "count": 16,
+    "create_time": 1773925883,
+    "update_time": 1773925883,
+    "_id": "https://education.nsu.ru/mechatronics"
   }
 }

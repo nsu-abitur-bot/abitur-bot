@@ -19,10 +19,11 @@
       "chunk-e90ee1508531a0d0286c1af7f4cc4792",
       "chunk-b99eada158dba358ec9c4bccd563a3d2",
       "chunk-289f4eb7d30d3af4bc0678a5197d6564",
-      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+      "chunk-8b0c6015b6de3a66da4ef7370457193b",
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
     ],
-    "count": 8,
-    "update_time": 1773907594,
+    "count": 9,
+    "update_time": 1773925872,
     "_id": "NSU"
   },
   "SBRAS": {
@@ -250,10 +251,11 @@
       "chunk-e90ee1508531a0d0286c1af7f4cc4792",
       "chunk-b99eada158dba358ec9c4bccd563a3d2",
       "chunk-289f4eb7d30d3af4bc0678a5197d6564",
-      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+      "chunk-8b0c6015b6de3a66da4ef7370457193b",
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
     ],
-    "count": 8,
-    "update_time": 1773907596,
+    "count": 9,
+    "update_time": 1773925874,
     "_id": "Novosibirsk State University"
   },
   "Faculty Of Information Technologies": {
@@ -1256,5 +1258,132 @@
     "create_time": 1773907598,
     "update_time": 1773907598,
     "_id": "GU"
+  },
+  "IIR": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925872,
+    "update_time": 1773925872,
+    "_id": "IIR"
+  },
+  "Mechatronics And Robotics": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925873,
+    "update_time": 1773925873,
+    "_id": "Mechatronics And Robotics"
+  },
+  "Applied Artificial Intelligence": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca",
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 2,
+    "create_time": 1773925873,
+    "update_time": 1773925873,
+    "_id": "Applied Artificial Intelligence"
+  },
+  "Curriculum": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925873,
+    "update_time": 1773925873,
+    "_id": "Curriculum"
+  },
+  "Practical Training": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925873,
+    "update_time": 1773925873,
+    "_id": "Practical Training"
+  },
+  "Institute Of Intelligent Robotics": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925874,
+    "update_time": 1773925874,
+    "_id": "Institute Of Intelligent Robotics"
+  },
+  "Lavrentyev Supercomputer Center": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925874,
+    "update_time": 1773925874,
+    "_id": "Lavrentyev Supercomputer Center"
+  },
+  "Machine Learning": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925874,
+    "update_time": 1773925874,
+    "_id": "Machine Learning"
+  },
+  "Robotics": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925875,
+    "update_time": 1773925875,
+    "_id": "Robotics"
+  },
+  "Mobile Applications": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925875,
+    "update_time": 1773925875,
+    "_id": "Mobile Applications"
+  },
+  "Industrial Partners": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925875,
+    "update_time": 1773925875,
+    "_id": "Industrial Partners"
+  },
+  "Hardware-Software Complexes": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925875,
+    "update_time": 1773925875,
+    "_id": "Hardware-Software Complexes"
+  },
+  "Digital Signal Processing": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925876,
+    "update_time": 1773925876,
+    "_id": "Digital Signal Processing"
+  },
+  "Deep Machine Learning": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925876,
+    "update_time": 1773925876,
+    "_id": "Deep Machine Learning"
   }
 }

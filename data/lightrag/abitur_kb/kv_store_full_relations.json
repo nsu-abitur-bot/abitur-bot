@@ -734,5 +734,73 @@
     "create_time": 1773907603,
     "update_time": 1773907603,
     "_id": "https://education.nsu.ru/promo/naturalsciences/"
+  },
+  "https://education.nsu.ru/mechatronics": {
+    "relation_pairs": [
+      [
+        "Applied Artificial Intelligence",
+        "Industrial Partners"
+      ],
+      [
+        "Curriculum",
+        "Mechatronics And Robotics"
+      ],
+      [
+        "IIR",
+        "NSU"
+      ],
+      [
+        "Mechatronics And Robotics",
+        "Practical Training"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "IIR"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Deep Machine Learning"
+      ],
+      [
+        "IIR",
+        "Mechatronics And Robotics"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Institute Of Intelligent Robotics"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Machine Learning"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Robotics"
+      ],
+      [
+        "Institute Of Intelligent Robotics",
+        "Mechatronics And Robotics"
+      ],
+      [
+        "Institute Of Intelligent Robotics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Mobile Applications"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Digital Signal Processing"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Lavrentyev Supercomputer Center"
+      ]
+    ],
+    "count": 15,
+    "create_time": 1773925883,
+    "update_time": 1773925883,
+    "_id": "https://education.nsu.ru/mechatronics"
   }
 }

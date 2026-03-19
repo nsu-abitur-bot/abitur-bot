@@ -2,6 +2,7 @@ import asyncio
 import logging
 import os
 import time
+from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
@@ -20,6 +21,15 @@ logger = logging.getLogger(__name__)
 GRAPH_QUERY_MODES: frozenset = frozenset(
     ["naive", "local", "global", "hybrid", "mix", "bypass"]
 )
+
+
+class _GraphWrapper:
+    """Wrapper to track usage count of LightRAG instances for safe finalization."""
+
+    def __init__(self, rag: LightRAG):
+        self.rag = rag
+        self.usage_count = 0
+        self.marked_for_deletion = False
 
 
 class GraphMemory:
@@ -53,7 +63,7 @@ class GraphMemory:
         self.model_name: str = model_name or os.getenv("GIGACHAT_MODEL", "GigaChat")
         self.embedding_model_name = embedding_model_name
 
-        self._graphs: Dict[str, LightRAG] = {}
+        self._graphs: Dict[str, _GraphWrapper] = {}
         self._graph_signatures: Dict[str, tuple[float, int]] = {}
         self._locks: Dict[tuple[asyncio.AbstractEventLoop, str], asyncio.Lock] = {}
         self._last_disk_check: Dict[str, float] = {}
@@ -116,7 +126,7 @@ class GraphMemory:
             pass
         return latest_mtime, file_count
 
-    async def _get_or_create_graph(self, graph_id: str) -> LightRAG:
+    async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
         async with self._get_lock(graph_id):
             now = time.monotonic()
             check_disk = False
@@ -142,16 +152,25 @@ class GraphMemory:
                         + " Перезагрузка..."
                     )
 
-                    # Финализируем и удаляем старый экземпляр перед перезагрузкой
-                    old_rag = self._graphs.pop(graph_id, None)
-                    if old_rag is not None:
-                        try:
-                            await old_rag.finalize_storages()
-                        except Exception as finalize_err:
-                            logger.warning(
-                                "Ошибка при финализации предыдущего "
-                                + "экземпляра LightRAG "
-                                f"для графа {graph_id}: {finalize_err}"
+                    # Финализируем старый экземпляр, если он никем не используется.
+                    # В противном случае помечаем его для финализации
+                    # после завершения всех запросов.
+                    old_wrapper = self._graphs.pop(graph_id, None)
+                    if old_wrapper is not None:
+                        old_wrapper.marked_for_deletion = True
+                        if old_wrapper.usage_count <= 0:
+                            try:
+                                await old_wrapper.rag.finalize_storages()
+                            except Exception as finalize_err:
+                                logger.warning(
+                                    "Ошибка при финализации предыдущего "
+                                    + "экземпляра LightRAG "
+                                    f"для графа {graph_id}: {finalize_err}"
+                                )
+                        else:
+                            logger.info(
+                                f"Отложена финализация графа {graph_id}"
+                                + " (в использовании: {old_wrapper.usage_count})"
                             )
             elif graph_id in self._graphs:
                 return self._graphs[graph_id]
@@ -238,7 +257,9 @@ class GraphMemory:
                 await rag.initialize_storages()
                 await initialize_pipeline_status()
 
-                self._graphs[graph_id] = rag
+                wrapper = _GraphWrapper(rag)
+                self._graphs[graph_id] = wrapper
+
                 # Обновляем сигнатуру после инициализации,
                 # чтобы не триггерить перезагрузку
                 self._graph_signatures[graph_id] = self._get_workspace_signature(
@@ -251,7 +272,23 @@ class GraphMemory:
                 logger.error(f"Error creating LightRAG instance for {graph_id}: {e}")
                 raise
 
-            return rag
+            return wrapper
+
+    @asynccontextmanager
+    async def _use_graph(self, graph_id: str):
+        """Безопасно инкрементирует счетчик использования графа на время запроса."""
+        wrapper = await self._get_or_create_graph(graph_id)
+        wrapper.usage_count += 1
+        try:
+            yield wrapper.rag
+        finally:
+            wrapper.usage_count -= 1
+            if wrapper.marked_for_deletion and wrapper.usage_count <= 0:
+                try:
+                    await wrapper.rag.finalize_storages()
+                    logger.info(f"Отложенная финализация графа завершена: {graph_id}")
+                except Exception as e:
+                    logger.warning(f"Ошибка при отложенной финализации: {e}")
 
     async def save(
         self,
@@ -261,12 +298,12 @@ class GraphMemory:
         file_paths_str: Optional[str] = None,
     ) -> bool:
         try:
-            rag = await self._get_or_create_graph(graph_id)
-            await rag.ainsert(
-                text,
-                ids=source_id,
-                file_paths=file_paths_str or source_id,
-            )
+            async with self._use_graph(graph_id) as rag:
+                await rag.ainsert(
+                    text,
+                    ids=source_id,
+                    file_paths=file_paths_str or source_id,
+                )
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
                 self._graph_signatures[graph_id] = self._get_workspace_signature(
@@ -285,9 +322,9 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
     ) -> str:
         try:
-            rag = await self._get_or_create_graph(graph_id)
-            result = await rag.aquery(question, param=QueryParam(mode=mode))
-            return str(result)
+            async with self._use_graph(graph_id) as rag:
+                result = await rag.aquery(question, param=QueryParam(mode=mode))
+                return str(result)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}"
@@ -299,20 +336,20 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
     ) -> tuple[str, list[str]]:
         try:
-            rag = await self._get_or_create_graph(graph_id)
-            result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
-            answer = result.get("llm_response", {}).get("content", "") or ""
-            references = result.get("data", {}).get("references", [])
-            sources_set: set[str] = set()
-            for ref in references:
-                file_paths_value = ref.get("file_path", "") or ""
-                for source in file_paths_value.split(","):
-                    source = source.strip()
-                    if source:
-                        # Добавляем все непустые идентификаторы источников
-                        # (как URL, так и локальные имена файлов).
-                        sources_set.add(source)
-            return str(answer), list(sources_set)
+            async with self._use_graph(graph_id) as rag:
+                result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
+                answer = result.get("llm_response", {}).get("content", "") or ""
+                references = result.get("data", {}).get("references", [])
+                sources_set: set[str] = set()
+                for ref in references:
+                    file_paths_value = ref.get("file_path", "") or ""
+                    for source in file_paths_value.split(","):
+                        source = source.strip()
+                        if source:
+                            # Добавляем все непустые идентификаторы источников
+                            # (как URL, так и локальные имена файлов).
+                            sources_set.add(source)
+                return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
@@ -326,12 +363,12 @@ class GraphMemory:
         """
         try:
             if graph_id and graph_id in self._graphs:
-                await self._graphs[graph_id].finalize_storages()
+                await self._graphs[graph_id].rag.finalize_storages()
                 logger.info(f"Хранилище финализировано для графа: {graph_id}")
             elif not graph_id:
-                for gid, rag in self._graphs.items():
-                    await rag.finalize_storages()
-                    logger.info(f"Хранилище финализировано для графа: {gid}")
+                for wrapper in self._graphs.values():
+                    await wrapper.rag.finalize_storages()
+                    logger.info("Хранилище финализировано для графа (all cleanup)")
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
 

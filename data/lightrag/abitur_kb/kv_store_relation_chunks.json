@@ -1485,5 +1485,140 @@
     "create_time": 1773907602,
     "update_time": 1773907602,
     "_id": "Akademgorodok<SEP>GU"
+  },
+  "IIR<SEP>NSU": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925876,
+    "update_time": 1773925876,
+    "_id": "IIR<SEP>NSU"
+  },
+  "IIR<SEP>Mechatronics And Robotics": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925877,
+    "update_time": 1773925877,
+    "_id": "IIR<SEP>Mechatronics And Robotics"
+  },
+  "Applied Artificial Intelligence<SEP>IIR": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925877,
+    "update_time": 1773925877,
+    "_id": "Applied Artificial Intelligence<SEP>IIR"
+  },
+  "Curriculum<SEP>Mechatronics And Robotics": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925877,
+    "update_time": 1773925877,
+    "_id": "Curriculum<SEP>Mechatronics And Robotics"
+  },
+  "Mechatronics And Robotics<SEP>Practical Training": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925878,
+    "update_time": 1773925878,
+    "_id": "Mechatronics And Robotics<SEP>Practical Training"
+  },
+  "Institute Of Intelligent Robotics<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925878,
+    "update_time": 1773925878,
+    "_id": "Institute Of Intelligent Robotics<SEP>Novosibirsk State University"
+  },
+  "Institute Of Intelligent Robotics<SEP>Mechatronics And Robotics": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925878,
+    "update_time": 1773925878,
+    "_id": "Institute Of Intelligent Robotics<SEP>Mechatronics And Robotics"
+  },
+  "Applied Artificial Intelligence<SEP>Institute Of Intelligent Robotics": {
+    "chunk_ids": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca"
+    ],
+    "count": 1,
+    "create_time": 1773925879,
+    "update_time": 1773925879,
+    "_id": "Applied Artificial Intelligence<SEP>Institute Of Intelligent Robotics"
+  },
+  "Applied Artificial Intelligence<SEP>Machine Learning": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925879,
+    "update_time": 1773925879,
+    "_id": "Applied Artificial Intelligence<SEP>Machine Learning"
+  },
+  "Applied Artificial Intelligence<SEP>Lavrentyev Supercomputer Center": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925879,
+    "update_time": 1773925879,
+    "_id": "Applied Artificial Intelligence<SEP>Lavrentyev Supercomputer Center"
+  },
+  "Applied Artificial Intelligence<SEP>Industrial Partners": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925880,
+    "update_time": 1773925880,
+    "_id": "Applied Artificial Intelligence<SEP>Industrial Partners"
+  },
+  "Applied Artificial Intelligence<SEP>Robotics": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925881,
+    "update_time": 1773925881,
+    "_id": "Applied Artificial Intelligence<SEP>Robotics"
+  },
+  "Applied Artificial Intelligence<SEP>Mobile Applications": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925881,
+    "update_time": 1773925881,
+    "_id": "Applied Artificial Intelligence<SEP>Mobile Applications"
+  },
+  "Applied Artificial Intelligence<SEP>Digital Signal Processing": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925882,
+    "update_time": 1773925882,
+    "_id": "Applied Artificial Intelligence<SEP>Digital Signal Processing"
+  },
+  "Applied Artificial Intelligence<SEP>Deep Machine Learning": {
+    "chunk_ids": [
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "count": 1,
+    "create_time": 1773925882,
+    "update_time": 1773925882,
+    "_id": "Applied Artificial Intelligence<SEP>Deep Machine Learning"
   }
 }

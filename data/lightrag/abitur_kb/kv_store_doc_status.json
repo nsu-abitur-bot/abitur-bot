@@ -146,5 +146,23 @@
       "processing_start_time": 1773907585,
       "processing_end_time": 1773907603
     }
+  },
+  "https://education.nsu.ru/mechatronics": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca",
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ИИР** — Институт интеллектуальной робототехники\n\nИсточники: https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai\n\n# Институт интеллектуальной робото...",
+    "content_length": 2443,
+    "created_at": "2026-03-19T13:11:00.061859+00:00",
+    "updated_at": "2026-03-19T13:11:23.085210+00:00",
+    "file_path": "https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai",
+    "track_id": "insert_20260319_131100_48def509",
+    "metadata": {
+      "processing_start_time": 1773925860,
+      "processing_end_time": 1773925883
+    }
   }
 }
