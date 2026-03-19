@@ -55,9 +55,9 @@ class GraphMemory:
 
         self._graphs: Dict[str, LightRAG] = {}
         self._graph_signatures: Dict[str, tuple[float, int]] = {}
-        self._locks: Dict[str, asyncio.Lock] = {}
+        self._locks: Dict[tuple[asyncio.AbstractEventLoop, str], asyncio.Lock] = {}
         self._last_disk_check: Dict[str, float] = {}
-        self._check_interval: float = 2.0  # limit os.walk frequency
+        self._check_interval: float = 2.0  # limit disk scanning (os.scandir) frequency
 
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
@@ -73,9 +73,17 @@ class GraphMemory:
         return path
 
     def _get_lock(self, graph_id: str) -> asyncio.Lock:
-        if graph_id not in self._locks:
-            self._locks[graph_id] = asyncio.Lock()
-        return self._locks[graph_id]
+        """
+        Get or create an asyncio.Lock scoped to the current event loop and graph_id.
+
+        asyncio primitives are bound to the event loop in which they are created,
+        so we must not share the same Lock instance across different loops.
+        """
+        loop = asyncio.get_running_loop()
+        key = (loop, graph_id)
+        if key not in self._locks:
+            self._locks[key] = asyncio.Lock()
+        return self._locks[key]
 
     def _get_workspace_signature(self, graph_id: str) -> tuple[float, int]:
         """Получает максимальное mtime и количество файлов для графа."""
@@ -84,9 +92,11 @@ class GraphMemory:
         latest_mtime: float = 0.0
         file_count: int = 0
 
-        # Используем более лёгкую метрику, чтобы не блокировать event loop:
+        # Используем более лёгкую метрику, чтобы уменьшить нагрузку на диск:
         # - mtime директории workspace
         # - поверхностный обход содержимого через os.scandir без рекурсии
+        # Обратите внимание: это по‑прежнему синхронный дисковый I/O и он может
+        # блокировать event loop, просто делает это менее тяжело, чем рекурсивный обход.
         try:
             latest_mtime = os.path.getmtime(workspace_path)
             with os.scandir(workspace_path) as it:
@@ -108,7 +118,7 @@ class GraphMemory:
 
     async def _get_or_create_graph(self, graph_id: str) -> LightRAG:
         async with self._get_lock(graph_id):
-            now = time.time()
+            now = time.monotonic()
             check_disk = False
 
             # Решаем, нужно ли проверять диск

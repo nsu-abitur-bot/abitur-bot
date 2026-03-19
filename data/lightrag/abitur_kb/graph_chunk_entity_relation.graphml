@@ -27,10 +27,12 @@
     <node id="NSU">
       <data key="d0">NSU</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Faculty of Economics.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/</data>
-      <data key="d5">1773905098</data>
+      <data key="d2">Novosibirsk State University (NSU) is a prominent higher education institution dedicated to providing comprehensive academic programs and infrastructure for its student body. As a center for learning and research, the university serves as the primary environment for the employment of diverse teaching staff and the facilitation of scholarly development.
+
+The university is organized into several specialized academic divisions, including the Faculty of Information Technology (FIT), which focuses on computing and digital sciences. Additionally, Novosibirsk State University hosts the Faculty of Economics and the Faculty of Natural Sciences, reflecting its broad commitment to both social and empirical disciplines. Through these various faculties, the institution maintains a robust academic framework designed to support students across a wide range of fields.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/&lt;SEP&gt;https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907596</data>
       <data key="d6" />
     </node>
     <node id="SBRAS">
@@ -252,10 +254,14 @@
     <node id="Novosibirsk State University">
       <data key="d0">Novosibirsk State University</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.&lt;SEP&gt;Novosibirsk State University is a higher education institution that hosts the Physics Department.&lt;SEP&gt;Novosibirsk State University is an educational institution that hosts the Faculty of Geology and Geophysics.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Faculty of Economics.</data>
-      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/</data>
-      <data key="d5">1773905100</data>
+      <data key="d2">Novosibirsk State University (NSU) is a prominent higher education institution that integrates a diverse range of academic disciplines, including natural sciences, engineering, and the humanities. The university is structured around several specialized faculties and departments, which facilitate its comprehensive educational mission.
+
+The academic infrastructure of Novosibirsk State University includes the Faculty of Natural Sciences, the Faculty of Physics, and the Faculty of Geology and Geophysics. Furthermore, the institution supports advanced technical and analytical studies through its Mechanics and Mathematics Department, as well as the Faculty of Information Technologies. In addition to these scientific and technical fields, the university maintains a Faculty of Economics, reflecting its commitment to a broad spectrum of scholarly competencies.
+
+Novosibirsk State University offers a variety of bachelor's degree programs designed to prepare students for professional and academic careers. Beyond its core academic offerings, the institution provides a range of student services to support the educational experience of its diverse student body.</data>
+      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792&lt;SEP&gt;chunk-b99eada158dba358ec9c4bccd563a3d2&lt;SEP&gt;chunk-289f4eb7d30d3af4bc0678a5197d6564&lt;SEP&gt;chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics&lt;SEP&gt;https://education.nsu.ru/promo/geology&lt;SEP&gt;https://education.nsu.ru/economics/&lt;SEP&gt;https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907598</data>
       <data key="d6" />
     </node>
     <node id="Faculty Of Information Technologies">
@@ -297,10 +303,10 @@
     <node id="Akademgorodok">
       <data key="d0">Akademgorodok</data>
       <data key="d1">location</data>
-      <data key="d2">Akademgorodok is the location where NSU is situated, known for integrating study, science, and student life.</data>
-      <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd</data>
-      <data key="d4">https://education.nsu.ru/freshmen</data>
-      <data key="d5">1773586727</data>
+      <data key="d2">Akademgorodok is the location where NSU is situated, known for integrating study, science, and student life.&lt;SEP&gt;Akademgorodok is a research center associated with the educational and research environment of Novosibirsk State University.&lt;SEP&gt;Akademgorodok is a specialized scientific and educational center known for its concentration of research institutes.</data>
+      <data key="d3">chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-8b0c6015b6de3a66da4ef7370457193b&lt;SEP&gt;chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0</data>
+      <data key="d4">https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907595</data>
       <data key="d6" />
     </node>
     <node id="Dormitories">
@@ -1194,6 +1200,60 @@
       <data key="d5">1773905110</data>
       <data key="d6" />
     </node>
+    <node id="FEN">
+      <data key="d0">FEN</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Natural Sciences is a department within NSU offering undergraduate programs in chemistry and natural sciences.</data>
+      <data key="d3">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907594</data>
+      <data key="d6" />
+    </node>
+    <node id="Chemistry: Fundamental Science and Breakthrough Technologies">
+      <data key="d0">Chemistry: Fundamental Science and Breakthrough Technologies</data>
+      <data key="d1">content</data>
+      <data key="d2">This is a bachelor's degree program offered by FEN focusing on fundamental science and modern technological applications.</data>
+      <data key="d3">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907595</data>
+      <data key="d6" />
+    </node>
+    <node id="Bachelor's Program">
+      <data key="d0">Bachelor's Program</data>
+      <data key="d1">concept</data>
+      <data key="d2">The bachelor's program is an undergraduate educational path at FEN that integrates fundamental science with research and technology.</data>
+      <data key="d3">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907596</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty Of Natural Sciences">
+      <data key="d0">Faculty Of Natural Sciences</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Faculty of Natural Sciences is a department within Novosibirsk State University that offers a bachelor's program in chemistry.</data>
+      <data key="d3">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907597</data>
+      <data key="d6" />
+    </node>
+    <node id="Chemistry: Fundamental Science And Breakthrough Technologies">
+      <data key="d0">Chemistry: Fundamental Science And Breakthrough Technologies</data>
+      <data key="d1">content</data>
+      <data key="d2">This is a bachelor's degree program offered by the Faculty of Natural Sciences focusing on fundamental science and modern technologies.</data>
+      <data key="d3">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d4">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907597</data>
+      <data key="d6" />
+    </node>
+    <node id="GU">
+      <data key="d0">GU</data>
+      <data key="d1">organization</data>
+      <data key="d2">GU is an educational or research institution located in or associated with Akademgorodok.</data>
+      <data key="d3">chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0</data>
+      <data key="d4">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d5">1773907598</data>
+      <data key="d6" />
+    </node>
     <edge source="FIT" target="NSU">
       <data key="d7">2.0</data>
       <data key="d8">FIT is a faculty belonging to the Novosibirsk State University.&lt;SEP&gt;FIT is a faculty within NSU where teaching is conducted by university staff and industry experts.</data>
@@ -1408,6 +1468,15 @@
       <data key="d10">chunk-289f4eb7d30d3af4bc0678a5197d6564</data>
       <data key="d11">https://education.nsu.ru/economics/</data>
       <data key="d12">1773905105</data>
+      <data key="d13" />
+    </edge>
+    <edge source="NSU" target="FEN">
+      <data key="d7">1.0</data>
+      <data key="d8">FEN is a faculty operating within the structure of NSU.</data>
+      <data key="d9">affiliation,department</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907599</data>
       <data key="d13" />
     </edge>
     <edge source="SO RAN" target="MMF">
@@ -1770,6 +1839,15 @@
       <data key="d12">1773902653</data>
       <data key="d13" />
     </edge>
+    <edge source="Novosibirsk State University" target="Faculty Of Natural Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences is a department belonging to Novosibirsk State University.</data>
+      <data key="d9">affiliation,organizational structure</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907600</data>
+      <data key="d13" />
+    </edge>
     <edge source="Faculty Of Information Technologies" target="Informatics And Computer Engineering">
       <data key="d7">1.0</data>
       <data key="d8">The Faculty of Information Technologies offers an undergraduate degree program in Informatics and Computer Engineering.</data>
@@ -1795,6 +1873,33 @@
       <data key="d10">chunk-9a82318078705ea1aaa12f147aec8f4f</data>
       <data key="d11">https://education.nsu.ru/information-technologies/</data>
       <data key="d12">1773577743</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Akademgorodok" target="FEN">
+      <data key="d7">1.0</data>
+      <data key="d8">FEN integrates its educational activities with the research environment of Akademgorodok.</data>
+      <data key="d9">location,research environment</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907600</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Akademgorodok" target="Faculty Of Natural Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences integrates its educational activities with the research environment of Akademgorodok.</data>
+      <data key="d9">collaboration,research environment</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907601</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Akademgorodok" target="GU">
+      <data key="d7">1.0</data>
+      <data key="d8">GU is situated within or is closely associated with the Akademgorodok area.</data>
+      <data key="d9">geographical location,institutional presence</data>
+      <data key="d10">chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907602</data>
       <data key="d13" />
     </edge>
     <edge source="Dormitories" target="First-Year Students">
@@ -2605,6 +2710,33 @@
       <data key="d10">chunk-cffa7dbe269afe324323fa0cb84ef340</data>
       <data key="d11">https://education.nsu.ru/economics/</data>
       <data key="d12">1773905110</data>
+      <data key="d13" />
+    </edge>
+    <edge source="FEN" target="Chemistry: Fundamental Science and Breakthrough Technologies">
+      <data key="d7">1.0</data>
+      <data key="d8">FEN offers the Chemistry: Fundamental Science and Breakthrough Technologies program to bachelor students.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907599</data>
+      <data key="d13" />
+    </edge>
+    <edge source="FEN" target="Bachelor's Program">
+      <data key="d7">1.0</data>
+      <data key="d8">The bachelor's program is provided by FEN and includes subjects like chemistry, mathematics, and physics.</data>
+      <data key="d9">academic structure,educational offering</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907600</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Natural Sciences" target="Chemistry: Fundamental Science And Breakthrough Technologies">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences offers the bachelor's program titled Chemistry: Fundamental Science and Breakthrough Technologies.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-8b0c6015b6de3a66da4ef7370457193b</data>
+      <data key="d11">https://education.nsu.ru/promo/naturalsciences/</data>
+      <data key="d12">1773907601</data>
       <data key="d13" />
     </edge>
   </graph>

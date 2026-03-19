@@ -128,5 +128,23 @@
       "processing_start_time": 1773905078,
       "processing_end_time": 1773905111
     }
+  },
+  "https://education.nsu.ru/promo/naturalsciences/": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b",
+      "chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФЕН** — Факультет естественных наук\n\nИсточник: https://education.nsu.ru/promo/naturalsciences/\n\n# Факультет естественных наук НГУ\n\n## Кратко\nДля бакалавров на ФЕН...",
+    "content_length": 1276,
+    "created_at": "2026-03-19T08:06:25.110853+00:00",
+    "updated_at": "2026-03-19T08:06:43.070109+00:00",
+    "file_path": "https://education.nsu.ru/promo/naturalsciences/",
+    "track_id": "insert_20260319_080625_cfaa761e",
+    "metadata": {
+      "processing_start_time": 1773907585,
+      "processing_end_time": 1773907603
+    }
   }
 }

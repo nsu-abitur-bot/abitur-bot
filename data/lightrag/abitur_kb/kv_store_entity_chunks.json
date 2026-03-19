@@ -18,10 +18,11 @@
       "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
       "chunk-e90ee1508531a0d0286c1af7f4cc4792",
       "chunk-b99eada158dba358ec9c4bccd563a3d2",
-      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
     ],
-    "count": 7,
-    "update_time": 1773905098,
+    "count": 8,
+    "update_time": 1773907594,
     "_id": "NSU"
   },
   "SBRAS": {
@@ -248,10 +249,11 @@
       "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
       "chunk-e90ee1508531a0d0286c1af7f4cc4792",
       "chunk-b99eada158dba358ec9c4bccd563a3d2",
-      "chunk-289f4eb7d30d3af4bc0678a5197d6564"
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
     ],
-    "count": 7,
-    "update_time": 1773905100,
+    "count": 8,
+    "update_time": 1773907596,
     "_id": "Novosibirsk State University"
   },
   "Faculty Of Information Technologies": {
@@ -292,11 +294,12 @@
   },
   "Akademgorodok": {
     "chunk_ids": [
-      "chunk-7ac667fa190f012d8ed66e7ef36a4acd"
+      "chunk-7ac667fa190f012d8ed66e7ef36a4acd",
+      "chunk-8b0c6015b6de3a66da4ef7370457193b",
+      "chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0"
     ],
-    "count": 1,
-    "create_time": 1773586727,
-    "update_time": 1773586727,
+    "count": 3,
+    "update_time": 1773907595,
     "_id": "Akademgorodok"
   },
   "Dormitories": {
@@ -1199,5 +1202,59 @@
     "create_time": 1773905110,
     "update_time": 1773905110,
     "_id": "IT Infrastructure"
+  },
+  "FEN": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907594,
+    "update_time": 1773907594,
+    "_id": "FEN"
+  },
+  "Chemistry: Fundamental Science and Breakthrough Technologies": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907595,
+    "update_time": 1773907595,
+    "_id": "Chemistry: Fundamental Science and Breakthrough Technologies"
+  },
+  "Bachelor's Program": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907596,
+    "update_time": 1773907596,
+    "_id": "Bachelor's Program"
+  },
+  "Faculty Of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907597,
+    "update_time": 1773907597,
+    "_id": "Faculty Of Natural Sciences"
+  },
+  "Chemistry: Fundamental Science And Breakthrough Technologies": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907597,
+    "update_time": 1773907597,
+    "_id": "Chemistry: Fundamental Science And Breakthrough Technologies"
+  },
+  "GU": {
+    "chunk_ids": [
+      "chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0"
+    ],
+    "count": 1,
+    "create_time": 1773907598,
+    "update_time": 1773907598,
+    "_id": "GU"
   }
 }

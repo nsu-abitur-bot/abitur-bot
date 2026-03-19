@@ -210,5 +210,22 @@
     "create_time": 1773905111,
     "update_time": 1773905111,
     "_id": "https://education.nsu.ru/economics/"
+  },
+  "https://education.nsu.ru/promo/naturalsciences/": {
+    "entity_names": [
+      "Akademgorodok",
+      "NSU",
+      "Bachelor's Program",
+      "Chemistry: Fundamental Science And Breakthrough Technologies",
+      "Novosibirsk State University",
+      "FEN",
+      "GU",
+      "Chemistry: Fundamental Science and Breakthrough Technologies",
+      "Faculty Of Natural Sciences"
+    ],
+    "count": 9,
+    "create_time": 1773907603,
+    "update_time": 1773907603,
+    "_id": "https://education.nsu.ru/promo/naturalsciences/"
   }
 }

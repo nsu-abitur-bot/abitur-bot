@@ -1413,5 +1413,77 @@
     "create_time": 1773905110,
     "update_time": 1773905110,
     "_id": "Business Informatics<SEP>IT Infrastructure"
+  },
+  "FEN<SEP>NSU": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907599,
+    "update_time": 1773907599,
+    "_id": "FEN<SEP>NSU"
+  },
+  "Chemistry: Fundamental Science and Breakthrough Technologies<SEP>FEN": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907599,
+    "update_time": 1773907599,
+    "_id": "Chemistry: Fundamental Science and Breakthrough Technologies<SEP>FEN"
+  },
+  "Akademgorodok<SEP>FEN": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907600,
+    "update_time": 1773907600,
+    "_id": "Akademgorodok<SEP>FEN"
+  },
+  "Bachelor's Program<SEP>FEN": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907600,
+    "update_time": 1773907600,
+    "_id": "Bachelor's Program<SEP>FEN"
+  },
+  "Faculty Of Natural Sciences<SEP>Novosibirsk State University": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907600,
+    "update_time": 1773907600,
+    "_id": "Faculty Of Natural Sciences<SEP>Novosibirsk State University"
+  },
+  "Chemistry: Fundamental Science And Breakthrough Technologies<SEP>Faculty Of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907601,
+    "update_time": 1773907601,
+    "_id": "Chemistry: Fundamental Science And Breakthrough Technologies<SEP>Faculty Of Natural Sciences"
+  },
+  "Akademgorodok<SEP>Faculty Of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b"
+    ],
+    "count": 1,
+    "create_time": 1773907601,
+    "update_time": 1773907601,
+    "_id": "Akademgorodok<SEP>Faculty Of Natural Sciences"
+  },
+  "Akademgorodok<SEP>GU": {
+    "chunk_ids": [
+      "chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0"
+    ],
+    "count": 1,
+    "create_time": 1773907602,
+    "update_time": 1773907602,
+    "_id": "Akademgorodok<SEP>GU"
   }
 }
