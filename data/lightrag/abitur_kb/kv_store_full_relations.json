@@ -474,5 +474,53 @@
     "create_time": 1773845580,
     "update_time": 1773845580,
     "_id": "https://education.nsu.ru/mathematics"
+  },
+  "https://education.nsu.ru/physics": {
+    "relation_pairs": [
+      [
+        "Bachelor's Degree",
+        "Physics: Fundamental Research, Breakthrough Technologies And Their Applications"
+      ],
+      [
+        "NSU",
+        "Physics Department"
+      ],
+      [
+        "Physics: Fundamental Research, Breakthrough Technologies and Their Applications",
+        "Secondary Vocational Education"
+      ],
+      [
+        "Itia",
+        "Sports"
+      ],
+      [
+        "Physics: Fundamental Research, Breakthrough Technologies and Their Applications",
+        "Unified State Exam"
+      ],
+      [
+        "Physics Department",
+        "Physics: Fundamental Research, Breakthrough Technologies and Their Applications"
+      ],
+      [
+        "Physics: Fundamental Research, Breakthrough Technologies And Their Applications",
+        "Unified State Exam"
+      ],
+      [
+        "Novosibirsk State University",
+        "Physics Department"
+      ],
+      [
+        "Itia",
+        "Student Life"
+      ],
+      [
+        "Physics Department",
+        "Physics: Fundamental Research, Breakthrough Technologies And Their Applications"
+      ]
+    ],
+    "count": 10,
+    "create_time": 1773896532,
+    "update_time": 1773896532,
+    "_id": "https://education.nsu.ru/physics"
   }
 }

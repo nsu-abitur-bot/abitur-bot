@@ -72,5 +72,23 @@
       "processing_start_time": 1773845522,
       "processing_end_time": 1773845580
     }
+  },
+  "https://education.nsu.ru/physics": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792",
+      "chunk-99a916192d9790255de414734f0ec4c7"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФФ** — Физический факультет\n\nИсточник: https://education.nsu.ru/physics\n\n# Физический факультет НГУ\n\n## Кратко\nФизический факультет НГУ ведёт набор на бакалавриат...",
+    "content_length": 1337,
+    "created_at": "2026-03-19T05:01:55.606552+00:00",
+    "updated_at": "2026-03-19T05:02:12.684189+00:00",
+    "file_path": "https://education.nsu.ru/physics",
+    "track_id": "insert_20260319_050155_7d31565e",
+    "metadata": {
+      "processing_start_time": 1773896515,
+      "processing_end_time": 1773896532
+    }
   }
 }

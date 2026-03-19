@@ -27,10 +27,10 @@
     <node id="NSU">
       <data key="d0">NSU</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.</data>
-      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
-      <data key="d5">1773845549</data>
+      <data key="d2">Novosibirsk State University is an educational institution offering programs in information technology.&lt;SEP&gt;NSU (Novosibirsk State University) is the institution where the FIT faculty is located and where teaching staff are employed.&lt;SEP&gt;NSU is the Novosibirsk State University, an educational institution that provides infrastructure for students.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.&lt;SEP&gt;Novosibirsk State University is an educational institution offering various academic programs.</data>
+      <data key="d3">chunk-b6d2a7fd88178e86b5d144a751ef7e12&lt;SEP&gt;chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-7ac667fa190f012d8ed66e7ef36a4acd&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/freshmen&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896525</data>
       <data key="d6" />
     </node>
     <node id="SBRAS">
@@ -189,10 +189,10 @@
     <node id="Bachelor's Degree">
       <data key="d0">Bachelor's Degree</data>
       <data key="d1">concept</data>
-      <data key="d2">The academic program level offered by FIT.</data>
-      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/</data>
-      <data key="d5">1773577727</data>
+      <data key="d2">The academic program level offered by FIT.&lt;SEP&gt;The Bachelor's degree is the level of higher education provided by the Physics Department's program.</data>
+      <data key="d3">chunk-730e570516ec9e7b29e2a113360804e7&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896525</data>
       <data key="d6" />
     </node>
     <node id="Scholarship Programs">
@@ -252,10 +252,10 @@
     <node id="Novosibirsk State University">
       <data key="d0">Novosibirsk State University</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.</data>
-      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
-      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics</data>
-      <data key="d5">1773845551</data>
+      <data key="d2">Novosibirsk State University is an educational institution that hosts the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is an educational institution that combines natural science, engineering, and humanities competencies, offering various bachelor's programs.&lt;SEP&gt;Novosibirsk State University (NSU) is an educational institution that offers various bachelor's degree programs, faculties, and student services.&lt;SEP&gt;Novosibirsk State University is a higher education institution that houses the Mechanics and Mathematics Department.&lt;SEP&gt;Novosibirsk State University is a higher education institution that hosts the Physics Department.</data>
+      <data key="d3">chunk-9a82318078705ea1aaa12f147aec8f4f&lt;SEP&gt;chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-edc9c271aedbda6bad0945f4c21a258f&lt;SEP&gt;chunk-e45aaf4de9dd2b8f35ec690ffef4ce11&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/information-technologies/&lt;SEP&gt;https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896526</data>
       <data key="d6" />
     </node>
     <node id="Faculty Of Information Technologies">
@@ -360,10 +360,10 @@
     <node id="Physics Department">
       <data key="d0">Physics Department</data>
       <data key="d1">organization</data>
-      <data key="d2">The Physics Department is an academic subdivision of Novosibirsk State University.</data>
-      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
-      <data key="d4">https://education.nsu.ru/</data>
-      <data key="d5">1773724475</data>
+      <data key="d2">The Physics Department is an academic subdivision of Novosibirsk State University.&lt;SEP&gt;The Physics Department is a division of Novosibirsk State University offering a bachelor's degree program.</data>
+      <data key="d3">chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896525</data>
       <data key="d6" />
     </node>
     <node id="Department of Natural Sciences">
@@ -666,10 +666,10 @@
     <node id="Unified State Exam">
       <data key="d0">Unified State Exam</data>
       <data key="d1">method</data>
-      <data key="d2">A standardized testing system used for university admissions, requiring subjects such as mathematics, informatics, physics, and Russian language.</data>
-      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df</data>
-      <data key="d4">https://education.nsu.ru/mathematics</data>
-      <data key="d5">1773845553</data>
+      <data key="d2">A standardized testing system used for university admissions, requiring subjects such as mathematics, informatics, physics, and Russian language.&lt;SEP&gt;The Unified State Exam is the standard testing method used for admission to the university program.</data>
+      <data key="d3">chunk-a7f4022f82d6e0bd59c16dadc8ded9df&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896526</data>
       <data key="d6" />
     </node>
     <node id="First-Year Students">
@@ -684,19 +684,19 @@
     <node id="Sports">
       <data key="d0">Sports</data>
       <data key="d1">concept</data>
-      <data key="d2">Sports represent the athletic activities available to students.</data>
-      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
-      <data key="d4">https://education.nsu.ru/mathematics</data>
-      <data key="d5">1773845554</data>
+      <data key="d2">Sports represent the athletic activities available to students.&lt;SEP&gt;Sports refers to physical activities and competitive games involving skill and exertion.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446&lt;SEP&gt;chunk-99a916192d9790255de414734f0ec4c7</data>
+      <data key="d4">https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896527</data>
       <data key="d6" />
     </node>
     <node id="Student Life">
       <data key="d0">Student Life</data>
       <data key="d1">concept</data>
-      <data key="d2">Student life encompasses the extracurricular and social experiences available to students.</data>
-      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
-      <data key="d4">https://education.nsu.ru/mathematics</data>
-      <data key="d5">1773845554</data>
+      <data key="d2">Student life encompasses the extracurricular and social experiences available to students.&lt;SEP&gt;Student Life encompasses the experiences, activities, and social interactions of individuals within an educational environment.</data>
+      <data key="d3">chunk-5d96525dc0a8e5f1a4d134623a3bf446&lt;SEP&gt;chunk-99a916192d9790255de414734f0ec4c7</data>
+      <data key="d4">https://education.nsu.ru/mathematics&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d5">1773896528</data>
       <data key="d6" />
     </node>
     <node id="Scientific Specialization">
@@ -814,6 +814,42 @@
       <data key="d3">chunk-56c035070f61cf4d5594c834da698ea7</data>
       <data key="d4">https://education.nsu.ru/mathematics</data>
       <data key="d5">1773845559</data>
+      <data key="d6" />
+    </node>
+    <node id="Physics: Fundamental Research, Breakthrough Technologies And Their Applications">
+      <data key="d0">Physics: Fundamental Research, Breakthrough Technologies And Their Applications</data>
+      <data key="d1">content</data>
+      <data key="d2">This is an undergraduate academic program offered by the Physics Department at NSU.</data>
+      <data key="d3">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/physics</data>
+      <data key="d5">1773896525</data>
+      <data key="d6" />
+    </node>
+    <node id="Physics: Fundamental Research, Breakthrough Technologies and Their Applications">
+      <data key="d0">Physics: Fundamental Research, Breakthrough Technologies and Their Applications</data>
+      <data key="d1">content</data>
+      <data key="d2">This is a bachelor's degree program offered by the Physics Department at Novosibirsk State University.</data>
+      <data key="d3">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/physics</data>
+      <data key="d5">1773896526</data>
+      <data key="d6" />
+    </node>
+    <node id="Secondary Vocational Education">
+      <data key="d0">Secondary Vocational Education</data>
+      <data key="d1">concept</data>
+      <data key="d2">Secondary Vocational Education is an alternative educational background for applicants to the program.</data>
+      <data key="d3">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d4">https://education.nsu.ru/physics</data>
+      <data key="d5">1773896526</data>
+      <data key="d6" />
+    </node>
+    <node id="Itia">
+      <data key="d0">Itia</data>
+      <data key="d1">other</data>
+      <data key="d2">Itia is a term mentioned in the context of sports and student life.</data>
+      <data key="d3">chunk-99a916192d9790255de414734f0ec4c7</data>
+      <data key="d4">https://education.nsu.ru/physics</data>
+      <data key="d5">1773896527</data>
       <data key="d6" />
     </node>
     <edge source="FIT" target="NSU">
@@ -1005,6 +1041,15 @@
       <data key="d12">1773845559</data>
       <data key="d13" />
     </edge>
+    <edge source="NSU" target="Physics Department">
+      <data key="d7">1.0</data>
+      <data key="d8">The Physics Department is a faculty belonging to NSU.</data>
+      <data key="d9">organizational structure</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896528</data>
+      <data key="d13" />
+    </edge>
     <edge source="SO RAN" target="MMF">
       <data key="d7">1.0</data>
       <data key="d8">MMF students conduct internships at SO RAN institutes.</data>
@@ -1176,6 +1221,15 @@
       <data key="d12">1773577741</data>
       <data key="d13" />
     </edge>
+    <edge source="Bachelor's Degree" target="Physics: Fundamental Research, Breakthrough Technologies And Their Applications">
+      <data key="d7">1.0</data>
+      <data key="d8">The program is categorized as a Bachelor's degree program.</data>
+      <data key="d9">educational level</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896529</data>
+      <data key="d13" />
+    </edge>
     <edge source="IVT" target="PIiKN">
       <data key="d7">1.0</data>
       <data key="d8">PIiKN is one of the two specialization profiles available under the IVT program.</data>
@@ -1213,12 +1267,12 @@
       <data key="d13" />
     </edge>
     <edge source="Novosibirsk State University" target="Physics Department">
-      <data key="d7">2.0</data>
-      <data key="d8">The Physics Department is a subdivision of Novosibirsk State University.</data>
-      <data key="d9">academic division,academic structure,organizational structure,subdivision</data>
-      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039</data>
-      <data key="d11">https://education.nsu.ru/</data>
-      <data key="d12">1773724482</data>
+      <data key="d7">3.0</data>
+      <data key="d8">The Physics Department is a subdivision of Novosibirsk State University.&lt;SEP&gt;The Physics Department is a faculty within Novosibirsk State University.</data>
+      <data key="d9">academic division,academic structure,affiliation,organizational structure,subdivision</data>
+      <data key="d10">chunk-3e0187d85fefff382fc2d89e5a6a1039&lt;SEP&gt;chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/&lt;SEP&gt;https://education.nsu.ru/physics</data>
+      <data key="d12">1773896530</data>
       <data key="d13" />
     </edge>
     <edge source="Novosibirsk State University" target="Department of Natural Sciences">
@@ -1426,6 +1480,24 @@
       <data key="d10">chunk-e45aaf4de9dd2b8f35ec690ffef4ce11</data>
       <data key="d11">https://education.nsu.ru/mathematics</data>
       <data key="d12">1773845564</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Physics Department" target="Physics: Fundamental Research, Breakthrough Technologies And Their Applications">
+      <data key="d7">1.0</data>
+      <data key="d8">The Physics Department offers the program titled Physics: Fundamental Research, Breakthrough Technologies And Their Applications.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896529</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Physics Department" target="Physics: Fundamental Research, Breakthrough Technologies and Their Applications">
+      <data key="d7">1.0</data>
+      <data key="d8">The Physics Department offers the bachelor's program titled Physics: Fundamental Research, Breakthrough Technologies and Their Applications.</data>
+      <data key="d9">academic program,curriculum</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896530</data>
       <data key="d13" />
     </edge>
     <edge source="Matematicheskiy Fakultet" target="NGU">
@@ -1671,6 +1743,24 @@
       <data key="d12">1773845566</data>
       <data key="d13" />
     </edge>
+    <edge source="Unified State Exam" target="Physics: Fundamental Research, Breakthrough Technologies And Their Applications">
+      <data key="d7">1.0</data>
+      <data key="d8">The Unified State Exam is required for applicants to enter the Physics program.</data>
+      <data key="d9">admission requirement</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896530</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Unified State Exam" target="Physics: Fundamental Research, Breakthrough Technologies and Their Applications">
+      <data key="d7">1.0</data>
+      <data key="d8">The Unified State Exam is the required examination process for students applying to the bachelor's program.</data>
+      <data key="d9">admission requirements,evaluation</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896531</data>
+      <data key="d13" />
+    </edge>
     <edge source="First-Year Students" target="Sports">
       <data key="d7">1.0</data>
       <data key="d8">First-year students have access to sports activities.</data>
@@ -1707,6 +1797,15 @@
       <data key="d12">1773845568</data>
       <data key="d13" />
     </edge>
+    <edge source="Sports" target="Itia">
+      <data key="d7">1.0</data>
+      <data key="d8">Itia is associated with the domain of sports.</data>
+      <data key="d9">association,context</data>
+      <data key="d10">chunk-99a916192d9790255de414734f0ec4c7</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896531</data>
+      <data key="d13" />
+    </edge>
     <edge source="Student Life" target="Freshmen">
       <data key="d7">1.0</data>
       <data key="d8">Freshmen have access to student life activities.</data>
@@ -1714,6 +1813,15 @@
       <data key="d10">chunk-5d96525dc0a8e5f1a4d134623a3bf446</data>
       <data key="d11">https://education.nsu.ru/mathematics</data>
       <data key="d12">1773845569</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Student Life" target="Itia">
+      <data key="d7">1.0</data>
+      <data key="d8">Itia is associated with the domain of student life.</data>
+      <data key="d9">association,context</data>
+      <data key="d10">chunk-99a916192d9790255de414734f0ec4c7</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896532</data>
       <data key="d13" />
     </edge>
     <edge source="Scientific Specialization" target="Freshmen">
@@ -1804,6 +1912,15 @@
       <data key="d10">chunk-56c035070f61cf4d5594c834da698ea7</data>
       <data key="d11">https://education.nsu.ru/mathematics</data>
       <data key="d12">1773845580</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Physics: Fundamental Research, Breakthrough Technologies and Their Applications" target="Secondary Vocational Education">
+      <data key="d7">1.0</data>
+      <data key="d8">Applicants with a background in Secondary Vocational Education follow specific subject requirements for the bachelor's program.</data>
+      <data key="d9">admission requirements,eligibility</data>
+      <data key="d10">chunk-e90ee1508531a0d0286c1af7f4cc4792</data>
+      <data key="d11">https://education.nsu.ru/physics</data>
+      <data key="d12">1773896531</data>
       <data key="d13" />
     </edge>
   </graph>

@@ -362,11 +362,11 @@
   },
   "Novosibirsk State University<SEP>Physics Department": {
     "chunk_ids": [
-      "chunk-3e0187d85fefff382fc2d89e5a6a1039"
+      "chunk-3e0187d85fefff382fc2d89e5a6a1039",
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
     ],
-    "count": 1,
-    "create_time": 1773724482,
-    "update_time": 1773724482,
+    "count": 2,
+    "update_time": 1773896530,
     "_id": "Novosibirsk State University<SEP>Physics Department"
   },
   "Department of Natural Sciences<SEP>Novosibirsk State University": {
@@ -990,5 +990,86 @@
     "create_time": 1773845580,
     "update_time": 1773845580,
     "_id": "Mmf<SEP>Schlumberger"
+  },
+  "NSU<SEP>Physics Department": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896528,
+    "update_time": 1773896528,
+    "_id": "NSU<SEP>Physics Department"
+  },
+  "Physics Department<SEP>Physics: Fundamental Research, Breakthrough Technologies And Their Applications": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896529,
+    "update_time": 1773896529,
+    "_id": "Physics Department<SEP>Physics: Fundamental Research, Breakthrough Technologies And Their Applications"
+  },
+  "Bachelor's Degree<SEP>Physics: Fundamental Research, Breakthrough Technologies And Their Applications": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896529,
+    "update_time": 1773896529,
+    "_id": "Bachelor's Degree<SEP>Physics: Fundamental Research, Breakthrough Technologies And Their Applications"
+  },
+  "Physics: Fundamental Research, Breakthrough Technologies And Their Applications<SEP>Unified State Exam": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896530,
+    "update_time": 1773896530,
+    "_id": "Physics: Fundamental Research, Breakthrough Technologies And Their Applications<SEP>Unified State Exam"
+  },
+  "Physics Department<SEP>Physics: Fundamental Research, Breakthrough Technologies and Their Applications": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896530,
+    "update_time": 1773896530,
+    "_id": "Physics Department<SEP>Physics: Fundamental Research, Breakthrough Technologies and Their Applications"
+  },
+  "Physics: Fundamental Research, Breakthrough Technologies and Their Applications<SEP>Unified State Exam": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896531,
+    "update_time": 1773896531,
+    "_id": "Physics: Fundamental Research, Breakthrough Technologies and Their Applications<SEP>Unified State Exam"
+  },
+  "Physics: Fundamental Research, Breakthrough Technologies and Their Applications<SEP>Secondary Vocational Education": {
+    "chunk_ids": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792"
+    ],
+    "count": 1,
+    "create_time": 1773896531,
+    "update_time": 1773896531,
+    "_id": "Physics: Fundamental Research, Breakthrough Technologies and Their Applications<SEP>Secondary Vocational Education"
+  },
+  "Itia<SEP>Sports": {
+    "chunk_ids": [
+      "chunk-99a916192d9790255de414734f0ec4c7"
+    ],
+    "count": 1,
+    "create_time": 1773896531,
+    "update_time": 1773896531,
+    "_id": "Itia<SEP>Sports"
+  },
+  "Itia<SEP>Student Life": {
+    "chunk_ids": [
+      "chunk-99a916192d9790255de414734f0ec4c7"
+    ],
+    "count": 1,
+    "create_time": 1773896532,
+    "update_time": 1773896532,
+    "_id": "Itia<SEP>Student Life"
   }
 }

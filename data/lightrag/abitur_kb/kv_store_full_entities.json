@@ -130,5 +130,24 @@
     "create_time": 1773845580,
     "update_time": 1773845580,
     "_id": "https://education.nsu.ru/mathematics"
+  },
+  "https://education.nsu.ru/physics": {
+    "entity_names": [
+      "Bachelor's Degree",
+      "Student Life",
+      "Physics: Fundamental Research, Breakthrough Technologies And Their Applications",
+      "Physics: Fundamental Research, Breakthrough Technologies and Their Applications",
+      "Secondary Vocational Education",
+      "Sports",
+      "Novosibirsk State University",
+      "Unified State Exam",
+      "NSU",
+      "Physics Department",
+      "Itia"
+    ],
+    "count": 11,
+    "create_time": 1773896532,
+    "update_time": 1773896532,
+    "_id": "https://education.nsu.ru/physics"
   }
 }

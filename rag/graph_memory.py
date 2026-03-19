@@ -1,7 +1,7 @@
 import logging
 import os
-import time
 from typing import Any, Dict, List, Literal, Optional
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 from lightrag import LightRAG, QueryParam
@@ -71,12 +71,29 @@ class GraphMemory:
     def _get_latest_mtime(self, graph_id: str) -> float:
         """Получает время последнего изменения хранилища (документов) для графа."""
         workspace_path = self._get_workspace_path(graph_id)
-        # Проверяем файл статуса документов, который обновляется при загрузке новых файлов
-        status_file = os.path.join(workspace_path, "kv_store_doc_status.json")
+
+        latest_mtime: float = 0.0
+
+        # Учитываем время изменения всех файлов в директории графа,
+        # чтобы любые изменения workspace (graphml/kv_store_*.json и др.)
+        # корректно инвалидацировали кэш.
+
         try:
-            return os.path.getmtime(status_file)
+            for root, _dirs, files in os.walk(workspace_path):
+                for name in files:
+                    file_path = os.path.join(root, name)
+                    try:
+                        mtime = os.path.getmtime(file_path)
+                    except OSError:
+                        # Игнорируем проблемы с отдельными файлами,
+                        # продолжаем сканирование
+                        continue
+                    if mtime > latest_mtime:
+                        latest_mtime = mtime
         except OSError:
+            # Если директория недоступна, считаем, что данных нет
             return 0.0
+        return latest_mtime
 
     async def _get_or_create_graph(self, graph_id: str) -> LightRAG:
         latest_mtime = self._get_latest_mtime(graph_id)
@@ -90,6 +107,18 @@ class GraphMemory:
             logger.info(
                 f"Обнаружено обновление файлов графа {graph_id}. Перезагрузка..."
             )
+
+            # Финализируем и удаляем старый экземпляр перед перезагрузкой,
+            # чтобы избежать утечек ресурсов и неконсистентного состояния хранилищ.
+            old_rag = self._graphs.pop(graph_id, None)
+            if old_rag is not None:
+                try:
+                    await old_rag.finalize_storages()
+                except Exception as finalize_err:
+                    logger.warning(
+                        "Ошибка при финализации предыдущего экземпляра LightRAG "
+                        f"для графа {graph_id}: {finalize_err}"
+                    )
 
         workspace_path = self._get_workspace_path(graph_id)
 
@@ -170,9 +199,8 @@ class GraphMemory:
             await initialize_pipeline_status()
 
             self._graphs[graph_id] = rag
-            # Обновляем время загрузки, берем текущее максимальное время файлов или time.time()
-            # Установим текущее системное время с запасом
-            self._graph_last_mtime[graph_id] = max(latest_mtime, time.time())
+            # Обновляем время загрузки, сохраняя фактическое максимальное mtime файлов
+            self._graph_last_mtime[graph_id] = latest_mtime
             logger.info(f"Created async LightRAG instance for graph: {graph_id}")
 
         except Exception as e:
@@ -229,8 +257,10 @@ class GraphMemory:
             for ref in references:
                 for url in (ref.get("file_path", "") or "").split(","):
                     url = url.strip()
-                    if url and url.startswith("http"):
-                        sources_set.add(url)
+                    if url:
+                        parsed = urlparse(url)
+                        if parsed.scheme in ("http", "https"):
+                            sources_set.add(url)
             return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
