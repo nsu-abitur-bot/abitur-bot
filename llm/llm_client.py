@@ -213,9 +213,9 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     rag_context = rag_context_raw
                 # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
                 # чтобы LLM использовала только те URL, что мы передадим явно.
-                # 1. Блок «Источники: ...» до конца текста
+                # 1. Блок «Источники: ...» и аналогичные до конца текста
                 rag_context = re.sub(
-                    r"\n{0,2}Источники?:[\s\S]*$",
+                    r"\n{0,2}(?:###\s*)?(?:Источники?|References?|Ссылки):?[\s\S]*$",
                     "",
                     rag_context,
                     flags=re.IGNORECASE,
@@ -246,7 +246,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 if url.startswith("http://") or url.startswith("https://")
             ]
             if valid_urls:
-                links_text = "\n".join([f"- {escape(url)}" for url in valid_urls[:5]])
+                links_text = "\n".join([f"- {url}" for url in valid_urls[:5]])
                 sources_hint = (
                     "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
                     "ЕСЛИ ты использовал информацию из блока 'Контекст из базы знаний"
@@ -284,7 +284,9 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     # Очищаем старые ответы от блока с источниками,
                     # чтобы они не сбивали с толку LLM при ответе на новый вопрос
                     entry_clean = re.sub(
-                        r"<b>Источники:</b>[\s\S]*", "", entry_content
+                        r"(?i)(?:<b>|###\s*)?(?:Источники|References|Ссылки):?(?:</b>)?[\s\S]*",
+                        "",
+                        entry_content,
                     ).strip()
                     messages.append(AIMessage(content=entry_clean))
 
