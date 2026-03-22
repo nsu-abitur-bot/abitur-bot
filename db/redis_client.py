@@ -104,6 +104,29 @@ class RedisClient:
             logger.error("Ошибка проверки awaiting_applicant_id: %s", e)
             return False
 
+    async def save_parsing_result(self, task_id: str, data: dict) -> None:
+        """Сохраняет промежуточный результат парсинга в Redis."""
+        key = f"parsing_task:{task_id}"
+        try:
+            await self.client.set(key, json.dumps(data), ex=TTL_SECONDS)
+            logger.debug("Сохранен промежуточный результат парсинга для %s", task_id)
+        except redis.RedisError as e:
+            logger.error("Ошибка сохранения результата парсинга: %s", e)
+            raise
+
+    async def get_and_delete_parsing_result(self, task_id: str) -> dict | None:
+        """Извлекает и удаляет промежуточный результат парсинга из Redis."""
+        key = f"parsing_task:{task_id}"
+        try:
+            data = await self.client.get(key)
+            if data:
+                await self.client.delete(key)
+                return json.loads(data)
+            return None
+        except redis.RedisError as e:
+            logger.error("Ошибка извлечения результата парсинга: %s", e)
+            return None
+
     # ------------------------------------------------------------------
     # Устаревшие псевдонимы (deprecated)
     # ------------------------------------------------------------------

@@ -20,8 +20,8 @@ async def add_texts_async(
     Args:
         texts: Список текстов для добавления.
         graph_id: ID графа для сохранения данных.
-        source_ids: URL-идентификаторы документов (для дедупликации).
-        file_paths: Строки со всеми URL источниками каждого документа.
+        source_ids: Названия документов (id для дедупликации/обновления).
+        file_paths: URL источники каждого документа.
 
     Returns:
         Количество успешно сохраненных текстов.
@@ -45,12 +45,16 @@ async def add_texts_async(
                 file_paths[i] if file_paths and i < len(file_paths) else source_id
             )
 
+            # Формируем строку без запятых, чтобы избежать проблем со split(",")
+            # в query_with_sources
+            safe_url = file_path.replace(",", "%2C") if file_path else "Нет"
+
             # LightRAG handles chunking internally
             saved = await graph_memory.save(
                 graph_id,
                 text,
-                source_id=source_id,
-                file_paths_str=file_path,
+                source_id=source_id,  # Теперь здесь будет title
+                file_paths_str=safe_url,  # Здесь только URL
             )
             if saved:
                 saved_count += 1
@@ -73,8 +77,8 @@ def add_texts(
 
     Args:
         texts: Список текстов для добавления
-        source_ids: URL-идентификаторы документов (для дедупликации)
-        file_paths: Строки со всеми URL источниками каждого документа (для цитирования)
+        source_ids: Названия документов (id для дедупликации/обновления).
+        file_paths: URL источники каждого документа.
     """
     coro = add_texts_async(
         texts,
