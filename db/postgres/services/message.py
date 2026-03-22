@@ -48,7 +48,7 @@ class MessageService:
             result = await self.session.execute(
                 select(Message)
                 .where(Message.user_id == user_id)
-                .order_by(Message.created_at)
+                .order_by(Message.created_at.desc())
                 .limit(limit)
                 .offset(offset)
             )
@@ -65,7 +65,7 @@ class MessageService:
             result = await self.session.execute(
                 select(Message)
                 .where(Message.session_id == session_id)
-                .order_by(Message.created_at)
+                .order_by(Message.created_at.desc())
                 .limit(limit)
                 .offset(offset)
             )
@@ -80,7 +80,7 @@ class MessageService:
         """Получает все сообщения с пагинацией."""
         try:
             result = await self.session.execute(
-                select(Message).order_by(Message.created_at).limit(limit).offset(offset)
+                select(Message).order_by(Message.created_at.desc()).limit(limit).offset(offset)
             )
             return list(result.scalars().all())
         except Exception as e:

@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 from typing import List, Optional
 
@@ -25,6 +26,7 @@ class UserCountStatsResponse(BaseModel):
 class MessageResponse(BaseModel):
     id: str
     user_id: int
+    username: Optional[str] = None
     session_id: str
     user_text: str
     bot_response: str
@@ -81,14 +83,26 @@ async def get_messages(
             messages = await service.get_all_messages(limit=limit, offset=offset)
     except Exception:
         raise HTTPException(status_code=503, detail="Database unavailable")
-    return [
-        MessageResponse(
-            id=msg.id,
-            user_id=msg.user_id,
-            session_id=msg.session_id,
-            user_text=msg.user_text,
-            bot_response=msg.bot_response,
-            created_at=msg.created_at,
+
+    result = []
+    for msg in messages:
+        # Извлекаем username из формата [from username] text
+        username = None
+        user_text = msg.user_text
+        match = re.match(r"^\[from (.*?)\] (.*)$", user_text, re.DOTALL)
+        if match:
+            username = match.group(1)
+            user_text = match.group(2)
+
+        result.append(
+            MessageResponse(
+                id=msg.id,
+                user_id=msg.user_id,
+                username=username,
+                session_id=msg.session_id,
+                user_text=user_text,  # Возвращаем основной текст без префикса
+                bot_response=msg.bot_response,
+                created_at=msg.created_at,
+            )
         )
-        for msg in messages
-    ]
+    return result
