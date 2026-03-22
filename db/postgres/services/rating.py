@@ -1,10 +1,10 @@
 import logging
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..dto import RatingEntry
+from ..dto import RatingChange, RatingEntry
 from ..models import Leaderboard, User, UserRating
 
 logger = logging.getLogger(__name__)
@@ -133,7 +133,7 @@ class RatingService:
         self,
         leaderboard_id: str,
         entries: List[RatingEntry],
-    ) -> dict:
+    ) -> Dict[str, Any]:
         """Обновить позиции абитуриентов в БД по результатам парсера.
 
         Поддерживает множественные пользователи с одним applicant_id.
@@ -146,9 +146,14 @@ class RatingService:
             entries: Список записей от парсера.
 
         Returns:
-            {"created": int, "updated": int, "skipped": int}
+            {"created": int, "updated": int, "skipped": int, "notifications": List[RatingChange]}
         """
-        stats = {"updated": 0, "created": 0, "skipped": 0}
+        stats: Dict[str, Any] = {
+            "updated": 0,
+            "created": 0,
+            "skipped": 0,
+            "notifications": [],
+        }
 
         if not entries:
             return stats
@@ -214,11 +219,27 @@ class RatingService:
                         user_id=user.user_id,
                         leaderboard_id=leaderboard_id,
                         place=0,
+                        competition_type="",
+                        status="",
                     )
                     self.session.add(user_rating)
                     self._apply_entry_fields(user_rating, entry)
                     existing_ratings[user.user_id] = user_rating
                     stats["created"] += 1
+                    stats["notifications"].append(
+                        RatingChange(
+                            user_id=user.user_id,
+                            applicant_id=entry.identifier,
+                            leaderboard_id=leaderboard_id,
+                            old_place=None,
+                            new_place=entry.place,
+                            old_status=None,
+                            new_status=entry.status,
+                            old_competition_type=None,
+                            new_competition_type=entry.competition_type,
+                            is_new=True,
+                        )
+                    )
                     logger.debug(
                         f"Создана запись рейтинга: user={user.user_id}, "
                         f"place={entry.place}, "
@@ -227,8 +248,32 @@ class RatingService:
                     )
                 else:
                     old_place = user_rating.place
+                    old_status = user_rating.status
+                    old_comp = user_rating.competition_type
+
                     self._apply_entry_fields(user_rating, entry)
                     stats["updated"] += 1
+
+                    if (
+                        old_place != entry.place
+                        or old_status != entry.status
+                        or old_comp != entry.competition_type
+                    ):
+                        stats["notifications"].append(
+                            RatingChange(
+                                user_id=user.user_id,
+                                applicant_id=entry.identifier,
+                                leaderboard_id=leaderboard_id,
+                                old_place=old_place,
+                                new_place=entry.place,
+                                old_status=old_status,
+                                new_status=entry.status,
+                                old_competition_type=old_comp,
+                                new_competition_type=entry.competition_type,
+                                is_new=False,
+                            )
+                        )
+
                     logger.debug(
                         f"Обновлена запись рейтинга: user={user.user_id}, "
                         f"{old_place} -> {entry.place}, "
