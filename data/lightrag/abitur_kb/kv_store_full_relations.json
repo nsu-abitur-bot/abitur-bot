@@ -170,5 +170,669 @@
     "create_time": 1773586732,
     "update_time": 1773586732,
     "_id": "https://education.nsu.ru/freshmen"
+  },
+  "https://education.nsu.ru/": {
+    "relation_pairs": [
+      [
+        "Institute of Medicine and Medical Technologies",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institut Intellektualnoy Robototekhniki",
+        "NGU"
+      ],
+      [
+        "Mechanics and Mathematics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Matematicheskiy Fakultet",
+        "NGU"
+      ],
+      [
+        "Department of Information Technologies",
+        "Novosibirsk State University"
+      ],
+      [
+        "Bachelor's Programs",
+        "NGU"
+      ],
+      [
+        "NGU",
+        "Student Resources"
+      ],
+      [
+        "Economics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institute of Intelligent Robotics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Humanities Institute",
+        "Novosibirsk State University"
+      ],
+      [
+        "Fakultet Yestestvennykh Nauk",
+        "NGU"
+      ],
+      [
+        "Faculty of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Ekonomicheskiy Fakultet",
+        "NGU"
+      ],
+      [
+        "Novosibirsk State University",
+        "Physics Department"
+      ],
+      [
+        "Novosibirsk State University",
+        "Student Services"
+      ],
+      [
+        "Department of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty of Mathematics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Bachelor's Degree Programs",
+        "Novosibirsk State University"
+      ],
+      [
+        "Geology and Geophysics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty of Economics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Institute of Philosophy and Law",
+        "Novosibirsk State University"
+      ]
+    ],
+    "count": 21,
+    "create_time": 1773724491,
+    "update_time": 1773724491,
+    "_id": "https://education.nsu.ru/"
+  },
+  "https://education.nsu.ru/mathematics": {
+    "relation_pairs": [
+      [
+        "Mathematics And Computer Sciences",
+        "Mmf"
+      ],
+      [
+        "Mathematics and Computer Sciences",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "MMF",
+        "SO RAN"
+      ],
+      [
+        "MMF",
+        "System Programming"
+      ],
+      [
+        "First-Year Students",
+        "Sports"
+      ],
+      [
+        "MMF",
+        "Schlumberger"
+      ],
+      [
+        "CFT",
+        "MMF"
+      ],
+      [
+        "Mmf",
+        "So Ran"
+      ],
+      [
+        "Fundamental Mathematics Research Group",
+        "MMF"
+      ],
+      [
+        "Mmf",
+        "Sber"
+      ],
+      [
+        "Freshmen",
+        "Student Life"
+      ],
+      [
+        "Google",
+        "Mmf"
+      ],
+      [
+        "First-Year Students",
+        "Scientific Specialization"
+      ],
+      [
+        "Alfa-Bank",
+        "Mmf"
+      ],
+      [
+        "Mechanics Technologies",
+        "Mmf"
+      ],
+      [
+        "MMF",
+        "Mathematical Methods and Information Technologies in Mechanics"
+      ],
+      [
+        "2gis",
+        "Mmf"
+      ],
+      [
+        "Artificial Intelligence and Applied Engineering School",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "Google",
+        "MMF"
+      ],
+      [
+        "Alfa-Bank",
+        "MMF"
+      ],
+      [
+        "Dormitories",
+        "First-Year Students"
+      ],
+      [
+        "2GIS",
+        "MMF"
+      ],
+      [
+        "MMF",
+        "Mathematics and Computer Sciences"
+      ],
+      [
+        "Mathematics And Computer Sciences",
+        "Research Group Of Fundamental Mathematics"
+      ],
+      [
+        "Mmf",
+        "Yandex"
+      ],
+      [
+        "MMF",
+        "NSU"
+      ],
+      [
+        "Mathematical Methods And Information Technologies In Mechanics",
+        "Mathematics And Computer Sciences"
+      ],
+      [
+        "Dormitories",
+        "Freshmen"
+      ],
+      [
+        "Mathematical Methods And Information Technologies In Mechanics",
+        "Unified State Exam"
+      ],
+      [
+        "Engineering School Artificial Intelligence And Applied Engineering",
+        "Mathematics And Computer Sciences"
+      ],
+      [
+        "Engineering School of Artificial Intelligence and Applied Engineering",
+        "MMF"
+      ],
+      [
+        "MMF",
+        "Sber"
+      ],
+      [
+        "Intel",
+        "Mmf"
+      ],
+      [
+        "Microsoft",
+        "Mmf"
+      ],
+      [
+        "MMF",
+        "Yandex"
+      ],
+      [
+        "Engineering School Artificial Intelligence And Applied Engineering",
+        "Unified State Exam"
+      ],
+      [
+        "Intel",
+        "MMF"
+      ],
+      [
+        "Freshmen",
+        "Sports"
+      ],
+      [
+        "First-Year Students",
+        "Student Life"
+      ],
+      [
+        "Applied Mathematics and Informatics",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "Mathematics And Computer Sciences",
+        "System Programming"
+      ],
+      [
+        "Mechanics and Mathematics Department",
+        "Novosibirsk State University"
+      ],
+      [
+        "MMF",
+        "Microsoft"
+      ],
+      [
+        "MKN",
+        "MMF"
+      ],
+      [
+        "Cft",
+        "Mmf"
+      ],
+      [
+        "Freshmen",
+        "Scientific Specialization"
+      ],
+      [
+        "Mmf",
+        "Schlumberger"
+      ],
+      [
+        "MMF",
+        "PMI"
+      ],
+      [
+        "Fundamental Mathematics Research Group",
+        "Mechanics and Mathematics Department"
+      ],
+      [
+        "MMF",
+        "Mechanics Technologies"
+      ],
+      [
+        "Research Group Of Fundamental Mathematics",
+        "Unified State Exam"
+      ]
+    ],
+    "count": 51,
+    "create_time": 1773845580,
+    "update_time": 1773845580,
+    "_id": "https://education.nsu.ru/mathematics"
+  },
+  "https://education.nsu.ru/physics": {
+    "relation_pairs": [
+      [
+        "Bachelor's Degree",
+        "Physics: Fundamental Research, Breakthrough Technologies And Their Applications"
+      ],
+      [
+        "NSU",
+        "Physics Department"
+      ],
+      [
+        "Physics: Fundamental Research, Breakthrough Technologies and Their Applications",
+        "Secondary Vocational Education"
+      ],
+      [
+        "Itia",
+        "Sports"
+      ],
+      [
+        "Physics: Fundamental Research, Breakthrough Technologies and Their Applications",
+        "Unified State Exam"
+      ],
+      [
+        "Physics Department",
+        "Physics: Fundamental Research, Breakthrough Technologies and Their Applications"
+      ],
+      [
+        "Physics: Fundamental Research, Breakthrough Technologies And Their Applications",
+        "Unified State Exam"
+      ],
+      [
+        "Novosibirsk State University",
+        "Physics Department"
+      ],
+      [
+        "Itia",
+        "Student Life"
+      ],
+      [
+        "Physics Department",
+        "Physics: Fundamental Research, Breakthrough Technologies And Their Applications"
+      ]
+    ],
+    "count": 10,
+    "create_time": 1773896532,
+    "update_time": 1773896532,
+    "_id": "https://education.nsu.ru/physics"
+  },
+  "https://education.nsu.ru/promo/geology": {
+    "relation_pairs": [
+      [
+        "Field Practices And Expeditions",
+        "GGF"
+      ],
+      [
+        "Geochemistry",
+        "Geology"
+      ],
+      [
+        "Geology Program",
+        "Geology Specialization"
+      ],
+      [
+        "Geology",
+        "Geophysics"
+      ],
+      [
+        "Geology Program",
+        "Geophysics"
+      ],
+      [
+        "GGF",
+        "Geological Exploration"
+      ],
+      [
+        "Faculty of Geology and Geophysics",
+        "Geology"
+      ],
+      [
+        "GGF",
+        "Scientific Conferences"
+      ],
+      [
+        "Geology Program",
+        "Geophysics In Oil And Mining"
+      ],
+      [
+        "GGF",
+        "Scholarship Programs"
+      ],
+      [
+        "GGF",
+        "Oil And Gas Industry"
+      ],
+      [
+        "GGF",
+        "Geology Program"
+      ],
+      [
+        "Geology",
+        "Oil and Gas"
+      ],
+      [
+        "Geology",
+        "Geophysics in Oilfield and Mining"
+      ],
+      [
+        "Field Expeditions",
+        "GGF"
+      ],
+      [
+        "Geochemistry",
+        "Geology Program"
+      ],
+      [
+        "Exchange Programs",
+        "GGF"
+      ],
+      [
+        "Geology Program",
+        "Oil And Gas"
+      ],
+      [
+        "Faculty of Geology and Geophysics",
+        "Novosibirsk State University"
+      ],
+      [
+        "GGF",
+        "NSU"
+      ]
+    ],
+    "count": 20,
+    "create_time": 1773902660,
+    "update_time": 1773902660,
+    "_id": "https://education.nsu.ru/promo/geology"
+  },
+  "https://education.nsu.ru/economics/": {
+    "relation_pairs": [
+      [
+        "Faculty of Economics",
+        "NSU"
+      ],
+      [
+        "Economics",
+        "Faculty of Economics"
+      ],
+      [
+        "Faculty of Economics",
+        "Sociology"
+      ],
+      [
+        "Business Informatics",
+        "IT Infrastructure"
+      ],
+      [
+        "EF",
+        "Mathematics"
+      ],
+      [
+        "Faculty of Economics",
+        "Novosibirsk State University"
+      ],
+      [
+        "EF",
+        "Practical Disciplines"
+      ],
+      [
+        "EF",
+        "IT and Data Analysis"
+      ],
+      [
+        "Faculty of Economics",
+        "Management"
+      ],
+      [
+        "SPSS",
+        "Sociology"
+      ],
+      [
+        "Business Informatics",
+        "Management"
+      ],
+      [
+        "Bank of Russia",
+        "Practical Disciplines"
+      ],
+      [
+        "Career Clubs and Internships",
+        "EF"
+      ],
+      [
+        "Faculty of Economics",
+        "Jurisprudence"
+      ],
+      [
+        "EF",
+        "Individual Educational Trajectory"
+      ],
+      [
+        "Economic Activity",
+        "Jurisprudence"
+      ],
+      [
+        "Business Informatics",
+        "Faculty of Economics"
+      ],
+      [
+        "Sociology",
+        "VAAL"
+      ],
+      [
+        "EF",
+        "Economics and Finance"
+      ]
+    ],
+    "count": 19,
+    "create_time": 1773905111,
+    "update_time": 1773905111,
+    "_id": "https://education.nsu.ru/economics/"
+  },
+  "https://education.nsu.ru/promo/naturalsciences/": {
+    "relation_pairs": [
+      [
+        "Faculty Of Natural Sciences",
+        "Novosibirsk State University"
+      ],
+      [
+        "Chemistry: Fundamental Science And Breakthrough Technologies",
+        "Faculty Of Natural Sciences"
+      ],
+      [
+        "Bachelor's Program",
+        "FEN"
+      ],
+      [
+        "Akademgorodok",
+        "Faculty Of Natural Sciences"
+      ],
+      [
+        "Chemistry: Fundamental Science and Breakthrough Technologies",
+        "FEN"
+      ],
+      [
+        "Akademgorodok",
+        "GU"
+      ],
+      [
+        "FEN",
+        "NSU"
+      ],
+      [
+        "Akademgorodok",
+        "FEN"
+      ]
+    ],
+    "count": 8,
+    "create_time": 1773907603,
+    "update_time": 1773907603,
+    "_id": "https://education.nsu.ru/promo/naturalsciences/"
+  },
+  "https://education.nsu.ru/mechatronics": {
+    "relation_pairs": [
+      [
+        "Applied Artificial Intelligence",
+        "Industrial Partners"
+      ],
+      [
+        "Curriculum",
+        "Mechatronics And Robotics"
+      ],
+      [
+        "IIR",
+        "NSU"
+      ],
+      [
+        "Mechatronics And Robotics",
+        "Practical Training"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "IIR"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Deep Machine Learning"
+      ],
+      [
+        "IIR",
+        "Mechatronics And Robotics"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Institute Of Intelligent Robotics"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Machine Learning"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Robotics"
+      ],
+      [
+        "Institute Of Intelligent Robotics",
+        "Mechatronics And Robotics"
+      ],
+      [
+        "Institute Of Intelligent Robotics",
+        "Novosibirsk State University"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Mobile Applications"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Digital Signal Processing"
+      ],
+      [
+        "Applied Artificial Intelligence",
+        "Lavrentyev Supercomputer Center"
+      ]
+    ],
+    "count": 15,
+    "create_time": 1773925883,
+    "update_time": 1773925883,
+    "_id": "https://education.nsu.ru/mechatronics"
+  },
+  "https://education.nsu.ru/psychology": {
+    "relation_pairs": [
+      [
+        "Psychology Program",
+        "Scholarship Programs"
+      ],
+      [
+        "IMMT",
+        "Psychology Program"
+      ],
+      [
+        "Entrance Exams",
+        "Psychology Program"
+      ],
+      [
+        "IMMT",
+        "NSU"
+      ],
+      [
+        "NSU Campus",
+        "Psychology Program"
+      ],
+      [
+        "NSU",
+        "NSU Campus"
+      ]
+    ],
+    "count": 6,
+    "create_time": 1773930582,
+    "update_time": 1773930582,
+    "_id": "https://education.nsu.ru/psychology"
   }
 }
