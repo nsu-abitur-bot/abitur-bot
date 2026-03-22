@@ -373,6 +373,39 @@ class GraphMemory:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
 
+    async def get_list_docs(self, graph_id: str) -> list[dict]:
+        """Возвращает список документов из KV-хранилища статусов."""
+        import json
+
+        workspace_path = self._get_workspace_path(graph_id)
+        status_file = os.path.join(workspace_path, "kv_store_doc_status.json")
+
+        if not os.path.exists(status_file):
+            return []
+
+        try:
+            with open(status_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+
+            result = []
+            for doc_id, info in data.items():
+                result.append(
+                    {
+                        "id": doc_id,
+                        "status": info.get("status"),
+                        "content_summary": info.get("content_summary"),
+                        "content_length": info.get("content_length"),
+                        "created_at": info.get("created_at"),
+                    }
+                )
+
+            # Сортируем документы: сначала новые (по created_at DESC)
+            result.sort(key=lambda x: x.get("created_at") or "", reverse=True)
+            return result
+        except Exception as e:
+            logger.error(f"Error reading doc status for {graph_id}: {e}")
+            return []
+
     async def cleanup(self, graph_id: Optional[str] = None) -> None:
         """
         Асинхронно финализировать хранилища для корректного завершения.

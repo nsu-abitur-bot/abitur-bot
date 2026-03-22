@@ -38,3 +38,15 @@ class RagUploadResponse(BaseModel):
     results: list[UploadedDocumentResult] = Field(
         ..., description="Результаты обработки по каждому загруженному файлу"
     )
+
+
+class RagDocument(BaseModel):
+    id: str = Field(..., description="Идентификатор документа (обычно URL или имя файла)")
+    status: str = Field(..., description="Статус обработки")
+    content_summary: str | None = Field(None, description="Краткое содержание")
+    content_length: int | None = Field(None, description="Длина контента")
+    created_at: str | None = Field(None, description="Дата создания")
+
+
+class RagDocumentListResponse(BaseModel):
+    documents: list[RagDocument] = Field(..., description="Список документов в RAG")
