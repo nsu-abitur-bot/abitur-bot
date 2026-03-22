@@ -1,5 +1,8 @@
+import asyncio
 import logging
 import os
+import time
+from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
@@ -18,6 +21,15 @@ logger = logging.getLogger(__name__)
 GRAPH_QUERY_MODES: frozenset = frozenset(
     ["naive", "local", "global", "hybrid", "mix", "bypass"]
 )
+
+
+class _GraphWrapper:
+    """Wrapper to track usage count of LightRAG instances for safe finalization."""
+
+    def __init__(self, rag: LightRAG):
+        self.rag = rag
+        self.usage_count = 0
+        self.marked_for_deletion = False
 
 
 class GraphMemory:
@@ -51,7 +63,11 @@ class GraphMemory:
         self.model_name: str = model_name or os.getenv("GIGACHAT_MODEL", "GigaChat")
         self.embedding_model_name = embedding_model_name
 
-        self._graphs: Dict[str, LightRAG] = {}
+        self._graphs: Dict[str, _GraphWrapper] = {}
+        self._graph_signatures: Dict[str, tuple[float, int]] = {}
+        self._locks: Dict[tuple[asyncio.AbstractEventLoop, str], asyncio.Lock] = {}
+        self._last_disk_check: Dict[str, float] = {}
+        self._check_interval: float = 2.0  # limit disk scanning (os.scandir) frequency
 
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
@@ -66,96 +82,232 @@ class GraphMemory:
         os.makedirs(path, exist_ok=True)
         return path
 
-    async def _get_or_create_graph(self, graph_id: str) -> LightRAG:
-        if graph_id in self._graphs:
-            return self._graphs[graph_id]
+    def _get_lock(self, graph_id: str) -> asyncio.Lock:
+        """
+        Get or create an asyncio.Lock scoped to the current event loop and graph_id.
 
+        asyncio primitives are bound to the event loop in which they are created,
+        so we must not share the same Lock instance across different loops.
+        """
+        loop = asyncio.get_running_loop()
+        key = (loop, graph_id)
+        if key not in self._locks:
+            self._locks[key] = asyncio.Lock()
+        return self._locks[key]
+
+    def _get_workspace_signature(self, graph_id: str) -> tuple[float, int]:
+        """Получает максимальное mtime и количество файлов для графа."""
         workspace_path = self._get_workspace_path(graph_id)
 
+        latest_mtime: float = 0.0
+        file_count: int = 0
+
+        # Используем более лёгкую метрику, чтобы уменьшить нагрузку на диск:
+        # - mtime директории workspace
+        # - поверхностный обход содержимого через os.scandir без рекурсии
+        # Обратите внимание: это по‑прежнему синхронный дисковый I/O и он может
+        # блокировать event loop, просто делает это менее тяжело, чем рекурсивный обход.
         try:
-            graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gigachat").lower()
+            latest_mtime = os.path.getmtime(workspace_path)
+            with os.scandir(workspace_path) as it:
+                for entry in it:
+                    if not entry.is_file() and not entry.is_dir():
+                        continue
+                    file_count += 1
+                    try:
+                        mtime = entry.stat().st_mtime
+                        if mtime > latest_mtime:
+                            latest_mtime = mtime
+                    except OSError:
+                        # Игнорируем проблемы с отдельными файлами/записями
+                        continue
+        except OSError:
+            # Если не удаётся просканировать директорию, используем только её mtime
+            pass
+        return latest_mtime, file_count
 
-            if graph_llm_provider == "openai":
-                openai_api_key = os.getenv("OPENAI_API_KEY", "")
-                if not openai_api_key:
-                    raise RuntimeError(
-                        "LIGHTRAG_LLM_PROVIDER=openai, но OPENAI_API_KEY не установлен."
+    async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
+        rag_to_finalize = None
+
+        async with self._get_lock(graph_id):
+            now = time.monotonic()
+            check_disk = False
+
+            if graph_id not in self._graphs:
+                check_disk = True
+            elif now - self._last_disk_check.get(graph_id, 0.0) > self._check_interval:
+                check_disk = True
+
+            if check_disk:
+                sig = self._get_workspace_signature(graph_id)
+                self._last_disk_check[graph_id] = now
+                current_sig = self._graph_signatures.get(graph_id, (-1.0, -1))
+
+                # Если граф уже загружен и файлы на диске не изменились — возвращаем кэш
+                if graph_id in self._graphs and sig == current_sig:
+                    wrapper = self._graphs[graph_id]
+                    wrapper.usage_count += 1
+                    return wrapper
+
+                if graph_id in self._graphs:
+                    logger.info(
+                        f"Обнаружено обновление файлов графа {graph_id}."
+                        + " Перезагрузка..."
                     )
-                llm_adapter: Any = OpenAILLM(
-                    api_key=openai_api_key,
-                    model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
-                )
-                embedding_adapter: Any = OpenAIEmbedding(
-                    api_key=openai_api_key,
-                    model=os.getenv(
-                        "OPENAI_GRAPH_EMBEDDING_MODEL",
-                        "text-embedding-3-small",
-                    ),
-                )
-            elif graph_llm_provider == "gemini":
-                gemini_api_key = os.getenv("GEMINI_API_KEY", "")
-                if not gemini_api_key:
-                    raise RuntimeError(
-                        "LIGHTRAG_LLM_PROVIDER=gemini, но GEMINI_API_KEY не установлен."
+
+                    old_wrapper = self._graphs.pop(graph_id, None)
+                    if old_wrapper is not None:
+                        old_wrapper.marked_for_deletion = True
+                        if old_wrapper.usage_count <= 0:
+                            rag_to_finalize = old_wrapper.rag
+                        else:
+                            logger.info(
+                                f"Отложена финализация графа {graph_id}"
+                                + f" (в использовании: {old_wrapper.usage_count})"
+                            )
+            elif graph_id in self._graphs:
+                wrapper = self._graphs[graph_id]
+                wrapper.usage_count += 1
+                return wrapper
+
+            # Если мы тут, значит графа нет в словаре. Создаем.
+            workspace_path = self._get_workspace_path(graph_id)
+
+            try:
+                graph_llm_provider = os.getenv(
+                    "LIGHTRAG_LLM_PROVIDER", "gigachat"
+                ).lower()
+
+                if graph_llm_provider == "openai":
+                    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+                    if not openai_api_key:
+                        raise RuntimeError(
+                            "LIGHTRAG_LLM_PROVIDER=openai,"
+                            + " но OPENAI_API_KEY не установлен."
+                        )
+                    llm_adapter: Any = OpenAILLM(
+                        api_key=openai_api_key,
+                        model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
                     )
-                llm_adapter: Any = GeminiLLM(
-                    api_key=gemini_api_key,
-                    model=os.getenv(
-                        "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
-                    ),
+                    embedding_adapter: Any = OpenAIEmbedding(
+                        api_key=openai_api_key,
+                        model=os.getenv(
+                            "OPENAI_GRAPH_EMBEDDING_MODEL",
+                            "text-embedding-3-small",
+                        ),
+                    )
+                elif graph_llm_provider == "gemini":
+                    gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+                    if not gemini_api_key:
+                        raise RuntimeError(
+                            "LIGHTRAG_LLM_PROVIDER=gemini,"
+                            + " но GEMINI_API_KEY не установлен."
+                        )
+                    llm_adapter: Any = GeminiLLM(
+                        api_key=gemini_api_key,
+                        model=os.getenv(
+                            "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
+                        ),
+                    )
+                    embedding_adapter: Any = GeminiEmbedding(
+                        api_key=gemini_api_key,
+                        model=os.getenv(
+                            "GEMINI_GRAPH_EMBEDDING_MODEL",
+                            "gemini-embedding-2-preview",
+                        ),
+                    )
+                else:
+                    llm_adapter = GigaChatLLM(
+                        credentials=self.credentials,
+                        scope=self.scope,
+                        model=self.model_name,
+                    )
+                    embedding_adapter = GigaChatEmbedding(
+                        credentials=self.credentials,
+                        scope=self.scope,
+                        model=self.embedding_model_name,
+                    )
+
+                @wrap_embedding_func_with_attrs(
+                    embedding_dim=embedding_adapter.embedding_dim
                 )
-                embedding_adapter: Any = GeminiEmbedding(
-                    api_key=gemini_api_key,
-                    model=os.getenv(
-                        "GEMINI_GRAPH_EMBEDDING_MODEL",
-                        "gemini-embedding-2-preview",
-                    ),
+                async def embedding_func(texts: List[str]) -> List[List[float]]:
+                    return await embedding_adapter(texts)
+
+                async def llm_model_func(prompt: str, **kwargs) -> str:
+                    return await llm_adapter(prompt, **kwargs)
+
+                embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
+                llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
+
+                rag = LightRAG(
+                    working_dir=workspace_path,
+                    llm_model_func=llm_model_func,
+                    embedding_func=embedding_func,
+                    chunk_token_size=400,
+                    chunk_overlap_token_size=50,
+                    embedding_func_max_async=embedding_workers,
+                    llm_model_max_async=llm_workers,
                 )
-            else:
-                llm_adapter = GigaChatLLM(
-                    credentials=self.credentials,
-                    scope=self.scope,
-                    model=self.model_name,
+
+                await rag.initialize_storages()
+                await initialize_pipeline_status()
+
+                wrapper = _GraphWrapper(rag)
+                self._graphs[graph_id] = wrapper
+
+                # Обновляем сигнатуру после инициализации,
+                # чтобы не триггерить перезагрузку
+                self._graph_signatures[graph_id] = self._get_workspace_signature(
+                    graph_id
                 )
-                embedding_adapter = GigaChatEmbedding(
-                    credentials=self.credentials,
-                    scope=self.scope,
-                    model=self.embedding_model_name,
+                self._last_disk_check[graph_id] = time.monotonic()
+                logger.info(f"Created async LightRAG instance for graph: {graph_id}")
+
+                # Инкрементируем использование сразу
+                wrapper.usage_count += 1
+
+            except Exception as e:
+                logger.error(f"Error creating LightRAG instance for {graph_id}: {e}")
+                raise
+
+        # Вне лока финализируем старый граф, если он был удален и счетчик 0
+        if rag_to_finalize is not None:
+            try:
+                await rag_to_finalize.finalize_storages()
+            except Exception as finalize_err:
+                logger.warning(
+                    "Ошибка при финализации предыдущего " + "экземпляра LightRAG "
+                    f"для графа {graph_id}: {finalize_err}"
                 )
 
-            @wrap_embedding_func_with_attrs(
-                embedding_dim=embedding_adapter.embedding_dim
-            )
-            async def embedding_func(texts: List[str]) -> List[List[float]]:
-                return await embedding_adapter(texts)
+        return wrapper
 
-            async def llm_model_func(prompt: str, **kwargs) -> str:
-                return await llm_adapter(prompt, **kwargs)
+    @asynccontextmanager
+    async def _use_graph(self, graph_id: str):
+        """Безопасно использует граф и декрементирует счетчик после
+        завершения запроса."""
+        # _get_or_create_graph теперь САМ инкрементирует usage_count под локом
+        # перед тем как вернуть.
+        # Это исключает race condition между получением и инкрементом.
+        wrapper = await self._get_or_create_graph(graph_id)
 
-            embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
-            llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
+        try:
+            yield wrapper.rag
+        finally:
+            rag_to_finalize = None
 
-            rag = LightRAG(
-                working_dir=workspace_path,
-                llm_model_func=llm_model_func,
-                embedding_func=embedding_func,
-                chunk_token_size=400,
-                chunk_overlap_token_size=50,
-                embedding_func_max_async=embedding_workers,
-                llm_model_max_async=llm_workers,
-            )
-
-            await rag.initialize_storages()
-            await initialize_pipeline_status()
-
-            self._graphs[graph_id] = rag
-            logger.info(f"Created async LightRAG instance for graph: {graph_id}")
-
-        except Exception as e:
-            logger.error(f"Error creating LightRAG instance for {graph_id}: {e}")
-            raise
-
-        return rag
+            # Декремент и решение о финализации также выполняем под тем же локом
+            async with self._get_lock(graph_id):
+                wrapper.usage_count -= 1
+                if wrapper.marked_for_deletion and wrapper.usage_count <= 0:
+                    rag_to_finalize = wrapper.rag
+            if rag_to_finalize is not None:
+                try:
+                    await rag_to_finalize.finalize_storages()
+                    logger.info(f"Отложенная финализация графа завершена: {graph_id}")
+                except Exception as e:
+                    logger.warning(f"Ошибка при отложенной финализации: {e}")
 
     async def save(
         self,
@@ -165,12 +317,18 @@ class GraphMemory:
         file_paths_str: Optional[str] = None,
     ) -> bool:
         try:
-            rag = await self._get_or_create_graph(graph_id)
-            await rag.ainsert(
-                text,
-                ids=source_id,
-                file_paths=file_paths_str or source_id,
-            )
+            async with self._use_graph(graph_id) as rag:
+                await rag.ainsert(
+                    text,
+                    ids=source_id,
+                    file_paths=file_paths_str or source_id,
+                )
+            # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
+            async with self._get_lock(graph_id):
+                self._graph_signatures[graph_id] = self._get_workspace_signature(
+                    graph_id
+                )
+                self._last_disk_check[graph_id] = time.monotonic()
             return True
         except Exception as e:
             logger.error(f"Error inserting text into graph {graph_id}: {e}")
@@ -183,9 +341,9 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
     ) -> str:
         try:
-            rag = await self._get_or_create_graph(graph_id)
-            result = await rag.aquery(question, param=QueryParam(mode=mode))
-            return str(result)
+            async with self._use_graph(graph_id) as rag:
+                result = await rag.aquery(question, param=QueryParam(mode=mode))
+                return str(result)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}"
@@ -197,17 +355,20 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
     ) -> tuple[str, list[str]]:
         try:
-            rag = await self._get_or_create_graph(graph_id)
-            result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
-            answer = result.get("llm_response", {}).get("content", "") or ""
-            references = result.get("data", {}).get("references", [])
-            sources_set = set()
-            for ref in references:
-                for url in (ref.get("file_path", "") or "").split(","):
-                    url = url.strip()
-                    if url:
-                        sources_set.add(url)
-            return str(answer), list(sources_set)
+            async with self._use_graph(graph_id) as rag:
+                result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
+                answer = result.get("llm_response", {}).get("content", "") or ""
+                references = result.get("data", {}).get("references", [])
+                sources_set: set[str] = set()
+                for ref in references:
+                    file_paths_value = ref.get("file_path", "") or ""
+                    for source in file_paths_value.split(","):
+                        source = source.strip()
+                        if source:
+                            # Добавляем все непустые идентификаторы источников
+                            # (как URL, так и локальные имена файлов).
+                            sources_set.add(source)
+                return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
@@ -220,13 +381,43 @@ class GraphMemory:
             graph_id: ID конкретного графа или None для очистки всех графов.
         """
         try:
-            if graph_id and graph_id in self._graphs:
-                await self._graphs[graph_id].finalize_storages()
-                logger.info(f"Хранилище финализировано для графа: {graph_id}")
-            elif not graph_id:
-                for gid, rag in self._graphs.items():
-                    await rag.finalize_storages()
-                    logger.info(f"Хранилище финализировано для графа: {gid}")
+            if graph_id:
+                async with self._get_lock(graph_id):
+                    wrapper = self._graphs.pop(graph_id, None)
+                    if wrapper is not None:
+                        wrapper.marked_for_deletion = True
+                        if wrapper.usage_count > 0:
+                            logger.info(
+                                f"Отложена финализация графа {graph_id} при cleanup"
+                                + f" (в использовании: {wrapper.usage_count})"
+                            )
+                            wrapper = None
+
+                if wrapper is not None:
+                    await wrapper.rag.finalize_storages()
+                    logger.info(
+                        f"Хранилище финализировано и выгружено для графа: {graph_id}"
+                    )
+            else:
+                # Если graph_id не указан, очищаем все графы в словаре.
+                keys_to_clean = list(self._graphs.keys())
+                for gid in keys_to_clean:
+                    async with self._get_lock(gid):
+                        wrapper = self._graphs.pop(gid, None)
+                        if wrapper is not None:
+                            wrapper.marked_for_deletion = True
+                            if wrapper.usage_count > 0:
+                                logger.info(
+                                    f"Отложена финализация графа {gid} при cleanup"
+                                    + f" (в использовании: {wrapper.usage_count})"
+                                )
+                                wrapper = None
+                    if wrapper is not None:
+                        await wrapper.rag.finalize_storages()
+                        logger.info(
+                            "Хранилище финализировано и"
+                            + f" выгружено для графа: {gid}"
+                        )
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
 

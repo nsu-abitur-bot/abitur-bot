@@ -34,5 +34,152 @@
       "processing_start_time": 1773586720,
       "processing_end_time": 1773586732
     }
+  },
+  "https://education.nsu.ru/": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-3e0187d85fefff382fc2d89e5a6a1039",
+      "chunk-edc9c271aedbda6bad0945f4c21a258f"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ММФ** — Механико-математический факультет\n- **ФФ** — Физический факультет\n- **ФЕН** — Факультет естественных наук\n- **ФИТ** — Факультет информационных технологий\n...",
+    "content_length": 2250,
+    "created_at": "2026-03-17T05:14:21.022802+00:00",
+    "updated_at": "2026-03-17T05:14:51.229851+00:00",
+    "file_path": "https://education.nsu.ru/",
+    "track_id": "insert_20260317_051421_d2046d17",
+    "metadata": {
+      "processing_start_time": 1773724461,
+      "processing_end_time": 1773724491
+    }
+  },
+  "https://education.nsu.ru/mathematics": {
+    "status": "processed",
+    "chunks_count": 4,
+    "chunks_list": [
+      "chunk-e45aaf4de9dd2b8f35ec690ffef4ce11",
+      "chunk-a7f4022f82d6e0bd59c16dadc8ded9df",
+      "chunk-56c035070f61cf4d5594c834da698ea7",
+      "chunk-5d96525dc0a8e5f1a4d134623a3bf446"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ММФ** — Механико-математический факультет\n- **ПМИ** — Прикладная математика и информатика\n- **МКН** — Математика и компьютерные науки\n\nИсточник: https://education...",
+    "content_length": 3569,
+    "created_at": "2026-03-18T14:52:02.856523+00:00",
+    "updated_at": "2026-03-18T14:53:00.939350+00:00",
+    "file_path": "https://education.nsu.ru/mathematics",
+    "track_id": "insert_20260318_145202_f80c2902",
+    "metadata": {
+      "processing_start_time": 1773845522,
+      "processing_end_time": 1773845580
+    }
+  },
+  "https://education.nsu.ru/physics": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-e90ee1508531a0d0286c1af7f4cc4792",
+      "chunk-99a916192d9790255de414734f0ec4c7"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФФ** — Физический факультет\n\nИсточник: https://education.nsu.ru/physics\n\n# Физический факультет НГУ\n\n## Кратко\nФизический факультет НГУ ведёт набор на бакалавриат...",
+    "content_length": 1337,
+    "created_at": "2026-03-19T05:01:55.606552+00:00",
+    "updated_at": "2026-03-19T05:02:12.684189+00:00",
+    "file_path": "https://education.nsu.ru/physics",
+    "track_id": "insert_20260319_050155_7d31565e",
+    "metadata": {
+      "processing_start_time": 1773896515,
+      "processing_end_time": 1773896532
+    }
+  },
+  "https://education.nsu.ru/promo/geology": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-b99eada158dba358ec9c4bccd563a3d2",
+      "chunk-aef0f32e4f1eacec24ba604f99cead31"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ГГФ** — Геолого-геофизический факультет\n\nИсточник: https://education.nsu.ru/promo/geology\n\n# Геолого-геофизический факультет НГУ\n\n## Кратко\nГГФ НГУ ведёт набор на...",
+    "content_length": 1726,
+    "created_at": "2026-03-19T06:43:49.926340+00:00",
+    "updated_at": "2026-03-19T06:44:20.513462+00:00",
+    "file_path": "https://education.nsu.ru/promo/geology",
+    "track_id": "insert_20260319_064349_f3e9c0d9",
+    "metadata": {
+      "processing_start_time": 1773902629,
+      "processing_end_time": 1773902660
+    }
+  },
+  "https://education.nsu.ru/economics/": {
+    "status": "processed",
+    "chunks_count": 4,
+    "chunks_list": [
+      "chunk-289f4eb7d30d3af4bc0678a5197d6564",
+      "chunk-cffa7dbe269afe324323fa0cb84ef340",
+      "chunk-c9b5b9d86b0566576f7adcb53fe2aff3",
+      "chunk-00684bcbeac969b103e950778cd091c8"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ЭФ** — Экономический факультет\n\nИсточник: https://education.nsu.ru/economics/\n\n# Экономический факультет НГУ\n\n## Кратко\nЭкономический факультет НГУ ведёт набор на...",
+    "content_length": 3797,
+    "created_at": "2026-03-19T07:24:37.924027+00:00",
+    "updated_at": "2026-03-19T07:25:11.407455+00:00",
+    "file_path": "https://education.nsu.ru/economics/",
+    "track_id": "insert_20260319_072437_7ea81f01",
+    "metadata": {
+      "processing_start_time": 1773905078,
+      "processing_end_time": 1773905111
+    }
+  },
+  "https://education.nsu.ru/promo/naturalsciences/": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-8b0c6015b6de3a66da4ef7370457193b",
+      "chunk-fa48a8b998a2fd0ca9fa23d21a6ffed0"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ФЕН** — Факультет естественных наук\n\nИсточник: https://education.nsu.ru/promo/naturalsciences/\n\n# Факультет естественных наук НГУ\n\n## Кратко\nДля бакалавров на ФЕН...",
+    "content_length": 1276,
+    "created_at": "2026-03-19T08:06:25.110853+00:00",
+    "updated_at": "2026-03-19T08:06:43.070109+00:00",
+    "file_path": "https://education.nsu.ru/promo/naturalsciences/",
+    "track_id": "insert_20260319_080625_cfaa761e",
+    "metadata": {
+      "processing_start_time": 1773907585,
+      "processing_end_time": 1773907603
+    }
+  },
+  "https://education.nsu.ru/mechatronics": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-005abd6ba3006ed416989746ff36c3ca",
+      "chunk-b4ac97f7a1aa8630ad9621f1e2be89bf"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ИИР** — Институт интеллектуальной робототехники\n\nИсточники: https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai\n\n# Институт интеллектуальной робото...",
+    "content_length": 2443,
+    "created_at": "2026-03-19T13:11:00.061859+00:00",
+    "updated_at": "2026-03-19T13:11:23.085210+00:00",
+    "file_path": "https://education.nsu.ru/mechatronics, https://education.nsu.ru/ai",
+    "track_id": "insert_20260319_131100_48def509",
+    "metadata": {
+      "processing_start_time": 1773925860,
+      "processing_end_time": 1773925883
+    }
+  },
+  "https://education.nsu.ru/psychology": {
+    "status": "processed",
+    "chunks_count": 1,
+    "chunks_list": [
+      "chunk-d23061a4545b6cb88f8c1cde2ebd4452"
+    ],
+    "content_summary": "## Аббревиатуры и сокращения\n\n- **НГУ** — Новосибирский государственный университет\n- **ИММТ** — Институт медицины и медицинских технологий\n\nИсточник: https://education.nsu.ru/psychology\n\n# Институт медицины и медицинских технологий НГУ\n\n## Кратко\nДл...",
+    "content_length": 1154,
+    "created_at": "2026-03-19T14:29:30.282452+00:00",
+    "updated_at": "2026-03-19T14:29:42.924631+00:00",
+    "file_path": "https://education.nsu.ru/psychology",
+    "track_id": "insert_20260319_142930_f96d5beb",
+    "metadata": {
+      "processing_start_time": 1773930570,
+      "processing_end_time": 1773930582
+    }
   }
 }
