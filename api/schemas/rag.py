@@ -8,6 +8,25 @@ class UploadedDocumentResult(BaseModel):
     chars: int = Field(0, description="Количество символов, отправленных в RAG")
 
 
+class ParsedDocument(BaseModel):
+    title: str = Field(..., description="Название документа")
+    url: str = Field(..., description="URL для скачивания/ссылки на документ")
+
+
+class ParsedPageResult(BaseModel):
+    text: str = Field(..., description="Сырой или предобработанный текст страницы")
+    documents: list[ParsedDocument] = Field(
+        ..., description="Список найденных PDF-документов"
+    )
+
+
+class ConfirmUploadRequest(BaseModel):
+    text: str = Field(..., description="Отредактированный текст страницы")
+    documents: list[ParsedDocument] = Field(
+        ..., description="Финальный список файлов для загрузки"
+    )
+
+
 class RagUploadResponse(BaseModel):
     accepted_formats: list[str] = Field(
         ..., description="Поддерживаемые расширения файлов"
