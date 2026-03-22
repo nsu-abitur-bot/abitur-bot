@@ -38,6 +38,20 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+  scheduler:
+    build: .
+    command: python -m scheduler.main
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
+      - DB_HOST=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+    depends_on:
+      - postgres
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   redis:
     image: redis:alpine
     restart: always

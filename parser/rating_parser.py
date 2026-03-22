@@ -121,6 +121,38 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str]:
             return [], ""
 
 
+def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str]:
+    """
+    Получает данные рейтингового списка с мок-сайта (напрямую GET-запросом).
+    
+    Args:
+        url: Ссылка на эндпоинт мок-сервера.
+        
+    Returns:
+        (список записей рейтинга, хэш ответа)
+    """
+    config = get_rating_config()
+    headers = config.get("headers", {})
+
+    try:
+        response = requests.get(url, headers={**headers, "Accept": "application/json"}, timeout=10)
+        response.raise_for_status()
+
+        data = response.json()
+        page_hash = calculate_page_hash(response.text)
+        entries = _extract_entries(data)
+
+        logger.info(f"Получено {len(entries)} записей из мока {url}")
+        return entries, page_hash
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Ошибка при GET запросе к моку {url}: {e}")
+        return [], ""
+    except Exception as e:
+        logger.error(f"Ошибка при парсинге мока {url}: {e}")
+        return [], ""
+
+
 def _extract_params_from_url(url: str) -> dict:
     """Извлекает faculty/direction/condition/type из URL."""
     parsed = urlparse(url)

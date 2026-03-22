@@ -292,5 +292,47 @@
     "create_time": 1774015215,
     "update_time": 1774015215,
     "_id": "hybrid:query:d007a099e50bff0564c5f0dcfd5e2f83"
+  },
+  "hybrid:keywords:275dd0eee94c5b09e22605be961bddf4": {
+    "return": "{\"high_level_keywords\": [\"\\u041f\\u0438\\u041a\\u041d\", \"\\u043c\\u0435\\u0434\\u0438\\u0446\\u0438\\u043d\\u0441\\u043a\\u0430\\u044f \\u0442\\u0435\\u0440\\u043c\\u0438\\u043d\\u043e\\u043b\\u043e\\u0433\\u0438\\u044f\", \"\\u043e\\u043f\\u0440\\u0435\\u0434\\u0435\\u043b\\u0435\\u043d\\u0438\\u0435\"], \"low_level_keywords\": [\"\\u041f\\u0438\\u041a\\u041d\", \"\\u043f\\u043e\\u0434\\u043a\\u043e\\u0440\\u043a\\u043e\\u0432\\u044b\\u0435 \\u0438\\u0448\\u0435\\u043c\\u0438\\u0447\\u0435\\u0441\\u043a\\u0438\\u0435 \\u043a\\u043e\\u0433\\u043d\\u0438\\u0442\\u0438\\u0432\\u043d\\u044b\\u0435 \\u043d\\u0430\\u0440\\u0443\\u0448\\u0435\\u043d\\u0438\\u044f\"]}",
+    "cache_type": "keywords",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Что такое ПиКН?\n\nВерни ответ в Telegram-совместимом HTML без Markdown. Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href=\"...\">.",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1774178304,
+    "update_time": 1774178304,
+    "_id": "hybrid:keywords:275dd0eee94c5b09e22605be961bddf4"
+  },
+  "hybrid:query:14b152543de4b9036bfc7383bc4ab963": {
+    "return": "<b>ПИиКН</b> — это сокращенное название образовательного профиля <b>«Программная инженерия и компьютерные науки»</b>, который реализуется на Факультете информационных технологий (ФИТ) Новосибирского государственного университета в рамках бакалаврской программы 09.03.01 «Информатика и вычислительная техника».\n\nОсновные сведения об этом профиле:\n- <b>Бюджетные места:</b> 125\n- <b>Платные места:</b> 65\n- <b>Стоимость обучения:</b> 112 500 руб. за семестр (в 2025–2026 учебном году)\n- <b>Вступительные испытания (ЕГЭ):</b> математика, русский язык, а также информатика и ИКТ или физика.\n\nДля поступающих на базе среднего профессионального образования (СПО) предусмотрены экзамены по высшей математике, русскому языку и физическим основам информатики / компьютерным наукам.\n\n### Ссылки\n<a href=\"https://education.nsu.ru/information-technologies/\">Факультет информационных технологий НГУ</a>",
+    "cache_type": "query",
+    "chunk_id": null,
+    "original_prompt": "[from seniormarat] Что такое ПиКН?\n\nВерни ответ в Telegram-совместимом HTML без Markdown. Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href=\"...\">.",
+    "queryparam": {
+      "mode": "hybrid",
+      "response_type": "Multiple Paragraphs",
+      "top_k": 40,
+      "chunk_top_k": 20,
+      "max_entity_tokens": 6000,
+      "max_relation_tokens": 8000,
+      "max_total_tokens": 30000,
+      "hl_keywords": "ПиКН, медицинская терминология, определение",
+      "ll_keywords": "ПиКН, подкорковые ишемические когнитивные нарушения",
+      "user_prompt": "",
+      "enable_rerank": true
+    },
+    "create_time": 1774178307,
+    "update_time": 1774178307,
+    "_id": "hybrid:query:14b152543de4b9036bfc7383bc4ab963"
   }
 }
