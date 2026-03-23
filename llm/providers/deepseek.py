@@ -47,6 +47,15 @@ class DeepSeekProvider(BaseLLMProvider):
         content: Any = completion.choices[0].message.content
         return content.strip() if isinstance(content, str) else str(content or "")
 
+    def get_embeddings_model(self) -> Any:
+        from langchain_openai import OpenAIEmbeddings
+
+        return OpenAIEmbeddings(
+            api_key=os.getenv("DEEPSEEK_API_KEY"),
+            model=os.getenv("DEEPSEEK_EMBEDDING_MODEL", "deepseek-embedding"),
+            base_url=DEEPSEEK_BASE_URL,
+        )
+
     @staticmethod
     def _to_openai_message(
         message: BaseMessage,

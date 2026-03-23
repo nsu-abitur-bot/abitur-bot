@@ -10,15 +10,12 @@ FAQ Matcher — модуль для поиска готовых ответов �
 """
 
 import logging
-import os
 import re
 from pathlib import Path
 from typing import Optional, Protocol
 
 import numpy as np
 import yaml
-from langchain_gigachat.embeddings import GigaChatEmbeddings
-from langchain_openai import OpenAIEmbeddings
 
 from llm.factory import get_llm_provider
 
@@ -118,12 +115,10 @@ class FAQMatcher:
         self,
         faq_path: Optional[Path] = None,
         threshold: float = SIMILARITY_THRESHOLD,
-        embedding_model_name: str = "Embeddings",
         embedder: Optional["EmbeddingClient"] = None,
     ):
         self._threshold = threshold
         self._faq_path = faq_path or FAQ_DATA_PATH
-        self._embedding_model_name = embedding_model_name
 
         self._embedder = embedder or self._create_embedder()
 
@@ -137,63 +132,25 @@ class FAQMatcher:
     def _create_embedder(self) -> Optional["EmbeddingClient"]:
         try:
             provider = get_llm_provider()
-            provider_name = provider.__class__.__name__.lower()
+            embedder = provider.get_embeddings_model()
+            if embedder:
+                provider_name = provider.__class__.__name__
+                logger.info("FAQ embedder initialized using %s", provider_name)
+                return embedder
+            else:
+                logger.warning(
+                    "LLM provider '%s' does not support embeddings for FAQ. "
+                    "FAQ semantic matching disabled.",
+                    provider.__class__.__name__,
+                )
+                return None
         except Exception as exc:
             logger.warning(
-                "Не удалось инициализировать LLM provider для FAQ embeddings: %s. "
-                "FAQ semantic matching отключен.",
+                "Failed to initialize LLM provider for FAQ embeddings: %s. "
+                "FAQ semantic matching disabled.",
                 exc,
             )
             return None
-
-        if "gigachat" in provider_name:
-            credentials = os.getenv("GIGACHAT_CREDENTIALS") or os.getenv(
-                "GIGACHAT_API_KEY"
-            )
-            if not credentials:
-                logger.warning(
-                    "GIGACHAT_CREDENTIALS или GIGACHAT_API_KEY не установлены. "
-                    "FAQ semantic matching отключен."
-                )
-                return None
-
-            scope = os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
-            return GigaChatEmbeddings(
-                credentials=credentials,
-                scope=scope,
-                model=self._embedding_model_name,
-                verify_ssl_certs=False,
-            )
-
-        if "openai" in provider_name:
-            api_key = os.getenv("OPENAI_API_KEY")
-            if not api_key:
-                logger.warning(
-                    "OPENAI_API_KEY не установлен. FAQ semantic matching отключен."
-                )
-                return None
-
-            model = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
-            return OpenAIEmbeddings(api_key=api_key, model=model)
-
-        if "deepseek" in provider_name:
-            api_key = os.getenv("DEEPSEEK_API_KEY")
-            if not api_key:
-                logger.warning(
-                    "DEEPSEEK_API_KEY не установлен. FAQ semantic matching отключен."
-                )
-                return None
-
-            base_url = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
-            model = os.getenv("DEEPSEEK_EMBEDDING_MODEL", "deepseek-embedding")
-            return OpenAIEmbeddings(api_key=api_key, model=model, base_url=base_url)
-
-        logger.warning(
-            "LLM provider '%s' не поддерживает embeddings для FAQ. "
-            "FAQ semantic matching отключен.",
-            provider_name,
-        )
-        return None
 
     def _load_faq(self) -> None:
         """Загружает FAQ из YAML и вычисляет embeddings."""
@@ -239,7 +196,7 @@ class FAQMatcher:
             norms = np.linalg.norm(vectors, axis=1, keepdims=True)
             self._embeddings = vectors / np.maximum(norms, 1e-10)
             logger.info(
-                f"FAQ loaded via GigaChat embeddings: {len(faq_items)} entries, "
+                f"FAQ loaded: {len(faq_items)} entries, "
                 f"{len(self._questions)} total phrases"
             )
         else:

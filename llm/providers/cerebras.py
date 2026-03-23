@@ -72,6 +72,9 @@ class CerebrasProvider(BaseLLMProvider):
         content: Any = completion.choices[0].message.content
         return content.strip() if isinstance(content, str) else str(content or "")
 
+    def get_embeddings_model(self) -> Any:
+        return None
+
     @staticmethod
     def _to_cerebras_message(message: BaseMessage) -> dict[str, str]:
         if isinstance(message, SystemMessage):

@@ -1,9 +1,10 @@
 import logging
 import os
-from typing import List
+from typing import Any, List
 
 from langchain_core.messages import BaseMessage
 from langchain_gigachat.chat_models import GigaChat
+from langchain_gigachat.embeddings import GigaChatEmbeddings
 
 from llm.base import BaseLLMProvider
 
@@ -42,3 +43,11 @@ class GigaChatProvider(BaseLLMProvider):
         else:
             content = str(response.content) if response.content else ""
         return content
+
+    def get_embeddings_model(self) -> Any:
+        return GigaChatEmbeddings(
+            credentials=os.getenv("GIGACHAT_API_KEY"),
+            scope="GIGACHAT_API_PERS",
+            model=os.getenv("GIGACHAT_EMBEDDING_MODEL", "Embeddings"),
+            verify_ssl_certs=False,
+        )

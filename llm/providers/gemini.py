@@ -1,12 +1,14 @@
 import logging
 import os
-from typing import List
+from typing import Any, List, Optional
 
 from google import genai
 from google.genai import types
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from llm.base import BaseLLMProvider
+
+logger = logging.getLogger(__name__)
 
 logger = logging.getLogger(__name__)
 
@@ -61,3 +63,25 @@ class GeminiProvider(BaseLLMProvider):
 
         content = response.text
         return content.strip() if isinstance(content, str) else str(content or "")
+
+    def get_embeddings_model(self) -> Any:
+        return GeminiEmbeddings(self.client)
+
+
+class GeminiEmbeddings:
+    """Воркер для эмбеддингов Gemini, совместимый с FAQMatcher."""
+
+    def __init__(self, client: genai.Client):
+        self.client = client
+        self.model = os.getenv("GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001")
+
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        # google-genai SDK поддерживает пакетную обработку
+        response = self.client.models.embed_content(
+            model=self.model,
+            contents=texts,
+        )
+        # response.embeddings — список объектов с полем values
+        if not response.embeddings:
+            return []
+        return [list(e.values or []) for e in response.embeddings]

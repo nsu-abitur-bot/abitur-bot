@@ -44,6 +44,14 @@ class OpenAIProvider(BaseLLMProvider):
         content: Any = completion.choices[0].message.content
         return content.strip() if isinstance(content, str) else str(content or "")
 
+    def get_embeddings_model(self) -> Any:
+        from langchain_openai import OpenAIEmbeddings
+
+        return OpenAIEmbeddings(
+            api_key=os.getenv("OPENAI_API_KEY"),
+            model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+        )
+
     @staticmethod
     def _to_openai_message(message: BaseMessage) -> dict[str, str]:
         if isinstance(message, SystemMessage):
