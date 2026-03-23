@@ -26,7 +26,7 @@ async def run_sync_job(bot: Bot):
         )
         logger.info(f"Парсинг новых данных с мок-URL: {url}")
 
-        parsed_entries, page_hash = parse_mock_rating_page(url)
+        parsed_entries, page_hash, direction_name = parse_mock_rating_page(url)
 
         if not parsed_entries:
             logger.warning("Не удалось получить данные с сайта. Пропускаем итерацию.")
@@ -38,7 +38,9 @@ async def run_sync_job(bot: Bot):
             rating_service = RatingService(session)
 
             # Получим/создадим запись о рейтинге (Leaderboard) по URL
-            leaderboard = await rating_service.get_or_create_leaderboard(url)
+            leaderboard = await rating_service.get_or_create_leaderboard(
+                url, direction_name=direction_name
+            )
             leaderboard_id = leaderboard.id
 
             # Проверяем, изменились ли данные на странице

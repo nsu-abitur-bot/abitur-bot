@@ -67,12 +67,12 @@ def _get_csrf_token(session: requests.Session, headers: dict) -> str | None:
         return None
 
 
-def parse_rating_page(url: str) -> tuple[list[RatingEntry], str]:
+def parse_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
     """
     Получает данные рейтингового списка через Form Data POST запрос.
 
     Returns:
-        (список записей рейтинга, хэш ответа)
+        (список записей рейтинга, хэш ответа, название направления)
     """
     config = get_rating_config()
     headers = config.get("headers", {})
@@ -81,12 +81,12 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str]:
         params = _extract_params_from_url(url)
     except ValueError as e:
         logger.error(f"Некорректные параметры в URL {url}: {e}")
-        return [], ""
+        return [], "", ""
 
     with requests.Session() as session:
         csrf_token = _get_csrf_token(session, headers)
         if not csrf_token:
-            return [], ""
+            return [], "", ""
 
         form_data = {
             "_csrf-frontend": csrf_token,
@@ -110,47 +110,81 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str]:
             page_hash = calculate_page_hash(response.text)
             entries = _extract_entries(data)
 
+            direction_name = ""
+            if (
+                data
+                and data.get("items")
+                and isinstance(data["items"], list)
+                and len(data["items"]) > 0
+            ):
+                item = data["items"][0]
+                if (
+                    item
+                    and isinstance(item, dict)
+                    and item.get("info")
+                    and item["info"].get("speciality")
+                ):
+                    direction_name = item["info"]["speciality"].get("name", "")
+
             logger.info(f"Получено {len(entries)} записей из {url}")
-            return entries, page_hash
+            return entries, page_hash, direction_name
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Ошибка при запросе {url}: {e}")
-            return [], ""
+            return [], "", ""
         except Exception as e:
             logger.error(f"Ошибка при парсинге {url}: {e}")
-            return [], ""
+            return [], "", ""
 
 
-def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str]:
+def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
     """
     Получает данные рейтингового списка с мок-сайта (напрямую GET-запросом).
-    
+
     Args:
         url: Ссылка на эндпоинт мок-сервера.
-        
+
     Returns:
-        (список записей рейтинга, хэш ответа)
+        (список записей рейтинга, хэш ответа, название направления)
     """
     config = get_rating_config()
     headers = config.get("headers", {})
 
     try:
-        response = requests.get(url, headers={**headers, "Accept": "application/json"}, timeout=10)
+        response = requests.get(
+            url, headers={**headers, "Accept": "application/json"}, timeout=10
+        )
         response.raise_for_status()
 
         data = response.json()
         page_hash = calculate_page_hash(response.text)
         entries = _extract_entries(data)
 
+        direction_name = ""
+        if (
+            data
+            and data.get("items")
+            and isinstance(data["items"], list)
+            and len(data["items"]) > 0
+        ):
+            item = data["items"][0]
+            if (
+                item
+                and isinstance(item, dict)
+                and item.get("info")
+                and item["info"].get("speciality")
+            ):
+                direction_name = item["info"]["speciality"].get("name", "")
+
         logger.info(f"Получено {len(entries)} записей из мока {url}")
-        return entries, page_hash
+        return entries, page_hash, direction_name
 
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка при GET запросе к моку {url}: {e}")
-        return [], ""
+        return [], "", ""
     except Exception as e:
         logger.error(f"Ошибка при парсинге мока {url}: {e}")
-        return [], ""
+        return [], "", ""
 
 
 def _extract_params_from_url(url: str) -> dict:

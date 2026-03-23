@@ -213,12 +213,11 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     rag_context = rag_context_raw
                 # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
                 # чтобы LLM использовала только те URL, что мы передадим явно.
-                # 1. Блок «Источники: ...» и аналогичные до конца текста
+                # 1. Блок «Источники: ...» и аналогичные до конца строки
                 rag_context = re.sub(
-                    r"\n{0,2}(?:###\s*)?(?:Источники?|References?|Ссылки):?[\s\S]*$",
+                    r"(?im)^.*?(?:###\s*)?(?:Источники?|References?|Ссылки):?\s*[^\n]*",
                     "",
                     rag_context,
-                    flags=re.IGNORECASE,
                 )
                 # 2. «Источник информации (https://...)"
                 rag_context = re.sub(
@@ -261,7 +260,9 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     '<a href="URL_2">URL_2</a>\n\n'
                     "(Но если ты просто здороваешься, говоришь на отвлеченные темы или"
                     + " не нашел ответа в Контексте - блок "
-                    + "'Источники:' ВООБЩЕ НЕ добавляй!)\n\n"
+                    + "'Источники:' ВООБЩЕ НЕ добавляй!)\n"
+                    "КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ придумывать свои ссылки или брать их из истории переписки. "
+                    "Используй ТОЛЬКО ссылки из списка ниже.\n\n"
                     "СПИСОК ДОСТУПНЫХ ССЫЛОК ИЗ БАЗЫ ЗНАНИЙ (выбери подходящие):\n"
                     f"{links_text}"
                 )
@@ -282,12 +283,14 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     messages.append(HumanMessage(content=entry_content))
                 elif role == "assistant":
                     # Очищаем старые ответы от блока с источниками,
-                    # чтобы они не сбивали с толку LLM при ответе на новый вопрос
+                    # чтобы они не сбивали с толку LLM
                     entry_clean = re.sub(
-                        r"(?i)(?:<b>|###\s*)?(?:Источники|References|Ссылки):?(?:</b>)?[\s\S]*",
+                        r"(?i)\n?(?:<br>|<b>|###\s*|\*+\s*)*\s*(?:Источники|Источник|References|Ссылки)(?:\s+информации)?:?\s*(?:</b>|\*+)*\s*(?:\n|<a)[\s\S]*",
                         "",
                         entry_content,
-                    ).strip()
+                    )
+                    # Также удаляем любые оставшиеся HTML-ссылки
+                    entry_clean = re.sub(r"<a\s+href=[^>]+>.*?</a>", "", entry_clean).strip()
                     messages.append(AIMessage(content=entry_clean))
 
             provider = get_llm_provider()

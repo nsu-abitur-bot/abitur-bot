@@ -14,6 +14,8 @@ class ParsedDocument(BaseModel):
 
 
 class ParsedPageResult(BaseModel):
+    title: str = Field(..., description="Название страницы")
+    url: str = Field(..., description="URL страницы")
     text: str = Field(..., description="Сырой или предобработанный текст страницы")
     documents: list[ParsedDocument] = Field(
         ..., description="Список найденных PDF-документов"
@@ -21,6 +23,8 @@ class ParsedPageResult(BaseModel):
 
 
 class ConfirmUploadRequest(BaseModel):
+    title: str = Field(..., description="Название страницы")
+    url: str = Field(..., description="URL страницы")
     text: str = Field(..., description="Отредактированный текст страницы")
     documents: list[ParsedDocument] = Field(
         ..., description="Финальный список файлов для загрузки"
@@ -41,7 +45,9 @@ class RagUploadResponse(BaseModel):
 
 
 class RagDocument(BaseModel):
-    id: str = Field(..., description="Идентификатор документа (обычно URL или имя файла)")
+    id: str = Field(
+        ..., description="Идентификатор документа (обычно URL или имя файла)"
+    )
     status: str = Field(..., description="Статус обработки")
     content_summary: str | None = Field(None, description="Краткое содержание")
     content_length: int | None = Field(None, description="Длина контента")

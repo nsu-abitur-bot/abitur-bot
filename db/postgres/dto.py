@@ -35,4 +35,5 @@ class RatingChange:
     old_competition_type: Optional[str]
     new_competition_type: str
     is_new: bool = False
-
+    direction: str = ""
+    url: str = ""

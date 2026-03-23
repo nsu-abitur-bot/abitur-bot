@@ -198,7 +198,10 @@ async def handle_message(message: Message):
                     f"Идентификатор пользователя {user_id} обновлен в БД: {user_text}"
                 )
                 await redis_client.set_awaiting_applicant_id(session_id, False)
-                await bot.send_message(chat_id, "Идентификатор записан")
+                await bot.send_message(
+                    chat_id,
+                    f"Отслеживание абитуриента {user_text} началось! Я пришлю уведомление при изменении позиции.",
+                )
             else:
                 logger.error(
                     f"Не удалось обновить идентификатор для пользователя {user_id}"

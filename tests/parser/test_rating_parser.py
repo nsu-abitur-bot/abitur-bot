@@ -228,7 +228,7 @@ class TestParseRatingPage:
         mock_session.get.return_value = get_response
         mock_session.post.return_value = post_response
 
-        entries, page_hash = parse_rating_page(self.URL)
+        entries, page_hash, direction_name = parse_rating_page(self.URL)
 
         assert len(entries) == 5
         assert page_hash != ""
@@ -244,10 +244,11 @@ class TestParseRatingPage:
         get_response.raise_for_status = MagicMock()
         mock_session.get.return_value = get_response
 
-        entries, page_hash = parse_rating_page(self.URL)
+        entries, page_hash, direction_name = parse_rating_page(self.URL)
 
         assert entries == []
         assert page_hash == ""
+        assert direction_name == ""
 
     @patch("parser.rating_parser.requests.Session")
     def test_returns_empty_on_post_error(self, mock_session_cls, mock_html_with_csrf):
@@ -263,7 +264,8 @@ class TestParseRatingPage:
         mock_session.get.return_value = get_response
         mock_session.post.side_effect = requests.exceptions.ConnectionError()
 
-        entries, page_hash = parse_rating_page(self.URL)
+        entries, page_hash, direction_name = parse_rating_page(self.URL)
 
         assert entries == []
         assert page_hash == ""
+        assert direction_name == ""

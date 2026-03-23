@@ -2,11 +2,11 @@ import logging
 from datetime import UTC, datetime, timedelta
 from typing import List, Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models import User
+from ..models import User, UserRating
 
 logger = logging.getLogger(__name__)
 
@@ -170,6 +170,12 @@ class UserService:
                 return False
 
             user.applicant_id = new_applicant_id
+
+            if new_applicant_id is None:
+                await self.session.execute(
+                    delete(UserRating).where(UserRating.user_id == user_id)
+                )
+
             await self.session.commit()
             logger.info(
                 f"applicant_id пользователя {user_id} обновлен на {new_applicant_id}"

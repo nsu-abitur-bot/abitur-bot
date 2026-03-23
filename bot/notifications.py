@@ -19,7 +19,8 @@ def generate_notification_texts(changes: List[RatingChange]) -> List[tuple[int, 
     for change in changes:
         if change.is_new:
             text = (
-                f"🎉 Вы ({change.applicant_id}) появились в рейтингах!\n\n"
+                f"🎉 Абитуриент {change.applicant_id} появился в рейтингах!\n\n"
+                f"🔸 Направление: {change.direction} ({change.url})\n"
                 f"🔹 Место: {change.new_place}\n"
                 f"🔹 Статус: {change.new_status or '—'}\n"
                 f"🔹 Конкурс: {change.new_competition_type or '—'}"
@@ -41,9 +42,10 @@ def generate_notification_texts(changes: List[RatingChange]) -> List[tuple[int, 
             )
 
         if diff:
-            text = f"🔔 Обновление позиции ({change.applicant_id})\n\n" + "\n".join(
-                f"🔸 {d}" for d in diff
-            )
+            text = (
+                f"🔔 Обновление позиции (Абитуриент {change.applicant_id})\n\n"
+                f"🔸 Направление: {change.direction} ({change.url})\n"
+            ) + "\n".join(f"🔸 {d}" for d in diff)
             notifications.append((change.user_id, text))
 
     return notifications

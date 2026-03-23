@@ -16,7 +16,9 @@ class RatingService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_or_create_leaderboard(self, url: str) -> Leaderboard:
+    async def get_or_create_leaderboard(
+        self, url: str, direction_name: str = ""
+    ) -> Leaderboard:
         """Получить существующий рейтинг или создать новый."""
         result = await self.session.execute(
             select(Leaderboard).where(Leaderboard.url == url)
@@ -24,11 +26,16 @@ class RatingService:
         leaderboard = result.scalar_one_or_none()
 
         if not leaderboard:
-            leaderboard = Leaderboard(url=url)
+            leaderboard = Leaderboard(url=url, direction=direction_name)
             self.session.add(leaderboard)
             await self.session.commit()
             await self.session.refresh(leaderboard)
             logger.info(f"Создан новый рейтинг: {url}")
+        elif direction_name and leaderboard.direction != direction_name:
+            leaderboard.direction = direction_name
+            await self.session.commit()
+            await self.session.refresh(leaderboard)
+            logger.info(f"Обновлено направление для рейтинга {url}: {direction_name}")
 
         return leaderboard
 
@@ -158,6 +165,14 @@ class RatingService:
         if not entries:
             return stats
 
+        # Получаем данные о рейтинговой таблице
+        leaderboard_result = await self.session.execute(
+            select(Leaderboard).where(Leaderboard.id == leaderboard_id)
+        )
+        leaderboard = leaderboard_result.scalar_one_or_none()
+        leaderboard_dir = leaderboard.direction if leaderboard else ""
+        leaderboard_url = leaderboard.url if leaderboard else ""
+
         identifiers = [e.identifier for e in entries if e.identifier]
 
         if not identifiers:
@@ -238,6 +253,8 @@ class RatingService:
                             old_competition_type=None,
                             new_competition_type=entry.competition_type,
                             is_new=True,
+                            direction=leaderboard_dir,
+                            url=leaderboard_url,
                         )
                     )
                     logger.debug(
@@ -271,6 +288,8 @@ class RatingService:
                                 old_competition_type=old_comp,
                                 new_competition_type=entry.competition_type,
                                 is_new=False,
+                                direction=leaderboard_dir,
+                                url=leaderboard_url,
                             )
                         )
 

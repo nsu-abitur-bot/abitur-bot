@@ -136,7 +136,12 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
         ParsedDocument(title=d["name"], url=d["url"]) for d in data.get("documents", [])
     ]
 
-    return ParsedPageResult(text=clean_text, documents=docs)
+    return ParsedPageResult(
+        title=data.get("title", "Не найдено"),
+        url=str(url),
+        text=clean_text,
+        documents=docs,
+    )
 
 
 @router.post("/confirm", status_code=201, summary="Подтвердить загрузку в RAG")
@@ -147,7 +152,8 @@ async def confirm_rag_upload(request: ConfirmUploadRequest):
         await add_texts_async(
             texts=[request.text],
             graph_id=DEFAULT_GRAPH_ID,
-            source_ids=["web_page"],  # В реальности лучше использовать URL как ID
+            source_ids=[request.title],
+            file_paths=[request.url],
         )
 
         # 2. Если есть документы, их тоже надо обработать
