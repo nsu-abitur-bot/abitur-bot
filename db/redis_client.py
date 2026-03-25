@@ -26,17 +26,18 @@ class RedisClient:
     ) -> List[Dict[str, str]]:
         """Добавляет сообщение в историю чата и возвращает историю."""
         history_key = f"chat_history:{session_id}"
-        self.client.rpush
+        logger.info(f"[Redis] Adding message to history for session: {session_id}")
         try:
             # pylance думает что эти функции могут быть синхронными, но они асинхронные
             # TODO: Исправить это и убрать type ignore
             await self.client.rpush(history_key, json.dumps(message))  # type: ignore
             await self.client.ltrim(history_key, -HISTORY_LIMIT, -1)  # type: ignore
             await self.client.expire(history_key, TTL_SECONDS)
-            logger.debug("Добавлено сообщение в историю %s", session_id)
             return await self.get_history(session_id)
         except redis.RedisError as e:
-            logger.error("Ошибка добавления сообщения в Redis: %s", e)
+            logger.error(
+                "[Redis] Ошибка добавления сообщения в Redis для %s: %s", session_id, e
+            )
             raise
 
     async def get_history(self, session_id: str) -> List[Dict[str, str]]:

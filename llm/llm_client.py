@@ -132,19 +132,26 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
     между пользователем и ассистентом
     user_id - идентификатор пользователя Telegram для сохранения в БД
     """
+    logger.info(
+        f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
+    )
 
     try:
         redis_client = await get_redis_client()
 
         # 1. Сначала сохраняем сообщение пользователя в историю
+        logger.info(f"[{session_id}] Saving user message to Redis history.")
         await redis_client.add_message(session_id, {"role": "user", "content": message})
 
         # 2. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
+        logger.info(f"[{session_id}] Checking FAQ for match.")
         try:
             faq_matcher = get_faq_matcher()
             faq_answer = faq_matcher.match(message)
             if faq_answer:
-                logger.info("FAQ match found, skipping LLM call")
+                logger.info(
+                    f"[{session_id}] FAQ match found, returning predefined answer."
+                )
                 await redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
@@ -201,15 +208,20 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         rag_sources: list[str] = []
         rag_context = ""
         if need_rag:
+            logger.info(f"[{session_id}] Querying LightRAG for context.")
             try:
                 rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
                 rag_context_raw, rag_sources = await query_graph_with_sources(rag_query)
                 if not rag_context_raw or rag_context_raw.startswith(
                     "Error executing query"
                 ):
+                    logger.info(f"[{session_id}] No relevant context found in RAG.")
                     rag_context = "Релевантный контекст из базы знаний не найден."
                     rag_sources = []
                 else:
+                    logger.info(
+                        f"[{session_id}] Retrieved context from RAG (sources: {len(rag_sources)})."
+                    )
                     rag_context = rag_context_raw
                 # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
                 # чтобы LLM использовала только те URL, что мы передадим явно.
@@ -239,6 +251,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
 
         # 5. Формируем сообщения и отправляем в LLM провайдер (Cerebras по умолчанию)
         try:
+            logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
             valid_urls = [
                 url
                 for url in rag_sources
@@ -290,35 +303,47 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                         entry_content,
                     )
                     # Также удаляем любые оставшиеся HTML-ссылки
-                    entry_clean = re.sub(r"<a\s+href=[^>]+>.*?</a>", "", entry_clean).strip()
+                    entry_clean = re.sub(
+                        r"<a\s+href=[^>]+>.*?</a>", "", entry_clean
+                    ).strip()
                     messages.append(AIMessage(content=entry_clean))
 
             provider = get_llm_provider()
+            logger.info(
+                f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
+            )
             content = await provider.generate(messages)
+            logger.info(f"[{session_id}] Received response from LLM.")
 
             # Удаляем блоки <think>...</think>
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
             content = _sanitize_telegram_html(content)
 
             if not content:
+                logger.warning(
+                    f"[{session_id}] LLM returned empty content after sanitization."
+                )
                 content = "Ответ не найден"
         except Exception as e:
-            logger.warning(f"Provider generation error: {e}")
+            logger.warning(f"[{session_id}] Provider generation error: {e}")
             content = "LLM временно недоступна."
 
         # Сохраняем ответ бота в историю
+        logger.info(f"[{session_id}] Saving bot response to Redis history.")
         await redis_client.add_message(
             session_id, {"role": "assistant", "content": content}
         )
 
         # Сохраняем в PostgreSQL
         if user_id:
+            logger.info(f"[{session_id}] Saving message pair to PostgreSQL.")
             await _save_message_to_pg(user_id, session_id, message, content)
 
+        logger.info(f"[{session_id}] Message processing complete.")
         return content
 
     except Exception as e:
-        logger.error(f"LLM error: {e}")
+        logger.error(f"[{session_id}] LLM error: {e}")
         return "Что-то пошло не так"
 
 

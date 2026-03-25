@@ -23,8 +23,9 @@ sync_url = async_url.replace("postgresql+asyncpg://", "postgresql+psycopg2://")
 config.set_main_option("sqlalchemy.url", sync_url)
 
 # Настройка логирования
-if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+if context.config.attributes.get("configure_logger", True):
+    if config.config_file_name is not None:
+        fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # Метаданные наших моделей
 target_metadata = Base.metadata

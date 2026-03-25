@@ -69,6 +69,8 @@ def run_migrations():
         # Путь к alembic.ini в корне проекта
         config_path = "alembic.ini"
         alembic_cfg = Config(config_path)
+        # Отключаем настройку логирования внутри Alembic, чтобы не переопределять настройки бота
+        alembic_cfg.attributes["configure_logger"] = False
         command.upgrade(alembic_cfg, "head")
         logger.info("Миграции применены успешно")
     except Exception as e:

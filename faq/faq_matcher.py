@@ -224,7 +224,7 @@ class FAQMatcher:
         if not cleaned:
             return None
 
-        logger.debug(f"FAQ input cleaned: '{user_question}' → '{cleaned}'")
+        logger.info(f"[FAQ] Input cleaned: '{user_question}' → '{cleaned}'")
 
         # Вычисляем embedding очищенного вопроса
         if self._embedder is None:
@@ -239,14 +239,14 @@ class FAQMatcher:
         best_idx = int(np.argmax(similarities))
         best_score = float(similarities[best_idx])
 
-        logger.debug(
-            f"FAQ match: best='{self._questions[best_idx]}' "
+        logger.info(
+            f"[FAQ] Match result: best='{self._questions[best_idx]}' "
             f"score={best_score:.4f} threshold={self._threshold}"
         )
 
         if best_score >= self._threshold:
             logger.info(
-                f"FAQ HIT: '{cleaned}' → '{self._questions[best_idx]}' "
+                f"[FAQ] HIT: '{cleaned}' → '{self._questions[best_idx]}' "
                 f"(score={best_score:.4f})"
             )
             return self._answers[best_idx]

@@ -73,7 +73,7 @@ class GeminiEmbeddings:
 
     def __init__(self, client: genai.Client):
         self.client = client
-        self.model = os.getenv("GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001")
+        self.model = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2-preview")
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         # google-genai SDK поддерживает пакетную обработку

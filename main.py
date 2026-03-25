@@ -4,10 +4,6 @@ import logging
 from bot.main import main as bot_main
 from db.postgres.init_db import main as init_db
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
 logger = logging.getLogger(__name__)
 
 
