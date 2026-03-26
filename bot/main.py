@@ -2,9 +2,11 @@ import asyncio
 import logging
 import re
 from os import getenv
+from urllib.parse import urlsplit
 
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
@@ -15,16 +17,47 @@ from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, cleanup_redis, get_redis_client
 
+logger = logging.getLogger(__name__)
+
+
+def _mask_proxy_url(proxy_url: str) -> str:
+    """Возвращает URL прокси без пароля, чтобы безопасно писать в логи."""
+    try:
+        parsed = urlsplit(proxy_url)
+        host = parsed.hostname or "unknown-host"
+        port = parsed.port or "unknown-port"
+        username = parsed.username
+        credentials = f"{username}:***@" if username else ""
+        return f"{parsed.scheme}://{credentials}{host}:{port}"
+    except Exception:
+        return "invalid-proxy-url"
+
+
 load_dotenv()
 BOT_TOKEN = getenv("BOT_TOKEN")
 if BOT_TOKEN is None:
     raise ValueError("BOT_TOKEN не задан")
 
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
+TELEGRAM_SOCKS5_PROXY = getenv("TELEGRAM_SOCKS5_PROXY")
+
+if TELEGRAM_SOCKS5_PROXY:
+    try:
+        # aiogram использует aiohttp_socks внутри AiohttpSession для SOCKS5.
+        telegram_session = AiohttpSession(proxy=TELEGRAM_SOCKS5_PROXY)
+    except Exception as exc:
+        raise RuntimeError(
+            "Не удалось инициализировать SOCKS5 прокси для Telegram. "
+            "Проверьте TELEGRAM_SOCKS5_PROXY и наличие зависимости aiohttp-socks."
+        ) from exc
+    bot = Bot(
+        token=BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode=None),
+        session=telegram_session,
+    )
+else:
+    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
+
 dp = Dispatcher()
-
-
-logger = logging.getLogger(__name__)
 
 
 def get_session_id(message: Message) -> str:
@@ -230,6 +263,14 @@ async def handle_message(message: Message):
 
 
 async def main():
+    if TELEGRAM_SOCKS5_PROXY:
+        logger.info(
+            "Telegram SOCKS5 proxy включен: %s",
+            _mask_proxy_url(TELEGRAM_SOCKS5_PROXY),
+        )
+    else:
+        logger.info("Telegram SOCKS5 proxy выключен")
+
     logger.info("Бот запущен")
     try:
         await dp.start_polling(bot)
