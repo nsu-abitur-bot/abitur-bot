@@ -64,3 +64,14 @@ async def test_clear_history(redis_client):
 
     history = await redis_client.get_history(session_id)
     assert len(history) == 0
+
+
+@pytest.mark.asyncio
+async def test_set_and_check_awaiting_comment(redis_client):
+    session_id = "comment-session"
+
+    await redis_client.set_awaiting_comment(session_id, True)
+    assert await redis_client.is_awaiting_comment(session_id) is True
+
+    await redis_client.set_awaiting_comment(session_id, False)
+    assert await redis_client.is_awaiting_comment(session_id) is False

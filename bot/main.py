@@ -14,6 +14,7 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 from db.postgres.db import AsyncSessionLocal
+from db.postgres.services.feedback import FeedbackService
 from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, cleanup_redis, get_redis_client
 
@@ -102,6 +103,7 @@ async def cmd_start(message: Message):
     # Сбрасываем флаг ожидания applicant_id на случай зависшего состояния
     redis_client = await get_redis_client()
     await redis_client.set_awaiting_applicant_id(session_id, False)
+    await redis_client.set_awaiting_comment(session_id, False)
     welcome_text = (
         "Привет! 👋 Я — умный ИИ-помощник для абитуриентов. Моя главная цель — сберечь ваши нервы и сделать процесс поступления проще и понятнее.\n\n"
         "<b>Что я умею:</b>\n"
@@ -111,6 +113,7 @@ async def cmd_start(message: Message):
         "Используйте эти команды:\n"
         "• /track — добавьте свой идентификационный номер (или СНИЛС), и я буду присылать уведомление каждый раз, когда ваша позиция в списке будет меняться.\n"
         "• /untrack — удалить номер из отслеживания.\n"
+        "• /comment — оставить обратную связь по работе бота.\n"
         "• /reset — очистить историю переписки.\n\n"
         "💡 <i>Небольшой факт: этот бот — проект студентов второго курса. Мы сами не так давно проходили через все этапы поступления, поэтому решили создать инструмент, которого нам самим тогда очень не хватало!</i>\n\n"
         "Напишите свой вопрос или используйте команду /track, чтобы начать! 🚀"
@@ -128,8 +131,27 @@ async def cmd_track(message: Message):
 
     redis_client = await get_redis_client()
     await redis_client.set_awaiting_applicant_id(session_id, True)
+    await redis_client.set_awaiting_comment(session_id, False)
 
     await bot.send_message(chat_id, "Укажите свой идентификатор абитуриента")
+
+
+@dp.message(Command("comment"))
+async def cmd_comment(message: Message):
+    """Обработчик /comment: переводим сессию в ожидание обратной связи."""
+    if not message.from_user:
+        return
+    chat_id = str(message.chat.id)
+    session_id = get_session_id(message)
+
+    redis_client = await get_redis_client()
+    await redis_client.set_awaiting_applicant_id(session_id, False)
+    await redis_client.set_awaiting_comment(session_id, True)
+
+    await bot.send_message(
+        chat_id,
+        "Напишите, пожалуйста, вашу обратную связь одним сообщением.",
+    )
 
 
 @dp.message(Command("untrack"))
@@ -154,6 +176,7 @@ async def cmd_untrack(message: Message):
 
     redis_client = await get_redis_client()
     await redis_client.set_awaiting_applicant_id(session_id, False)
+    await redis_client.set_awaiting_comment(session_id, False)
     await bot.send_message(chat_id, "Отслеживание прекращено")
 
 
@@ -169,6 +192,7 @@ async def cmd_reset(message: Message):
         # Очищаем историю в Redis
         redis_client = await get_redis_client()
         await redis_client.clear_history(session_id)
+        await redis_client.set_awaiting_comment(session_id, False)
 
         await bot.send_message(chat_id, "История переписки очищена")
     except Exception as e:
@@ -193,6 +217,41 @@ async def handle_message(message: Message):
 
     redis_client = await get_redis_client()
     is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
+    is_awaiting_comment = await redis_client.is_awaiting_comment(session_id)
+
+    # Если ожидали отзыв — сохраняем его
+    if is_awaiting_comment:
+        if not user_text.strip():
+            await bot.send_message(
+                chat_id,
+                "Текст отзыва не должен быть пустым. Попробуйте еще раз.",
+            )
+            return
+
+        async with AsyncSessionLocal() as session:
+            user_service = UserService(session)
+            feedback_service = FeedbackService(session)
+            user_id = message.from_user.id
+
+            existing_user = await user_service.get_user(user_id)
+            if not existing_user:
+                await user_service.create_user(user_id)
+                logger.info(f"Пользователь {user_id} создан автоматически при /comment")
+
+            created = await feedback_service.create_feedback(
+                user_id=user_id,
+                session_id=session_id,
+                text=user_text,
+            )
+            if created:
+                await redis_client.set_awaiting_comment(session_id, False)
+                await bot.send_message(chat_id, "Спасибо! Обратная связь сохранена.")
+            else:
+                await bot.send_message(
+                    chat_id,
+                    "Не удалось сохранить обратную связь. Попробуйте позже.",
+                )
+        return
 
     # Если ожидали идентификатор абитуриента — сохраняем его
     if is_awaiting:

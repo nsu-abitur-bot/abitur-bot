@@ -42,6 +42,9 @@ class User(Base):
     messages: Mapped[List["Message"]] = relationship(
         "Message", back_populates="user", cascade="all, delete-orphan"
     )
+    feedbacks: Mapped[List["Feedback"]] = relationship(
+        "Feedback", back_populates="user", cascade="all, delete-orphan"
+    )
 
     __table_args__ = (
         Index("idx_user_applicant_id", "applicant_id"),
@@ -147,5 +150,35 @@ class Message(Base):
     def __repr__(self) -> str:
         return (
             f"<Message(id='{self.id}', user_id={self.user_id}, "
+            f"session_id='{self.session_id}')>"
+        )
+
+
+class Feedback(Base):
+    """Обратная связь от пользователей."""
+
+    __tablename__ = "feedback"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("user.user_id"), nullable=False
+    )
+    session_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+
+    user: Mapped["User"] = relationship("User", back_populates="feedbacks")
+
+    __table_args__ = (
+        Index("idx_feedback_user_id", "user_id"),
+        Index("idx_feedback_session_id", "session_id"),
+        Index("idx_feedback_created_at", "created_at"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<Feedback(id='{self.id}', user_id={self.user_id}, "
             f"session_id='{self.session_id}')>"
         )
