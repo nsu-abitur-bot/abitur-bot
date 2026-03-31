@@ -189,8 +189,26 @@ class UserService:
             return False
         except Exception as e:
             await self.session.rollback()
-            logger.error(f"Ошибка обновления applicant_id пользователя {user_id}: {e}")
+            logger.error(
+                f"Ошибка обновления applicant_id пользователя {user_id}: {e}"
+            )
             return False
+
+    async def ensure_user_exists(
+        self, user_id: int, applicant_id: Optional[str] = None
+    ) -> User:
+        """Убедиться, что пользователь существует в БД. Если нет - создать."""
+        user = await self.get_user(user_id)
+        if not user:
+            user = await self.create_user(user_id, applicant_id)
+            if not user:
+                # В случае гонки (два сообщения одновременно) пробуем получить еще раз
+                user = await self.get_user(user_id)
+                if not user:
+                    raise RuntimeError(
+                        f"Не удалось гарантировать существование пользователя {user_id}"
+                    )
+        return user
 
     async def delete_user(self, user_id: int) -> bool:
         """Удалить пользователя."""

@@ -194,18 +194,16 @@ async def handle_message(message: Message):
     redis_client = await get_redis_client()
     is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
 
+    async with AsyncSessionLocal() as session:
+        user_service = UserService(session)
+        user_id = message.from_user.id
+        await user_service.ensure_user_exists(user_id)
+
     # Если ожидали идентификатор абитуриента — сохраняем его
     if is_awaiting:
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             user_id = message.from_user.id
-
-            # Убедимся, что пользователь существует в БД
-            # (на случай если /start не вызывался)
-            existing_user = await user_service.get_user(user_id)
-            if not existing_user:
-                await user_service.create_user(user_id)
-                logger.info(f"Пользователь {user_id} создан автоматически при /track")
 
             # Валидация формата applicant_id (макс 7 символов)
             if len(user_text) > 7:

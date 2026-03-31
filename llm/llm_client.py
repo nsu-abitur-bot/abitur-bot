@@ -9,6 +9,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
+from db.postgres.services.user import UserService
 from db.redis_client import RedisClient
 from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
@@ -113,8 +114,11 @@ async def _save_message_to_pg(
     """Сохраняет пару вопрос/ответ в PostgreSQL."""
     try:
         async with AsyncSessionLocal() as db_session:
-            service = MessageService(db_session)
-            await service.create_message(
+            user_service = UserService(db_session)
+            await user_service.ensure_user_exists(user_id)
+
+            message_service = MessageService(db_session)
+            await message_service.create_message(
                 user_id=user_id,
                 session_id=session_id,
                 user_text=user_text,
