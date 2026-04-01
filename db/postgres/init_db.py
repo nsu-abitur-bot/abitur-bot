@@ -4,22 +4,19 @@
 """
 
 import asyncio
-import logging
+import logging as std_logging
 import os
 import sys
 
 import asyncpg
 from alembic import command
-from alembic.config import Config
+from alembic.config import logging
 from dotenv import load_dotenv
 
 # Загружаем переменные окружения из корня проекта
 load_dotenv()
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-logger = logging.getLogger(__name__)
+logger = std_logging.getLogger(__name__)
 
 
 async def create_database_if_not_exists():

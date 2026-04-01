@@ -6,3 +6,6 @@ __pycache__/
 parsed_faculties.json
 
 chroma_db/
+
+logs/
+*.log

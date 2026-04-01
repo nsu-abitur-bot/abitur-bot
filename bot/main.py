@@ -248,16 +248,21 @@ async def handle_message(message: Message):
 
     # Пересылаем сообщение локальной модели LLM
     await bot.send_chat_action(chat_id, "typing")
+    logger.info(f"[{session_id}] Sending message to LLM: {formatted_message}")
     response = await ask_local_llm(
         formatted_message, session_id=session_id, user_id=message.from_user.id
     )
 
     if response:
+        logger.info(f"[{session_id}] Final bot response to user: {response[:200]}...")
         try:
             await bot.send_message(chat_id, response, parse_mode=ParseMode.HTML)
         except TelegramBadRequest:
+            logger.warning(f"[{session_id}] HTML parsing failed, sending plain text")
             plain = re.sub(r"<[^>]+>", "", response)
             await bot.send_message(chat_id, plain)
+    else:
+        logger.warning(f"[{session_id}] No response received from LLM")
 
 
 async def main():

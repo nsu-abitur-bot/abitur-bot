@@ -11,9 +11,6 @@ from parser.rating_parser import (
     parse_mock_rating_page,
 )
 
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
-)
 logger = logging.getLogger(__name__)
 
 

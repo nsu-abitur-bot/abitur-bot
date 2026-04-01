@@ -156,6 +156,9 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 logger.info(
                     f"[{session_id}] FAQ match found, returning predefined answer."
                 )
+                # Логируем что решил ответить из FAQ
+                logger.info(f"[{session_id}] FAQ result:")
+                logger.info(f"[{session_id}] - Matched FAQ answer: {faq_answer}")
                 await redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
@@ -222,11 +225,16 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     logger.info(f"[{session_id}] No relevant context found in RAG.")
                     rag_context = "Релевантный контекст из базы знаний не найден."
                     rag_sources = []
+                    logger.info(f"[{session_id}] RAG retrieval result: No context found")
                 else:
                     logger.info(
                         f"[{session_id}] Retrieved context from RAG (sources: {len(rag_sources)})."
                     )
                     rag_context = rag_context_raw
+                    # Логируем что достали из RAG
+                    logger.info(f"[{session_id}] RAG retrieval result:")
+                    logger.info(f"[{session_id}] - Context (first 500 chars): {rag_context_raw[:500]}...")
+                    logger.info(f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}")
                 # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
                 # чтобы LLM использовала только те URL, что мы передадим явно.
                 # 1. Блок «Источники: ...» и аналогичные до конца строки
@@ -318,6 +326,11 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
             )
             content = await provider.generate(messages)
             logger.info(f"[{session_id}] Received response from LLM.")
+            
+            # Логируем что решил ответить LLM
+            logger.info(f"[{session_id}] LLM response result:")
+            logger.info(f"[{session_id}] - Raw response (first 500 chars): {content[:500]}...")
+            logger.info(f"[{session_id}] - Response length: {len(content)} characters")
 
             # Удаляем блоки <think>...</think>
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
@@ -328,9 +341,13 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     f"[{session_id}] LLM returned empty content after sanitization."
                 )
                 content = "Ответ не найден"
+                logger.info(f"[{session_id}] Final LLM response after sanitization: {content}")
+            else:
+                logger.info(f"[{session_id}] Final LLM response after sanitization (first 300 chars): {content[:300]}...")
         except Exception as e:
             logger.warning(f"[{session_id}] Provider generation error: {e}")
             content = "LLM временно недоступна."
+            logger.info(f"[{session_id}] Fallback response due to error: {content}")
 
         # Сохраняем ответ бота в историю
         logger.info(f"[{session_id}] Saving bot response to Redis history.")
