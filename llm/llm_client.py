@@ -134,7 +134,7 @@ async def _save_log_to_db(
     session_id: str,
     message_type: str,
     content: str,
-    metadata: dict = None,
+    message_metadata: dict = None,
 ) -> None:
     """Сохраняет лог в таблицу message_logs."""
     try:
@@ -145,7 +145,7 @@ async def _save_log_to_db(
                 session_id=session_id,
                 message_type=message_type,
                 content=content,
-                metadata=metadata,
+                message_metadata=message_metadata,
             )
     except Exception as e:
         logger.error(f"Ошибка сохранения лога в БД: {e}")
@@ -182,14 +182,14 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 # Логируем что решил ответить из FAQ
                 logger.info(f"[{session_id}] FAQ result:")
                 logger.info(f"[{session_id}] - Matched FAQ answer: {faq_answer}")
-                
+
                 # Сохраняем лог в БД
                 await _save_log_to_db(
                     user_id=user_id,
                     session_id=session_id,
                     message_type="faq_match",
                     content=faq_answer,
-                    metadata={"source": "faq"},
+                    message_metadata={"source": "faq"},
                 )
                 await redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
@@ -257,24 +257,32 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     logger.info(f"[{session_id}] No relevant context found in RAG.")
                     rag_context = "Релевантный контекст из базы знаний не найден."
                     rag_sources = []
-                    logger.info(f"[{session_id}] RAG retrieval result: No context found")
+                    logger.info(
+                        f"[{session_id}] RAG retrieval result: No context found"
+                    )
                 else:
                     logger.info(
-                        f"[{session_id}] Retrieved context from RAG (sources: {len(rag_sources)})."
+                        f"[{session_id}] Retrieved context from RAG "
+                        f"(sources: {len(rag_sources)})."
                     )
                     rag_context = rag_context_raw
                     # Логируем что достали из RAG
                     logger.info(f"[{session_id}] RAG retrieval result:")
-                    logger.info(f"[{session_id}] - Context (first 500 chars): {rag_context_raw[:500]}...")
-                    logger.info(f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}")
-                    
+                    logger.info(
+                        f"[{session_id}] - Context (first 500 chars): "
+                        f"{rag_context_raw[:500]}..."
+                    )
+                    logger.info(
+                        f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}"
+                    )
+
                     # Сохраняем лог RAG в БД
                     await _save_log_to_db(
                         user_id=user_id,
                         session_id=session_id,
                         message_type="rag_context",
                         content=rag_context_raw[:1000],  # ограничиваем размер
-                        metadata={
+                        message_metadata={
                             "sources": rag_sources,
                             "context_length": len(rag_context_raw),
                             "sources_count": len(rag_sources),
@@ -331,7 +339,8 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     "(Но если ты просто здороваешься, говоришь на отвлеченные темы или"
                     + " не нашел ответа в Контексте - блок "
                     + "'Источники:' ВООБЩЕ НЕ добавляй!)\n"
-                    "КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ придумывать свои ссылки или брать их из истории переписки. "
+                    "КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ придумывать свои ссылки или брать "
+                    "их из истории переписки. "
                     "Используй ТОЛЬКО ссылки из списка ниже.\n\n"
                     "СПИСОК ДОСТУПНЫХ ССЫЛОК ИЗ БАЗЫ ЗНАНИЙ (выбери подходящие):\n"
                     f"{links_text}"
@@ -367,23 +376,27 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
 
             provider = get_llm_provider()
             logger.info(
-                f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
+                f"[{session_id}] Sending payload to LLM "
+                f"({provider.__class__.__name__})."
             )
             content = await provider.generate(messages)
             logger.info(f"[{session_id}] Received response from LLM.")
-            
+
             # Логируем что решил ответить LLM
             logger.info(f"[{session_id}] LLM response result:")
-            logger.info(f"[{session_id}] - Raw response (first 500 chars): {content[:500]}...")
+            logger.info(
+                f"[{session_id}] - Raw response (first 500 chars): "
+                f"{content[:500]}..."
+            )
             logger.info(f"[{session_id}] - Response length: {len(content)} characters")
-            
+
             # Сохраняем лог LLM ответа в БД
             await _save_log_to_db(
                 user_id=user_id,
                 session_id=session_id,
                 message_type="llm_response",
                 content=content[:2000],  # ограничиваем размер
-                metadata={
+                message_metadata={
                     "response_length": len(content),
                     "provider": provider.__class__.__name__,
                 },
@@ -398,9 +411,14 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     f"[{session_id}] LLM returned empty content after sanitization."
                 )
                 content = "Ответ не найден"
-                logger.info(f"[{session_id}] Final LLM response after sanitization: {content}")
+                logger.info(
+                    f"[{session_id}] Final LLM response after sanitization: {content}"
+                )
             else:
-                logger.info(f"[{session_id}] Final LLM response after sanitization (first 300 chars): {content[:300]}...")
+                logger.info(
+                    f"[{session_id}] Final LLM response after sanitization "
+                    f"(first 300 chars): {content[:300]}..."
+                )
         except Exception as e:
             logger.warning(f"[{session_id}] Provider generation error: {e}")
             content = "LLM временно недоступна."

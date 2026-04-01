@@ -2,9 +2,8 @@
 Тесты для API эндпоинта /api/v1/messages.
 """
 
-import pytest
+from datetime import datetime
 from unittest.mock import AsyncMock, patch
-from datetime import datetime, UTC
 
 from fastapi.testclient import TestClient
 

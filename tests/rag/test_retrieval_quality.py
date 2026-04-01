@@ -12,10 +12,12 @@ from pathlib import Path
 
 import pytest
 
-pytest.skip("Тесты несовместимы с новой графовой RAG системой", allow_module_level=True)
-
 from rag.loader import add_texts
 from rag.retriever import search_similar
+
+pytest.skip(
+    "Тесты несовместимы с новой графовой RAG системой", allow_module_level=True
+)
 
 BAZA_DIR = Path(__file__).parent.parent.parent / "baza"
 
@@ -32,7 +34,7 @@ def load_baza(tmp_path_factory):
 
     tmp_dir = tmp_path_factory.mktemp("chroma_quality")
     original_persist_dir = vs_module.PERSIST_DIR
-    original_instance = vs_module._vectorstore_instance
+    # original_instance = vs_module._vectorstore_instance
 
     vs_module.PERSIST_DIR = str(tmp_dir)
     vs_module._vectorstore_instance = None
@@ -69,7 +71,10 @@ COMPLETENESS_CASES = [
         ["195"],
         "Контекст должен содержать стоимость обучения на ФИТ",
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 не находит чанк со стоимостью ФИТ — нужна русскоязычная модель"
+            reason=(
+                "all-MiniLM-L6-v2 не находит чанк со стоимостью ФИТ — "
+                "нужна русскоязычная модель"
+            )
         ),
     ),
     (
@@ -121,14 +126,20 @@ RANKING_CASES = [
         "Какие экзамены нужны для поступления на ФИТ?",
         ["информатик", "информационных технологий", "фит", "09.03.01"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 ранжирует нерелевантный чанк выше ФИТ — нужна русскоязычная модель"
+            reason=(
+                "all-MiniLM-L6-v2 ранжирует нерелевантный чанк выше ФИТ — "
+                "нужна русскоязычная модель"
+            )
         ),
     ),
     pytest.param(
         "Какой проходной балл на бюджет на ФИТе?",
         ["267", "фит", "информационных технологий"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 ранжирует нерелевантный чанк выше ФИТ — нужна русскоязычная модель"
+            reason=(
+                "all-MiniLM-L6-v2 ранжирует нерелевантный чанк выше ФИТ — "
+                "нужна русскоязычная модель"
+            )
         ),
     ),
     (
@@ -139,7 +150,10 @@ RANKING_CASES = [
         "Какой проходной балл на математику в НГУ?",
         ["239", "232", "ммф", "механико"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 возвращает нерелевантный top-1 для ММФ — нужна русскоязычная модель"
+            reason=(
+                "all-MiniLM-L6-v2 возвращает нерелевантный top-1 для ММФ — "
+                "нужна русскоязычная модель"
+            )
         ),
     ),
     (
@@ -150,7 +164,10 @@ RANKING_CASES = [
         "Какие студенческие клубы есть в НГУ?",
         ["клуб", "квант", "гея"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 не ранжирует чанк о клубах в top-1 — нужна русскоязычная модель"
+            reason=(
+                "all-MiniLM-L6-v2 не ранжирует чанк о клубах в top-1 — "
+                "нужна русскоязычная модель"
+            )
         ),
     ),
 ]
@@ -305,7 +322,10 @@ ROBUSTNESS_CASES = [
         "ЕГЭ на факультет информационных технологий",
         "Два разных запроса о ФИТ ЕГЭ",
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 даёт разный top-3 для разных формулировок — нужна русскоязычная модель"
+            reason=(
+                "all-MiniLM-L6-v2 даёт разный top-3 для разных "
+                "формулировок — нужна русскоязычная модель"
+            )
         ),
     ),
     (

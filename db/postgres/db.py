@@ -13,7 +13,7 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
-async def get_session() -> AsyncGenerator[AsyncSession, None]:
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     """Получение сессии БД."""
     async with AsyncSessionLocal() as session:
         try:

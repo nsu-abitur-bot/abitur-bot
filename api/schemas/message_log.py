@@ -11,7 +11,7 @@ class MessageLogResponse(BaseModel):
     session_id: str
     message_type: str
     content: str
-    metadata: Optional[dict] = None
+    message_metadata: Optional[dict] = None
     created_at: datetime
 
     class Config:

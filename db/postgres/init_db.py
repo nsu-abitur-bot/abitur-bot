@@ -10,7 +10,7 @@ import sys
 
 import asyncpg
 from alembic import command
-from alembic.config import logging
+from alembic.config import Config
 from dotenv import load_dotenv
 
 # Загружаем переменные окружения из корня проекта
@@ -66,7 +66,8 @@ def run_migrations():
         # Путь к alembic.ini в корне проекта
         config_path = "alembic.ini"
         alembic_cfg = Config(config_path)
-        # Отключаем настройку логирования внутри Alembic, чтобы не переопределять настройки бота
+        # Отключаем настройку логирования внутри Alembic,
+        # чтобы не переопределять настройки бота
         alembic_cfg.attributes["configure_logger"] = False
         command.upgrade(alembic_cfg, "head")
         logger.info("Миграции применены успешно")

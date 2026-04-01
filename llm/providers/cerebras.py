@@ -47,7 +47,8 @@ class CerebrasProvider(BaseLLMProvider):
             max_retries=self.max_retries,
         )
         logger.info(
-            "Cerebras провайдер инициализирован (модель: %s, timeout: %ss, retries: %s)",
+            "Cerebras провайдер инициализирован (модель: %s, "
+            "timeout: %ss, retries: %s)",
             self.model_name,
             self.timeout_seconds,
             self.max_retries,

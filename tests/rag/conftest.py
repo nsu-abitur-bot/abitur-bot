@@ -12,9 +12,15 @@ def _empty_counters():
 _TRACKED_TESTS = {
     "test_keyword_in_retrieved_context": ("Keyword Matching", _empty_counters()),
     "test_context_completeness":         ("Context Completeness", _empty_counters()),
-    "test_ranking_top1_relevance":       ("Ranking Quality (top-1)", _empty_counters()),
-    "test_cross_topic_isolation":        ("Cross-Topic Isolation", _empty_counters()),
-    "test_factual_number_retrieval":     ("Factual Number Retrieval", _empty_counters()),
+    "test_ranking_top1_relevance": (
+        "Ranking Quality (top-1)", _empty_counters()
+    ),
+    "test_cross_topic_isolation": (
+        "Cross-Topic Isolation", _empty_counters()
+    ),
+    "test_factual_number_retrieval": (
+        "Factual Number Retrieval", _empty_counters()
+    ),
     "test_query_robustness":             ("Query Robustness", _empty_counters()),
 }
 
@@ -57,7 +63,10 @@ def _print_group(tw, label, r):
     overall_acc = passed / total * 100
 
     tw.write_line(f"  {label}:")
-    tw.write_line(f"    Passed: {r['passed']}  |  xfail: {xfailed}  |  Failed: {failed}  |  Total: {total}")
+    tw.write_line(
+        f"    Passed: {r['passed']}  |  xfail: {xfailed}  |  "
+        f"Failed: {failed}  |  Total: {total}"
+    )
     if r["xpassed"]:
         tw.write_line(f"    Unexpected pass (xpass): {r['xpassed']}")
     tw.write_line(
@@ -100,7 +109,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     tw.write_sep("-", "Overall")
     tw.write_line(
-        f"  Total: {grand_total}  |  Passed: {total_passed}  |  xfail: {total_xfailed}  |  Failed: {total_failed}"
+        f"  Total: {grand_total}  |  Passed: {total_passed}  |  "
+        f"xfail: {total_xfailed}  |  Failed: {total_failed}"
     )
     tw.write_line(
         f"  Accuracy (excl. xfail): {strict_acc:.1f}%  ({total_passed}/{strict_total})"

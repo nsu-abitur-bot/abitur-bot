@@ -46,7 +46,8 @@ class OpenAIProvider(BaseLLMProvider):
                 self._sync_http_client = httpx.Client(proxy=self.proxy_url)
             except ImportError as exc:
                 raise RuntimeError(
-                    "OPENAI_SOCKS5_PROXY задан, но не установлена SOCKS-поддержка для httpx. "
+                    "OPENAI_SOCKS5_PROXY задан, но не установлена "
+                    "SOCKS-поддержка для httpx. "
                     'Установите зависимость: pip install "httpx[socks]"'
                 ) from exc
             except Exception as exc:

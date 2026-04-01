@@ -5,7 +5,10 @@ class FaqItem(BaseModel):
     """Схема для отдельного элемента FAQ."""
 
     question: str = Field(..., description="Основной вопрос")
-    aliases: list[str] = Field(default_factory=list, description="Альтернативные формулировки (синонимы) вопроса")
+    aliases: list[str] = Field(
+        default_factory=list,
+        description="Альтернативные формулировки (синонимы) вопроса"
+    )
     answer: str = Field(..., description="Текст ответа")
 
 

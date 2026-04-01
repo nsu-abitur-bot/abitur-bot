@@ -95,7 +95,10 @@ async def get_session_logs(
             offset=offset,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка получения логов сессии: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения логов сессии: {str(e)}"
+        )
 
 
 @router.get(
@@ -124,7 +127,10 @@ async def get_user_logs(
             offset=offset,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка получения логов пользователя: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения логов пользователя: {str(e)}"
+        )
 
 
 @router.get(
@@ -161,4 +167,7 @@ async def get_type_logs(
             offset=offset,
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Ошибка получения логов по типу: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения логов по типу: {str(e)}"
+        )

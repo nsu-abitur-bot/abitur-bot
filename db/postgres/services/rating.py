@@ -153,7 +153,8 @@ class RatingService:
             entries: Список записей от парсера.
 
         Returns:
-            {"created": int, "updated": int, "skipped": int, "notifications": List[RatingChange]}
+            {"created": int, "updated": int, "skipped": int, 
+             "notifications": List[RatingChange]}
         """
         stats: Dict[str, Any] = {
             "updated": 0,

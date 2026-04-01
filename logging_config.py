@@ -1,7 +1,6 @@
 import logging
 import logging.handlers
 import os
-from datetime import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -82,8 +81,10 @@ def setup_logging():
     
     # Устанавливаем уровень для конкретных логгеров
     logging.getLogger("bot.main").setLevel(logging.INFO)
-    logging.getLogger("llm.llm_client").setLevel(logging.DEBUG)  # Подробные логи для LLM
-    logging.getLogger("rag.graph_memory").setLevel(logging.DEBUG)  # Подробные логи для RAG
+    # Подробные логи для LLM
+    logging.getLogger("llm.llm_client").setLevel(logging.DEBUG)
+    # Подробные логи для RAG
+    logging.getLogger("rag.graph_memory").setLevel(logging.DEBUG)
     
     # Уменьшаем уровень для слишком подробных внешних библиотек
     logging.getLogger("aiogram").setLevel(logging.WARNING)

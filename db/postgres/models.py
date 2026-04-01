@@ -2,6 +2,7 @@ from datetime import UTC, datetime
 from typing import List, Optional
 
 from sqlalchemy import (
+    JSON,
     BigInteger,
     Boolean,
     DateTime,
@@ -10,7 +11,6 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    JSON,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -160,9 +160,13 @@ class MessageLog(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     session_id: Mapped[str] = mapped_column(String(255), nullable=False)
-    message_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'user_input', 'rag_context', 'llm_response', 'faq_match'
+    message_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # 'user_input', 'rag_context', 'llm_response', 'faq_match'
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)  # для источников, длины ответа и т.д.
+    message_metadata: Mapped[Optional[dict]] = mapped_column(
+        JSON, nullable=True
+    )  # для источников, длины ответа и т.д.
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
     __table_args__ = (

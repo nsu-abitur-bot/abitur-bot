@@ -51,8 +51,9 @@ markers = ["asyncio: mark test as async"]
 
 [tool.ruff]
 line-length = 88
+
+[tool.ruff.lint]
 select = ["E", "F", "I"]
-fix = true
 
 
 [tool.ruff.format]

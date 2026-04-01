@@ -5,7 +5,6 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.postgres.models import User
 from db.postgres.services.message import MessageService
 from db.postgres.services.user import UserService
 

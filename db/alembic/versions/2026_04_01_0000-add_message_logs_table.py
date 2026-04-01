@@ -7,13 +7,12 @@ Create Date: 2026-04-01 10:20:00.000000
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '2026_04_01_0000-add_message_logs_table'
-down_revision: Union[str, None] = '2026_03_08_0000-add_message_table'
+revision: str = '8c7d6e5a4b3c'
+down_revision: Union[str, None] = 'f6a7b8c9d0e1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -25,10 +24,15 @@ def upgrade() -> None:
         sa.Column('id', sa.BigInteger(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.Column('session_id', sa.String(length=255), nullable=False),
-        sa.Column('message_type', sa.String(length=50), nullable=False),  # 'user_input', 'rag_context', 'llm_response', 'faq_match'
+        sa.Column('message_type', sa.String(length=50), nullable=False),
+        # 'user_input', 'rag_context', 'llm_response', 'faq_match'
         sa.Column('content', sa.Text(), nullable=False),
-        sa.Column('metadata', sa.JSON(), nullable=True),  # для источников, длины ответа и т.д.
-        sa.Column('created_at', sa.DateTime(), nullable=False, server_default=sa.text('now()')),
+        sa.Column('message_metadata', sa.JSON(), nullable=True),
+        # для источников, длины ответа и т.д.
+        sa.Column(
+            'created_at', sa.DateTime(), nullable=False,
+            server_default=sa.text('now()')
+        ),
         sa.PrimaryKeyConstraint('id')
     )
     

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
-from db.postgres.db import get_session
+from db.postgres.db import get_async_session
 from db.postgres.services.message import MessageService
 from db.postgres.services.user import UserService
 
@@ -57,7 +57,7 @@ app.include_router(rag_router, prefix="/api/v1")
 
 @app.get("/api/v1/users/count-stats", response_model=UserCountStatsResponse)
 async def get_users_count_stats(
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ) -> UserCountStatsResponse:
     service = UserService(session)
     try:
@@ -72,7 +72,7 @@ async def get_messages(
     user_id: Optional[int] = Query(None, description="Фильтр по user_id"),
     limit: int = Query(50, ge=1, le=500, description="Количество записей"),
     offset: int = Query(0, ge=0, description="Смещение"),
-    session: AsyncSession = Depends(get_session),
+    session: AsyncSession = Depends(get_async_session),
 ) -> List[MessageResponse]:
     """Возвращает список сообщений и ответов бота."""
     service = MessageService(session)

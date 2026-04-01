@@ -18,7 +18,7 @@ class MessageLogService:
         session_id: str,
         message_type: str,
         content: str,
-        metadata: Optional[dict] = None,
+        message_metadata: Optional[dict] = None,
     ) -> MessageLog:
         """Создает запись в логе сообщений."""
         log_entry = MessageLog(
@@ -26,7 +26,7 @@ class MessageLogService:
             session_id=session_id,
             message_type=message_type,
             content=content,
-            metadata=metadata,
+            message_metadata=message_metadata,
         )
         self.session.add(log_entry)
         await self.session.commit()

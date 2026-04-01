@@ -1,6 +1,7 @@
 import asyncio
-import os
+
 from rag.graph_memory import get_graph_memory
+
 
 async def test_get_content():
     gm = get_graph_memory()

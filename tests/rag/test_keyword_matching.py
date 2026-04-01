@@ -7,10 +7,12 @@ from pathlib import Path
 
 import pytest
 
-pytest.skip("Тесты несовместимы с новой графовой RAG системой", allow_module_level=True)
-
 from rag.loader import add_texts
 from rag.retriever import search_similar
+
+pytest.skip(
+    "Тесты несовместимы с новой графовой RAG системой", allow_module_level=True
+)
 
 BAZA_DIR = Path(__file__).parent.parent.parent / "baza"
 
@@ -78,7 +80,10 @@ KEYWORD_CASES = [
         "Как поступить на лечебное дело в НГУ?",
         ["лечебное дело", "медицин", "химия", "биология"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 не разделяет 'лечебное дело' и 'психология' — нужна русскоязычная модель эмбеддингов"
+            reason=(
+                "all-MiniLM-L6-v2 не разделяет 'лечебное дело' и 'психология' "
+                "— нужна русскоязычная модель эмбеддингов"
+            )
         ),
     ),
     (
@@ -90,7 +95,10 @@ KEYWORD_CASES = [
         "Где в НГУ можно учиться на журналиста?",
         ["журналист", "медиа", "гуманитарн"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 не извлекает gi.md для запроса о журналистике — нужна русскоязычная модель эмбеддингов"
+            reason=(
+                "all-MiniLM-L6-v2 не извлекает gi.md для запроса о "
+                "журналистике — нужна русскоязычная модель эмбеддингов"
+            )
         ),
     ),
     (
@@ -125,7 +133,10 @@ KEYWORD_CASES = [
         "Когда был основан НГУ?",
         ["1958", "1959", "академгородок"],
         marks=pytest.mark.xfail(
-            reason="all-MiniLM-L6-v2 возвращает нерелевантные чанки для исторического запроса — нужна русскоязычная модель эмбеддингов"
+            reason=(
+                "all-MiniLM-L6-v2 возвращает нерелевантные чанки для "
+                "исторического запроса — нужна русскоязычная модель эмбеддингов"
+            )
         ),
     ),
     (
@@ -147,7 +158,7 @@ def load_baza(tmp_path_factory):
 
     tmp_dir = tmp_path_factory.mktemp("chroma")
     original_persist_dir = vs_module.PERSIST_DIR
-    original_instance = vs_module._vectorstore_instance
+    # original_instance = vs_module._vectorstore_instance
 
     # Переключаемся на изолированную временную директорию
     vs_module.PERSIST_DIR = str(tmp_dir)
@@ -195,7 +206,10 @@ def test_search_returns_page_content_attribute():
 
 
 def test_search_respects_k_parameter():
-    """search_similar должен возвращать ровно k результатов (если в базе достаточно чанков)."""
+    """
+    search_similar должен возвращать ровно k результатов
+    (если в базе достаточно чанков).
+    """
     for k in (1, 3, 5):
         results = search_similar("факультет НГУ", k=k)
         assert len(results) == k, f"Ожидалось {k} результатов, получено {len(results)}"
