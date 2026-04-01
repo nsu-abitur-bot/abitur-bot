@@ -10,6 +10,7 @@ from api.schemas.rag import (
     RagUploadResponse,
 )
 from api.services.rag_upload import RagUploadService
+from llm.pdf_parser import parse_pdf_with_llm
 from llm.preprocessor import clean_and_structure_text
 from parser.nsu_parser import parse_page
 from rag.graph_memory import get_graph_memory
@@ -148,22 +149,62 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 @router.post("/confirm", status_code=201, summary="Подтвердить загрузку в RAG")
 async def confirm_rag_upload(request: ConfirmUploadRequest):
     """Загружает отредактированный текст и выбранные документы в RAG."""
-    # 1. Загружаем текст страницы
+    # 1. Загружаем текст страницы (если он есть и не пуст)
     try:
-        await add_texts_async(
-            texts=[request.text],
-            graph_id=DEFAULT_GRAPH_ID,
-            source_ids=[request.title],
-            file_paths=[request.url],
-        )
+        if request.text and request.text.strip():
+            await add_texts_async(
+                texts=[request.text],
+                graph_id=DEFAULT_GRAPH_ID,
+                source_ids=[request.title],
+                file_paths=[request.url],
+            )
 
-        # 2. Если есть документы, их тоже надо обработать
-        # Но для документов в ConfirmUploadRequest у нас только URL.
-        # В идеале их надо сначала скачать. Пока просто логируем или
-        # сохраняем их как ссылки.
-        # Для простоты в рамках этой задачи ограничимся текстом.
+        # 2. Если есть прикреплённые документы, скачиваем, парсим LLM и загружаем
+        if request.documents:
+            import httpx
 
-        return {"status": "success", "message": "Content uploaded to RAG"}
+            # Для каждого документа скачиваем его PDF и парсим
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                for doc in request.documents:
+                    doc_title = doc.title
+                    doc_url = doc.url
+                    # Базовая валидация, нам нужны только PDF
+                    if not doc_url.lower().endswith(".pdf"):
+                        continue
+
+                    try:
+                        # 1) Скачивание
+                        resp = await client.get(doc_url, follow_redirects=True)
+                        if resp.status_code != 200:
+                            import logging
+
+                            logging.getLogger(__name__).warning(
+                                f"Не удалось скачать: {doc_url}, статус: {resp.status_code}"
+                            )
+                            continue
+
+                        pdf_bytes = resp.content
+
+                        # 2) Парсинг PDF через LLM
+                        parsed_md = await parse_pdf_with_llm(pdf_bytes)
+                        if not parsed_md.strip():
+                            continue
+
+                        # 3) Закидываем в граф RAG
+                        await add_texts_async(
+                            texts=[parsed_md],
+                            graph_id=DEFAULT_GRAPH_ID,
+                            source_ids=[doc_title],
+                            file_paths=[doc_url],
+                        )
+                    except Exception as e:
+                        import logging
+
+                        logging.getLogger(__name__).error(
+                            f"Ошибка обработки документа {doc_title} ({doc_url}): {e}"
+                        )
+
+        return {"status": "success", "message": "Content and documents uploaded to RAG"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to upload: {str(e)}")
 
@@ -176,6 +217,8 @@ async def list_rag_documents():
     memory = get_graph_memory()
     docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
     return RagDocumentListResponse(documents=docs)
+
+
 @router.get(
     "/docs/{doc_id:path}/content",
     response_model=RagDocumentContentResponse,
