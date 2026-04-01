@@ -104,5 +104,4 @@ def parse_baza_and_save_to_memory():
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     parse_baza_and_save_to_memory()

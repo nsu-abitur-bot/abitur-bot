@@ -10,6 +10,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    JSON,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -148,4 +149,31 @@ class Message(Base):
         return (
             f"<Message(id='{self.id}', user_id={self.user_id}, "
             f"session_id='{self.session_id}')>"
+        )
+
+
+class MessageLog(Base):
+    """Детальные логи обработки сообщений."""
+
+    __tablename__ = "message_logs"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    session_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    message_type: Mapped[str] = mapped_column(String(50), nullable=False)  # 'user_input', 'rag_context', 'llm_response', 'faq_match'
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    metadata: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)  # для источников, длины ответа и т.д.
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+
+    __table_args__ = (
+        Index("ix_message_logs_user_id", "user_id"),
+        Index("ix_message_logs_session_id", "session_id"),
+        Index("ix_message_logs_created_at", "created_at"),
+        Index("ix_message_logs_message_type", "message_type"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<MessageLog(id={self.id}, user_id={self.user_id}, "
+            f"message_type='{self.message_type}', session_id='{self.session_id}')>"
         )

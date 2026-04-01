@@ -3,6 +3,10 @@ import logging
 
 from bot.main import main as bot_main
 from db.postgres.init_db import main as init_db
+from logging_config import setup_logging
+
+# Настраиваем логирование в самом начале
+setup_logging()
 
 logger = logging.getLogger(__name__)
 
