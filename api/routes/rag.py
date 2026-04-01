@@ -5,6 +5,7 @@ from api.schemas.rag import (
     ConfirmUploadRequest,
     ParsedDocument,
     ParsedPageResult,
+    RagDocumentContentResponse,
     RagDocumentListResponse,
     RagUploadResponse,
 )
@@ -175,3 +176,17 @@ async def list_rag_documents():
     memory = get_graph_memory()
     docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
     return RagDocumentListResponse(documents=docs)
+@router.get(
+    "/docs/{doc_id:path}/content",
+    response_model=RagDocumentContentResponse,
+    summary="Получить полный текст документа",
+)
+async def get_rag_document_content(doc_id: str):
+    """Возвращает полный исходный текст документа по его ID."""
+    memory = get_graph_memory()
+    content = await memory.get_doc_full_text(DEFAULT_GRAPH_ID, doc_id)
+
+    if content is None:
+        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
+
+    return RagDocumentContentResponse(id=doc_id, content=content)

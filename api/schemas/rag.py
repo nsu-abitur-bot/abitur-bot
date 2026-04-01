@@ -56,3 +56,8 @@ class RagDocument(BaseModel):
 
 class RagDocumentListResponse(BaseModel):
     documents: list[RagDocument] = Field(..., description="Список документов в RAG")
+
+
+class RagDocumentContentResponse(BaseModel):
+    id: str = Field(..., description="Идентификатор документа")
+    content: str = Field(..., description="Полный текст документа")

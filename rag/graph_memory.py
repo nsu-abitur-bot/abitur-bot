@@ -406,6 +406,27 @@ class GraphMemory:
             logger.error(f"Error reading doc status for {graph_id}: {e}")
             return []
 
+    async def get_doc_full_text(self, graph_id: str, doc_id: str) -> Optional[str]:
+        """Возвращает полный текст документа по его ID."""
+        import json
+
+        workspace_path = self._get_workspace_path(graph_id)
+        full_docs_file = os.path.join(workspace_path, "kv_store_full_docs.json")
+
+        if not os.path.exists(full_docs_file):
+            return None
+
+        try:
+            with open(full_docs_file, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            doc_data = data.get(doc_id)
+            if doc_data:
+                return doc_data.get("content")
+            return None
+        except Exception as e:
+            logger.error(f"Error reading full docs for {doc_id} in {graph_id}: {e}")
+            return None
+
     async def cleanup(self, graph_id: Optional[str] = None) -> None:
         """
         Асинхронно финализировать хранилища для корректного завершения.
