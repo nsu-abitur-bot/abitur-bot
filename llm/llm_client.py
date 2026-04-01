@@ -9,6 +9,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
+from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from db.redis_client import RedisClient
 from faq.faq_matcher import get_faq_matcher
@@ -128,6 +129,28 @@ async def _save_message_to_pg(
         logger.error(f"Ошибка сохранения сообщения в PostgreSQL: {e}")
 
 
+async def _save_log_to_db(
+    user_id: int,
+    session_id: str,
+    message_type: str,
+    content: str,
+    metadata: dict = None,
+) -> None:
+    """Сохраняет лог в таблицу message_logs."""
+    try:
+        async with AsyncSessionLocal() as db_session:
+            log_service = MessageLogService(db_session)
+            await log_service.create_log(
+                user_id=user_id,
+                session_id=session_id,
+                message_type=message_type,
+                content=content,
+                metadata=metadata,
+            )
+    except Exception as e:
+        logger.error(f"Ошибка сохранения лога в БД: {e}")
+
+
 async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
     """
     message - сообщение от пользователя
@@ -159,6 +182,15 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 # Логируем что решил ответить из FAQ
                 logger.info(f"[{session_id}] FAQ result:")
                 logger.info(f"[{session_id}] - Matched FAQ answer: {faq_answer}")
+                
+                # Сохраняем лог в БД
+                await _save_log_to_db(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="faq_match",
+                    content=faq_answer,
+                    metadata={"source": "faq"},
+                )
                 await redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
@@ -235,6 +267,19 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     logger.info(f"[{session_id}] RAG retrieval result:")
                     logger.info(f"[{session_id}] - Context (first 500 chars): {rag_context_raw[:500]}...")
                     logger.info(f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}")
+                    
+                    # Сохраняем лог RAG в БД
+                    await _save_log_to_db(
+                        user_id=user_id,
+                        session_id=session_id,
+                        message_type="rag_context",
+                        content=rag_context_raw[:1000],  # ограничиваем размер
+                        metadata={
+                            "sources": rag_sources,
+                            "context_length": len(rag_context_raw),
+                            "sources_count": len(rag_sources),
+                        },
+                    )
                 # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
                 # чтобы LLM использовала только те URL, что мы передадим явно.
                 # 1. Блок «Источники: ...» и аналогичные до конца строки
@@ -331,6 +376,18 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
             logger.info(f"[{session_id}] LLM response result:")
             logger.info(f"[{session_id}] - Raw response (first 500 chars): {content[:500]}...")
             logger.info(f"[{session_id}] - Response length: {len(content)} characters")
+            
+            # Сохраняем лог LLM ответа в БД
+            await _save_log_to_db(
+                user_id=user_id,
+                session_id=session_id,
+                message_type="llm_response",
+                content=content[:2000],  # ограничиваем размер
+                metadata={
+                    "response_length": len(content),
+                    "provider": provider.__class__.__name__,
+                },
+            )
 
             # Удаляем блоки <think>...</think>
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)

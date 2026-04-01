@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.routes.faq import router as faq_router
+from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
 from db.postgres.db import get_session
 from db.postgres.services.message import MessageService
@@ -48,8 +49,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Регистрируем роутер FAQ
+# Регистрируем роутеры
 app.include_router(faq_router, prefix="/api/v1")
+app.include_router(message_log_router, prefix="/api/v1")
 app.include_router(rag_router, prefix="/api/v1")
 
 

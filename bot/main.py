@@ -14,10 +14,27 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 from db.postgres.db import AsyncSessionLocal
+from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, cleanup_redis, get_redis_client
 
 logger = logging.getLogger(__name__)
+
+
+async def _save_user_message_to_db(user_id: int, session_id: str, message: str) -> None:
+    """Сохраняет входящее сообщение пользователя в БД."""
+    try:
+        async with AsyncSessionLocal() as db_session:
+            log_service = MessageLogService(db_session)
+            await log_service.create_log(
+                user_id=user_id,
+                session_id=session_id,
+                message_type="user_input",
+                content=message,
+                metadata={"source": "telegram"},
+            )
+    except Exception as e:
+        logger.error(f"Ошибка сохранения входящего сообщения в БД: {e}")
 
 
 def _mask_proxy_url(proxy_url: str) -> str:
@@ -190,6 +207,9 @@ async def handle_message(message: Message):
     formatted_message = f"[from {user_name}] {user_text}"
 
     logger.info(f"Сообщение от {user_name} в чате {chat_id}: {user_text}")
+
+    # Сохраняем входящее сообщение в БД
+    await _save_user_message_to_db(message.from_user.id, session_id, formatted_message)
 
     redis_client = await get_redis_client()
     is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
