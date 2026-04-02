@@ -9,6 +9,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
+from db.postgres.services.message_category import MessageCategoryService
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from db.redis_client import RedisClient
@@ -110,21 +111,27 @@ async def get_redis_client() -> RedisClient:
 
 
 async def _save_message_to_pg(
-    user_id: int, session_id: str, user_text: str, bot_response: str
+    user_id: int, session_id: str, user_text: str, bot_response: str, category: str = None
 ) -> None:
-    """Сохраняет пару вопрос/ответ в PostgreSQL."""
+    """Сохраняет пару вопрос/ответ в PostgreSQL с категорией."""
     try:
         async with AsyncSessionLocal() as db_session:
             user_service = UserService(db_session)
             await user_service.ensure_user_exists(user_id)
 
             message_service = MessageService(db_session)
-            await message_service.create_message(
+            message = await message_service.create_message(
                 user_id=user_id,
                 session_id=session_id,
                 user_text=user_text,
                 bot_response=bot_response,
             )
+            
+            # Если есть категория, обновляем сообщение
+            if category:
+                category_service = MessageCategoryService(db_session)
+                await category_service.update_message_category(message.id, category)
+                
     except Exception as e:
         logger.error(f"Ошибка сохранения сообщения в PostgreSQL: {e}")
 
@@ -163,6 +170,16 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
     )
 
+    # Определяем категорию сообщения
+    message_category = None
+    try:
+        async with AsyncSessionLocal() as db_session:
+            category_service = MessageCategoryService(db_session)
+            message_category = await category_service.classify_message(message)
+            logger.info(f"[{session_id}] Message classified as: {message_category}")
+    except Exception as e:
+        logger.warning(f"[{session_id}] Error classifying message: {e}")
+
     try:
         redis_client = await get_redis_client()
 
@@ -195,7 +212,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
                 if user_id:
-                    await _save_message_to_pg(user_id, session_id, message, faq_answer)
+                    await _save_message_to_pg(user_id, session_id, message, faq_answer, message_category)
                 return faq_answer
         except Exception as e:
             logger.warning(f"FAQ matcher error: {e}")
@@ -433,7 +450,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         # Сохраняем в PostgreSQL
         if user_id:
             logger.info(f"[{session_id}] Saving message pair to PostgreSQL.")
-            await _save_message_to_pg(user_id, session_id, message, content)
+            await _save_message_to_pg(user_id, session_id, message, content, message_category)
 
         logger.info(f"[{session_id}] Message processing complete.")
         return content

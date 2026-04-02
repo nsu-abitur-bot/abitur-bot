@@ -135,6 +135,8 @@ class Message(Base):
     session_id: Mapped[str] = mapped_column(String(100), nullable=False)
     user_text: Mapped[str] = mapped_column(Text, nullable=False)
     bot_response: Mapped[str] = mapped_column(Text, nullable=False)
+    category: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    tagged_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
     user: Mapped["User"] = relationship("User", back_populates="messages")
@@ -143,6 +145,8 @@ class Message(Base):
         Index("idx_message_user_id", "user_id"),
         Index("idx_message_session_id", "session_id"),
         Index("idx_message_created_at", "created_at"),
+        Index("idx_message_category", "category"),
+        Index("idx_message_tagged_at", "tagged_at"),
     )
 
     def __repr__(self) -> str:

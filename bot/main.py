@@ -17,6 +17,7 @@ from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, cleanup_redis, get_redis_client
+from bot.category_handlers import register_category_handlers
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +76,9 @@ else:
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=None))
 
 dp = Dispatcher()
+
+# Регистрируем обработчики категорий
+register_category_handlers(dp)
 
 
 def get_session_id(message: Message) -> str:
