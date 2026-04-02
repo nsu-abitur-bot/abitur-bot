@@ -18,9 +18,10 @@ SUPPORTED_EXTENSIONS = {
     ".csv",
     ".html",
     ".htm",
+    ".pdf",
 }
 
-MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # увеличен лимит до 50MB из-за PDF
 
 
 class _HTMLTextExtractor(HTMLParser):
@@ -72,13 +73,13 @@ class RagUploadService:
                     UploadedDocumentResult(
                         filename=filename,
                         status="skipped",
-                        message="File is too large (max 5 MB)",
+                        message="File is too large (max 50 MB)",
                     )
                 )
                 continue
 
             try:
-                text = self._extract_text(raw=raw, extension=extension)
+                text = await self._extract_text(raw=raw, extension=extension)
             except ValueError as exc:
                 results.append(
                     UploadedDocumentResult(
@@ -131,7 +132,14 @@ class RagUploadService:
 
         return results
 
-    def _extract_text(self, raw: bytes, extension: str) -> str:
+    async def _extract_text(self, raw: bytes, extension: str) -> str:
+        if extension == ".pdf":
+            from llm.pdf_parser import parse_pdf_with_llm
+            text = await parse_pdf_with_llm(raw)
+            if not text:
+                raise ValueError("Could not extract text from PDF")
+            return text
+
         try:
             text = raw.decode("utf-8")
         except UnicodeDecodeError as exc:
