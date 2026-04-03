@@ -73,7 +73,6 @@ class OpenAILLM:
             response = await self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                max_tokens=int(kwargs.get("max_tokens", 2000)),
                 temperature=float(kwargs.get("temperature", 0.2)),
             )
             content = response.choices[0].message.content

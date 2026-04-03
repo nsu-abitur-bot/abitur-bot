@@ -33,7 +33,6 @@ class OpenAIProvider(BaseLLMProvider):
             raise RuntimeError("Переменная окружения OPENAI_API_KEY не установлена.")
 
         self.model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.max_tokens = int(os.getenv("OPENAI_MAX_TOKENS", "1024"))
         self.temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
         self.timeout_seconds = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "60"))
         self.proxy_url = os.getenv("OPENAI_SOCKS5_PROXY")
@@ -80,7 +79,6 @@ class OpenAIProvider(BaseLLMProvider):
             completion = await self.client.chat.completions.create(
                 model=self.model_name,
                 messages=openai_messages,
-                max_tokens=self.max_tokens,
                 temperature=self.temperature,
             )
         except Exception:
