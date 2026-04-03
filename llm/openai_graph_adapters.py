@@ -70,13 +70,14 @@ class OpenAILLM:
                 messages.append({"role": "system", "content": kwargs["system_prompt"]})
             messages.append({"role": "user", "content": prompt})
 
-            response = await self.client.chat.completions.create(
+            response = await self.client.responses.create(
                 model=self.model,
-                messages=messages,
+                input=messages,
+                max_output_tokens=int(kwargs.get("max_tokens", 2000)),
                 temperature=float(kwargs.get("temperature", 0.2)),
             )
-            content = response.choices[0].message.content
-            return content.strip() if isinstance(content, str) else str(content or "")
+
+            return response.output_text.strip()
         except Exception as e:
             logger.error(f"Error in OpenAILLM: {e}")
             return ""

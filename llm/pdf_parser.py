@@ -111,13 +111,13 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
         )
 
     try:
-        response = await client.chat.completions.create(
+        response = await client.responses.create(
             model=model,
-            messages=[{"role": "user", "content": content}],
-            max_tokens=4000,
+            input=content,
+            max_output_tokens=4000,
             temperature=0.1,
         )
-        text = response.choices[0].message.content or ""
+        text = response.output_text or ""
         return _clean_markdown(text)
     except Exception as e:
         logger.error(f"Ошибка OpenAI парсинга страниц PDF: {e}")

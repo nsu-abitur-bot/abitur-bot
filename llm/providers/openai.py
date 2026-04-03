@@ -34,6 +34,7 @@ class OpenAIProvider(BaseLLMProvider):
 
         self.model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         self.temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
+        self.max_tokens = int(os.getenv("OPENAI_MAX_TOKENS", "1024"))
         self.timeout_seconds = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "60"))
         self.proxy_url = os.getenv("OPENAI_SOCKS5_PROXY")
 
@@ -76,9 +77,10 @@ class OpenAIProvider(BaseLLMProvider):
         openai_messages: Any = [self._to_openai_message(m) for m in messages]
 
         try:
-            completion = await self.client.chat.completions.create(
+            completion = await self.client.responses.create(
                 model=self.model_name,
-                messages=openai_messages,
+                input=openai_messages,
+                max_output_tokens=self.max_tokens,
                 temperature=self.temperature,
             )
         except Exception:
@@ -88,7 +90,7 @@ class OpenAIProvider(BaseLLMProvider):
             )
             raise
 
-        content: Any = completion.choices[0].message.content
+        content: Any = completion.output_text
         return content.strip() if isinstance(content, str) else str(content or "")
 
     def get_embeddings_model(self) -> Any:
