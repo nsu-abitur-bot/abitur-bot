@@ -108,7 +108,7 @@ class OpenAIProvider(BaseLLMProvider):
         )
 
     @staticmethod
-    def _to_openai_message(message: BaseMessage) -> dict[str, str]:
+    def _to_openai_message(message: BaseMessage) -> dict[str, Any]:
         if isinstance(message, SystemMessage):
             role = "system"
         elif isinstance(message, AIMessage):
@@ -123,4 +123,7 @@ class OpenAIProvider(BaseLLMProvider):
             if isinstance(message.content, str)
             else str(message.content)
         )
-        return {"role": role, "content": content}
+        return {
+            "role": role,
+            "content": [{"type": "text", "text": content}],
+        }

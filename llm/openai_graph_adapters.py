@@ -67,8 +67,15 @@ class OpenAILLM:
         try:
             messages: Any = []
             if kwargs.get("system_prompt"):
-                messages.append({"role": "system", "content": kwargs["system_prompt"]})
-            messages.append({"role": "user", "content": prompt})
+                messages.append(
+                    {
+                        "role": "system",
+                        "content": [{"type": "text", "text": kwargs["system_prompt"]}],
+                    }
+                )
+            messages.append(
+                {"role": "user", "content": [{"type": "text", "text": prompt}]}
+            )
 
             response = await self.client.responses.create(
                 model=self.model,
