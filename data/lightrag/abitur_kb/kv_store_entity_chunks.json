@@ -92,11 +92,11 @@
   },
   "Novosibirsk State University": {
     "chunk_ids": [
-      "chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb"
+      "chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb",
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
     ],
-    "count": 1,
-    "create_time": 1774284728,
-    "update_time": 1774284728,
+    "count": 2,
+    "update_time": 1775532972,
     "_id": "Novosibirsk State University"
   },
   "Computer Science and System Design": {
@@ -119,11 +119,11 @@
   },
   "Informatics and Computer Engineering": {
     "chunk_ids": [
-      "chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb"
+      "chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb",
+      "chunk-acbb4c427974c0e90945bd06014d92c7"
     ],
-    "count": 1,
-    "create_time": 1774284730,
-    "update_time": 1774284730,
+    "count": 2,
+    "update_time": 1775532970,
     "_id": "Informatics and Computer Engineering"
   },
   "Faculty Of Information Technologies NSU": {
@@ -521,5 +521,404 @@
     "create_time": 1774285743,
     "update_time": 1774285743,
     "_id": "Upbringing Program"
+  },
+  "Fundamental and Applied Linguistics": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e",
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 2,
+    "create_time": 1775532962,
+    "update_time": 1775532962,
+    "_id": "Fundamental and Applied Linguistics"
+  },
+  "History": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e",
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 2,
+    "create_time": 1775532962,
+    "update_time": 1775532962,
+    "_id": "History"
+  },
+  "Institute of Philosophy and Law NSU": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532963,
+    "update_time": 1775532963,
+    "_id": "Institute of Philosophy and Law NSU"
+  },
+  "Jurisprudence": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e",
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 2,
+    "create_time": 1775532963,
+    "update_time": 1775532963,
+    "_id": "Jurisprudence"
+  },
+  "Philosophy": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532964,
+    "update_time": 1775532964,
+    "_id": "Philosophy"
+  },
+  "Department of Mechanics and Mathematics": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532964,
+    "update_time": 1775532964,
+    "_id": "Department of Mechanics and Mathematics"
+  },
+  "Mathematics and Mechanics": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532964,
+    "update_time": 1775532964,
+    "_id": "Mathematics and Mechanics"
+  },
+  "Mathematics and Computer Sciences": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532964,
+    "update_time": 1775532964,
+    "_id": "Mathematics and Computer Sciences"
+  },
+  "Department of Physics": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532965,
+    "update_time": 1775532965,
+    "_id": "Department of Physics"
+  },
+  "Applied Mathematics and Physics": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532965,
+    "update_time": 1775532965,
+    "_id": "Applied Mathematics and Physics"
+  },
+  "Applied Physics and Engineering": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532966,
+    "update_time": 1775532966,
+    "_id": "Applied Physics and Engineering"
+  },
+  "Physics": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532966,
+    "update_time": 1775532966,
+    "_id": "Physics"
+  },
+  "Department of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532966,
+    "update_time": 1775532966,
+    "_id": "Department of Natural Sciences"
+  },
+  "Chemistry": {
+    "chunk_ids": [
+      "chunk-63e7247f79032c20c318e23e30437f7e"
+    ],
+    "count": 1,
+    "create_time": 1775532966,
+    "update_time": 1775532966,
+    "_id": "Chemistry"
+  },
+  "Faculty Of Natural Sciences": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532967,
+    "update_time": 1775532967,
+    "_id": "Faculty Of Natural Sciences"
+  },
+  "Faculty Of Economics": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532967,
+    "update_time": 1775532967,
+    "_id": "Faculty Of Economics"
+  },
+  "Faculty Of Geological And Geophysical Sciences": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532967,
+    "update_time": 1775532967,
+    "_id": "Faculty Of Geological And Geophysical Sciences"
+  },
+  "Faculty Of Information Technologies": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532968,
+    "update_time": 1775532968,
+    "_id": "Faculty Of Information Technologies"
+  },
+  "Chemistry: Fundamental Science And Breakthrough Technologies": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532968,
+    "update_time": 1775532968,
+    "_id": "Chemistry: Fundamental Science And Breakthrough Technologies"
+  },
+  "Fundamental And Applied Chemistry": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532968,
+    "update_time": 1775532968,
+    "_id": "Fundamental And Applied Chemistry"
+  },
+  "Biology: Advanced Research And Technologies": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532968,
+    "update_time": 1775532968,
+    "_id": "Biology: Advanced Research And Technologies"
+  },
+  "Economics": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532969,
+    "update_time": 1775532969,
+    "_id": "Economics"
+  },
+  "Management": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532969,
+    "update_time": 1775532969,
+    "_id": "Management"
+  },
+  "Business Informatics": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532969,
+    "update_time": 1775532969,
+    "_id": "Business Informatics"
+  },
+  "Sociology": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532969,
+    "update_time": 1775532969,
+    "_id": "Sociology"
+  },
+  "Geology": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532970,
+    "update_time": 1775532970,
+    "_id": "Geology"
+  },
+  "Informatics And Computer Engineering: Software Engineering And Computer Science": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532970,
+    "update_time": 1775532970,
+    "_id": "Informatics And Computer Engineering: Software Engineering And Computer Science"
+  },
+  "Faculty Of Geology And Geophysics": {
+    "chunk_ids": [
+      "chunk-b440e3a0508acec341c48ce3265a714c"
+    ],
+    "count": 1,
+    "create_time": 1775532970,
+    "update_time": 1775532970,
+    "_id": "Faculty Of Geology And Geophysics"
+  },
+  "Computer Science and Systems Engineering": {
+    "chunk_ids": [
+      "chunk-acbb4c427974c0e90945bd06014d92c7"
+    ],
+    "count": 1,
+    "create_time": 1775532971,
+    "update_time": 1775532971,
+    "_id": "Computer Science and Systems Engineering"
+  },
+  "Institute of Intelligent Robotics": {
+    "chunk_ids": [
+      "chunk-acbb4c427974c0e90945bd06014d92c7"
+    ],
+    "count": 1,
+    "create_time": 1775532971,
+    "update_time": 1775532971,
+    "_id": "Institute of Intelligent Robotics"
+  },
+  "Mechatronics and Robotics": {
+    "chunk_ids": [
+      "chunk-acbb4c427974c0e90945bd06014d92c7"
+    ],
+    "count": 1,
+    "create_time": 1775532971,
+    "update_time": 1775532971,
+    "_id": "Mechatronics and Robotics"
+  },
+  "Applied Informatics": {
+    "chunk_ids": [
+      "chunk-acbb4c427974c0e90945bd06014d92c7"
+    ],
+    "count": 1,
+    "create_time": 1775532972,
+    "update_time": 1775532972,
+    "_id": "Applied Informatics"
+  },
+  "Total Enrollment": {
+    "chunk_ids": [
+      "chunk-acbb4c427974c0e90945bd06014d92c7"
+    ],
+    "count": 1,
+    "create_time": 1775532972,
+    "update_time": 1775532972,
+    "_id": "Total Enrollment"
+  },
+  "D.V. Pyshny": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532972,
+    "update_time": 1775532972,
+    "_id": "D.V. Pyshny"
+  },
+  "Institute of Medicine and Medical Technology": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532973,
+    "update_time": 1775532973,
+    "_id": "Institute of Medicine and Medical Technology"
+  },
+  "Humanities Institute of NSU": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532973,
+    "update_time": 1775532973,
+    "_id": "Humanities Institute of NSU"
+  },
+  "Medical Cybernetics": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532973,
+    "update_time": 1775532973,
+    "_id": "Medical Cybernetics"
+  },
+  "General Medicine": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532974,
+    "update_time": 1775532974,
+    "_id": "General Medicine"
+  },
+  "Psychology": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532974,
+    "update_time": 1775532974,
+    "_id": "Psychology"
+  },
+  "Oriental and African Studies": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532974,
+    "update_time": 1775532974,
+    "_id": "Oriental and African Studies"
+  },
+  "Journalism and Modern Media Technologies": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532975,
+    "update_time": 1775532975,
+    "_id": "Journalism and Modern Media Technologies"
+  },
+  "Philology": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532975,
+    "update_time": 1775532975,
+    "_id": "Philology"
+  },
+  "Linguistics": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532975,
+    "update_time": 1775532975,
+    "_id": "Linguistics"
+  },
+  "Humanities Institute": {
+    "chunk_ids": [
+      "chunk-4a23a3538b7bb66172ee72f2bd7b3b38"
+    ],
+    "count": 1,
+    "create_time": 1775532976,
+    "update_time": 1775532976,
+    "_id": "Humanities Institute"
   }
 }

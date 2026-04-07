@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import unquote
 
 import httpx
 import requests
@@ -18,7 +19,7 @@ from api.services.rag_upload import RagUploadService
 from llm.preprocessor import clean_and_structure_text
 from parser.nsu_parser import parse_page
 from parser.parser_to_rag import parse_and_save_url
-from parser.url_parser import get_content_type, process_pdf_bytes
+from parser.url_parser import process_pdf_bytes
 from rag.graph_memory import get_graph_memory
 from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
 
@@ -64,30 +65,34 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
     url_str = str(url)
 
     # 1. Проверяем тип контента (может это PDF документ)
-    content_type = await get_content_type(url_str)
+    try:
+        async with httpx.AsyncClient(verify=False, timeout=30.0) as client:
+            resp = await client.head(url_str, follow_redirects=True)
+            content_type = resp.headers.get("Content-Type", "").lower()
 
-    if "application/pdf" in content_type or url_str.lower().endswith(".pdf"):
-        logger.info(
-            f"Обнаружен PDF по URL: {url_str}. Запуск Vision парсера для превью."
-        )
-        try:
-            async with httpx.AsyncClient(verify=False, timeout=30.0) as client:
-                resp = await client.get(url_str, follow_redirects=True)
-                resp.raise_for_status()
+            if "application/pdf" in content_type or url_str.lower().endswith(".pdf"):
+                logger.info(
+                    f"Обнаружен PDF по URL: {url_str}. Запуск Vision парсера для превью."
+                )
 
-            pdf_markdown = await process_pdf_bytes(resp.content)
+                resp_get = await client.get(url_str, follow_redirects=True)
+                resp_get.raise_for_status()
 
-            return ParsedPageResult(
-                title=url_str.split("/")[-1],  # Берем имя файла как заголовок
-                url=url_str,
-                text=pdf_markdown,
-                documents=[],  # Внутри PDF ссылок на другие документы мы не собираем
-            )
-        except Exception as e:
-            logger.error(f"Ошибка при парсинге PDF для превью: {e}")
-            raise HTTPException(
-                status_code=400, detail=f"Failed to parse PDF file: {e}"
-            )
+                pdf_markdown = await process_pdf_bytes(resp_get.content)
+
+                # Декодируем URL (чтобы вместо %D0%98 было нормальное русское название)
+                raw_filename = url_str.split("/")[-1]
+                decoded_title = unquote(raw_filename)
+
+                return ParsedPageResult(
+                    title=decoded_title,  # Нормальное имя файла как заголовок
+                    url=url_str,
+                    text=pdf_markdown,
+                    documents=[],  # Внутри PDF ссылок на другие документы мы не собираем
+                )
+    except Exception as e:
+        logger.error(f"Ошибка загрузки {url_str} перед превью: {e}")
+        raise HTTPException(status_code=400, detail="Failed to fetch URL check") from e
 
     # 2. Если это обычная HTML страница
     # Добавляем стандартные заголовки, чтобы избежать блокировки (Requirement 1 - Fix)

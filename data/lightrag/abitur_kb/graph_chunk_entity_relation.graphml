@@ -108,10 +108,10 @@
     <node id="Novosibirsk State University">
       <data key="d0">Novosibirsk State University</data>
       <data key="d1">organization</data>
-      <data key="d2">Novosibirsk State University is the parent institution hosting the Faculty of Information Technologies.</data>
-      <data key="d3">chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb</data>
-      <data key="d4">https://education.nsu.ru/information-technologies</data>
-      <data key="d5">1774284728</data>
+      <data key="d2">Novosibirsk State University is the parent institution hosting the Faculty of Information Technologies.&lt;SEP&gt;Novosibirsk State University is a higher education institution that offers various academic programs and sets admission quotas for paid spots.</data>
+      <data key="d3">chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb&lt;SEP&gt;chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://education.nsu.ru/information-technologies&lt;SEP&gt;https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532972</data>
       <data key="d6" />
     </node>
     <node id="Computer Science and System Design">
@@ -135,10 +135,10 @@
     <node id="Informatics and Computer Engineering">
       <data key="d0">Informatics and Computer Engineering</data>
       <data key="d1">concept</data>
-      <data key="d2">The academic field and degree program code 09.03.01 under which the educational programs are offered.</data>
-      <data key="d3">chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb</data>
-      <data key="d4">https://education.nsu.ru/information-technologies</data>
-      <data key="d5">1774284730</data>
+      <data key="d2">The academic field and degree program code 09.03.01 under which the educational programs are offered.&lt;SEP&gt;An academic field of study (code 09.03.01) offering a bachelor's degree with 65 total places.</data>
+      <data key="d3">chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb&lt;SEP&gt;chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d4">https://education.nsu.ru/information-technologies&lt;SEP&gt;https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532970</data>
       <data key="d6" />
     </node>
     <node id="Faculty Of Information Technologies NSU">
@@ -537,6 +537,402 @@
       <data key="d5">1774285743</data>
       <data key="d6" />
     </node>
+    <node id="Fundamental and Applied Linguistics">
+      <data key="d0">Fundamental and Applied Linguistics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Fundamental and Applied Linguistics is a bachelor's program offered by the Humanities Institute with 18 paid spots.&lt;SEP&gt;An academic specialization (45.03.01) offered at the bachelor's level with 18 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e&lt;SEP&gt;chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532962</data>
+      <data key="d6" />
+    </node>
+    <node id="History">
+      <data key="d0">History</data>
+      <data key="d1">concept</data>
+      <data key="d2">History is a bachelor's program offered at the Humanities Institute of NSU.&lt;SEP&gt;An academic specialization (46.03.01) offered at the bachelor's level with 15 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e&lt;SEP&gt;chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532962</data>
+      <data key="d6" />
+    </node>
+    <node id="Institute of Philosophy and Law NSU">
+      <data key="d0">Institute of Philosophy and Law NSU</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic institution within Novosibirsk State University offering degrees in law and philosophy.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532963</data>
+      <data key="d6" />
+    </node>
+    <node id="Jurisprudence">
+      <data key="d0">Jurisprudence</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (40.03.01) offered at the bachelor's level with 49 students.&lt;SEP&gt;A bachelor's degree program (40.03.01) with 17 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e&lt;SEP&gt;chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532963</data>
+      <data key="d6" />
+    </node>
+    <node id="Philosophy">
+      <data key="d0">Philosophy</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (47.03.01) offered at the bachelor's level with 20 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532964</data>
+      <data key="d6" />
+    </node>
+    <node id="Department of Mechanics and Mathematics">
+      <data key="d0">Department of Mechanics and Mathematics</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic division offering specializations in Mathematics, Mechanics, and Computer Science.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532964</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematics and Mechanics">
+      <data key="d0">Mathematics and Mechanics</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (01.03.00) focused on applied mathematics and informatics with 65 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532964</data>
+      <data key="d6" />
+    </node>
+    <node id="Mathematics and Computer Sciences">
+      <data key="d0">Mathematics and Computer Sciences</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (02.03.01) offered at the bachelor's level with 15 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532964</data>
+      <data key="d6" />
+    </node>
+    <node id="Department of Physics">
+      <data key="d0">Department of Physics</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic division offering specializations in Applied Mathematics, Physics, and Engineering.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532965</data>
+      <data key="d6" />
+    </node>
+    <node id="Applied Mathematics and Physics">
+      <data key="d0">Applied Mathematics and Physics</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (03.03.01) with tracks in IT and Engineering, each with 10 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532965</data>
+      <data key="d6" />
+    </node>
+    <node id="Applied Physics and Engineering">
+      <data key="d0">Applied Physics and Engineering</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic program focusing on applied physics and engineering with 10 students enrolled.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532966</data>
+      <data key="d6" />
+    </node>
+    <node id="Physics">
+      <data key="d0">Physics</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (03.03.02) focused on fundamental and experimental physics with 30 students.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532966</data>
+      <data key="d6" />
+    </node>
+    <node id="Department of Natural Sciences">
+      <data key="d0">Department of Natural Sciences</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic department offering degrees in chemistry and breakthrough technologies.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532966</data>
+      <data key="d6" />
+    </node>
+    <node id="Chemistry">
+      <data key="d0">Chemistry</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic specialization (04.03.01) focused on fundamental science and breakthrough technologies.</data>
+      <data key="d3">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532966</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty Of Natural Sciences">
+      <data key="d0">Faculty Of Natural Sciences</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic department offering programs in Chemistry and Biology.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532967</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty Of Economics">
+      <data key="d0">Faculty Of Economics</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic department offering programs in Economics, Management, Business Informatics, Sociology, and Law.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532967</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty Of Geological And Geophysical Sciences">
+      <data key="d0">Faculty Of Geological And Geophysical Sciences</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic department offering a program in Geology.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532967</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty Of Information Technologies">
+      <data key="d0">Faculty Of Information Technologies</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic department offering programs in Informatics and Computer Engineering.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532968</data>
+      <data key="d6" />
+    </node>
+    <node id="Chemistry: Fundamental Science And Breakthrough Technologies">
+      <data key="d0">Chemistry: Fundamental Science And Breakthrough Technologies</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (04.03.01) with 15 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532968</data>
+      <data key="d6" />
+    </node>
+    <node id="Fundamental And Applied Chemistry">
+      <data key="d0">Fundamental And Applied Chemistry</data>
+      <data key="d1">concept</data>
+      <data key="d2">A specialist degree program (04.05.01) with 10 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532968</data>
+      <data key="d6" />
+    </node>
+    <node id="Biology: Advanced Research And Technologies">
+      <data key="d0">Biology: Advanced Research And Technologies</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (06.03.01) with 25 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532968</data>
+      <data key="d6" />
+    </node>
+    <node id="Economics">
+      <data key="d0">Economics</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (38.03.01) with 42 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532969</data>
+      <data key="d6" />
+    </node>
+    <node id="Management">
+      <data key="d0">Management</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (38.03.02) with 43 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532969</data>
+      <data key="d6" />
+    </node>
+    <node id="Business Informatics">
+      <data key="d0">Business Informatics</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (38.03.05) with 19 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532969</data>
+      <data key="d6" />
+    </node>
+    <node id="Sociology">
+      <data key="d0">Sociology</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (39.03.01) with 15 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532969</data>
+      <data key="d6" />
+    </node>
+    <node id="Geology">
+      <data key="d0">Geology</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (05.03.01) with 25 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532970</data>
+      <data key="d6" />
+    </node>
+    <node id="Informatics And Computer Engineering: Software Engineering And Computer Science">
+      <data key="d0">Informatics And Computer Engineering: Software Engineering And Computer Science</data>
+      <data key="d1">concept</data>
+      <data key="d2">A bachelor's degree program (09.03.01) with 65 students.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532970</data>
+      <data key="d6" />
+    </node>
+    <node id="Faculty Of Geology And Geophysics">
+      <data key="d0">Faculty Of Geology And Geophysics</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic department offering a program in Geology.</data>
+      <data key="d3">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532970</data>
+      <data key="d6" />
+    </node>
+    <node id="Computer Science and Systems Engineering">
+      <data key="d0">Computer Science and Systems Engineering</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic field of study (code 09.03.01) under the specialization of Informatics and Computer Engineering, with 35 total places.</data>
+      <data key="d3">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532971</data>
+      <data key="d6" />
+    </node>
+    <node id="Institute of Intelligent Robotics">
+      <data key="d0">Institute of Intelligent Robotics</data>
+      <data key="d1">organization</data>
+      <data key="d2">An academic institution offering programs in mechatronics, robotics, and artificial intelligence.</data>
+      <data key="d3">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532971</data>
+      <data key="d6" />
+    </node>
+    <node id="Mechatronics and Robotics">
+      <data key="d0">Mechatronics and Robotics</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic field of study (code 15.03.06) focusing on artificial intelligence with 12 total places.</data>
+      <data key="d3">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532971</data>
+      <data key="d6" />
+    </node>
+    <node id="Applied Informatics">
+      <data key="d0">Applied Informatics</data>
+      <data key="d1">concept</data>
+      <data key="d2">An academic field of study (code 09.03.03) focusing on applied artificial intelligence with 135 total places.</data>
+      <data key="d3">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532972</data>
+      <data key="d6" />
+    </node>
+    <node id="Total Enrollment">
+      <data key="d0">Total Enrollment</data>
+      <data key="d1">data</data>
+      <data key="d2">The aggregate number of available academic places, totaling 965.</data>
+      <data key="d3">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532972</data>
+      <data key="d6" />
+    </node>
+    <node id="D.V. Pyshny">
+      <data key="d0">D.V. Pyshny</data>
+      <data key="d1">person</data>
+      <data key="d2">D.V. Pyshny is the Rector of Novosibirsk State University who approved the document regarding paid enrollment spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532972</data>
+      <data key="d6" />
+    </node>
+    <node id="Institute of Medicine and Medical Technology">
+      <data key="d0">Institute of Medicine and Medical Technology</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Institute of Medicine and Medical Technology is a department within Novosibirsk State University offering programs in medical cybernetics, general medicine, and psychology.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532973</data>
+      <data key="d6" />
+    </node>
+    <node id="Humanities Institute of NSU">
+      <data key="d0">Humanities Institute of NSU</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Humanities Institute of NSU is a department within Novosibirsk State University offering programs in linguistics, history, journalism, and oriental studies.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532973</data>
+      <data key="d6" />
+    </node>
+    <node id="Medical Cybernetics">
+      <data key="d0">Medical Cybernetics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Medical Cybernetics is a specialty program offered by the Institute of Medicine and Medical Technology with 15 paid spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532973</data>
+      <data key="d6" />
+    </node>
+    <node id="General Medicine">
+      <data key="d0">General Medicine</data>
+      <data key="d1">concept</data>
+      <data key="d2">General Medicine is a specialty program offered by the Institute of Medicine and Medical Technology with 80 paid spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532974</data>
+      <data key="d6" />
+    </node>
+    <node id="Psychology">
+      <data key="d0">Psychology</data>
+      <data key="d1">concept</data>
+      <data key="d2">Psychology is a bachelor's program offered by the Institute of Medicine and Medical Technology with 61 total paid spots across two forms of study.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532974</data>
+      <data key="d6" />
+    </node>
+    <node id="Oriental and African Studies">
+      <data key="d0">Oriental and African Studies</data>
+      <data key="d1">concept</data>
+      <data key="d2">Oriental and African Studies is a bachelor's program offered by the Humanities Institute with 35 paid spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532974</data>
+      <data key="d6" />
+    </node>
+    <node id="Journalism and Modern Media Technologies">
+      <data key="d0">Journalism and Modern Media Technologies</data>
+      <data key="d1">concept</data>
+      <data key="d2">Journalism and Modern Media Technologies is a bachelor's program offered by the Humanities Institute with 22 paid spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532975</data>
+      <data key="d6" />
+    </node>
+    <node id="Philology">
+      <data key="d0">Philology</data>
+      <data key="d1">concept</data>
+      <data key="d2">Philology is a bachelor's program offered by the Humanities Institute with 10 paid spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532975</data>
+      <data key="d6" />
+    </node>
+    <node id="Linguistics">
+      <data key="d0">Linguistics</data>
+      <data key="d1">concept</data>
+      <data key="d2">Linguistics is a bachelor's program offered by the Humanities Institute with 52 paid spots.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532975</data>
+      <data key="d6" />
+    </node>
+    <node id="Humanities Institute">
+      <data key="d0">Humanities Institute</data>
+      <data key="d1">organization</data>
+      <data key="d2">The Humanities Institute is a department within Novosibirsk State University offering programs in oriental studies, journalism, philology, linguistics, and history.</data>
+      <data key="d3">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d4">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d5">1775532976</data>
+      <data key="d6" />
+    </node>
     <edge source="Faculty" target="SberLab-NSU">
       <data key="d7">1.0</data>
       <data key="d8">SberLab-NSU is a research laboratory operating within the faculty.</data>
@@ -616,6 +1012,42 @@
       <data key="d10">chunk-b7c17a92a89bb4fb7dcc9d4fda83ecdb</data>
       <data key="d11">https://education.nsu.ru/information-technologies</data>
       <data key="d12">1774284787</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="D.V. Pyshny">
+      <data key="d7">1.0</data>
+      <data key="d8">D.V. Pyshny serves as the Rector of Novosibirsk State University.</data>
+      <data key="d9">Administration,Leadership</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532985</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Institute of Medicine and Medical Technology">
+      <data key="d7">1.0</data>
+      <data key="d8">The Institute of Medicine and Medical Technology is a division of Novosibirsk State University.</data>
+      <data key="d9">Affiliation,Department</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532985</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Humanities Institute of NSU">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute of NSU is a division of Novosibirsk State University.</data>
+      <data key="d9">Affiliation,Department</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532986</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Novosibirsk State University" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute is a division of Novosibirsk State University.</data>
+      <data key="d9">Affiliation,Department</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532990</data>
       <data key="d13" />
     </edge>
     <edge source="Computer Science and System Design" target="Informatics and Computer Engineering">
@@ -1057,6 +1489,330 @@
       <data key="d10">chunk-8e102c1ec8bf19fec8c012cc5b6d8ba4</data>
       <data key="d11">https://www.nsu.ru/n/information-technologies-department/education_fit/programs/</data>
       <data key="d12">1774285757</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Fundamental and Applied Linguistics" target="Humanities Institute of NSU">
+      <data key="d7">1.0</data>
+      <data key="d8">Fundamental and Applied Linguistics is a program offered by the Humanities Institute of NSU.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532990</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Fundamental and Applied Linguistics" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute offers the Fundamental and Applied Linguistics program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532994</data>
+      <data key="d13" />
+    </edge>
+    <edge source="History" target="Humanities Institute of NSU">
+      <data key="d7">1.0</data>
+      <data key="d8">History is a program offered by the Humanities Institute of NSU.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532990</data>
+      <data key="d13" />
+    </edge>
+    <edge source="History" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute offers the History program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532994</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Philosophy and Law NSU" target="Jurisprudence">
+      <data key="d7">1.0</data>
+      <data key="d8">The Institute of Philosophy and Law NSU offers a bachelor's program in Jurisprudence.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532976</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Philosophy and Law NSU" target="Philosophy">
+      <data key="d7">1.0</data>
+      <data key="d8">The Institute of Philosophy and Law NSU offers a bachelor's program in Philosophy.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532977</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Jurisprudence" target="Faculty Of Economics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers the Jurisprudence program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532983</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Department of Mechanics and Mathematics" target="Mathematics and Mechanics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Department of Mechanics and Mathematics offers a bachelor's program in Mathematics and Mechanics.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532977</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Department of Mechanics and Mathematics" target="Mathematics and Computer Sciences">
+      <data key="d7">1.0</data>
+      <data key="d8">The Department of Mechanics and Mathematics offers a bachelor's program in Mathematics and Computer Sciences.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532978</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Department of Physics" target="Applied Mathematics and Physics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Department of Physics offers a bachelor's program in Applied Mathematics and Physics.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532978</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Department of Physics" target="Applied Physics and Engineering">
+      <data key="d7">1.0</data>
+      <data key="d8">The Department of Physics offers a bachelor's program in Applied Physics and Engineering.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532978</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Department of Physics" target="Physics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Department of Physics offers a bachelor's program in Physics.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532979</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Department of Natural Sciences" target="Chemistry">
+      <data key="d7">1.0</data>
+      <data key="d8">The Department of Natural Sciences offers a bachelor's program in Chemistry.</data>
+      <data key="d9">academic program,education</data>
+      <data key="d10">chunk-63e7247f79032c20c318e23e30437f7e</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532979</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Natural Sciences" target="Chemistry: Fundamental Science And Breakthrough Technologies">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences offers the Chemistry: Fundamental Science and Breakthrough Technologies program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532980</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Natural Sciences" target="Fundamental And Applied Chemistry">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences offers the Fundamental and Applied Chemistry program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532980</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Natural Sciences" target="Biology: Advanced Research And Technologies">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Natural Sciences offers the Biology: Advanced Research and Technologies program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532981</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Economics" target="Economics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers the Economics program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532981</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Economics" target="Management">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers the Management program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532982</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Economics" target="Business Informatics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers the Business Informatics program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532982</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Economics" target="Sociology">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Economics offers the Sociology program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532983</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Geological And Geophysical Sciences" target="Geology">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Geological and Geophysical Sciences offers the Geology program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532983</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Faculty Of Information Technologies" target="Informatics And Computer Engineering: Software Engineering And Computer Science">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Information Technologies offers the Informatics and Computer Engineering program.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532984</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Geology" target="Faculty Of Geology And Geophysics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Faculty of Geology and Geophysics offers the Geology program.</data>
+      <data key="d9">academic program,enrollment</data>
+      <data key="d10">chunk-b440e3a0508acec341c48ce3265a714c</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532984</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Intelligent Robotics" target="Mechatronics and Robotics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Institute of Intelligent Robotics offers a bachelor's program in Mechatronics and Robotics.</data>
+      <data key="d9">academic program,enrollment</data>
+      <data key="d10">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532984</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Intelligent Robotics" target="Applied Informatics">
+      <data key="d7">1.0</data>
+      <data key="d8">The Institute of Intelligent Robotics offers a bachelor's program in Applied Informatics.</data>
+      <data key="d9">academic program,enrollment</data>
+      <data key="d10">chunk-acbb4c427974c0e90945bd06014d92c7</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532985</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Medicine and Medical Technology" target="Medical Cybernetics">
+      <data key="d7">2.0</data>
+      <data key="d8">Medical Cybernetics is a program offered by the Institute of Medicine and Medical Technology.&lt;SEP&gt;The Institute of Medicine and Medical Technology offers the Medical Cybernetics program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532986</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Medicine and Medical Technology" target="General Medicine">
+      <data key="d7">2.0</data>
+      <data key="d8">General Medicine is a program offered by the Institute of Medicine and Medical Technology.&lt;SEP&gt;The Institute of Medicine and Medical Technology offers the General Medicine program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532987</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Institute of Medicine and Medical Technology" target="Psychology">
+      <data key="d7">2.0</data>
+      <data key="d8">Psychology is a program offered by the Institute of Medicine and Medical Technology.&lt;SEP&gt;The Institute of Medicine and Medical Technology offers the Psychology program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532987</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Humanities Institute of NSU" target="Oriental and African Studies">
+      <data key="d7">1.0</data>
+      <data key="d8">Oriental and African Studies is a program offered by the Humanities Institute of NSU.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532987</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Humanities Institute of NSU" target="Journalism and Modern Media Technologies">
+      <data key="d7">1.0</data>
+      <data key="d8">Journalism and Modern Media Technologies is a program offered by the Humanities Institute of NSU.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532988</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Humanities Institute of NSU" target="Philology">
+      <data key="d7">1.0</data>
+      <data key="d8">Philology is a program offered by the Humanities Institute of NSU.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532989</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Humanities Institute of NSU" target="Linguistics">
+      <data key="d7">1.0</data>
+      <data key="d8">Linguistics is a program offered by the Humanities Institute of NSU.</data>
+      <data key="d9">Academic Program</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532989</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Oriental and African Studies" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute offers the Oriental and African Studies program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532991</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Journalism and Modern Media Technologies" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute offers the Journalism and Modern Media Technologies program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532992</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Philology" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute offers the Philology program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532992</data>
+      <data key="d13" />
+    </edge>
+    <edge source="Linguistics" target="Humanities Institute">
+      <data key="d7">1.0</data>
+      <data key="d8">The Humanities Institute offers the Linguistics program.</data>
+      <data key="d9">Academic Program,Admission</data>
+      <data key="d10">chunk-4a23a3538b7bb66172ee72f2bd7b3b38</data>
+      <data key="d11">https://www.nsu.ru/upload/iblock/34a/4hgt8yq8zysn6w8u2rryru1mmhty2qi2/%D0%98%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D1%8F%20%D0%BE%20%D0%BA%D0%BE%D0%BB%D0%B8%D1%87%D0%B5%D1%81%D1%82%D0%B2%D0%B5%20%D0%BF%D0%BB%D0%B0%D1%82%D0%BD%D1%8B%D1%85%20%D0%BC%D0%B5%D1%81%D1%82%20%D0%BF%D1%80%D0%B8%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B5%20%D0%B2%20%D0%B1%D0%B0%D0%BA%D0%B0%D0%BB%D0%B0%D0%B2%D1%80%D0%B8%D0%B0%D1%82_%D1%81%D0%BF%D0%B5%D1%86%D0%B8%D0%B0%D0%BB%D0%B8%D1%82%D0%B5%D1%82%20%D0%B2%202026%20%D0%B3%D0%BE%D0%B4%D1%83.pdf</data>
+      <data key="d12">1775532993</data>
       <data key="d13" />
     </edge>
   </graph>

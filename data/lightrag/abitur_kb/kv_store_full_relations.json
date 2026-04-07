@@ -246,5 +246,173 @@
     "create_time": 1774285757,
     "update_time": 1774285757,
     "_id": "Обучение — Факультет информационных технологий"
+  },
+  "Информация о количестве платных мест при приеме в бакалавриат_специалитет в 2026 году.pdf": {
+    "relation_pairs": [
+      [
+        "Humanities Institute of NSU",
+        "Philology"
+      ],
+      [
+        "Department of Physics",
+        "Physics"
+      ],
+      [
+        "Humanities Institute",
+        "Philology"
+      ],
+      [
+        "Faculty Of Economics",
+        "Sociology"
+      ],
+      [
+        "Humanities Institute of NSU",
+        "Novosibirsk State University"
+      ],
+      [
+        "Economics",
+        "Faculty Of Economics"
+      ],
+      [
+        "Humanities Institute",
+        "Novosibirsk State University"
+      ],
+      [
+        "General Medicine",
+        "Institute of Medicine and Medical Technology"
+      ],
+      [
+        "Humanities Institute of NSU",
+        "Linguistics"
+      ],
+      [
+        "Institute of Philosophy and Law NSU",
+        "Jurisprudence"
+      ],
+      [
+        "Humanities Institute",
+        "Linguistics"
+      ],
+      [
+        "History",
+        "Humanities Institute"
+      ],
+      [
+        "Institute of Medicine and Medical Technology",
+        "Psychology"
+      ],
+      [
+        "Institute of Medicine and Medical Technology",
+        "Novosibirsk State University"
+      ],
+      [
+        "Humanities Institute of NSU",
+        "Oriental and African Studies"
+      ],
+      [
+        "Business Informatics",
+        "Faculty Of Economics"
+      ],
+      [
+        "Faculty Of Economics",
+        "Management"
+      ],
+      [
+        "Chemistry: Fundamental Science And Breakthrough Technologies",
+        "Faculty Of Natural Sciences"
+      ],
+      [
+        "Humanities Institute",
+        "Oriental and African Studies"
+      ],
+      [
+        "Faculty Of Geological And Geophysical Sciences",
+        "Geology"
+      ],
+      [
+        "Department of Mechanics and Mathematics",
+        "Mathematics and Computer Sciences"
+      ],
+      [
+        "Applied Physics and Engineering",
+        "Department of Physics"
+      ],
+      [
+        "Fundamental and Applied Linguistics",
+        "Humanities Institute"
+      ],
+      [
+        "Applied Informatics",
+        "Institute of Intelligent Robotics"
+      ],
+      [
+        "Chemistry",
+        "Department of Natural Sciences"
+      ],
+      [
+        "D.V. Pyshny",
+        "Novosibirsk State University"
+      ],
+      [
+        "Faculty Of Information Technologies",
+        "Informatics And Computer Engineering: Software Engineering And Computer Science"
+      ],
+      [
+        "Applied Mathematics and Physics",
+        "Department of Physics"
+      ],
+      [
+        "Humanities Institute of NSU",
+        "Journalism and Modern Media Technologies"
+      ],
+      [
+        "History",
+        "Humanities Institute of NSU"
+      ],
+      [
+        "Humanities Institute",
+        "Journalism and Modern Media Technologies"
+      ],
+      [
+        "Faculty Of Natural Sciences",
+        "Fundamental And Applied Chemistry"
+      ],
+      [
+        "Institute of Intelligent Robotics",
+        "Mechatronics and Robotics"
+      ],
+      [
+        "Department of Mechanics and Mathematics",
+        "Mathematics and Mechanics"
+      ],
+      [
+        "Fundamental and Applied Linguistics",
+        "Humanities Institute of NSU"
+      ],
+      [
+        "Faculty Of Geology And Geophysics",
+        "Geology"
+      ],
+      [
+        "Institute of Philosophy and Law NSU",
+        "Philosophy"
+      ],
+      [
+        "Biology: Advanced Research And Technologies",
+        "Faculty Of Natural Sciences"
+      ],
+      [
+        "Faculty Of Economics",
+        "Jurisprudence"
+      ],
+      [
+        "Institute of Medicine and Medical Technology",
+        "Medical Cybernetics"
+      ]
+    ],
+    "count": 40,
+    "create_time": 1775532995,
+    "update_time": 1775532995,
+    "_id": "Информация о количестве платных мест при приеме в бакалавриат_специалитет в 2026 году.pdf"
   }
 }
