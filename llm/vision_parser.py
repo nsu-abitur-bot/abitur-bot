@@ -3,7 +3,6 @@ import logging
 import os
 from typing import Any, List, Optional
 
-import fitz
 import httpx
 from google import genai
 from google.genai import types
@@ -13,8 +12,10 @@ logger = logging.getLogger(__name__)
 
 PARSE_PROMPT = (
     "Твоя задача — перевести содержимое этих отсканированных страниц документа в чистый структурированный Markdown. "
-    "Строго сохраняй структуру таблиц в Markdown-формате. Не добавляй никаких лишних комментариев и вступительных фраз, "
-    "только результат."
+    "Если в документе есть таблицы, НЕ используй табличный формат Markdown. Вместо этого преобразуй "
+    "каждую строку таблицы в связный текстовый абзац (например: 'Объект: X, Характеристика: Y'). "
+    "Это необходимо для лучшего векторного поиска. Убедись, что связь между заголовками столбцов и значениями ячеек "
+    "чётко отражена в тексте. Не добавляй лишних комментариев, только результат."
 )
 
 
@@ -30,20 +31,19 @@ def _clean_markdown(text: str) -> str:
     return text.strip()
 
 
-async def parse_pdf_with_llm(pdf_bytes: bytes, provider: Optional[str] = None) -> str:
+async def parse_images_with_llm(images_base64: List[str], provider: Optional[str] = None) -> str:
     """
-    Конвертирует PDF в изображения и отправляет в LLM (OpenAI или Gemini) для извлечения текста и таблиц в Markdown.
+    Отправляет base64 изображения страниц в LLM (OpenAI или Gemini) для извлечения текста и таблиц в Markdown.
     Если provider не указан, берет из конфигурации окружения PDF_PARSER_PROVIDER, по умолчанию "gemini".
     """
     if not provider:
         provider = os.getenv("PDF_PARSER_PROVIDER", "openai").lower()
 
-    images_base64 = _pdf_to_base64_images(pdf_bytes)
     if not images_base64:
         return ""
 
     logger.info(
-        f"PDF конвертирован в {len(images_base64)} изображений. Используем провайдер: {provider}"
+        f"LLM получила {len(images_base64)} изображений. Используем провайдер: {provider}"
     )
 
     # Бьем на батчи по 5 страниц, чтобы не превысить лимиты окна или ошибки TimeOut на больших документах
@@ -67,19 +67,6 @@ async def parse_pdf_with_llm(pdf_bytes: bytes, provider: Optional[str] = None) -
     return "\n\n".join(all_markdown)
 
 
-def _pdf_to_base64_images(pdf_bytes: bytes) -> List[str]:
-    """Конвертирует страницы PDF во множество base64-строк формата JPEG"""
-    images = []
-    # fitz.open(stream) -> filetype должен быть "pdf"
-    with fitz.open(stream=pdf_bytes, filetype="pdf") as doc:
-        for page in doc:
-            # Масштаб 2.0 дает ~150-300 DPI, что достаточно для качественного OCR
-            pix = page.get_pixmap(matrix=fitz.Matrix(2.0, 2.0))
-            img_bytes = pix.tobytes("jpeg")
-            images.append(base64.b64encode(img_bytes).decode("utf-8"))
-    return images
-
-
 async def _process_batch_openai(images_b64: List[str]) -> str:
     """Обрабатывает пачку страниц с помощью OpenAI Vision"""
     api_key = os.getenv("OPENAI_API_KEY")
@@ -92,7 +79,6 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
 
     client = AsyncOpenAI(api_key=api_key, http_client=http_client)
 
-    # Можно использовать gpt-4o, он быстрее и мощнее
     model = os.getenv("OPENAI_MODEL_VISION", "gpt-4o-mini")
 
     content: List[Any] = [
@@ -111,13 +97,13 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
         )
 
     try:
-        response = await client.responses.create(
+        response = await client.chat.completions.create(
             model=model,
-            input=content,
-            max_output_tokens=4000,
+            messages=[{"role": "user", "content": content}],
+            max_tokens=4000,
             temperature=0.1,
         )
-        text = response.output_text or ""
+        text = response.choices[0].message.content or ""
         return _clean_markdown(text)
     except Exception as e:
         logger.error(f"Ошибка OpenAI парсинга страниц PDF: {e}")
@@ -132,7 +118,7 @@ async def _process_batch_gemini(images_b64: List[str]) -> str:
         return ""
 
     client = genai.Client(api_key=api_key)
-    model = os.getenv("GEMINI_MODEL_VISION", "gemini-3.1-flash-lite-preview")
+    model = os.getenv("GEMINI_MODEL_VISION", "gemini-2.5-flash")
 
     contents: List[Any] = [PARSE_PROMPT]
     for img in images_b64:

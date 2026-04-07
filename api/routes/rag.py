@@ -1,3 +1,8 @@
+import logging
+
+import httpx
+import requests
+from bs4 import BeautifulSoup
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from pydantic import HttpUrl
 
@@ -10,12 +15,14 @@ from api.schemas.rag import (
     RagUploadResponse,
 )
 from api.services.rag_upload import RagUploadService
-from llm.pdf_parser import parse_pdf_with_llm
 from llm.preprocessor import clean_and_structure_text
 from parser.nsu_parser import parse_page
+from parser.parser_to_rag import parse_and_save_url
+from parser.url_parser import get_content_type, process_pdf_bytes
 from rag.graph_memory import get_graph_memory
 from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
 
+logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/rag", tags=["RAG Management"])
 
 
@@ -53,7 +60,36 @@ async def upload_documents_to_rag(
     "/parse", response_model=ParsedPageResult, summary="Спарсить страницу для RAG"
 )
 async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL страницы")):
-    """Парсит страницу, очищает текст через LLM и находит документы."""
+    """Парсит страницу или PDF-документ, очищает текст через LLM и находит документы."""
+    url_str = str(url)
+
+    # 1. Проверяем тип контента (может это PDF документ)
+    content_type = await get_content_type(url_str)
+
+    if "application/pdf" in content_type or url_str.lower().endswith(".pdf"):
+        logger.info(
+            f"Обнаружен PDF по URL: {url_str}. Запуск Vision парсера для превью."
+        )
+        try:
+            async with httpx.AsyncClient(verify=False, timeout=30.0) as client:
+                resp = await client.get(url_str, follow_redirects=True)
+                resp.raise_for_status()
+
+            pdf_markdown = await process_pdf_bytes(resp.content)
+
+            return ParsedPageResult(
+                title=url_str.split("/")[-1],  # Берем имя файла как заголовок
+                url=url_str,
+                text=pdf_markdown,
+                documents=[],  # Внутри PDF ссылок на другие документы мы не собираем
+            )
+        except Exception as e:
+            logger.error(f"Ошибка при парсинге PDF для превью: {e}")
+            raise HTTPException(
+                status_code=400, detail=f"Failed to parse PDF file: {e}"
+            )
+
+    # 2. Если это обычная HTML страница
     # Добавляем стандартные заголовки, чтобы избежать блокировки (Requirement 1 - Fix)
     headers = {
         "User-Agent": (
@@ -103,9 +139,6 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 
     # Если блоков не нашли, пытаемся достать хоть что-то из body (Fallback)
     if not cleaned_blocks:
-        import requests
-        from bs4 import BeautifulSoup
-
         try:
             resp = requests.get(str(url), headers=headers)
             if resp.status_code == 200:
@@ -149,8 +182,9 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 @router.post("/confirm", status_code=201, summary="Подтвердить загрузку в RAG")
 async def confirm_rag_upload(request: ConfirmUploadRequest):
     """Загружает отредактированный текст и выбранные документы в RAG."""
-    # 1. Загружаем текст страницы (если он есть и не пуст)
+
     try:
+        # 1. Загружаем текст страницы (если он есть и не пуст)
         if request.text and request.text.strip():
             await add_texts_async(
                 texts=[request.text],
@@ -159,53 +193,15 @@ async def confirm_rag_upload(request: ConfirmUploadRequest):
                 file_paths=[request.url],
             )
 
-        # 2. Если есть прикреплённые документы, скачиваем, парсим LLM и загружаем
+        # 2. Обрабатываем прикреплённые документы (извлекаются из страницы на этапе /parse)
         if request.documents:
-            import httpx
-
-            # Для каждого документа скачиваем его PDF и парсим
-            async with httpx.AsyncClient(timeout=120.0) as client:
-                for doc in request.documents:
-                    doc_title = doc.title
-                    doc_url = doc.url
-                    # Базовая валидация, нам нужны только PDF
-                    if not doc_url.lower().endswith(".pdf"):
-                        continue
-
-                    try:
-                        # 1) Скачивание
-                        resp = await client.get(doc_url, follow_redirects=True)
-                        if resp.status_code != 200:
-                            import logging
-
-                            logging.getLogger(__name__).warning(
-                                f"Не удалось скачать: {doc_url}, статус: {resp.status_code}"
-                            )
-                            continue
-
-                        pdf_bytes = resp.content
-
-                        # 2) Парсинг PDF через LLM
-                        parsed_md = await parse_pdf_with_llm(pdf_bytes)
-                        if not parsed_md.strip():
-                            continue
-
-                        # 3) Закидываем в граф RAG
-                        await add_texts_async(
-                            texts=[parsed_md],
-                            graph_id=DEFAULT_GRAPH_ID,
-                            source_ids=[doc_title],
-                            file_paths=[doc_url],
-                        )
-                    except Exception as e:
-                        import logging
-
-                        logging.getLogger(__name__).error(
-                            f"Ошибка обработки документа {doc_title} ({doc_url}): {e}"
-                        )
+            for doc in request.documents:
+                logger.info(f"Парсинг вложенного документа: {doc.url}")
+                await parse_and_save_url(doc.url, title=doc.title)
 
         return {"status": "success", "message": "Content and documents uploaded to RAG"}
     except Exception as e:
+        logger.error(f"Error during RAG confirmation upload: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to upload: {str(e)}")
 
 
