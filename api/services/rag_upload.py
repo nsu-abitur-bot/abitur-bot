@@ -7,7 +7,9 @@ from pathlib import Path
 from fastapi import UploadFile
 
 from api.schemas.rag import UploadedDocumentResult
+from llm.vision_parser import parse_images_with_llm
 from parser.baza_to_rag import _extract_sources
+from parser.pdf_parser import pdf_to_base64_images
 from rag.loader import add_texts_async
 
 SUPPORTED_EXTENSIONS = {
@@ -134,8 +136,11 @@ class RagUploadService:
 
     async def _extract_text(self, raw: bytes, extension: str) -> str:
         if extension == ".pdf":
-            from llm.pdf_parser import parse_pdf_with_llm
-            text = await parse_pdf_with_llm(raw)
+            images = pdf_to_base64_images(raw)
+            if not images:
+                raise ValueError("Could not extract images from PDF")
+
+            text = await parse_images_with_llm(images)
             if not text:
                 raise ValueError("Could not extract text from PDF")
             return text
