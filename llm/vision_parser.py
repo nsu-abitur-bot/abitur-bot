@@ -85,7 +85,7 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
 
     content: List[Any] = [
         {
-            "type": "text",
+            "type": "input_text",
             "text": PARSE_PROMPT,
         }
     ]
@@ -93,8 +93,9 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
     for img in images_b64:
         content.append(
             {
-                "type": "image_url",
-                "image_url": {"url": f"data:image/jpeg;base64,{img}", "detail": "high"},
+                "type": "input_image",
+                "image_url": f"data:image/jpeg;base64,{img}",
+                "detail": "high",
             }
         )
 
@@ -102,8 +103,8 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
         response = await client.responses.create(
             model=model,
             input=[{"role": "user", "content": content}],
-            max_output_tokens=4000,
-            temperature=0.1,
+            temperature=0.1,  # Низкая креативность для точного извлечения фактов
+            max_output_tokens=8192,  # Достаточный запас для перевода 5 страниц текста
         )
         text = response.output_text or ""
         return _clean_markdown(text)
