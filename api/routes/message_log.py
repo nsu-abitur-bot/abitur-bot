@@ -171,3 +171,30 @@ async def get_type_logs(
             status_code=500,
             detail=f"Ошибка получения логов по типу: {str(e)}"
         )
+
+from api.schemas.popular_questions import PopularQuestionsResponse, PopularQuestion
+
+@router.get(
+    "/popular",
+    response_model=PopularQuestionsResponse,
+    summary="Получить самые популярные вопросы",
+)
+async def get_popular_questions(
+    limit: int = Query(10, ge=1, le=100),
+    log_service: MessageLogService = Depends(get_message_log_service),
+):
+    """
+    Получает самые часто задаваемые вопросы пользователей.
+    
+    - **limit**: максимальное количество возвращаемых вопросов
+    """
+    try:
+        popular = await log_service.get_popular_questions(limit=limit)
+        return PopularQuestionsResponse(
+            questions=[PopularQuestion(question=item["question"], count=item["count"]) for item in popular]
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения популярных вопросов: {str(e)}"
+        )
