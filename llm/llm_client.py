@@ -134,7 +134,7 @@ async def _save_log_to_db(
     session_id: str,
     message_type: str,
     content: str,
-    message_metadata: dict = None,
+    message_metadata: dict,
 ) -> None:
     """Сохраняет лог в таблицу message_logs."""
     try:
@@ -334,8 +334,8 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     "Затем обязательно добавь в самый конец своего ответа"
                     + " выбранные ссылки в следующем формате:\n\n"
                     "<b>Источники:</b>\n"
-                    '<a href="URL_1">URL_1</a>\n'
-                    '<a href="URL_2">URL_2</a>\n\n'
+                    '<a href="URL_1">Название документа или страницы</a>\n'
+                    '<a href="URL_2">Понятное описание источника</a>\n\n'
                     "(Но если ты просто здороваешься, говоришь на отвлеченные темы или"
                     + " не нашел ответа в Контексте - блок "
                     + "'Источники:' ВООБЩЕ НЕ добавляй!)\n"
@@ -380,6 +380,29 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 f"({provider.__class__.__name__})."
             )
             content = await provider.generate(messages)
+
+            # Пост-процессинг: удаляем "левые" ссылки, которых не было в valid_urls
+            if valid_urls:
+                # Находим все ссылки вида <a href="...">...</a>
+                def _filter_links(match):
+                    link_html = match.group(0)
+                    href_val = re.search(r'href=["\']([^"\']+)["\']', link_html, re.I)
+                    if href_val:
+                        found_url = href_val.group(1).strip()
+                        # Если URL не из нашего списка базы знаний, вырезаем его из ответа
+                        if found_url not in valid_urls:
+                            return match.group(
+                                2
+                            )  # возвращаем только текст ссылки без тега
+                    return link_html
+
+                content = re.sub(
+                    r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
+                    _filter_links,
+                    content,
+                    flags=re.IGNORECASE,
+                )
+
             logger.info(f"[{session_id}] Received response from LLM.")
 
             # Логируем что решил ответить LLM
