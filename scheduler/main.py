@@ -2,7 +2,8 @@ import asyncio
 import logging
 import os
 
-from aiogram import Bot
+from aiogram import Bot as TelegramBot
+from maxapi import Bot as MaxBot
 
 from bot.notifications import notify_users
 from db.postgres.db import AsyncSessionLocal
@@ -14,7 +15,7 @@ from parser.rating_parser import (
 logger = logging.getLogger(__name__)
 
 
-async def run_sync_job(bot: Bot):
+async def run_sync_job(bot: TelegramBot | None, max_client: MaxBot | None = None):
     """Скрипт одного прогона: парсинг -> обновление БД -> уведомления."""
     logger.info("Начало цикла синхронизации рейтингов...")
     try:
@@ -82,7 +83,7 @@ async def run_sync_job(bot: Bot):
                 f"Рассылка уведомлений для {len(notifications)}"
                 + "пользователей/изменений..."
             )
-            await notify_users(bot, notifications)
+            await notify_users(bot, notifications, max_client=max_client)
         else:
             logger.info("Изменений нет, уведомления не требуются.")
 
@@ -98,18 +99,29 @@ async def main():
 
     # Инициализация бота
     bot_token = os.getenv("BOT_TOKEN")
+    max_bot_token = os.getenv("MAX_BOT_TOKEN")
     if not bot_token:
         logger.warning(
             "Переменная окружения BOT_TOKEN не задана. Уведомления могут не работать!"
         )
 
+    max_client = None
+    if max_bot_token:
+        try:
+            max_client = MaxBot(token=max_bot_token)
+            logger.info("MAX клиент для уведомлений инициализирован")
+        except Exception as exc:
+            logger.warning("Не удалось инициализировать MAX клиент: %s", exc)
+
     # parse_mode 'HTML' или 'Markdown' можете добавить при необходимости
-    bot = Bot(token=bot_token) if bot_token else None
+    bot = TelegramBot(token=bot_token) if bot_token else None
 
     while True:
         # Выполняем наш "один цикл"
         if bot is not None:
-            await run_sync_job(bot)
+            await run_sync_job(bot, max_client=max_client)
+        elif max_client is not None:
+            await run_sync_job(None, max_client=max_client)
         logger.info(f"Ожидание {interval} секунд до следующего запуска...")
         await asyncio.sleep(interval)
 

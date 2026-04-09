@@ -10,6 +10,7 @@ dependencies = [
     "python-multipart>=0.0.9",
     "uvicorn>=0.30.0",
     "aiogram",
+    "maxapi",
     "aiohttp-socks>=0.10.1",
     "python-dotenv",
     "httpx[socks]",
