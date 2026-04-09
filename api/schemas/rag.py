@@ -74,3 +74,14 @@ class CsvImportResponse(BaseModel):
 class RagDocumentContentResponse(BaseModel):
     id: str = Field(..., description="Идентификатор документа")
     content: str = Field(..., description="Полный текст документа")
+
+
+class CsvImportPreviewResult(BaseModel):
+    title: str = Field(..., description="Название документа")
+    url: str = Field(..., description="URL документа")
+    comment: str | None = Field(None, description="Комментарий из CSV")
+
+
+class CsvImportPreviewResponse(BaseModel):
+    total_found: int = Field(..., description="Всего найдено ссылок в CSV")
+    results: list[CsvImportPreviewResult] = Field(..., description="Список найденных документов для превью")

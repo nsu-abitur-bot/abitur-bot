@@ -11,6 +11,8 @@ from pydantic import HttpUrl
 
 from api.schemas.rag import (
     ConfirmUploadRequest,
+    CsvImportPreviewResponse,
+    CsvImportPreviewResult,
     CsvImportResponse,
     CsvImportResult,
     ParsedDocument,
@@ -202,11 +204,11 @@ async def confirm_rag_upload(request: ConfirmUploadRequest):
                 file_paths=[request.url],
             )
 
-        # 2. Обрабатываем прикреплённые документы (извлекаются из страницы на этапе /parse)
-        if request.documents:
-            for doc in request.documents:
-                logger.info(f"Парсинг вложенного документа: {doc.url}")
-                await parse_and_save_url(doc.url, title=doc.title)
+        # 2. Вложенные документы больше не загружаем (по запросу)
+        # if request.documents:
+        #     for doc in request.documents:
+        #         logger.info(f"Парсинг вложенного документа: {doc.url}")
+        #         await parse_and_save_url(doc.url, title=doc.title)
 
         return {"status": "success", "message": "Content and documents uploaded to RAG"}
     except Exception as e:
@@ -325,3 +327,52 @@ async def upload_csv_documents(
         total_found=len(results),
         results=results,
     )
+
+
+@router.post(
+    "/upload/csv/preview",
+    response_model=CsvImportPreviewResponse,
+    summary="Превью документов из CSV (без обработки)",
+)
+async def preview_csv_documents(
+    file: UploadFile = File(
+        ..., description="CSV файл с полями (Название, Link, Комментарий)"
+    ),
+):
+    """
+    Принимает CSV документ и возвращает список найденных в нём ссылок без их обработки.
+    """
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Файл должен быть в формате CSV")
+
+    try:
+        content = await file.read()
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(
+            status_code=400, detail="Файл должен быть в кодировке UTF-8"
+        )
+
+    reader = csv.DictReader(io.StringIO(text))
+    if not reader.fieldnames or "Link" not in reader.fieldnames:
+        raise HTTPException(
+            status_code=400, detail="CSV должен содержать колонку 'Link'"
+        )
+
+    results = []
+    for row in reader:
+        url = row.get("Link", "").strip()
+        title = row.get("Название", "").strip()
+        comment = row.get("Комментарий", "").strip()
+
+        if not url:
+            continue
+
+        if not title:
+            # Fallback to URL or filename from URL
+            raw_filename = url.split("/")[-1]
+            title = unquote(raw_filename) if raw_filename else url
+
+        results.append(CsvImportPreviewResult(title=title, url=url, comment=comment))
+
+    return CsvImportPreviewResponse(total_found=len(results), results=results)
