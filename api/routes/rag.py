@@ -1,3 +1,5 @@
+import csv
+import io
 import logging
 from urllib.parse import unquote
 
@@ -9,6 +11,8 @@ from pydantic import HttpUrl
 
 from api.schemas.rag import (
     ConfirmUploadRequest,
+    CsvImportResponse,
+    CsvImportResult,
     ParsedDocument,
     ParsedPageResult,
     RagDocumentContentResponse,
@@ -234,3 +238,90 @@ async def get_rag_document_content(doc_id: str):
         raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
 
     return RagDocumentContentResponse(id=doc_id, content=content)
+
+
+@router.post(
+    "/upload/csv",
+    response_model=CsvImportResponse,
+    summary="Импорт документов по ссылкам из CSV",
+)
+async def upload_csv_documents(
+    file: UploadFile = File(
+        ..., description="CSV файл с полями (Название, Link, Комментарий)"
+    ),
+):
+    """
+    Принимает CSV документ на вход и обрабатывает все документы там.
+    Ожидаемый формат: Название,Link,Комментарий
+    """
+    if not file.filename or not file.filename.lower().endswith(".csv"):
+        raise HTTPException(status_code=400, detail="Файл должен быть в формате CSV")
+
+    try:
+        content = await file.read()
+        text = content.decode("utf-8")
+    except UnicodeDecodeError:
+        raise HTTPException(
+            status_code=400, detail="Файл должен быть в кодировке UTF-8"
+        )
+
+    reader = csv.DictReader(io.StringIO(text))
+    # Проверяем наличие колонки Link
+    if not reader.fieldnames or "Link" not in reader.fieldnames:
+        raise HTTPException(
+            status_code=400, detail="CSV должен содержать колонку 'Link'"
+        )
+
+    results = []
+
+    for row in reader:
+        url = row.get("Link", "").strip()
+        title = row.get("Название", "").strip()
+
+        if not url:
+            continue
+
+        if not title:
+            try:
+                # Если названия нет, пытаемся достать его по ссылке
+                path = url.lower()
+                if "application/pdf" in path or path.endswith(".pdf"):
+                    # Для документов берем имя файла из ссылки
+                    raw_filename = url.split("/")[-1]
+                    title = unquote(raw_filename)
+                else:
+                    # Для веб-страниц пытаемся получить <title>
+                    async with httpx.AsyncClient(verify=False, timeout=10.0) as client:
+                        resp = await client.get(url, follow_redirects=True)
+                        if resp.status_code == 200:
+                            soup = BeautifulSoup(resp.text, "html.parser")
+                            if soup.title and soup.title.string:
+                                title = soup.title.string.strip()
+            except Exception as title_e:
+                logger.warning(f"Не удалось извлечь название для {url}: {title_e}")
+            
+            # Если всё еще нет названия, оставляем как есть (будет использован URL как fallback)
+            if not title:
+                title = url
+
+        try:
+            success = await parse_and_save_url(url=url, title=title)
+            message = (
+                "Успешно"
+                if success
+                else "Не удалось сохранить (возможно пустой контент или недоступен)"
+            )
+            results.append(
+                CsvImportResult(title=title, url=url, success=success, message=message)
+            )
+        except Exception as e:
+            logger.error(f"Ошибка при обработке {url} из CSV: {e}")
+            results.append(
+                CsvImportResult(title=title, url=url, success=False, message=str(e))
+            )
+
+    return CsvImportResponse(
+        imported_count=sum(1 for r in results if r.success),
+        total_found=len(results),
+        results=results,
+    )
