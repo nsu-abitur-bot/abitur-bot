@@ -1,6 +1,6 @@
 import logging
 from datetime import UTC, datetime, timedelta
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from sqlalchemy import delete, func, select
 from sqlalchemy.exc import IntegrityError
@@ -17,27 +17,118 @@ class UserService:
     def __init__(self, session: AsyncSession):
         self.session = session
 
+    async def get_user_by_telegram_id(self, telegram_id: int) -> Optional[User]:
+        """Получить пользователя по Telegram ID."""
+        try:
+            result = await self.session.execute(
+                select(User).where(User.telegram_id == telegram_id)
+            )
+            return result.scalar_one_or_none()
+        except Exception as e:
+            logger.error(
+                f"Ошибка получения пользователя по telegram_id {telegram_id}: {e}"
+            )
+            return None
+
+    async def get_user_by_max_id(self, max_id: str) -> Optional[User]:
+        """Получить пользователя по MAX ID."""
+        try:
+            result = await self.session.execute(
+                select(User).where(User.max_id == max_id)
+            )
+            return result.scalar_one_or_none()
+        except Exception as e:
+            logger.error(f"Ошибка получения пользователя по max_id {max_id}: {e}")
+            return None
+
+    async def get_user_by_channel_id(
+        self, channel: Literal["telegram", "max"], external_id: str
+    ) -> Optional[User]:
+        """Получить пользователя по идентификатору канала."""
+        if channel == "telegram":
+            try:
+                return await self.get_user_by_telegram_id(int(external_id))
+            except ValueError:
+                logger.warning(f"Некорректный telegram external_id: {external_id}")
+                return None
+        return await self.get_user_by_max_id(external_id)
+
+    async def ensure_user_by_telegram_id(self, telegram_id: int) -> User:
+        """Гарантировать наличие пользователя по Telegram ID."""
+        user = await self.get_user_by_telegram_id(telegram_id)
+        if user:
+            return user
+
+        user = await self.create_user(telegram_id=telegram_id)
+        if user:
+            return user
+
+        # На случай гонки (одновременные апдейты) читаем повторно.
+        user = await self.get_user_by_telegram_id(telegram_id)
+        if not user:
+            raise RuntimeError(
+                f"Не удалось гарантировать существование пользователя с telegram_id={telegram_id}"
+            )
+        return user
+
+    async def ensure_user_by_max_id(self, max_id: str) -> User:
+        """Гарантировать наличие пользователя по MAX ID."""
+        user = await self.get_user_by_max_id(max_id)
+        if user:
+            return user
+
+        user = await self.create_user(max_id=max_id)
+        if user:
+            return user
+
+        # На случай гонки (одновременные апдейты) читаем повторно.
+        user = await self.get_user_by_max_id(max_id)
+        if not user:
+            raise RuntimeError(
+                f"Не удалось гарантировать существование пользователя с max_id={max_id}"
+            )
+        return user
+
     async def create_user(
-        self, user_id: int, applicant_id: Optional[str] = None
+        self,
+        user_id: Optional[int] = None,
+        applicant_id: Optional[str] = None,
+        telegram_id: Optional[int] = None,
+        max_id: Optional[str] = None,
     ) -> Optional[User]:
         """Создать нового пользователя."""
         try:
-            user = User(user_id=user_id, applicant_id=applicant_id)
+            user_kwargs = {
+                "applicant_id": applicant_id,
+                "telegram_id": telegram_id,
+                "max_id": max_id,
+            }
+            if user_id is not None:
+                user_kwargs["user_id"] = user_id
+
+            user = User(**user_kwargs)
             self.session.add(user)
             await self.session.commit()
             await self.session.refresh(user)
-            logger.info(f"Пользователь {user_id} создан")
+            logger.info(
+                "Пользователь создан: user_id=%s telegram_id=%s max_id=%s",
+                user.user_id,
+                user.telegram_id,
+                user.max_id,
+            )
             return user
         except IntegrityError as e:
             await self.session.rollback()
             logger.warning(
-                f"Не удалось создать пользователя {user_id} из-за "
+                f"Не удалось создать пользователя ({user_id=}, {telegram_id=}, {max_id=}) из-за "
                 f"нарушения ограничения БД: {e}"
             )
             return None
         except Exception as e:
             await self.session.rollback()
-            logger.error(f"Ошибка создания пользователя {user_id}: {e}")
+            logger.error(
+                f"Ошибка создания пользователя ({user_id=}, {telegram_id=}, {max_id=}): {e}"
+            )
             return None
 
     async def get_user(self, user_id: int) -> Optional[User]:
@@ -76,6 +167,34 @@ class UserService:
                 f"Ошибка получения пользователей по applicant_id {applicant_id}: {e}"
             )
             return []
+
+    async def bind_max_id(self, user_id: int, max_id: str) -> bool:
+        """Привязать MAX ID к существующему пользователю."""
+        try:
+            result = await self.session.execute(
+                select(User).where(User.user_id == user_id)
+            )
+            user = result.scalar_one_or_none()
+            if not user:
+                logger.warning(f"Пользователь {user_id} не найден для bind_max_id")
+                return False
+
+            user.max_id = max_id
+            await self.session.commit()
+            logger.info(f"MAX ID {max_id} привязан к пользователю {user_id}")
+            return True
+        except IntegrityError as e:
+            await self.session.rollback()
+            logger.warning(
+                f"Ошибка bind_max_id для пользователя {user_id}, max_id={max_id}: {e}"
+            )
+            return False
+        except Exception as e:
+            await self.session.rollback()
+            logger.error(
+                f"Неожиданная ошибка bind_max_id для пользователя {user_id}: {e}"
+            )
+            return False
 
     async def get_all_users(self) -> List[User]:
         """Получить всех пользователей."""
@@ -189,9 +308,7 @@ class UserService:
             return False
         except Exception as e:
             await self.session.rollback()
-            logger.error(
-                f"Ошибка обновления applicant_id пользователя {user_id}: {e}"
-            )
+            logger.error(f"Ошибка обновления applicant_id пользователя {user_id}: {e}")
             return False
 
     async def ensure_user_exists(
@@ -200,7 +317,7 @@ class UserService:
         """Убедиться, что пользователь существует в БД. Если нет - создать."""
         user = await self.get_user(user_id)
         if not user:
-            user = await self.create_user(user_id, applicant_id)
+            user = await self.create_user(user_id=user_id, applicant_id=applicant_id)
             if not user:
                 # В случае гонки (два сообщения одновременно) пробуем получить еще раз
                 user = await self.get_user(user_id)

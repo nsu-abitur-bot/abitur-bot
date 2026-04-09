@@ -28,12 +28,16 @@ class Base(DeclarativeBase):
 
 
 class User(Base):
-    """Пользователи Telegram."""
+    """Пользователи бота с внутренним идентификатором."""
 
     __tablename__ = "user"
 
-    # Это user_id из телеграмма
-    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    # Внутренний идентификатор пользователя (не внешний ID мессенджера)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, primary_key=True, autoincrement=True
+    )
+    telegram_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
+    max_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     applicant_id: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
@@ -45,12 +49,17 @@ class User(Base):
     )
 
     __table_args__ = (
+        Index("ux_user_telegram_id", "telegram_id", unique=True),
+        Index("ux_user_max_id", "max_id", unique=True),
         Index("idx_user_applicant_id", "applicant_id"),
         Index("idx_user_created_at", "created_at"),
     )
 
     def __repr__(self) -> str:
-        return f"<User(user_id={self.user_id}, applicant_id='{self.applicant_id}')>"
+        return (
+            f"<User(user_id={self.user_id}, telegram_id={self.telegram_id}, "
+            f"max_id='{self.max_id}', applicant_id='{self.applicant_id}')>"
+        )
 
 
 class Leaderboard(Base):

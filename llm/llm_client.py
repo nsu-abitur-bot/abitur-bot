@@ -157,7 +157,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
     session_id - идентификатор переписки,
     используется для получения и сохранения истории переписки (контекста)
     между пользователем и ассистентом
-    user_id - идентификатор пользователя Telegram для сохранения в БД
+    user_id - внутренний идентификатор пользователя для сохранения в БД
     """
     logger.info(
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
@@ -385,8 +385,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
             # Логируем что решил ответить LLM
             logger.info(f"[{session_id}] LLM response result:")
             logger.info(
-                f"[{session_id}] - Raw response (first 500 chars): "
-                f"{content[:500]}..."
+                f"[{session_id}] - Raw response (first 500 chars): {content[:500]}..."
             )
             logger.info(f"[{session_id}] - Response length: {len(content)} characters")
 

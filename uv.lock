@@ -31,6 +31,7 @@ dependencies = [
     { name = "langchain-openai" },
     { name = "langchain-text-splitters" },
     { name = "lightrag-hku" },
+    { name = "maxapi" },
     { name = "psycopg2" },
     { name = "pymupdf" },
     { name = "python-dotenv" },
@@ -74,6 +75,7 @@ requires-dist = [
     { name = "langchain-openai", specifier = ">=0.3.35" },
     { name = "langchain-text-splitters", specifier = ">=0.3.0" },
     { name = "lightrag-hku", specifier = ">=1.4.9.8" },
+    { name = "maxapi" },
     { name = "psycopg2", specifier = ">=2.9.11" },
     { name = "pymupdf", specifier = ">=1.27.2.2" },
     { name = "python-dotenv" },
@@ -1581,6 +1583,22 @@ wheels = [
 ]
 
 [[package]]
+name = "maxapi"
+version = "0.9.17"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "aiofiles" },
+    { name = "aiohttp" },
+    { name = "magic-filter" },
+    { name = "puremagic" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c6/78/91b3e5c0095fbdc83a7fa8afa59f4299c041235bb0eb81a2f35b3996d1de/maxapi-0.9.17.tar.gz", hash = "sha256:b82fe30731be261b73521b8b4fe9a9b76e1ab23038445d3523d3a785160e39ce", size = 93216, upload-time = "2026-03-18T13:50:58.16Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/36/0da9520027c6887d12e91d4c5c99f5263ba76f6b87e6014e8e1f03ecfb49/maxapi-0.9.17-py3-none-any.whl", hash = "sha256:1a4dec8fb34899da1b1d597aeac1eeedff847bf9c0dfa638ab5a75e66fc8ca0c", size = 133073, upload-time = "2026-03-18T13:50:56.745Z" },
+]
+
+[[package]]
 name = "mdurl"
 version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
@@ -2271,6 +2289,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b5/bf/635fbe5dd10ed200afbbfbe98f8602829252ca1cce81cc48fb25ed8dadc0/psycopg2-2.9.11-cp312-cp312-win_amd64.whl", hash = "sha256:e03e4a6dbe87ff81540b434f2e5dc2bddad10296db5eea7bdc995bf5f4162938", size = 2713969, upload-time = "2025-10-10T11:10:15.946Z" },
     { url = "https://files.pythonhosted.org/packages/88/5a/18c8cb13fc6908dc41a483d2c14d927a7a3f29883748747e8cb625da6587/psycopg2-2.9.11-cp313-cp313-win_amd64.whl", hash = "sha256:8dc379166b5b7d5ea66dcebf433011dfc51a7bb8a5fc12367fa05668e5fc53c8", size = 2714048, upload-time = "2025-10-10T11:10:19.816Z" },
     { url = "https://files.pythonhosted.org/packages/47/08/737aa39c78d705a7ce58248d00eeba0e9fc36be488f9b672b88736fbb1f7/psycopg2-2.9.11-cp314-cp314-win_amd64.whl", hash = "sha256:f10a48acba5fe6e312b891f290b4d2ca595fc9a06850fe53320beac353575578", size = 2803738, upload-time = "2025-10-10T11:10:23.196Z" },
+]
+
+[[package]]
+name = "puremagic"
+version = "1.30"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/dd/7f/9998706bc516bdd664ccf929a1da6c6e5ee06e48f723ce45aae7cf3ff36e/puremagic-1.30.tar.gz", hash = "sha256:f9ff7ac157d54e9cf3bff1addfd97233548e75e685282d84ae11e7ffee1614c9", size = 314785, upload-time = "2025-07-04T18:48:36.061Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/91/ed/1e347d85d05b37a8b9a039ca832e5747e1e5248d0bd66042783ef48b4a37/puremagic-1.30-py3-none-any.whl", hash = "sha256:5eeeb2dd86f335b9cfe8e205346612197af3500c6872dffebf26929f56e9d3c1", size = 43304, upload-time = "2025-07-04T18:48:34.801Z" },
 ]
 
 [[package]]

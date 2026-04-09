@@ -239,3 +239,77 @@ async def test_get_user_count_stats_boundary_365_days(session: AsyncSession):
     assert stats["month"] == 0
     assert stats["year"] == 0
     assert stats["all_time"] == 1
+
+
+@pytest.mark.asyncio
+async def test_ensure_user_by_telegram_id_creates_new_user(session: AsyncSession):
+    """Тест: ensure_user_by_telegram_id создает пользователя при отсутствии."""
+    service = UserService(session)
+
+    user = await service.ensure_user_by_telegram_id(telegram_id=5550001)
+
+    assert user.telegram_id == 5550001
+    assert user.max_id is None
+    assert user.user_id is not None
+
+
+@pytest.mark.asyncio
+async def test_ensure_user_by_telegram_id_returns_existing(session: AsyncSession):
+    """Тест: ensure_user_by_telegram_id возвращает существующего пользователя."""
+    service = UserService(session)
+
+    created = await service.create_user(user_id=200001, telegram_id=8881001)
+    assert created is not None
+
+    resolved = await service.ensure_user_by_telegram_id(telegram_id=8881001)
+    assert resolved.user_id == 200001
+    assert resolved.telegram_id == 8881001
+
+
+@pytest.mark.asyncio
+async def test_ensure_user_by_max_id_creates_new_user(session: AsyncSession):
+    """Тест: ensure_user_by_max_id создает нового пользователя для MAX."""
+    service = UserService(session)
+
+    user = await service.ensure_user_by_max_id(max_id="max-user-42")
+
+    assert user.max_id == "max-user-42"
+    assert user.telegram_id is None
+    assert user.user_id is not None
+
+
+@pytest.mark.asyncio
+async def test_get_user_by_channel_id(session: AsyncSession):
+    """Тест резолва пользователя по channel/external_id."""
+    service = UserService(session)
+
+    created = await service.create_user(
+        user_id=300001,
+        telegram_id=7770001,
+        max_id="max-777",
+    )
+    assert created is not None
+
+    via_tg = await service.get_user_by_channel_id("telegram", "7770001")
+    via_max = await service.get_user_by_channel_id("max", "max-777")
+
+    assert via_tg is not None
+    assert via_max is not None
+    assert via_tg.user_id == 300001
+    assert via_max.user_id == 300001
+
+
+@pytest.mark.asyncio
+async def test_bind_max_id(session: AsyncSession):
+    """Тест привязки max_id к существующему пользователю."""
+    service = UserService(session)
+
+    created = await service.create_user(user_id=400001, telegram_id=9990001)
+    assert created is not None
+
+    ok = await service.bind_max_id(user_id=400001, max_id="max-400001")
+    assert ok is True
+
+    updated = await service.get_user(400001)
+    assert updated is not None
+    assert updated.max_id == "max-400001"
