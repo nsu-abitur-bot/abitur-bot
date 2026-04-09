@@ -33,6 +33,20 @@ class FaqService:
         self._reload_matcher()
         return item
 
+    def create_many(self, items: List[FaqItem]) -> List[FaqItem]:
+        """Создает несколько вопросов FAQ и один раз перезагружает matcher."""
+        with self._lock:
+            data = self._read_data()
+            if "faq" not in data:
+                data["faq"] = []
+
+            for item in items:
+                data["faq"].append(item.model_dump())
+            self._write_data(data)
+
+        self._reload_matcher()
+        return items
+
     def update(self, index: int, item: FaqItem) -> FaqItem:
         """Обновляет существующий FAQ элемент по индексу."""
         with self._lock:
