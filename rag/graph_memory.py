@@ -379,9 +379,18 @@ class GraphMemory:
 
         workspace_path = self._get_workspace_path(graph_id)
         status_file = os.path.join(workspace_path, "kv_store_doc_status.json")
+        full_docs_file = os.path.join(workspace_path, "kv_store_full_docs.json")
 
         if not os.path.exists(status_file):
             return []
+            
+        full_docs_data = {}
+        if os.path.exists(full_docs_file):
+            try:
+                with open(full_docs_file, "r", encoding="utf-8") as f:
+                    full_docs_data = json.load(f)
+            except Exception:
+                pass
 
         try:
             with open(status_file, "r", encoding="utf-8") as f:
@@ -389,9 +398,26 @@ class GraphMemory:
 
             result = []
             for doc_id, info in data.items():
+                url = info.get("url") or info.get("file_path") or info.get("file_paths_str")
+                if not url:
+                    doc_full = full_docs_data.get(doc_id, {})
+                    if isinstance(doc_full, dict):
+                        # Сначала пытаемся из metadata или общих полей full_doc
+                        # (в зависимости от формата памяти LightRAG это может быть metadata.get('file_path') и т.д.)
+                        metadata = doc_full.get("metadata", {})
+                        if isinstance(metadata, dict):
+                            url = metadata.get("file_paths") or metadata.get("file_path") or metadata.get("url")
+                        
+                        if not url:
+                            url = doc_full.get("file_paths") or doc_full.get("file_path") or doc_full.get("url")
+                            
+                if not url and str(doc_id).startswith("http"):
+                    url = str(doc_id)
+
                 result.append(
                     {
                         "id": doc_id,
+                        "url": url,
                         "status": info.get("status"),
                         "content_summary": info.get("content_summary"),
                         "content_length": info.get("content_length"),
