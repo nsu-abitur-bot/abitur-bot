@@ -12,3 +12,4 @@ logs/
 
 *.pkl
 data
+faq/faq_data.yaml
