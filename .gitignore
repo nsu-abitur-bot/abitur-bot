@@ -9,3 +9,6 @@ chroma_db/
 
 logs/
 *.log
+
+*.pkl
+data
