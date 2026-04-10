@@ -190,14 +190,48 @@ class FAQMatcher:
                     self._answers.append(answer)
 
         if self._questions:
-            vectors = np.array(
-                self._embedder.embed_documents(self._questions), dtype=float
-            )
+            import pickle
+
+            cache_path = self._faq_path.with_name("faq_cache.pkl")
+            cache = {}
+            if cache_path.exists():
+                try:
+                    with open(cache_path, "rb") as f:
+                        cache = pickle.load(f)
+                except Exception as e:
+                    logger.warning(f"Failed to load FAQ embeddings cache: {e}")
+
+            # Ищем уникальные фразы, которых нет в кэше
+            needed_phrases = list(set(self._questions))
+            to_embed_phrases = [p for p in needed_phrases if p not in cache]
+
+            if to_embed_phrases:
+                logger.info(f"FAQ: Embedding {len(to_embed_phrases)} new phrases...")
+                try:
+                    new_embeddings = self._embedder.embed_documents(to_embed_phrases)
+                    for phrase, emb in zip(to_embed_phrases, new_embeddings):
+                        cache[phrase] = emb
+
+                    # Сохраняем обновленный кэш
+                    with open(cache_path, "wb") as f:
+                        pickle.dump(cache, f)
+                except Exception as e:
+                    logger.error(f"FAQ: Failed to embed new phrases: {e}")
+                    # В случае ошибки лучше остановить загрузку/вернуть как было, но
+                    # в текущем коде мы просто не сможем обработать эти фразы.
+                    # Позволим коду упасть или продолжить - если continue,
+                    # то будут пропущены. Лучше позволим выбросить исключение.
+                    raise
+
+            # Собираем векторы для всех вопросов
+            vectors_list = [cache[phrase] for phrase in self._questions]
+            vectors = np.array(vectors_list, dtype=float)
+
             norms = np.linalg.norm(vectors, axis=1, keepdims=True)
             self._embeddings = vectors / np.maximum(norms, 1e-10)
             logger.info(
                 f"FAQ loaded: {len(faq_items)} entries, "
-                f"{len(self._questions)} total phrases"
+                f"{len(self._questions)} total phrases (cached {len(self._questions) - len(to_embed_phrases)})"
             )
         else:
             logger.warning("No valid FAQ entries found")
