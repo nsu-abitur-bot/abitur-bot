@@ -242,6 +242,20 @@ async def get_rag_document_content(doc_id: str):
     return RagDocumentContentResponse(id=doc_id, content=content)
 
 
+@router.delete(
+    "/docs/{doc_id:path}",
+    summary="Удалить документ из RAG",
+)
+async def delete_rag_document(doc_id: str):
+    """Удаляет документ из базы знаний RAG."""
+    memory = get_graph_memory()
+    success = await memory.delete_doc(DEFAULT_GRAPH_ID, doc_id)
+    if not success:
+        raise HTTPException(status_code=500, detail=f"Failed to delete document '{doc_id}'")
+    
+    return {"status": "success", "message": f"Document '{doc_id}' deleted."}
+
+
 @router.post(
     "/upload/csv",
     response_model=CsvImportResponse,

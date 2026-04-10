@@ -383,7 +383,7 @@ class GraphMemory:
 
         if not os.path.exists(status_file):
             return []
-            
+
         full_docs_data = {}
         if os.path.exists(full_docs_file):
             try:
@@ -398,7 +398,11 @@ class GraphMemory:
 
             result = []
             for doc_id, info in data.items():
-                url = info.get("url") or info.get("file_path") or info.get("file_paths_str")
+                url = (
+                    info.get("url")
+                    or info.get("file_path")
+                    or info.get("file_paths_str")
+                )
                 if not url:
                     doc_full = full_docs_data.get(doc_id, {})
                     if isinstance(doc_full, dict):
@@ -406,11 +410,19 @@ class GraphMemory:
                         # (в зависимости от формата памяти LightRAG это может быть metadata.get('file_path') и т.д.)
                         metadata = doc_full.get("metadata", {})
                         if isinstance(metadata, dict):
-                            url = metadata.get("file_paths") or metadata.get("file_path") or metadata.get("url")
-                        
+                            url = (
+                                metadata.get("file_paths")
+                                or metadata.get("file_path")
+                                or metadata.get("url")
+                            )
+
                         if not url:
-                            url = doc_full.get("file_paths") or doc_full.get("file_path") or doc_full.get("url")
-                            
+                            url = (
+                                doc_full.get("file_paths")
+                                or doc_full.get("file_path")
+                                or doc_full.get("url")
+                            )
+
                 if not url and str(doc_id).startswith("http"):
                     url = str(doc_id)
 
@@ -452,6 +464,28 @@ class GraphMemory:
         except Exception as e:
             logger.error(f"Error reading full docs for {doc_id} in {graph_id}: {e}")
             return None
+
+    async def delete_doc(self, graph_id: str, doc_id: str) -> bool:
+        """Удаляет документ из RAG по его ID."""
+        try:
+            async with self._use_graph(graph_id) as rag:
+                if hasattr(rag, "adelete_by_doc_id"):
+                    # LightRAG удалит документ из векторной БД и графа
+                    await rag.adelete_by_doc_id(doc_id)
+                else:
+                    logger.warning(f"LightRAG не поддерживает adelete_by_doc_id (попытка удалить {doc_id})")
+                    return False
+
+            # Обновляем кэш сигнатуры
+            async with self._get_lock(graph_id):
+                self._graph_signatures[graph_id] = self._get_workspace_signature(
+                    graph_id
+                )
+                self._last_disk_check[graph_id] = time.monotonic()
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting doc {doc_id} from {graph_id}: {e}")
+            return False
 
     async def cleanup(self, graph_id: Optional[str] = None) -> None:
         """
