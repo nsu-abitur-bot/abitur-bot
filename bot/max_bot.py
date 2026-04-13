@@ -9,6 +9,7 @@ from maxapi.enums.sender_action import SenderAction
 from maxapi.types.updates.message_created import MessageCreated
 
 from bot.core import BotCore
+from bot.utils import normalize_links_for_messaging
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +90,7 @@ async def run_max_bot() -> None:
             user_name=user_name,
             user_text=user_text,
         )
-        await message.answer(text=reply.text)
+        await message.answer(text=normalize_links_for_messaging(reply.text))
 
         # Уступка API лимитам до внедрения адаптивного backoff.
         await asyncio.sleep(0)

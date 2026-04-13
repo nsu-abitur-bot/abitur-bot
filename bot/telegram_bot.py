@@ -16,6 +16,7 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 from bot.core import BotCore
+from bot.utils import normalize_links_for_messaging
 
 logger = logging.getLogger(__name__)
 
@@ -145,7 +146,7 @@ async def run_telegram_bot() -> None:
         )
         await bot.send_message(
             str(message.chat.id),
-            reply.text,
+            normalize_links_for_messaging(reply.text),
             parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
         )
 
@@ -154,7 +155,9 @@ async def run_telegram_bot() -> None:
         if not message.from_user:
             return
         reply = await core.cmd_track(session_id=get_session_id(message))
-        await bot.send_message(str(message.chat.id), reply.text)
+        await bot.send_message(
+            str(message.chat.id), normalize_links_for_messaging(reply.text)
+        )
 
     @dp.message(Command("untrack"))
     async def cmd_untrack(message: Message):
@@ -165,7 +168,9 @@ async def run_telegram_bot() -> None:
             external_user_id=str(message.from_user.id),
             session_id=get_session_id(message),
         )
-        await bot.send_message(str(message.chat.id), reply.text)
+        await bot.send_message(
+            str(message.chat.id), normalize_links_for_messaging(reply.text)
+        )
 
     @dp.message(Command("reset"))
     async def cmd_reset(message: Message):
@@ -173,7 +178,9 @@ async def run_telegram_bot() -> None:
             return
         try:
             reply = await core.cmd_reset(session_id=get_session_id(message))
-            await bot.send_message(str(message.chat.id), reply.text)
+            await bot.send_message(
+                str(message.chat.id), normalize_links_for_messaging(reply.text)
+            )
         except Exception as e:
             logger.error(
                 "Ошибка при очистке истории %s: %s",
@@ -208,7 +215,7 @@ async def run_telegram_bot() -> None:
         try:
             await bot.send_message(
                 chat_id,
-                reply.text,
+                normalize_links_for_messaging(reply.text),
                 parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
             )
         except TelegramBadRequest:
@@ -217,7 +224,7 @@ async def run_telegram_bot() -> None:
                     "[%s] HTML parsing failed, sending plain text", session_id
                 )
                 plain = re.sub(r"<[^>]+>", "", reply.text)
-                await bot.send_message(chat_id, plain)
+                await bot.send_message(chat_id, normalize_links_for_messaging(plain))
             else:
                 raise
 
