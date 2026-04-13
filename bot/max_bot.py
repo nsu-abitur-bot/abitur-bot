@@ -5,6 +5,7 @@ from os import getenv
 from dotenv import load_dotenv
 from maxapi import Bot, Dispatcher
 from maxapi.enums.parse_mode import ParseMode
+from maxapi.enums.sender_action import SenderAction
 from maxapi.types.updates.message_created import MessageCreated
 
 from bot.core import BotCore
@@ -71,6 +72,15 @@ async def run_max_bot() -> None:
                 logger.error("MAX reset failed for session %s: %s", session_id, exc)
                 await message.answer(text="Произошла ошибка при очистке истории")
             return
+
+        # show typing action similar to Telegram
+        try:
+            # chat_id may be None for some update types, guard against that
+            if chat_id is not None:
+                await client.send_action(chat_id=chat_id, action=SenderAction.TYPING_ON)
+        except Exception:
+            # non-fatal: continue even if action can't be sent
+            logger.debug("Failed to send typing action for session %s", session_id)
 
         reply = await core.handle_message(
             channel="max",
