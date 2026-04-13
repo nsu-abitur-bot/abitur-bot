@@ -190,3 +190,19 @@ class MessageLog(Base):
             f"<MessageLog(id={self.id}, user_id={self.user_id}, "
             f"message_type='{self.message_type}', session_id='{self.session_id}')>"
         )
+
+
+class Settings(Base):
+    """Настройки приложения."""
+
+    __tablename__ = "settings"
+
+    key: Mapped[str] = mapped_column(String(255), primary_key=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    def __repr__(self) -> str:
+        return f"<Settings(key='{self.key}', value='{self.value}')>"

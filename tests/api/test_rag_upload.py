@@ -1,10 +1,13 @@
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
+from fastapi import UploadFile
 from fastapi.testclient import TestClient
 
 from api.main import app
 from api.routes.rag import get_rag_upload_service
 from api.schemas.rag import UploadedDocumentResult
+from api.services.rag_upload import RagUploadService
 
 
 class TestRagUploadEndpoint:
@@ -58,3 +61,55 @@ class TestRagUploadEndpoint:
         assert data["indexed_count"] == 0
         assert data["skipped_count"] == 1
         assert data["results"][0]["status"] == "skipped"
+
+
+@pytest.fixture
+def rag_service():
+    return RagUploadService()
+
+
+class TestRagUploadService:
+    @pytest.mark.asyncio
+    async def test_ingest_files_exceeds_size_limit(self, rag_service: RagUploadService):
+        with patch.object(
+            rag_service,
+            "_get_settings",
+            AsyncMock(return_value={"max_document_size": "10"}),
+        ):
+            mock_file = MagicMock(spec=UploadFile)
+            mock_file.filename = "large_file.txt"
+            mock_file.read = AsyncMock(
+                return_value=b"This text is definitely longer than 10 bytes."
+            )
+
+            results = await rag_service.ingest_files([mock_file], graph_id="test_graph")
+
+            assert len(results) == 1
+            assert results[0].status == "skipped"
+            assert "File is too large" in results[0].message
+
+    @pytest.mark.asyncio
+    async def test_ingest_files_pdf_page_limit(self, rag_service: RagUploadService):
+        with patch.object(
+            rag_service,
+            "_get_settings",
+            AsyncMock(return_value={"max_document_pages": "1"}),
+        ):
+            mock_file = MagicMock(spec=UploadFile)
+            mock_file.filename = "test.pdf"
+            mock_file.read = AsyncMock(return_value=b"fake pdf content")
+
+            with patch.object(
+                rag_service,
+                "_extract_text",
+                AsyncMock(
+                    side_effect=ValueError("PDF exceeds maximum allowed pages (1)")
+                ),
+            ):
+                results = await rag_service.ingest_files(
+                    [mock_file], graph_id="test_graph"
+                )
+
+                assert len(results) == 1
+                assert results[0].status == "skipped"
+                assert "PDF exceeds maximum allowed pages" in results[0].message

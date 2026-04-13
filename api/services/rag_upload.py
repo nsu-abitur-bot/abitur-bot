@@ -5,8 +5,11 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 from fastapi import UploadFile
+from sqlalchemy import select
 
 from api.schemas.rag import UploadedDocumentResult
+from db.postgres.db import AsyncSessionLocal
+from db.postgres.models import Settings
 from llm.vision_parser import parse_images_with_llm
 from parser.baza_to_rag import _extract_sources
 from parser.pdf_parser import pdf_to_base64_images
@@ -45,11 +48,28 @@ class RagUploadService:
     def accepted_formats(self) -> list[str]:
         return sorted(SUPPORTED_EXTENSIONS)
 
+    async def _get_settings(self) -> dict[str, str]:
+        async with AsyncSessionLocal() as session:
+            stmt = select(Settings)
+            result = await session.execute(stmt)
+            return {s.key: s.value for s in result.scalars()}
+
     async def ingest_files(
         self,
         files: list[UploadFile],
         graph_id: str,
     ) -> list[UploadedDocumentResult]:
+        settings = await self._get_settings()
+        try:
+            max_file_size = int(settings.get("max_document_size", 50 * 1024 * 1024))
+        except ValueError:
+            max_file_size = 50 * 1024 * 1024
+
+        try:
+            max_pages = int(settings.get("max_document_pages", 50))
+        except ValueError:
+            max_pages = 50
+
         results: list[UploadedDocumentResult] = []
 
         for file in files:
@@ -70,18 +90,23 @@ class RagUploadService:
                 continue
 
             raw = await file.read()
-            if len(raw) > MAX_FILE_SIZE_BYTES:
+            if len(raw) > max_file_size:
                 results.append(
                     UploadedDocumentResult(
                         filename=filename,
                         status="skipped",
-                        message="File is too large (max 50 MB)",
+                        message=(
+                            "File is too large "
+                            f"(max {max_file_size // (1024 * 1024)} MB)"
+                        ),
                     )
                 )
                 continue
 
             try:
-                text = await self._extract_text(raw=raw, extension=extension)
+                text = await self._extract_text(
+                    raw=raw, extension=extension, max_pages=max_pages
+                )
             except ValueError as exc:
                 results.append(
                     UploadedDocumentResult(
@@ -134,9 +159,11 @@ class RagUploadService:
 
         return results
 
-    async def _extract_text(self, raw: bytes, extension: str) -> str:
+    async def _extract_text(
+        self, raw: bytes, extension: str, max_pages: int = 50
+    ) -> str:
         if extension == ".pdf":
-            images = pdf_to_base64_images(raw)
+            images = pdf_to_base64_images(raw, max_pages=max_pages)
             if not images:
                 raise ValueError("Could not extract images from PDF")
 
