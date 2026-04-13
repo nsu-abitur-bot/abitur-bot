@@ -48,3 +48,32 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
         logger.error(f"Ошибка при очистке текста через LLM: {e}")
         # Возвращаем сырой текст в случае ошибки, чтобы цепочка не прервалась полностью
         return raw_text
+
+
+async def generate_title_from_text(text: str) -> str:
+    """
+    Генерирует короткое и понятное название для документа на основе его текста.
+    Используется, чтобы не оставлять загруженные файлы (напр., PDF) со скучными техническими названиями.
+    """
+    if not text or not text.strip():
+        return "Без названия"
+
+    llm = get_llm_provider()
+    
+    # Берем первые 3000 символов, чтобы не тратить весь контекст
+    preview_text = text[:3000]
+
+    messages: list[BaseMessage] = [
+        SystemMessage(content="Ты - нейросеть, которая придумывает релевантные названия для документов. "
+                              "Проанализируй текст и верни ТОЛЬКО ОДНО короткое емкое название "
+                              "(до 7 слов), без кавычек, точек на конце и без пояснений."),
+        HumanMessage(content=f"Сгенерируй название для этого документа:\n\n{preview_text}")
+    ]
+
+    try:
+        response_text = await llm.generate(messages)
+        title = str(response_text).strip('\'" \n\r.')
+        return title if title else "Без названия"
+    except Exception as e:
+        logger.error(f"Ошибка при генерации заголовка через LLM: {e}")
+        return "Без названия"
