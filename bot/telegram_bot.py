@@ -100,22 +100,26 @@ async def run_telegram_bot() -> None:
 
     bot_token = getenv("BOT_TOKEN")
     if bot_token is None:
-        raise ValueError("BOT_TOKEN не задан")
+        logger.error("Telegram bot skipped: BOT_TOKEN не задан")
+        return
 
     telegram_socks5_proxy = getenv("TELEGRAM_SOCKS5_PROXY")
     if telegram_socks5_proxy:
         try:
             telegram_session = AiohttpSession(proxy=telegram_socks5_proxy)
         except Exception as exc:
-            raise RuntimeError(
-                "Не удалось инициализировать SOCKS5 прокси для Telegram. "
-                "Проверьте TELEGRAM_SOCKS5_PROXY и наличие зависимости aiohttp-socks."
-            ) from exc
-        bot = Bot(
-            token=bot_token,
-            default=DefaultBotProperties(parse_mode=None),
-            session=telegram_session,
-        )
+            logger.exception(
+                "Не удалось инициализировать SOCKS5 прокси для Telegram: %s. "
+                "Запускаю без прокси.",
+                exc,
+            )
+            bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=None))
+        else:
+            bot = Bot(
+                token=bot_token,
+                default=DefaultBotProperties(parse_mode=None),
+                session=telegram_session,
+            )
     else:
         bot = Bot(token=bot_token, default=DefaultBotProperties(parse_mode=None))
 
@@ -221,4 +225,5 @@ async def run_telegram_bot() -> None:
     try:
         await dp.start_polling(bot)
     finally:
+        await bot.session.close()
         polling_lock.release()
