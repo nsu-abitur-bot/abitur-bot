@@ -482,6 +482,9 @@ class GraphMemory:
                     graph_id
                 )
                 self._last_disk_check[graph_id] = time.monotonic()
+            
+            # Очищаем LLM кеш, чтобы новые запросы не брались из него после удаления документов
+            await self.clear_cache(graph_id)
             return True
         except Exception as e:
             logger.error(f"Error deleting doc {doc_id} from {graph_id}: {e}")
@@ -534,6 +537,26 @@ class GraphMemory:
                         )
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
+
+    async def clear_cache(self, graph_id: str) -> None:
+        """
+        Удаляет файл кеша ответов LLM (kv_store_llm_response_cache.json)
+        для указанного графа, чтобы после обновления базы знаний агент
+        перестал отдавать старые (кешированные) ответы "Не знаю".
+        """
+        workspace_path = self._get_workspace_path(graph_id)
+        # В LightRAG кеш ответов обычно хранится в этом файле
+        cache_file = os.path.join(workspace_path, "kv_store_llm_response_cache.json")
+        try:
+            if os.path.exists(cache_file):
+                os.remove(cache_file)
+                logger.info(
+                    f"Очищен кеш ответов LLM для графа {graph_id}: удален файл {cache_file}"
+                )
+            else:
+                logger.debug(f"Файл кеша не найден, очистка не требуется: {cache_file}")
+        except Exception as e:
+            logger.error(f"Ошибка при удалении файла кеша {cache_file}: {e}")
 
 
 _graph_memory_instance = None
