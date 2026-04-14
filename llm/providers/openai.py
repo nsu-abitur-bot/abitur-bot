@@ -34,7 +34,7 @@ class OpenAIProvider(BaseLLMProvider):
 
         self.model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
         self.temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
-        self.max_tokens = int(os.getenv("OPENAI_MAX_TOKENS", "1024"))
+        # self.max_tokens = int(os.getenv("OPENAI_MAX_TOKENS", "1024"))
         self.timeout_seconds = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "60"))
         self.proxy_url = os.getenv("OPENAI_SOCKS5_PROXY")
 
@@ -80,7 +80,7 @@ class OpenAIProvider(BaseLLMProvider):
             completion = await self.client.responses.create(
                 model=self.model_name,
                 input=openai_messages,
-                max_output_tokens=self.max_tokens,
+                # max_output_tokens=self.max_tokens,
                 temperature=self.temperature,
             )
         except Exception:
