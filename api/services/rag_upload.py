@@ -182,7 +182,7 @@ class RagUploadService:
             return text
 
         try:
-            text = raw.decode("utf-8")
+            text = raw.decode("utf-8-sig")
         except UnicodeDecodeError as exc:
             raise ValueError("Only UTF-8 encoded files are supported") from exc
 

@@ -89,12 +89,18 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
                 # Декодируем URL для fallback (чтобы вместо %D0%98 было нормальное русское название)
                 raw_filename = url_str.split("/")[-1]
                 decoded_title = unquote(raw_filename)
-                
+
                 generated_title = await generate_title_from_text(pdf_markdown)
-                title_to_use = generated_title if generated_title and generated_title != "Без названия" else decoded_title
-                
+                title_to_use = (
+                    generated_title
+                    if generated_title and generated_title != "Без названия"
+                    else decoded_title
+                )
+
                 # Добавляем сгенерированный заголовок в текст, если его там нет
-                if title_to_use != decoded_title and not pdf_markdown.startswith(f"# {title_to_use}"):
+                if title_to_use != decoded_title and not pdf_markdown.startswith(
+                    f"# {title_to_use}"
+                ):
                     pdf_markdown = f"# {title_to_use}\n\n{pdf_markdown}"
 
                 return ParsedPageResult(
@@ -179,10 +185,14 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 
     # Очищаем через LLM preprocessor (Requirement 1)
     clean_text = await clean_and_structure_text(raw_text)
-
-    # Если LLM вернула сообщение об отсутствии текста (как у пользователя),
-    # а у нас в raw_text что-то есть - значит LLM запуталась или raw_text плохой.
-    # Но обычно clean_and_structure_text справляется.
+    
+    # Генерируем заголовок с помощью LLM (так же, как для PDF)
+    generated_title_html = await generate_title_from_text(clean_text)
+    html_title_to_use = (
+        generated_title_html
+        if generated_title_html and generated_title_html != "Без названия"
+        else data.get("title", "Не найдено")
+    )
 
     # Преобразуем документы
     docs = [
@@ -190,7 +200,7 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
     ]
 
     return ParsedPageResult(
-        title=data.get("title", "Не найдено"),
+        title=html_title_to_use,
         url=str(url),
         text=clean_text,
         documents=docs,
@@ -258,8 +268,10 @@ async def delete_rag_document(doc_id: str):
     memory = get_graph_memory()
     success = await memory.delete_doc(DEFAULT_GRAPH_ID, doc_id)
     if not success:
-        raise HTTPException(status_code=500, detail=f"Failed to delete document '{doc_id}'")
-    
+        raise HTTPException(
+            status_code=500, detail=f"Failed to delete document '{doc_id}'"
+        )
+
     return {"status": "success", "message": f"Document '{doc_id}' deleted."}
 
 
@@ -282,7 +294,7 @@ async def upload_csv_documents(
 
     try:
         content = await file.read()
-        text = content.decode("utf-8")
+        text = content.decode("utf-8-sig")
     except UnicodeDecodeError:
         raise HTTPException(
             status_code=400, detail="Файл должен быть в кодировке UTF-8"
@@ -322,7 +334,7 @@ async def upload_csv_documents(
                                 title = soup.title.string.strip()
             except Exception as title_e:
                 logger.warning(f"Не удалось извлечь название для {url}: {title_e}")
-            
+
             # Если всё еще нет названия, оставляем как есть (будет использован URL как fallback)
             if not title:
                 title = url
@@ -368,7 +380,7 @@ async def preview_csv_documents(
 
     try:
         content = await file.read()
-        text = content.decode("utf-8")
+        text = content.decode("utf-8-sig")
     except UnicodeDecodeError:
         raise HTTPException(
             status_code=400, detail="Файл должен быть в кодировке UTF-8"
