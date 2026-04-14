@@ -22,7 +22,7 @@ from api.schemas.rag import (
     RagUploadResponse,
 )
 from api.services.rag_upload import RagUploadService
-from llm.preprocessor import clean_and_structure_text
+from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu_parser import parse_page
 from parser.parser_to_rag import parse_and_save_url
 from parser.url_parser import process_pdf_bytes
@@ -86,12 +86,19 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 
                 pdf_markdown = await process_pdf_bytes(resp_get.content)
 
-                # Декодируем URL (чтобы вместо %D0%98 было нормальное русское название)
+                # Декодируем URL для fallback (чтобы вместо %D0%98 было нормальное русское название)
                 raw_filename = url_str.split("/")[-1]
                 decoded_title = unquote(raw_filename)
+                
+                generated_title = await generate_title_from_text(pdf_markdown)
+                title_to_use = generated_title if generated_title and generated_title != "Без названия" else decoded_title
+                
+                # Добавляем сгенерированный заголовок в текст, если его там нет
+                if title_to_use != decoded_title and not pdf_markdown.startswith(f"# {title_to_use}"):
+                    pdf_markdown = f"# {title_to_use}\n\n{pdf_markdown}"
 
                 return ParsedPageResult(
-                    title=decoded_title,  # Нормальное имя файла как заголовок
+                    title=title_to_use,  # Сгенерированное нейронкой или нормальное имя файла как заголовок
                     url=url_str,
                     text=pdf_markdown,
                     documents=[],  # Внутри PDF ссылок на другие документы мы не собираем

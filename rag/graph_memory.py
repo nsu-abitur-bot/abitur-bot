@@ -358,16 +358,21 @@ class GraphMemory:
             async with self._use_graph(graph_id) as rag:
                 result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
                 answer = result.get("llm_response", {}).get("content", "") or ""
-                references = result.get("data", {}).get("references", [])
-                sources_set: set[str] = set()
-                for ref in references:
-                    file_paths_value = ref.get("file_path", "") or ""
-                    for source in file_paths_value.split(","):
-                        source = source.strip()
-                        if source:
-                            # Добавляем все непустые идентификаторы источников
-                            # (как URL, так и локальные имена файлов).
-                            sources_set.add(source)
+
+                # Достаем ссылки из самого сгенерированного ответа (RAG контекста),
+                # так как там находятся только релевантные "реальные" ссылки.
+                # В metadata (result.get("data", {}).get("references")) лежат
+                # все просмотренные ссылки, что приводит к кривым/лишним URL.
+                import re
+
+                urls = re.findall(r'(https?://[^\s)\]"\']+)', answer)
+
+                sources_set = set()
+                for url in urls:
+                    # Очищаем от висячей пунктуации, которая могла прикрепиться в тексте
+                    clean_url = url.rstrip(".,;:!?\"'")
+                    sources_set.add(clean_url.strip())
+
                 return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
@@ -473,7 +478,9 @@ class GraphMemory:
                     # LightRAG удалит документ из векторной БД и графа
                     await rag.adelete_by_doc_id(doc_id)
                 else:
-                    logger.warning(f"LightRAG не поддерживает adelete_by_doc_id (попытка удалить {doc_id})")
+                    logger.warning(
+                        f"LightRAG не поддерживает adelete_by_doc_id (попытка удалить {doc_id})"
+                    )
                     return False
 
             # Обновляем кэш сигнатуры
@@ -482,6 +489,9 @@ class GraphMemory:
                     graph_id
                 )
                 self._last_disk_check[graph_id] = time.monotonic()
+            
+            # Очищаем LLM кеш, чтобы новые запросы не брались из него после удаления документов
+            await self.clear_cache(graph_id)
             return True
         except Exception as e:
             logger.error(f"Error deleting doc {doc_id} from {graph_id}: {e}")
@@ -534,6 +544,26 @@ class GraphMemory:
                         )
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
+
+    async def clear_cache(self, graph_id: str) -> None:
+        """
+        Удаляет файл кеша ответов LLM (kv_store_llm_response_cache.json)
+        для указанного графа, чтобы после обновления базы знаний агент
+        перестал отдавать старые (кешированные) ответы "Не знаю".
+        """
+        workspace_path = self._get_workspace_path(graph_id)
+        # В LightRAG кеш ответов обычно хранится в этом файле
+        cache_file = os.path.join(workspace_path, "kv_store_llm_response_cache.json")
+        try:
+            if os.path.exists(cache_file):
+                os.remove(cache_file)
+                logger.info(
+                    f"Очищен кеш ответов LLM для графа {graph_id}: удален файл {cache_file}"
+                )
+            else:
+                logger.debug(f"Файл кеша не найден, очистка не требуется: {cache_file}")
+        except Exception as e:
+            logger.error(f"Ошибка при удалении файла кеша {cache_file}: {e}")
 
 
 _graph_memory_instance = None

@@ -10,6 +10,7 @@ from sqlalchemy import select
 from api.schemas.rag import UploadedDocumentResult
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
+from llm.preprocessor import generate_title_from_text
 from llm.vision_parser import parse_images_with_llm
 from parser.baza_to_rag import _extract_sources
 from parser.pdf_parser import pdf_to_base64_images
@@ -127,6 +128,14 @@ class RagUploadService:
                     )
                 )
                 continue
+
+            if extension == ".pdf":
+                generated_title = await generate_title_from_text(prepared)
+                if generated_title and generated_title != "Без названия":
+                    if not prepared.startswith(f"# {generated_title}"):
+                        prepared = f"# {generated_title}\n\n{prepared}"
+                    # Обновляем имя, чтобы отправить клиенту нормальное название и оригинальное в скобках
+                    filename = f"{generated_title} ({filename})"
 
             source_id, file_paths_str = _extract_sources(prepared, fallback=filename)
 
