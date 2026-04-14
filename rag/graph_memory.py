@@ -358,16 +358,21 @@ class GraphMemory:
             async with self._use_graph(graph_id) as rag:
                 result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
                 answer = result.get("llm_response", {}).get("content", "") or ""
-                references = result.get("data", {}).get("references", [])
-                sources_set: set[str] = set()
-                for ref in references:
-                    file_paths_value = ref.get("file_path", "") or ""
-                    for source in file_paths_value.split(","):
-                        source = source.strip()
-                        if source:
-                            # Добавляем все непустые идентификаторы источников
-                            # (как URL, так и локальные имена файлов).
-                            sources_set.add(source)
+
+                # Достаем ссылки из самого сгенерированного ответа (RAG контекста),
+                # так как там находятся только релевантные "реальные" ссылки.
+                # В metadata (result.get("data", {}).get("references")) лежат
+                # все просмотренные ссылки, что приводит к кривым/лишним URL.
+                import re
+
+                urls = re.findall(r'(https?://[^\s)\]"\']+)', answer)
+
+                sources_set = set()
+                for url in urls:
+                    # Очищаем от висячей пунктуации, которая могла прикрепиться в тексте
+                    clean_url = url.rstrip(".,;:!?\"'")
+                    sources_set.add(clean_url.strip())
+
                 return str(answer), list(sources_set)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
@@ -473,7 +478,9 @@ class GraphMemory:
                     # LightRAG удалит документ из векторной БД и графа
                     await rag.adelete_by_doc_id(doc_id)
                 else:
-                    logger.warning(f"LightRAG не поддерживает adelete_by_doc_id (попытка удалить {doc_id})")
+                    logger.warning(
+                        f"LightRAG не поддерживает adelete_by_doc_id (попытка удалить {doc_id})"
+                    )
                     return False
 
             # Обновляем кэш сигнатуры
