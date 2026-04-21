@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
@@ -53,6 +54,7 @@ app.add_middleware(
 app.include_router(faq_router, prefix="/api/v1")
 app.include_router(message_log_router, prefix="/api/v1")
 app.include_router(rag_router, prefix="/api/v1")
+app.include_router(evals_router, prefix="/api/v1")
 
 
 @app.get("/api/v1/users/count-stats", response_model=UserCountStatsResponse)
