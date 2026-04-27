@@ -1,125 +1,123 @@
 import asyncio
+import json
 import logging
 import os
-import uuid
+import random
 
 import yaml
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
 import rag.loader
 import rag.retriever
-from db.redis_client import RedisClient
-from evals.judge import evaluate_bot_answer
-from llm.llm_client import ask_local_llm
-from rag.graph_memory import get_graph_memory
-from rag.loader import add_texts_async
+from evals.judge import evaluate_rag_answer
+from llm.factory import get_llm_provider
 
 logger = logging.getLogger(__name__)
 
 
 class PipelineEvaluator:
     def __init__(self, scenarios_path: str = "evals/scenarios.yaml"):
-        # ПЕРЕХВАТ ПУТИ ДЛЯ RAG: заставляем LightRAG смотреть в тестовую папку
-        os.environ["LIGHTRAG_WORKSPACE_BASE"] = "./data/lightrag_eval"
+        self.scenarios = []
 
-        self.session_id = f"eval_session_{uuid.uuid4()}"
-        # Передаем user_id=0, в llm_client.py логика сохранения часто пропускает запись,
-        # если id 0 или None. Если это не поможет,
-        # в будущем можно добавить mock для postgres
-        self.test_user_id = 0
+        # Подгружаем статические сценарии (гардрейлы, галлюцинации и т.д.)
+        if os.path.exists(scenarios_path):
+            with open(scenarios_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                self.scenarios.extend(data.get("scenarios", []))
 
-        with open(scenarios_path, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
-            self.test_documents = data.get("test_documents", [])
-            self.scenarios = data.get("scenarios", [])
+    async def generate_dynamic_scenarios(self, count: int = 3):
+        """Автоматически генерирует вопросы на основе случайных документов из реальной базы."""
+        chunk_file = "./data/lightrag/abitur_kb/kv_store_text_chunks.json"
 
-    async def _setup_test_graph(self):
-        """Инжектим выдуманный текст в базу."""
-        await add_texts_async(self.test_documents, graph_id="eval_kb")
-        logger.info(
-            f"Тестовые документы ({len(self.test_documents)} шт.) загружены в eval_kb"
-        )
+        if not os.path.exists(chunk_file):
+            logger.warning(
+                "База данных графа (chunks) не найдена. Динамическая генерация пропущена."
+            )
+            return
+
+        with open(chunk_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        chunks = list(data.values())
+        if not chunks:
+            return
+
+        # Берем случайные куски достаточной длины
+        valid_chunks = [ch for ch in chunks if len(ch.get("content", "")) > 100]
+        selected = random.sample(valid_chunks, min(count, len(valid_chunks)))
+
+        llm = get_llm_provider()
+
+        for chunk in selected:
+            content = chunk.get("content", "")
+            prompt: list[BaseMessage] = [
+                SystemMessage(
+                    content="Ты — проверяющий эксперт. Твоя задача сгенерировать 1 конкретный тестовый вопрос (question) по предоставленному тексту, "
+                    "написать эталонный краткий ответ (reference_answer) и критерии оценки (criteria). "
+                    "Вопрос должен проверять, сможет ли RAG-система найти этот факт. "
+                    "Верни ТОЛЬКО валидный JSON. Ключи: question, reference_answer, criteria."
+                ),
+                HumanMessage(content=f"Текст из базы НГУ:\n{content}"),
+            ]
+
+            resp = await llm.generate(prompt)
+            try:
+                clean_json = resp.replace("```json", "").replace("```", "").strip()
+                parsed = json.loads(clean_json)
+                parsed["id"] = f"dynamic_rag_{random.randint(1000, 9999)}"
+                self.scenarios.append(parsed)
+                logger.info(f"Добавлен динамический сценарий: {parsed['question']}")
+            except Exception as e:
+                logger.error(
+                    f"Ошибка парсинга динамического сценария: {e} | Ответ: {resp}"
+                )
+
+            await asyncio.sleep(5)  # Задержка, чтобы не спамить API при генерации
 
     async def run(self) -> dict:
+        # Генерируем 3 случайных вопроса из боевой RAG базы перед стартом
+        logger.info("Генерация тестовых RAG сценариев на основе текущих документов...")
+        await self.generate_dynamic_scenarios(count=3)
+
         report = {"total": len(self.scenarios), "passed_perfectly": 0, "results": []}
 
-        try:
-            for scenario in self.scenarios:
-                # 1. Спрашиваем реального бота
-                # Тут потребуется так де временно подменить graph_id в retriever'е,
-                # если ask_local_llm использует дефолтный abitur_kb
-                original_graph = rag.retriever.DEFAULT_GRAPH_ID
-                setattr(rag.retriever, "DEFAULT_GRAPH_ID", "eval_kb")
-                setattr(rag.loader, "DEFAULT_GRAPH_ID", "eval_kb")
-
-                try:
-                    bot_answer = await ask_local_llm(
-                        message=scenario["question"],
-                        session_id=self.session_id,
-                        user_id=self.test_user_id,
-                    )
-                except Exception as e:
-                    logger.error(f"Error asking local LLM: {str(e)}")
-                    bot_answer = f"Error: {str(e)}"
-                finally:
-                    rag.retriever.DEFAULT_GRAPH_ID = original_graph
-                    rag.loader.DEFAULT_GRAPH_ID = original_graph
-
-                # 2. Отдаём LLM-судье на оценку
-                evaluation = await evaluate_bot_answer(
-                    question=scenario["question"],
-                    reference=scenario["reference_answer"],
-                    criteria=scenario["criteria"],
-                    actual_answer=bot_answer,
-                )
-
-                score = evaluation.get("score", 0)
-                if score >= 4:
-                    report["passed_perfectly"] += 1
-
-                report["results"].append(
-                    {
-                        "id": scenario["id"],
-                        "question": scenario["question"],
-                        "bot_answer": bot_answer,
-                        "judge_score": score,
-                        "judge_reasoning": evaluation.get("reasoning", ""),
-                    }
-                )
-
-                # Если сценарий требует добавления документов в граф ПОСЛЕ проверки
-                if scenario.get("load_documents_after"):
-                    await self._setup_test_graph()
-
-                # Добавляем паузу между сценариями, чтобы не превысить лимит (обычно 15 RPM для бесплатных LLM)
-                logger.info(
-                    "Ожидание 15 секунд перед следующим сценарием для обхода лимитов LLM (15 RPM)..."
-                )
-                await asyncio.sleep(15)
-
-        finally:
-            # 3. Удаляем мусор из Redis
-            redis = RedisClient()
-            await redis.clear_history(self.session_id)
-            logger.info("Тестовая история Redis очищена")
-
-            # 4. Удаляем добавленные документы из LightRAG графа
+        for scenario in self.scenarios:
+            # 1. Спрашиваем НАПРЯМУЮ RAG (LightRAG), минуя бота и FAQ
             try:
-                gm = get_graph_memory()
-                docs = await gm.get_list_docs("eval_kb")
-                deleted_count = 0
-                for doc in docs:
-                    doc_id = doc.get("id")
-                    if doc_id:
-                        success = await gm.delete_doc("eval_kb", doc_id)
-                        if success:
-                            deleted_count += 1
-                        else:
-                            logger.warning(
-                                f"Не удалось удалить документ {doc_id} из eval_kb"
-                            )
-                logger.info(f"Удалено документов из графа eval_kb: {deleted_count}")
+                rag_answer = await rag.retriever.query_graph(
+                    query=scenario["question"], mode="hybrid"
+                )
             except Exception as e:
-                logger.error(f"Ошибка при очистке документов графа: {e}")
+                logger.error(f"Error querying RAG graph directly: {str(e)}")
+                rag_answer = f"Error: {str(e)}"
+
+            # 2. Отдаём LLM-судье на оценку
+            evaluation = await evaluate_rag_answer(
+                question=scenario["question"],
+                reference=scenario["reference_answer"],
+                criteria=scenario["criteria"],
+                actual_answer=rag_answer,
+            )
+
+            score = evaluation.get("score", 0)
+            if score >= 4:
+                report["passed_perfectly"] += 1
+
+            report["results"].append(
+                {
+                    "id": scenario["id"],
+                    "question": scenario["question"],
+                    "rag_answer": rag_answer,
+                    "judge_score": score,
+                    "judge_reasoning": evaluation.get("reasoning", ""),
+                }
+            )
+
+            # Добавляем паузу между сценариями, чтобы не превысить лимит (обычно 15 RPM для бесплатных LLM)
+            logger.info(
+                "Ожидание 15 секунд перед следующим сценарием для обхода лимитов LLM (15 RPM)..."
+            )
+            await asyncio.sleep(15)
 
         return report
 
