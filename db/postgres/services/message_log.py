@@ -1,5 +1,7 @@
+from datetime import datetime
 from typing import List, Optional
 
+from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -98,3 +100,42 @@ class MessageLogService:
         )
         result = await self.session.execute(stmt)
         return result.scalars().all()
+
+    async def get_request_count_stats(
+        self,
+        start: Optional[datetime],
+        end: Optional[datetime],
+        group_by: str,
+        message_type: str = "user_input",
+    ) -> dict:
+        """Возвращает статистику количества запросов по периодам."""
+        base_stmt = select(func.count(MessageLog.id)).where(
+            MessageLog.message_type == message_type
+        )
+
+        if start is not None:
+            base_stmt = base_stmt.where(MessageLog.created_at >= start)
+        if end is not None:
+            base_stmt = base_stmt.where(MessageLog.created_at <= end)
+
+        total = (await self.session.execute(base_stmt)).scalar_one()
+
+        period_expr = func.date_trunc(group_by, MessageLog.created_at).label("period")
+        bucket_stmt = select(period_expr, func.count(MessageLog.id).label("count")).where(
+            MessageLog.message_type == message_type
+        )
+        if start is not None:
+            bucket_stmt = bucket_stmt.where(MessageLog.created_at >= start)
+        if end is not None:
+            bucket_stmt = bucket_stmt.where(MessageLog.created_at <= end)
+
+        bucket_stmt = bucket_stmt.group_by(period_expr).order_by(period_expr)
+        rows = (await self.session.execute(bucket_stmt)).all()
+
+        buckets = [
+            {"period": row.period, "count": row.count}
+            for row in rows
+            if row.period is not None
+        ]
+
+        return {"total": total, "buckets": buckets}
