@@ -1,7 +1,7 @@
 import re
 from urllib.parse import quote, splitport, splituser, urlsplit, urlunsplit
 
-_URL_RE = re.compile(r"https?://\S+", re.IGNORECASE)
+_URL_RE = re.compile(r"https?://[^\s<>'\"]+", re.IGNORECASE)
 _DOUBLE_ENCODED_OCTET_RE = re.compile(r"%25([0-9A-Fa-f]{2})")
 
 
