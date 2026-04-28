@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import List, Optional
 
 from sqlalchemy import func
@@ -6,6 +6,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from db.postgres.models import MessageLog
+
+
+def _truncate_dt(dt: datetime, group_by: str) -> datetime:
+    if group_by == "hour":
+        return dt.replace(minute=0, second=0, microsecond=0)
+    if group_by == "day":
+        return dt.replace(hour=0, minute=0, second=0, microsecond=0)
+    if group_by == "week":
+        return (dt - timedelta(days=dt.weekday())).replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
+    if group_by == "month":
+        return dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    return dt
+
+
+def _advance_dt(dt: datetime, group_by: str) -> datetime:
+    if group_by == "hour":
+        return dt + timedelta(hours=1)
+    if group_by == "day":
+        return dt + timedelta(days=1)
+    if group_by == "week":
+        return dt + timedelta(weeks=1)
+    if group_by == "month":
+        month = dt.month % 12 + 1
+        year = dt.year + (1 if dt.month == 12 else 0)
+        return dt.replace(year=year, month=month)
+    return dt
 
 
 class MessageLogService:
@@ -109,6 +137,11 @@ class MessageLogService:
         message_type: str = "user_input",
     ) -> dict:
         """Возвращает статистику количества запросов по периодам."""
+        if start is not None:
+            start = start.replace(tzinfo=None)
+        if end is not None:
+            end = end.replace(tzinfo=None)
+
         base_stmt = select(func.count(MessageLog.id)).where(
             MessageLog.message_type == message_type
         )
@@ -121,9 +154,9 @@ class MessageLogService:
         total = (await self.session.execute(base_stmt)).scalar_one()
 
         period_expr = func.date_trunc(group_by, MessageLog.created_at).label("period")
-        bucket_stmt = select(period_expr, func.count(MessageLog.id).label("count")).where(
-            MessageLog.message_type == message_type
-        )
+        bucket_stmt = select(
+            period_expr, func.count(MessageLog.id).label("count")
+        ).where(MessageLog.message_type == message_type)
         if start is not None:
             bucket_stmt = bucket_stmt.where(MessageLog.created_at >= start)
         if end is not None:
@@ -132,10 +165,28 @@ class MessageLogService:
         bucket_stmt = bucket_stmt.group_by(period_expr).order_by(period_expr)
         rows = (await self.session.execute(bucket_stmt)).all()
 
-        buckets = [
-            {"period": row.period, "count": row.count}
-            for row in rows
-            if row.period is not None
-        ]
+        valid_rows = [row for row in rows if row.period is not None]
+        if valid_rows:
+            range_start = (
+                _truncate_dt(start, group_by)
+                if start is not None
+                else min(row.period for row in valid_rows)
+            )
+            range_end = (
+                end if end is not None else max(row.period for row in valid_rows)
+            )
+            all_buckets: dict[datetime, int] = {}
+            current = range_start
+            while current <= range_end:
+                all_buckets[current] = 0
+                current = _advance_dt(current, group_by)
+            for row in valid_rows:
+                if row.period in all_buckets:
+                    all_buckets[row.period] = row.count
+            buckets = [
+                {"period": k, "count": v} for k, v in sorted(all_buckets.items())
+            ]
+        else:
+            buckets = []
 
         return {"total": total, "buckets": buckets}
