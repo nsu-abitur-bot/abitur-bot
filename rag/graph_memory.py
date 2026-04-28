@@ -359,19 +359,14 @@ class GraphMemory:
                 result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
                 answer = result.get("llm_response", {}).get("content", "") or ""
 
-                # Достаем ссылки из самого сгенерированного ответа (RAG контекста),
-                # так как там находятся только релевантные "реальные" ссылки.
-                # В metadata (result.get("data", {}).get("references")) лежат
-                # все просмотренные ссылки, что приводит к кривым/лишним URL.
-                import re
-
-                urls = re.findall(r'(https?://[^\s)\]"\']+)', answer)
-
-                sources_set = set()
-                for url in urls:
-                    # Очищаем от висячей пунктуации, которая могла прикрепиться в тексте
-                    clean_url = url.rstrip(".,;:!?\"'")
-                    sources_set.add(clean_url.strip())
+                references = result.get("data", {}).get("references", [])
+                sources_set: set[str] = set()
+                for ref in references:
+                    file_paths_value = ref.get("file_path", "") or ""
+                    for source in file_paths_value.split(","):
+                        source = source.strip()
+                        if source.startswith("http://") or source.startswith("https://"):
+                            sources_set.add(source)
 
                 return str(answer), list(sources_set)
         except Exception as e:
