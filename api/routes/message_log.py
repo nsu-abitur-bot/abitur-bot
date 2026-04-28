@@ -1,9 +1,12 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from api.schemas.message_log import (
     MessageLogListResponse,
     MessageLogQueryParams,
     MessageLogResponse,
+    RequestCountStatsResponse,
 )
 from db.postgres.db import get_async_session
 from db.postgres.services.message_log import MessageLogService
@@ -14,6 +17,59 @@ router = APIRouter(prefix="/logs", tags=["Message Logs"])
 def get_message_log_service(session=Depends(get_async_session)) -> MessageLogService:
     """Получает сервис для работы с логами сообщений."""
     return MessageLogService(session)
+
+
+@router.get(
+    "/request-stats",
+    response_model=RequestCountStatsResponse,
+    summary="Статистика количества запросов",
+)
+async def get_request_stats(
+    start: datetime | None = Query(
+        None, description="Начало периода (ISO 8601)"
+    ),
+    end: datetime | None = Query(None, description="Конец периода (ISO 8601)"),
+    group_by: str = Query(
+        "day",
+        description="Группировка: hour, day, week, month",
+    ),
+    message_type: str = Query(
+        "user_input", description="Тип сообщения для статистики"
+    ),
+    log_service: MessageLogService = Depends(get_message_log_service),
+):
+    allowed_groups = {"hour", "day", "week", "month"}
+    if group_by not in allowed_groups:
+        raise HTTPException(
+            status_code=400,
+            detail=f"group_by должен быть одним из {sorted(allowed_groups)}",
+        )
+
+    if start is not None and end is not None and start > end:
+        raise HTTPException(
+            status_code=400,
+            detail="start не может быть позже end",
+        )
+
+    try:
+        stats = await log_service.get_request_count_stats(
+            start=start,
+            end=end,
+            group_by=group_by,
+            message_type=message_type,
+        )
+        return RequestCountStatsResponse(
+            total=stats["total"],
+            group_by=group_by,
+            start=start,
+            end=end,
+            buckets=stats["buckets"],
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения статистики: {str(e)}",
+        )
 
 
 @router.get(

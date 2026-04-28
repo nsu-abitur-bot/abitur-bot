@@ -33,3 +33,18 @@ class MessageLogQueryParams(BaseModel):
     message_type: Optional[str] = Field(None, description="Тип сообщения")
     limit: int = Field(50, ge=1, le=1000, description="Лимит записей")
     offset: int = Field(0, ge=0, description="Сдвиг")
+
+
+class RequestCountBucket(BaseModel):
+    """Элемент статистики по количеству запросов."""
+    period: datetime
+    count: int
+
+
+class RequestCountStatsResponse(BaseModel):
+    """Статистика количества запросов за период времени."""
+    total: int
+    group_by: str
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    buckets: List[RequestCountBucket]
