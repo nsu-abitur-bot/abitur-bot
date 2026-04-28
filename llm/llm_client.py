@@ -12,6 +12,7 @@ from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from db.redis_client import RedisClient
+from bot.utils import normalize_url_for_messaging
 from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
 from rag.retriever import query_graph_with_sources
@@ -95,8 +96,10 @@ def _sanitize_telegram_html(text: str) -> str:
                 flags=re.IGNORECASE,
             )
             if href_match:
-                href = escape(href_match.group(1), quote=True)
-                return f'<a href="{href}">'
+                raw_href = href_match.group(1)
+                normalized_href = normalize_url_for_messaging(raw_href)
+                href = escape(normalized_href, quote=True)
+                return f'<a href="{href}">' 
             return ""
 
         return ""
