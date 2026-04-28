@@ -13,3 +13,5 @@ logs/
 *.pkl
 data
 faq/faq_data.yaml
+
+evals/eval_results.json

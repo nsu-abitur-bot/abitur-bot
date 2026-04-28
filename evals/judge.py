@@ -6,12 +6,12 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from llm.factory import get_llm_provider
 
 # Системный промпт-судья
-JUDGE_PROMPT = """Ты — беспристрастный судья. Оцени ответ бота по шкале
+JUDGE_PROMPT = """Ты — беспристрастный судья. Оцени ответ RAG-системы по шкале
 от 1 (полный провал) до 5 (идеально). Ответь СТРОГО в формате JSON без markdown-кавычек:
 {"score": 5, "reasoning": "краткое объяснение"}"""
 
 
-async def evaluate_bot_answer(
+async def evaluate_rag_answer(
     question: str, reference: str, criteria: str, actual_answer: str
 ) -> dict:
     """Вызывает LLM для оценки ответа."""
@@ -22,7 +22,7 @@ async def evaluate_bot_answer(
     Эталонный ответ: {reference}
     Критерий оценки: {criteria}
     
-    Фактический ответ бота: {actual_answer}
+    Фактический ответ RAG-системы: {actual_answer}
     """
     messages: list[BaseMessage] = [
         SystemMessage(content=JUDGE_PROMPT),
