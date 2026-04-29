@@ -1,12 +1,13 @@
 import logging
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 
 from langchain_core.messages import BaseMessage
 from langchain_gigachat.chat_models import GigaChat
 from langchain_gigachat.embeddings import GigaChatEmbeddings
 
 from llm.base import BaseLLMProvider
+from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
 
@@ -36,8 +37,29 @@ class GigaChatProvider(BaseLLMProvider):
             model_name,
         )
 
-    async def generate(self, messages: List[BaseMessage]) -> str:
-        response = await self.llm.ainvoke(messages)
+    async def generate(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> str:
+        # LangChain LLM instances are immutable/Pydantic-based often,
+        # so we pass config overrides via bind or config directly to ainvoke.
+        kwargs_invoke = {}
+        if profile:
+            if profile.temperature is not None:
+                kwargs_invoke['temperature'] = profile.temperature
+            if profile.max_tokens is not None:
+                kwargs_invoke['max_tokens'] = profile.max_tokens
+            if profile.timeout is not None:
+                kwargs_invoke['timeout'] = profile.timeout
+        
+        # Merge other kwargs
+        kwargs_invoke.update(kwargs)
+
+        llm_binded = self.llm.bind(**kwargs_invoke) if kwargs_invoke else self.llm
+
+        response = await llm_binded.ainvoke(messages)
         if isinstance(response.content, str):
             content = response.content.strip()
         else:

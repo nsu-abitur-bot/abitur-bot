@@ -3,6 +3,8 @@ import os
 
 from openai import AsyncOpenAI
 
+from llm.profiles import LLMProfiles
+
 logger = logging.getLogger(__name__)
 
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
@@ -13,27 +15,23 @@ class DeepSeekLLM:
         self,
         api_key: str | None = None,
         model: str = "deepseek-chat",
-        max_tokens: int = 2000,
-        temperature: float = 0.7,
-        timeout_seconds: float = 120,
     ):
         self.api_key = api_key or os.getenv("DEEPSEEK_API_KEY")
         if not self.api_key:
             raise RuntimeError("DEEPSEEK_API_KEY не установлен.")
 
         self.model = model
-        self.max_tokens = max_tokens
-        self.temperature = temperature
+        self.profile = LLMProfiles.GRAPH
 
         self.client = AsyncOpenAI(
             api_key=self.api_key,
             base_url=DEEPSEEK_BASE_URL,
-            timeout=timeout_seconds,
+            timeout=float(self.profile.timeout or 120),
         )
         logger.info(
             "DeepSeekLLM initialized (model=%s, timeout=%ss)",
             self.model,
-            timeout_seconds,
+            self.profile.timeout,
         )
 
     async def __call__(self, prompt: str, **kwargs) -> str:
@@ -43,8 +41,12 @@ class DeepSeekLLM:
                 messages.append({"role": "system", "content": kwargs["system_prompt"]})
             messages.append({"role": "user", "content": prompt})
 
-            temperature: float = kwargs.get("temperature", self.temperature)
-            max_tokens: int = kwargs.get("max_tokens", self.max_tokens)
+            temperature: float = float(
+                kwargs.get("temperature", self.profile.temperature or 0.7)
+            )
+            max_tokens: int = int(
+                kwargs.get("max_tokens", self.profile.max_tokens or 2000)
+            )
 
             completion = await self.client.chat.completions.create(
                 model=self.model,

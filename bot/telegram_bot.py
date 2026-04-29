@@ -82,8 +82,8 @@ def get_session_id(message: Message) -> str:
     )
 
 
-async def run_telegram_bot() -> None:
-    """Запускает Telegram-адаптер на aiogram."""
+async def run_telegram_bot() -> bool | None:
+    """Запускает Telegram-адаптер на aiogram. Возвращает False, если запуск отменен."""
     load_dotenv()
 
     lock_path = getenv(
@@ -97,12 +97,12 @@ async def run_telegram_bot() -> None:
             "Пропускаю второй экземпляр (lock: %s)",
             lock_path,
         )
-        return
+        return False
 
     bot_token = getenv("BOT_TOKEN")
     if bot_token is None:
         logger.error("Telegram bot skipped: BOT_TOKEN не задан")
-        return
+        return False
 
     telegram_socks5_proxy = getenv("TELEGRAM_SOCKS5_PROXY")
     if telegram_socks5_proxy:

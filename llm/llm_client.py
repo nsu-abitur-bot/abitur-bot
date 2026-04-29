@@ -15,6 +15,7 @@ from db.redis_client import RedisClient
 from bot.utils import normalize_url_for_messaging
 from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
+from llm.profiles import LLMProfiles
 from rag.retriever import query_graph_with_sources
 
 load_dotenv()
@@ -226,7 +227,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 HumanMessage(content=message),
             ]
             intent_provider = get_llm_provider()
-            intent_response = await intent_provider.generate(intent_messages)
+            intent_response = await intent_provider.generate(intent_messages, profile=LLMProfiles.INTENT)
             intent_response = (
                 re.sub(r"<think>.*?</think>", "", intent_response, flags=re.DOTALL)
                 .strip()
@@ -386,7 +387,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 f"[{session_id}] Sending payload to LLM "
                 f"({provider.__class__.__name__})."
             )
-            content = await provider.generate(messages)
+            content = await provider.generate(messages, profile=LLMProfiles.CHAT)
 
             # Пост-процессинг: удаляем "левые" ссылки, которых не было в valid_urls
             if valid_urls:

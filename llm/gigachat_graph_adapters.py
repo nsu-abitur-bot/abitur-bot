@@ -5,6 +5,8 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_gigachat.chat_models import GigaChat
 from langchain_gigachat.embeddings import GigaChatEmbeddings
 
+from llm.profiles import LLMProfiles
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,6 +20,7 @@ class GigaChatLLM:
         self.credentials = credentials
         self.scope = scope
         self.model = model
+        self.profile = LLMProfiles.GRAPH
 
     async def __call__(self, prompt: str, **kwargs) -> str:
         try:
@@ -26,8 +29,9 @@ class GigaChatLLM:
                 scope=self.scope,
                 model=self.model,
                 verify_ssl_certs=False,
-                temperature=kwargs.get("temperature", 0.7),
-                max_tokens=kwargs.get("max_tokens", 2000),
+                timeout=self.profile.timeout,
+                temperature=kwargs.get("temperature", self.profile.temperature),
+                max_tokens=kwargs.get("max_tokens", self.profile.max_tokens),
             )
 
             messages = []
@@ -55,6 +59,7 @@ class GigaChatEmbedding:
         self.scope = scope
         self.model = model
         self.embedding_dim = embedding_dim
+        self.profile = LLMProfiles.EMBEDDING
 
     async def __call__(self, texts: List[str]) -> List[List[float]]:
         try:
@@ -63,6 +68,7 @@ class GigaChatEmbedding:
                 scope=self.scope,
                 model=self.model,
                 verify_ssl_certs=False,
+                timeout=self.profile.timeout,
             )
             return await embeddings.aembed_documents(texts)
         except Exception as e:

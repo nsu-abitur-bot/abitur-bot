@@ -14,18 +14,19 @@ from bot.utils import normalize_links_for_messaging
 logger = logging.getLogger(__name__)
 
 
-async def run_max_bot() -> None:
+async def run_max_bot() -> bool | None:
     """Запускает MAX-адаптер в режиме long polling.
 
     Текущий вариант реализован как безопасный scaffold: если библиотека или токен
-    не настроены, процесс не падает и Telegram продолжает работать.
+    не настроены, процесс не падает и Telegram продолжает работать. Возвращает False
+    для отмены перезапуска.
     """
     load_dotenv()
 
     token = getenv("MAX_BOT_TOKEN")
     if not token:
         logger.info("MAX bot skipped: MAX_BOT_TOKEN is not configured")
-        return
+        return False
 
     client = Bot(token=token, parse_mode=ParseMode.HTML)
     dp = Dispatcher()
