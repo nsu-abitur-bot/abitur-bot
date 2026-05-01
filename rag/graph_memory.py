@@ -11,7 +11,6 @@ from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
 
 from llm.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
-from llm.gigachat_graph_adapters import GigaChatEmbedding, GigaChatLLM
 from llm.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 
 load_dotenv()
@@ -35,34 +34,11 @@ class _GraphWrapper:
 class GraphMemory:
     """
     Async manager for LightRAG graph memory.
-    Uses GigaChat or OpenAI for LLM and embeddings
+    Uses OpenAI or Gemini for LLM and embeddings
     (controlled by LIGHTRAG_LLM_PROVIDER).
     """
 
-    def __init__(
-        self,
-        credentials: Optional[str] = None,
-        scope: str = "GIGACHAT_API_PERS",
-        model_name: str = "GigaChat",
-        embedding_model_name: str = "Embeddings",
-    ) -> None:
-        # GigaChat credentials for LLM and embeddings
-        self.credentials: Optional[str] = credentials or os.getenv(
-            "GIGACHAT_CREDENTIALS"
-        )
-        if not self.credentials:
-            self.credentials = os.getenv("GIGACHAT_API_KEY")
-
-        if not self.credentials:
-            logger.warning(
-                "GIGACHAT_CREDENTIALS or GIGACHAT_API_KEY "
-                "environment variable is not set."
-            )
-
-        self.scope: str = scope or os.getenv("GIGACHAT_SCOPE", "GIGACHAT_API_PERS")
-        self.model_name: str = model_name or os.getenv("GIGACHAT_MODEL", "GigaChat")
-        self.embedding_model_name = embedding_model_name
-
+    def __init__(self) -> None:
         self._graphs: Dict[str, _GraphWrapper] = {}
         self._graph_signatures: Dict[str, tuple[float, int]] = {}
         self._locks: Dict[tuple[asyncio.AbstractEventLoop, str], asyncio.Lock] = {}
@@ -73,8 +49,7 @@ class GraphMemory:
         os.makedirs(self.workspace_path, exist_ok=True)
 
         logger.info(
-            f"GraphMemory initialized (async) with model: {self.model_name}, "
-            f"workspace: {self.workspace_path}"
+            f"GraphMemory initialized (async), workspace: {self.workspace_path}"
         )
 
     def _get_workspace_path(self, graph_id: str) -> str:
@@ -175,7 +150,7 @@ class GraphMemory:
 
             try:
                 graph_llm_provider = os.getenv(
-                    "LIGHTRAG_LLM_PROVIDER", "gigachat"
+                    "LIGHTRAG_LLM_PROVIDER", "gemini"
                 ).lower()
 
                 if graph_llm_provider == "openai":
@@ -217,15 +192,9 @@ class GraphMemory:
                         ),
                     )
                 else:
-                    llm_adapter = GigaChatLLM(
-                        credentials=self.credentials,
-                        scope=self.scope,
-                        model=self.model_name,
-                    )
-                    embedding_adapter = GigaChatEmbedding(
-                        credentials=self.credentials,
-                        scope=self.scope,
-                        model=self.embedding_model_name,
+                    raise RuntimeError(
+                        f"LIGHTRAG_LLM_PROVIDER='{graph_llm_provider}' не поддерживается. "
+                        "Допустимые значения: openai, gemini"
                     )
 
                 @wrap_embedding_func_with_attrs(

@@ -32,9 +32,7 @@ dependencies = [
     "uuid6>=2024.1.12",
     "chonkie>=1.4.2",
     "psycopg2>=2.9.11",
-    "langchain-gigachat>=0.3.12",
     "lightrag-hku>=1.4.9.8",
-    "cerebras-cloud-sdk>=1.54.0",
     "google-genai>=1.56.0",
     "pymupdf>=1.27.2.2",
 ]

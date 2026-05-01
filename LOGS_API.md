@@ -103,7 +103,7 @@ GET /api/v1/logs/type/{message_type}?limit=50&offset=0
 ```json
 {
   "response_length": 847,
-  "provider": "GigaChatLLM"
+  "provider": "GeminiProvider"
 }
 ```
 

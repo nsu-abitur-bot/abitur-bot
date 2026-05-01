@@ -329,7 +329,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 logger.warning(f"LightRAG query error: {e}")
                 rag_context = "База знаний временно недоступна."
 
-        # 5. Формируем сообщения и отправляем в LLM провайдер (Cerebras по умолчанию)
+        # 5. Формируем сообщения и отправляем в LLM провайдер
         try:
             logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
             valid_urls = [
