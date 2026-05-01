@@ -2,6 +2,7 @@ import logging
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
+from abbrev.abbrev_expander import get_abbrev_expander
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 
@@ -38,12 +39,11 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
 
     llm = get_llm_provider()
 
-    # Можно добавить разбиение на куски, если текст слишком большой,
-    # но пока предполагаем, что модель в состоянии переварить подаваемый текст
+    expanded_text = get_abbrev_expander().expand(raw_text)
 
     messages: list[BaseMessage] = [
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=f"Очисти и структурируй следующий текст:\n\n{raw_text}"),
+        HumanMessage(content=f"Очисти и структурируй следующий текст:\n\n{expanded_text}"),
     ]
 
     try:

@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi import UploadFile
 from sqlalchemy import select
 
+from abbrev.abbrev_expander import get_abbrev_expander
 from api.schemas.rag import UploadedDocumentResult
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
@@ -118,7 +119,7 @@ class RagUploadService:
                 )
                 continue
 
-            prepared = text.strip()
+            prepared = get_abbrev_expander().expand(text.strip())
             if not prepared:
                 results.append(
                     UploadedDocumentResult(

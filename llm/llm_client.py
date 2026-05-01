@@ -13,6 +13,7 @@ from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from db.redis_client import RedisClient
 from bot.utils import normalize_url_for_messaging
+from abbrev.abbrev_expander import get_abbrev_expander
 from faq.faq_matcher import get_faq_matcher
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
@@ -178,11 +179,17 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         logger.info(f"[{session_id}] Saving user message to Redis history.")
         await redis_client.add_message(session_id, {"role": "user", "content": message})
 
-        # 2. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
+        # 2. Расширяем аббревиатуры для улучшения FAQ-матчинга и RAG-запросов
+        try:
+            expanded_message = get_abbrev_expander().expand(message)
+        except Exception:
+            expanded_message = message
+
+        # 3. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
         logger.info(f"[{session_id}] Checking FAQ for match.")
         try:
             faq_matcher = get_faq_matcher()
-            faq_answer = faq_matcher.match(message)
+            faq_answer = faq_matcher.match(expanded_message)
             if faq_answer:
                 logger.info(
                     f"[{session_id}] FAQ match found, returning predefined answer."
@@ -224,7 +231,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
             )
             intent_messages: list[BaseMessage] = [
                 SystemMessage(content=intent_prompt),
-                HumanMessage(content=message),
+                HumanMessage(content=expanded_message),
             ]
             intent_provider = get_llm_provider()
             intent_response = await intent_provider.generate(intent_messages, profile=LLMProfiles.INTENT)
@@ -257,7 +264,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         if need_rag:
             logger.info(f"[{session_id}] Querying LightRAG for context.")
             try:
-                rag_query = f"{message}\n\n{LIGHTRAG_FORMAT_HINT}"
+                rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
                 rag_context_raw, rag_sources = await query_graph_with_sources(rag_query)
                 if not rag_context_raw or rag_context_raw.startswith(
                     "Error executing query"

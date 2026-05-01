@@ -15,3 +15,5 @@ data
 faq/faq_data.yaml
 
 evals/eval_results.json
+
+abbrev/abbrev_data.yaml

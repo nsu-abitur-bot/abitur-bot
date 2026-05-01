@@ -21,6 +21,7 @@ from api.schemas.rag import (
     RagDocumentListResponse,
     RagUploadResponse,
 )
+from abbrev.abbrev_expander import get_abbrev_expander
 from api.services.rag_upload import RagUploadService
 from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu_parser import parse_page
@@ -84,7 +85,9 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
                 resp_get = await client.get(url_str, follow_redirects=True)
                 resp_get.raise_for_status()
 
-                pdf_markdown = await process_pdf_bytes(resp_get.content)
+                pdf_markdown = get_abbrev_expander().expand(
+                    await process_pdf_bytes(resp_get.content)
+                )
 
                 # Декодируем URL для fallback (чтобы вместо %D0%98 было нормальное русское название)
                 raw_filename = url_str.split("/")[-1]
