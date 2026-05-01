@@ -53,8 +53,8 @@ async def test_get_messages_by_user(session: AsyncSession):
 
     messages = await msg_service.get_messages_by_user(user_id=100002)
     assert len(messages) == 2
-    assert messages[0].user_text == "Вопрос 1"
-    assert messages[1].user_text == "Вопрос 2"
+    assert messages[0].user_text == "Вопрос 2"
+    assert messages[1].user_text == "Вопрос 1"
 
 
 @pytest.mark.asyncio
@@ -112,8 +112,8 @@ async def test_get_messages_with_pagination(session: AsyncSession):
     # Первая страница — 2 записи
     page1 = await msg_service.get_messages_by_user(user_id=100004, limit=2, offset=0)
     assert len(page1) == 2
-    assert page1[0].user_text == "Вопрос 0"
-    assert page1[1].user_text == "Вопрос 1"
+    assert page1[0].user_text == "Вопрос 4"
+    assert page1[1].user_text == "Вопрос 3"
 
     # Вторая страница
     page2 = await msg_service.get_messages_by_user(user_id=100004, limit=2, offset=2)

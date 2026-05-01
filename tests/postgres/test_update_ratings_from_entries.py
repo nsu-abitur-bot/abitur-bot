@@ -349,7 +349,7 @@ async def test_empty_entries_list(session: AsyncSession):
 
     stats = await rating_service.update_ratings_from_entries(leaderboard.id, [])
 
-    assert stats == {"created": 0, "updated": 0, "skipped": 0}
+    assert stats == {"created": 0, "updated": 0, "skipped": 0, "notifications": []}
 
 
 @pytest.mark.asyncio
