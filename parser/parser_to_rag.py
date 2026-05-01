@@ -2,7 +2,7 @@
 
 import logging
 
-from parser.url_parser import process_url
+from parser.url import process_url
 from rag.loader import add_texts_async
 
 logger = logging.getLogger(__name__)

@@ -6,7 +6,7 @@ import httpx
 from bs4 import BeautifulSoup
 
 from llm.vision_parser import parse_images_with_llm
-from parser.pdf_parser import pdf_to_base64_images
+from parser.pdf import pdf_to_base64_images
 
 logger = logging.getLogger(__name__)
 

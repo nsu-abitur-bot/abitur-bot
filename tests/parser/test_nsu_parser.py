@@ -1,10 +1,10 @@
 from unittest.mock import MagicMock, patch
 
-from parser.nsu_parser import parse_nsu_faculty
+from parser.nsu import parse_nsu_faculty
 
 
 class TestNsuParser:
-    @patch("parser.nsu_parser.requests.get")
+    @patch("parser.nsu.requests.get")
     def test_parse_nsu_fit(self, mock_get, html_fixture_path):
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock()

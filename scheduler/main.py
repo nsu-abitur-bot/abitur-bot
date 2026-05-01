@@ -8,7 +8,7 @@ from maxapi import Bot as MaxBot
 from bot.notifications import notify_users
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.rating import RatingService
-from parser.rating_parser import (
+from parser.rating import (
     parse_mock_rating_page,
 )
 
