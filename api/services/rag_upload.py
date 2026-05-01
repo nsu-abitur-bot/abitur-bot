@@ -13,8 +13,8 @@ from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
 from llm.preprocessor import generate_title_from_text
 from llm.vision_parser import parse_images_with_llm
-from parser.baza_to_rag import _extract_sources
 from parser.pdf_parser import pdf_to_base64_images
+from parser.utils import extract_sources
 from rag.loader import add_texts_async
 
 SUPPORTED_EXTENSIONS = {
@@ -138,7 +138,7 @@ class RagUploadService:
                     # Обновляем имя, чтобы отправить клиенту нормальное название и оригинальное в скобках
                     filename = f"{generated_title} ({filename})"
 
-            source_id, file_paths_str = _extract_sources(prepared, fallback=filename)
+            source_id, file_paths_str = extract_sources(prepared, fallback=filename)
 
             # Передаем подготовленный текст и извлеченные ID/источники в RAG
             saved_count = await add_texts_async(

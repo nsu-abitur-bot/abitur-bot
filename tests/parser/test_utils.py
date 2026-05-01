@@ -1,4 +1,4 @@
-from parser.utils import calculate_page_hash, parse_content_blocks, parse_header_faculty
+from parser.utils import calculate_page_hash, parse_content_blocks, parse_page_header
 
 
 class TestUtils:
@@ -6,7 +6,7 @@ class TestUtils:
         soup = load_html_fixture("it.html")
         data = {}
 
-        parse_header_faculty(soup, data)
+        parse_page_header(soup, data)
 
         assert data["title"] == "Информационные технологии НГУ"
         assert (
