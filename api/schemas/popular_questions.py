@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class PopularQuestion(BaseModel):
     question: str
     count: int

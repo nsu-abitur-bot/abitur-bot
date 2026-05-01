@@ -37,9 +37,7 @@ def _encode_url_parts(url: str) -> str:
     safe_query = quote(parts.query, safe="=&%+;:@/?-._~")
     safe_fragment = quote(parts.fragment, safe="%!-._~")
 
-    return urlunsplit(
-        (parts.scheme, safe_netloc, safe_path, safe_query, safe_fragment)
-    )
+    return urlunsplit((parts.scheme, safe_netloc, safe_path, safe_query, safe_fragment))
 
 
 def normalize_url_for_messaging(url: str) -> str:

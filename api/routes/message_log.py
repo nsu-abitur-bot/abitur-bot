@@ -228,7 +228,8 @@ async def get_type_logs(
             detail=f"Ошибка получения логов по типу: {str(e)}"
         )
 
-from api.schemas.popular_questions import PopularQuestionsResponse, PopularQuestion
+from api.schemas.popular_questions import PopularQuestion, PopularQuestionsResponse
+
 
 @router.get(
     "/popular",
