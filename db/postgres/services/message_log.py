@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, TypedDict
 
-from sqlalchemy import func
+from sqlalchemy import Sequence, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -68,7 +68,7 @@ class MessageLogService:
         session_id: str,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[MessageLog]:
+    ) -> Sequence[MessageLog]:
         """Получает логи для конкретной сессии."""
         stmt = (
             select(MessageLog)
@@ -85,7 +85,7 @@ class MessageLogService:
         user_id: int,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[MessageLog]:
+    ) -> Sequence[MessageLog]:
         """Получает логи для конкретного пользователя."""
         stmt = (
             select(MessageLog)
@@ -102,7 +102,7 @@ class MessageLogService:
         message_type: str,
         limit: int = 100,
         offset: int = 0,
-    ) -> List[MessageLog]:
+    ) -> Sequence[MessageLog]:
         """Получает логи по типу сообщения."""
         stmt = (
             select(MessageLog)
@@ -118,7 +118,7 @@ class MessageLogService:
         self,
         limit: int = 50,
         offset: int = 0,
-    ) -> List[MessageLog]:
+    ) -> Sequence[MessageLog]:
         """Получает самые последние логи."""
         stmt = (
             select(MessageLog)
@@ -154,9 +154,9 @@ class MessageLogService:
         total = (await self.session.execute(base_stmt)).scalar_one()
 
         period_expr = func.date_trunc(group_by, MessageLog.created_at).label("period")
-        bucket_stmt = select(
-            period_expr, func.count(MessageLog.id).label("count")
-        ).where(MessageLog.message_type == message_type)
+        bucket_stmt = select(period_expr, func.count(MessageLog.id).label("count")).where(
+            MessageLog.message_type == message_type
+        )
         if start is not None:
             bucket_stmt = bucket_stmt.where(MessageLog.created_at >= start)
         if end is not None:
@@ -172,9 +172,7 @@ class MessageLogService:
                 if start is not None
                 else min(row.period for row in valid_rows)
             )
-            range_end = (
-                end if end is not None else max(row.period for row in valid_rows)
-            )
+            range_end = end if end is not None else max(row.period for row in valid_rows)
             all_buckets: dict[datetime, int] = {}
             current = range_start
             while current <= range_end:
@@ -182,11 +180,39 @@ class MessageLogService:
                 current = _advance_dt(current, group_by)
             for row in valid_rows:
                 if row.period in all_buckets:
-                    all_buckets[row.period] = row.count
-            buckets = [
-                {"period": k, "count": v} for k, v in sorted(all_buckets.items())
-            ]
+                    count_value = row._mapping["count"]
+                    all_buckets[row.period] = int(count_value)
+            buckets = [{"period": k, "count": v} for k, v in sorted(all_buckets.items())]
         else:
             buckets = []
 
         return {"total": total, "buckets": buckets}
+
+    class PopularQuestionRow(TypedDict):
+        question: str
+        count: int
+
+    async def get_popular_questions(
+        self,
+        limit: int = 10,
+    ) -> List[PopularQuestionRow]:
+        """Возвращает самые часто встречающиеся вопросы пользователей."""
+        stmt = (
+            select(
+                MessageLog.content.label("question"),
+                func.count(MessageLog.id).label("count"),
+            )
+            .where(MessageLog.message_type == "user_input")
+            .group_by(MessageLog.content)
+            .order_by(func.count(MessageLog.id).desc())
+            .limit(limit)
+        )
+        rows = (await self.session.execute(stmt)).all()
+        return [
+            {
+                "question": str(row._mapping["question"]),
+                "count": int(row._mapping["count"]),
+            }
+            for row in rows
+            if row._mapping["question"] is not None
+        ]

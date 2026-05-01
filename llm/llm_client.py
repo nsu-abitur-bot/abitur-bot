@@ -101,7 +101,7 @@ def _sanitize_telegram_html(text: str) -> str:
                 raw_href = href_match.group(1)
                 normalized_href = normalize_url_for_messaging(raw_href)
                 href = escape(normalized_href, quote=True)
-                return f'<a href="{href}">' 
+                return f'<a href="{href}">'
             return ""
 
         return ""
@@ -234,7 +234,9 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 HumanMessage(content=expanded_message),
             ]
             intent_provider = get_llm_provider()
-            intent_response = await intent_provider.generate(intent_messages, profile=LLMProfiles.INTENT)
+            intent_response = await intent_provider.generate(
+                intent_messages, profile=LLMProfiles.INTENT
+            )
             intent_response = (
                 re.sub(r"<think>.*?</think>", "", intent_response, flags=re.DOTALL)
                 .strip()
@@ -254,9 +256,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 )
 
         except Exception as e:
-            logger.warning(
-                f"Intent classification error: {e}, falling back to full RAG"
-            )
+            logger.warning(f"Intent classification error: {e}, falling back to full RAG")
 
         # 4. Получаем контекст из LightRAG (если нужно)
         rag_sources: list[str] = []
@@ -272,9 +272,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                     logger.info(f"[{session_id}] No relevant context found in RAG.")
                     rag_context = "Релевантный контекст из базы знаний не найден."
                     rag_sources = []
-                    logger.info(
-                        f"[{session_id}] RAG retrieval result: No context found"
-                    )
+                    logger.info(f"[{session_id}] RAG retrieval result: No context found")
                 else:
                     logger.info(
                         f"[{session_id}] Retrieved context from RAG "
@@ -391,8 +389,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
 
             provider = get_llm_provider()
             logger.info(
-                f"[{session_id}] Sending payload to LLM "
-                f"({provider.__class__.__name__})."
+                f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
             )
             content = await provider.generate(messages, profile=LLMProfiles.CHAT)
 

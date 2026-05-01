@@ -43,12 +43,14 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
 
     messages: list[BaseMessage] = [
         SystemMessage(content=SYSTEM_PROMPT),
-        HumanMessage(content=f"Очисти и структурируй следующий текст:\n\n{expanded_text}"),
+        HumanMessage(
+            content=f"Очисти и структурируй следующий текст:\n\n{expanded_text}"
+        ),
     ]
 
     try:
         response_text = await llm.generate(messages, profile=LLMProfiles.PARSER)
-        return str(response_text)
+        return response_text
     except Exception as e:
         logger.error(f"Ошибка при очистке текста через LLM: {e}")
         # Возвращаем сырой текст в случае ошибки, чтобы цепочка не прервалась полностью
@@ -58,7 +60,8 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
 async def generate_title_from_text(text: str) -> str:
     """
     Генерирует короткое и понятное название для документа на основе его текста.
-    Используется, чтобы не оставлять загруженные файлы (напр., PDF) со скучными техническими названиями.
+    Используется, чтобы не оставлять загруженные файлы (напр., PDF)
+    со скучными техническими названиями.
     """
     if not text or not text.strip():
         return "Без названия"
@@ -70,7 +73,8 @@ async def generate_title_from_text(text: str) -> str:
 
     messages: list[BaseMessage] = [
         SystemMessage(
-            content="Ты - нейросеть, которая придумывает релевантные названия для документов. "
+            content="Ты - нейросеть, которая придумывает"
+            "релевантные названия для документов."
             "Проанализируй текст и верни ТОЛЬКО ОДНО короткое емкое название "
             "(до 7 слов), без кавычек, точек на конце и без пояснений."
         ),
@@ -81,7 +85,7 @@ async def generate_title_from_text(text: str) -> str:
 
     try:
         response_text = await llm.generate(messages, profile=LLMProfiles.TITLE)
-        title = str(response_text).strip("'\" \n\r.")
+        title = response_text.strip("'\" \n\r.")
         return title if title else "Без названия"
     except Exception as e:
         logger.error(f"Ошибка при генерации заголовка через LLM: {e}")

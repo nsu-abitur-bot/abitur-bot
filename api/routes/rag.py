@@ -89,7 +89,8 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
                     await process_pdf_bytes(resp_get.content)
                 )
 
-                # Декодируем URL для fallback (чтобы вместо %D0%98 было нормальное русское название)
+                # Декодируем URL для fallback
+                # (чтобы вместо %D0%98 было нормальное русское название)
                 raw_filename = url_str.split("/")[-1]
                 decoded_title = unquote(raw_filename)
 
@@ -107,7 +108,8 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
                     pdf_markdown = f"# {title_to_use}\n\n{pdf_markdown}"
 
                 return ParsedPageResult(
-                    title=title_to_use,  # Сгенерированное нейронкой или нормальное имя файла как заголовок
+                    # Сгенерированное нейронкой или нормальное имя файла как заголовок
+                    title=title_to_use,
                     url=url_str,
                     text=pdf_markdown,
                     documents=[],  # Внутри PDF ссылок на другие документы мы не собираем
@@ -188,7 +190,7 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 
     # Очищаем через LLM preprocessor (Requirement 1)
     clean_text = await clean_and_structure_text(raw_text)
-    
+
     # Генерируем заголовок с помощью LLM (так же, как для PDF)
     generated_title_html = await generate_title_from_text(clean_text)
     html_title_to_use = (
@@ -338,7 +340,8 @@ async def upload_csv_documents(
             except Exception as title_e:
                 logger.warning(f"Не удалось извлечь название для {url}: {title_e}")
 
-            # Если всё еще нет названия, оставляем как есть (будет использован URL как fallback)
+            # Если всё еще нет названия,
+            # оставляем как есть (будет использован URL как fallback)
             if not title:
                 title = url
 

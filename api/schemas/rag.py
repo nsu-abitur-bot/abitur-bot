@@ -45,9 +45,7 @@ class RagUploadResponse(BaseModel):
 
 
 class RagDocument(BaseModel):
-    id: str = Field(
-        ..., description="Идентификатор документа (обычно URL или имя файла)"
-    )
+    id: str = Field(..., description="Идентификатор документа (обычно URL или имя файла)")
     url: str | None = Field(None, description="Оригинальный URL или путь к файлу")
     status: str = Field(..., description="Статус обработки")
     content_summary: str | None = Field(None, description="Краткое содержание")
@@ -65,10 +63,15 @@ class CsvImportResult(BaseModel):
     success: bool = Field(..., description="Статус обработки")
     message: str | None = Field(None, description="Сообщение об ошибке или статус")
 
+
 class CsvImportResponse(BaseModel):
-    imported_count: int = Field(..., description="Количество успешно импортированных документов")
+    imported_count: int = Field(
+        ..., description="Количество успешно импортированных документов"
+    )
     total_found: int = Field(..., description="Всего найдено ссылок в CSV")
-    results: list[CsvImportResult] = Field(..., description="Результаты обработки по каждой ссылке")
+    results: list[CsvImportResult] = Field(
+        ..., description="Результаты обработки по каждой ссылке"
+    )
 
 
 class RagDocumentContentResponse(BaseModel):
@@ -84,4 +87,6 @@ class CsvImportPreviewResult(BaseModel):
 
 class CsvImportPreviewResponse(BaseModel):
     total_found: int = Field(..., description="Всего найдено ссылок в CSV")
-    results: list[CsvImportPreviewResult] = Field(..., description="Список найденных документов для превью")
+    results: list[CsvImportPreviewResult] = Field(
+        ..., description="Список найденных документов для превью"
+    )

@@ -33,9 +33,7 @@ class UserService:
     async def get_user_by_max_id(self, max_id: str) -> Optional[User]:
         """Получить пользователя по MAX ID."""
         try:
-            result = await self.session.execute(
-                select(User).where(User.max_id == max_id)
-            )
+            result = await self.session.execute(select(User).where(User.max_id == max_id))
             return result.scalar_one_or_none()
         except Exception as e:
             logger.error(f"Ошибка получения пользователя по max_id {max_id}: {e}")
@@ -67,7 +65,8 @@ class UserService:
         user = await self.get_user_by_telegram_id(telegram_id)
         if not user:
             raise RuntimeError(
-                f"Не удалось гарантировать существование пользователя с telegram_id={telegram_id}"
+                f"Не удалось гарантировать наличие"
+                f"пользователя с telegram_id={telegram_id}"
             )
         return user
 
@@ -85,7 +84,7 @@ class UserService:
         user = await self.get_user_by_max_id(max_id)
         if not user:
             raise RuntimeError(
-                f"Не удалось гарантировать существование пользователя с max_id={max_id}"
+                f"Не удалось гарантировать наличие пользователя с max_id={max_id}"
             )
         return user
 
@@ -120,14 +119,16 @@ class UserService:
         except IntegrityError as e:
             await self.session.rollback()
             logger.warning(
-                f"Не удалось создать пользователя ({user_id=}, {telegram_id=}, {max_id=}) из-за "
+                f"Не удалось создать пользователя"
+                f"({user_id=}, {telegram_id=}, {max_id=}) из-за "
                 f"нарушения ограничения БД: {e}"
             )
             return None
         except Exception as e:
             await self.session.rollback()
             logger.error(
-                f"Ошибка создания пользователя ({user_id=}, {telegram_id=}, {max_id=}): {e}"
+                f"Ошибка создания пользователя"
+                f"({user_id=}, {telegram_id=}, {max_id=}): {e}"
             )
             return None
 

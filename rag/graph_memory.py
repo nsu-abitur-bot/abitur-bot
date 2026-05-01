@@ -48,9 +48,7 @@ class GraphMemory:
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
 
-        logger.info(
-            f"GraphMemory initialized (async), workspace: {self.workspace_path}"
-        )
+        logger.info(f"GraphMemory initialized (async), workspace: {self.workspace_path}")
 
     def _get_workspace_path(self, graph_id: str) -> str:
         path = os.path.join(self.workspace_path, graph_id)
@@ -149,9 +147,7 @@ class GraphMemory:
             workspace_path = self._get_workspace_path(graph_id)
 
             try:
-                graph_llm_provider = os.getenv(
-                    "LIGHTRAG_LLM_PROVIDER", "gemini"
-                ).lower()
+                graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gemini").lower()
 
                 if graph_llm_provider == "openai":
                     openai_api_key = os.getenv("OPENAI_API_KEY", "")
@@ -193,7 +189,7 @@ class GraphMemory:
                     )
                 else:
                     raise RuntimeError(
-                        f"LIGHTRAG_LLM_PROVIDER='{graph_llm_provider}' не поддерживается. "
+                        f"LIGHTRAG_LLM_PROVIDER='{graph_llm_provider}' не поддерживается."
                         "Допустимые значения: openai, gemini"
                     )
 
@@ -227,9 +223,7 @@ class GraphMemory:
 
                 # Обновляем сигнатуру после инициализации,
                 # чтобы не триггерить перезагрузку
-                self._graph_signatures[graph_id] = self._get_workspace_signature(
-                    graph_id
-                )
+                self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
                 self._last_disk_check[graph_id] = time.monotonic()
                 logger.info(f"Created async LightRAG instance for graph: {graph_id}")
 
@@ -294,9 +288,7 @@ class GraphMemory:
                 )
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
-                self._graph_signatures[graph_id] = self._get_workspace_signature(
-                    graph_id
-                )
+                self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
                 self._last_disk_check[graph_id] = time.monotonic()
             return True
         except Exception as e:
@@ -368,15 +360,14 @@ class GraphMemory:
             result = []
             for doc_id, info in data.items():
                 url = (
-                    info.get("url")
-                    or info.get("file_path")
-                    or info.get("file_paths_str")
+                    info.get("url") or info.get("file_path") or info.get("file_paths_str")
                 )
                 if not url:
                     doc_full = full_docs_data.get(doc_id, {})
                     if isinstance(doc_full, dict):
                         # Сначала пытаемся из metadata или общих полей full_doc
-                        # (в зависимости от формата памяти LightRAG это может быть metadata.get('file_path') и т.д.)
+                        # (в зависимости от формата памяти LightRAG
+                        # это может быть metadata.get('file_path') и т.д.)
                         metadata = doc_full.get("metadata", {})
                         if isinstance(metadata, dict):
                             url = (
@@ -443,18 +434,18 @@ class GraphMemory:
                     await rag.adelete_by_doc_id(doc_id)
                 else:
                     logger.warning(
-                        f"LightRAG не поддерживает adelete_by_doc_id (попытка удалить {doc_id})"
+                        f"LightRAG не поддерживает"
+                        f"adelete_by_doc_id (попытка удалить {doc_id})"
                     )
                     return False
 
             # Обновляем кэш сигнатуры
             async with self._get_lock(graph_id):
-                self._graph_signatures[graph_id] = self._get_workspace_signature(
-                    graph_id
-                )
+                self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
                 self._last_disk_check[graph_id] = time.monotonic()
-            
-            # Очищаем LLM кеш, чтобы новые запросы не брались из него после удаления документов
+
+            # Очищаем LLM кеш,
+            # чтобы новые запросы не брались из него после удаления документов
             await self.clear_cache(graph_id)
             return True
         except Exception as e:
@@ -503,8 +494,7 @@ class GraphMemory:
                     if wrapper is not None:
                         await wrapper.rag.finalize_storages()
                         logger.info(
-                            "Хранилище финализировано и"
-                            + f" выгружено для графа: {gid}"
+                            "Хранилище финализировано и" + f" выгружено для графа: {gid}"
                         )
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
@@ -522,7 +512,8 @@ class GraphMemory:
             if os.path.exists(cache_file):
                 os.remove(cache_file)
                 logger.info(
-                    f"Очищен кеш ответов LLM для графа {graph_id}: удален файл {cache_file}"
+                    f"Очищен кеш ответов LLM для графа {graph_id}:"
+                    f"удален файл {cache_file}"
                 )
             else:
                 logger.debug(f"Файл кеша не найден, очистка не требуется: {cache_file}")

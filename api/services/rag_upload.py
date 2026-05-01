@@ -98,8 +98,7 @@ class RagUploadService:
                         filename=filename,
                         status="skipped",
                         message=(
-                            "File is too large "
-                            f"(max {max_file_size // (1024 * 1024)} MB)"
+                            f"File is too large (max {max_file_size // (1024 * 1024)} MB)"
                         ),
                     )
                 )
@@ -135,7 +134,8 @@ class RagUploadService:
                 if generated_title and generated_title != "Без названия":
                     if not prepared.startswith(f"# {generated_title}"):
                         prepared = f"# {generated_title}\n\n{prepared}"
-                    # Обновляем имя, чтобы отправить клиенту нормальное название и оригинальное в скобках
+                    # Обновляем имя, чтобы отправить клиенту
+                    # нормальное название и оригинальное в скобках
                     filename = f"{generated_title} ({filename})"
 
             source_id, file_paths_str = extract_sources(prepared, fallback=filename)
@@ -169,9 +169,7 @@ class RagUploadService:
 
         return results
 
-    async def _extract_text(
-        self, raw: bytes, extension: str, max_pages: int = 50
-    ) -> str:
+    async def _extract_text(self, raw: bytes, extension: str, max_pages: int = 50) -> str:
         if extension == ".pdf":
             images = pdf_to_base64_images(raw, max_pages=max_pages)
             if not images:

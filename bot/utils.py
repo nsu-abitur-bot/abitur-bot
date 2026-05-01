@@ -1,8 +1,31 @@
 import re
-from urllib.parse import quote, splitport, splituser, urlsplit, urlunsplit
+from urllib.parse import quote, urlsplit, urlunsplit
 
 _URL_RE = re.compile(r"https?://[^\s<>'\"]+", re.IGNORECASE)
 _DOUBLE_ENCODED_OCTET_RE = re.compile(r"%25([0-9A-Fa-f]{2})")
+
+
+def _split_userinfo(netloc: str) -> tuple[str | None, str]:
+    if "@" not in netloc:
+        return None, netloc
+    userinfo, _, hostport = netloc.rpartition("@")
+    return userinfo or None, hostport
+
+
+def _split_hostport(hostport: str) -> tuple[str, str | None]:
+    if hostport.startswith("["):
+        end = hostport.find("]")
+        if end != -1:
+            host = hostport[: end + 1]
+            if len(hostport) > end + 1 and hostport[end + 1] == ":":
+                return host, hostport[end + 2 :]
+            return host, None
+
+    if ":" not in hostport:
+        return hostport, None
+
+    host, _, port = hostport.rpartition(":")
+    return host, port or None
 
 
 def _encode_url_parts(url: str) -> str:
@@ -10,14 +33,8 @@ def _encode_url_parts(url: str) -> str:
     if not parts.scheme or not parts.netloc:
         return url
 
-    userinfo, hostport = splituser(parts.netloc)
-    if hostport is None:
-        hostport = parts.netloc
-        userinfo = None
-
-    host, port = splitport(hostport)
-    if host is None:
-        host = hostport
+    userinfo, hostport = _split_userinfo(parts.netloc)
+    host, port = _split_hostport(hostport)
 
     if host.startswith("[") and host.endswith("]"):
         safe_host = host

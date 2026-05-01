@@ -27,7 +27,9 @@ class PipelineEvaluator:
                 self.scenarios.extend(data.get("scenarios", []))
 
     async def generate_dynamic_scenarios(self, count: int = 3):
-        """Автоматически генерирует вопросы на основе случайных документов из реальной базы."""
+        """
+        Автоматически генерирует вопросы на основе случайных документов из реальной базы.
+        """
         chunk_file = "./data/lightrag/abitur_kb/kv_store_text_chunks.json"
 
         if not os.path.exists(chunk_file):
@@ -53,10 +55,14 @@ class PipelineEvaluator:
             content = chunk.get("content", "")
             prompt: list[BaseMessage] = [
                 SystemMessage(
-                    content="Ты — проверяющий эксперт. Твоя задача сгенерировать 1 конкретный тестовый вопрос (question) по предоставленному тексту, "
-                    "написать эталонный краткий ответ (reference_answer) и критерии оценки (criteria). "
-                    "Вопрос должен проверять, сможет ли RAG-система найти этот факт. "
-                    "Верни ТОЛЬКО валидный JSON. Ключи: question, reference_answer, criteria."
+                    content="Ты — проверяющий эксперт."
+                    "Твоя задача сгенерировать 1 конкретный тестовый вопрос (question)"
+                    "по предоставленному тексту, "
+                    "написать эталонный краткий ответ (reference_answer)"
+                    "и критерии оценки (criteria). "
+                    "Вопрос должен проверять, сможет ли RAG-система найти этот факт."
+                    "Верни ТОЛЬКО валидный JSON. Ключи:"
+                    "question, reference_answer, criteria."
                 ),
                 HumanMessage(content=f"Текст из базы НГУ:\n{content}"),
             ]
@@ -85,7 +91,7 @@ class PipelineEvaluator:
             "total": len(self.scenarios),
             "passed_perfectly": 0,
             "rag_results": [],
-            "faq_results": []
+            "faq_results": [],
         }
 
         faq_matcher = get_faq_matcher()
@@ -97,23 +103,25 @@ class PipelineEvaluator:
                 # --- ЛОГИКА ОЦЕНКИ FAQ ---
                 question = scenario["question"]
                 expected_match = scenario.get("expected_match", True)
-                
+
                 # Вызываем FAQ Matcher
                 faq_response = faq_matcher.match(question)
                 is_matched = bool(faq_response)
 
-                passed = (is_matched == expected_match)
+                passed = is_matched == expected_match
                 if passed:
                     report["passed_perfectly"] += 1
 
-                report["faq_results"].append({
-                    "id": scenario["id"],
-                    "question": question,
-                    "expected_match": expected_match,
-                    "actual_match": is_matched,
-                    "passed": passed,
-                    "faq_answer": faq_response if is_matched else None
-                })
+                report["faq_results"].append(
+                    {
+                        "id": scenario["id"],
+                        "question": question,
+                        "expected_match": expected_match,
+                        "actual_match": is_matched,
+                        "passed": passed,
+                        "faq_answer": faq_response if is_matched else None,
+                    }
+                )
             else:
                 # --- ЛОГИКА ОЦЕНКИ RAG ---
                 # 1. Спрашиваем НАПРЯМУЮ RAG (LightRAG), минуя бота и FAQ
@@ -147,9 +155,11 @@ class PipelineEvaluator:
                     }
                 )
 
-                # Добавляем паузу между сценариями, чтобы не превысить лимит (обычно 15 RPM для бесплатных LLM)
+                # Добавляем паузу между сценариями,
+                # чтобы не превысить лимит (обычно 15 RPM для бесплатных LLM)
                 logger.info(
-                    "Ожидание 15 секунд перед следующим сценарием для обхода лимитов LLM (15 RPM)..."
+                    "Ожидание 15 секунд перед следующим сценарием"
+                    "для обхода лимитов LLM (15 RPM)..."
                 )
                 await asyncio.sleep(15)
 

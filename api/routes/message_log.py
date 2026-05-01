@@ -8,6 +8,7 @@ from api.schemas.message_log import (
     MessageLogResponse,
     RequestCountStatsResponse,
 )
+from api.schemas.popular_questions import PopularQuestion, PopularQuestionsResponse
 from db.postgres.db import get_async_session
 from db.postgres.services.message_log import MessageLogService
 
@@ -25,17 +26,13 @@ def get_message_log_service(session=Depends(get_async_session)) -> MessageLogSer
     summary="Статистика количества запросов",
 )
 async def get_request_stats(
-    start: datetime | None = Query(
-        None, description="Начало периода (ISO 8601)"
-    ),
+    start: datetime | None = Query(None, description="Начало периода (ISO 8601)"),
     end: datetime | None = Query(None, description="Конец периода (ISO 8601)"),
     group_by: str = Query(
         "day",
         description="Группировка: hour, day, week, month",
     ),
-    message_type: str = Query(
-        "user_input", description="Тип сообщения для статистики"
-    ),
+    message_type: str = Query("user_input", description="Тип сообщения для статистики"),
     log_service: MessageLogService = Depends(get_message_log_service),
 ):
     allowed_groups = {"hour", "day", "week", "month"}
@@ -83,9 +80,9 @@ async def get_message_logs(
 ):
     """
     Получает логи сообщений с фильтрацией.
-    
+
     - **user_id**: фильтр по ID пользователя
-    - **session_id**: фильтр по ID сессии  
+    - **session_id**: фильтр по ID сессии
     - **message_type**: фильтр по типу сообщения
     - **limit**: количество записей (макс. 1000)
     - **offset**: сдвиг для пагинации
@@ -152,8 +149,7 @@ async def get_session_logs(
         )
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Ошибка получения логов сессии: {str(e)}"
+            status_code=500, detail=f"Ошибка получения логов сессии: {str(e)}"
         )
 
 
@@ -167,7 +163,7 @@ async def get_user_logs(
     limit: int = Query(50, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     log_service: MessageLogService = Depends(get_message_log_service),
-):
+) -> MessageLogListResponse:
     """Получает все логи для конкретного пользователя."""
     try:
         logs = await log_service.get_logs_by_user(
@@ -184,8 +180,7 @@ async def get_user_logs(
         )
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Ошибка получения логов пользователя: {str(e)}"
+            status_code=500, detail=f"Ошибка получения логов пользователя: {str(e)}"
         )
 
 
@@ -202,7 +197,7 @@ async def get_type_logs(
 ):
     """
     Получает логи по типу сообщения.
-    
+
     Возможные типы:
     - `user_input` - входящие сообщения от пользователей
     - `rag_context` - контекст полученный из RAG
@@ -224,11 +219,8 @@ async def get_type_logs(
         )
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Ошибка получения логов по типу: {str(e)}"
+            status_code=500, detail=f"Ошибка получения логов по типу: {str(e)}"
         )
-
-from api.schemas.popular_questions import PopularQuestion, PopularQuestionsResponse
 
 
 @router.get(
@@ -242,16 +234,18 @@ async def get_popular_questions(
 ):
     """
     Получает самые часто задаваемые вопросы пользователей.
-    
+
     - **limit**: максимальное количество возвращаемых вопросов
     """
     try:
         popular = await log_service.get_popular_questions(limit=limit)
         return PopularQuestionsResponse(
-            questions=[PopularQuestion(question=item["question"], count=item["count"]) for item in popular]
+            questions=[
+                PopularQuestion(question=item["question"], count=item["count"])
+                for item in popular
+            ]
         )
     except Exception as e:
         raise HTTPException(
-            status_code=500,
-            detail=f"Ошибка получения популярных вопросов: {str(e)}"
+            status_code=500, detail=f"Ошибка получения популярных вопросов: {str(e)}"
         )

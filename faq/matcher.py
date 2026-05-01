@@ -231,7 +231,8 @@ class FAQMatcher:
             self._embeddings = vectors / np.maximum(norms, 1e-10)
             logger.info(
                 f"FAQ loaded: {len(faq_items)} entries, "
-                f"{len(self._questions)} total phrases (cached {len(self._questions) - len(to_embed_phrases)})"
+                f"{len(self._questions)} total phrases"
+                f"(cached {len(self._questions) - len(to_embed_phrases)})"
             )
         else:
             logger.warning("No valid FAQ entries found")

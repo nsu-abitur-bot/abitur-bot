@@ -28,7 +28,8 @@ async def process_url(url: str) -> Optional[str]:
                 logger.info("Обнаружен PDF-документ. Запуск PDF-парсера...")
                 return await process_pdf_bytes(response.content)
 
-            # Если это не PDF, возвращаем сырой текст страницы без дополнительного препроцессинга,
+            # Если это не PDF, возвращаем сырой текст страницы
+            # без дополнительного препроцессинга,
             # чтобы его можно было отправить в LLM-cleaner, если нужно
             logger.info("Обнаружена HTML-страница. Запуск базового парсера...")
             return process_html(response.text)
