@@ -2,7 +2,7 @@ import logging
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
-from abbrev.abbrev_expander import get_abbrev_expander
+from abbrev.expander import get_abbrev_expander
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 

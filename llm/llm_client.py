@@ -11,10 +11,10 @@ from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
-from db.redis_client import RedisClient
+from db.redis.client import RedisClient
 from bot.utils import normalize_url_for_messaging
-from abbrev.abbrev_expander import get_abbrev_expander
-from faq.faq_matcher import get_faq_matcher
+from abbrev.expander import get_abbrev_expander
+from faq.matcher import get_faq_matcher
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from rag.retriever import query_graph_with_sources

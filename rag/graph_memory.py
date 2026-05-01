@@ -10,8 +10,8 @@ from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
 
-from llm.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
-from llm.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
+from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
+from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 
 load_dotenv()
 

@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from faq.faq_matcher import FAQMatcher, clean_user_input
+from faq.matcher import FAQMatcher, clean_user_input
 
 
 class FakeEmbeddings:

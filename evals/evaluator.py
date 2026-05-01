@@ -10,7 +10,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 import rag.loader
 import rag.retriever
 from evals.judge import evaluate_rag_answer
-from faq.faq_matcher import get_faq_matcher
+from faq.matcher import get_faq_matcher
 from llm.factory import get_llm_provider
 
 logger = logging.getLogger(__name__)

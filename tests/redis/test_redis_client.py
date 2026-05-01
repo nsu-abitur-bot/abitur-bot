@@ -2,7 +2,7 @@ import fakeredis.aioredis as fakeredis
 import pytest
 import pytest_asyncio
 
-from db.redis_client import HISTORY_LIMIT, RedisClient
+from db.redis.client import HISTORY_LIMIT, RedisClient
 
 
 @pytest_asyncio.fixture
@@ -10,7 +10,7 @@ async def redis_client(monkeypatch):
     fake_redis = await fakeredis.FakeRedis(decode_responses=True)
 
     # подменяем redis.from_url внутри RedisClient
-    monkeypatch.setattr("db.redis_client.redis.from_url", lambda *a, **kw: fake_redis)
+    monkeypatch.setattr("db.redis.client.redis.from_url", lambda *a, **kw: fake_redis)
 
     client = RedisClient()
     yield client

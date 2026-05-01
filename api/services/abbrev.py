@@ -3,7 +3,7 @@ from typing import List
 
 import yaml
 
-from abbrev.abbrev_expander import ABBREV_DATA_PATH, get_abbrev_expander
+from abbrev.expander import ABBREV_DATA_PATH, get_abbrev_expander
 from api.schemas.abbrev import AbbrevItem
 
 

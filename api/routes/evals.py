@@ -4,7 +4,7 @@ import os
 
 from fastapi import APIRouter, BackgroundTasks
 
-from db.redis_client import RedisClient
+from db.redis.client import RedisClient
 from evals.evaluator import PipelineEvaluator
 
 logger = logging.getLogger(__name__)

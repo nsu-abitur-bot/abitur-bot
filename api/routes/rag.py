@@ -21,7 +21,7 @@ from api.schemas.rag import (
     RagDocumentListResponse,
     RagUploadResponse,
 )
-from abbrev.abbrev_expander import get_abbrev_expander
+from abbrev.expander import get_abbrev_expander
 from api.services.rag_upload import RagUploadService
 from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu_parser import parse_page

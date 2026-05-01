@@ -4,7 +4,7 @@ from typing import List
 import yaml
 
 from api.schemas.faq import FaqItem
-from faq.faq_matcher import FAQ_DATA_PATH, get_faq_matcher
+from faq.matcher import FAQ_DATA_PATH, get_faq_matcher
 
 
 class FaqService:
