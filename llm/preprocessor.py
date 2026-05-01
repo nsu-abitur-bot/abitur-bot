@@ -3,6 +3,7 @@ import logging
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
 from llm.factory import get_llm_provider
+from llm.profiles import LLMProfiles
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +47,7 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
     ]
 
     try:
-        response_text = await llm.generate(messages)
+        response_text = await llm.generate(messages, profile=LLMProfiles.PARSER)
         return str(response_text)
     except Exception as e:
         logger.error(f"Ошибка при очистке текста через LLM: {e}")
@@ -79,7 +80,7 @@ async def generate_title_from_text(text: str) -> str:
     ]
 
     try:
-        response_text = await llm.generate(messages)
+        response_text = await llm.generate(messages, profile=LLMProfiles.TITLE)
         title = str(response_text).strip("'\" \n\r.")
         return title if title else "Без названия"
     except Exception as e:

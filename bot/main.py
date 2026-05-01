@@ -12,13 +12,17 @@ logger = logging.getLogger(__name__)
 
 async def _run_with_restart(
     name: str,
-    runner: Callable[[], Awaitable[None]],
+    runner: Callable[[], Awaitable[bool | None]],
     restart_delay_seconds: float,
 ) -> None:
-    """Держит адаптер живым: перезапускает при любой ошибке/выходе."""
+    """Держит адаптер живым: перезапускает при выходе.
+    Если runner() возвращает False, значит адаптер решил вообще не запускаться.
+    """
     while True:
         try:
-            await runner()
+            result = await runner()
+            if result is False:
+                break
             logger.warning(
                 "%s adapter stopped unexpectedly, restart in %.1f sec",
                 name,

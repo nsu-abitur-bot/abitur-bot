@@ -1,12 +1,13 @@
 import logging
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 
 from google import genai
 from google.genai import types
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from llm.base import BaseLLMProvider
+from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +30,12 @@ class GeminiProvider(BaseLLMProvider):
             self.model_name,
         )
 
-    async def generate(self, messages: List[BaseMessage]) -> str:
+    async def generate(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> str:
         system_instruction = None
         gemini_messages = []
 
@@ -49,8 +55,16 @@ class GeminiProvider(BaseLLMProvider):
                     {"role": "user", "parts": [{"text": str(msg.content)}]}
                 )
 
+        temperature = (
+            profile.temperature
+            if profile and profile.temperature is not None
+            else self.temperature
+        )
+        max_tokens = profile.max_tokens if profile else None
+
         config = types.GenerateContentConfig(
-            temperature=self.temperature,
+            temperature=temperature,
+            max_output_tokens=max_tokens,
         )
         if system_instruction:
             config.system_instruction = system_instruction

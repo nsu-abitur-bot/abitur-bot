@@ -1,11 +1,12 @@
 import logging
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from openai import AsyncOpenAI
 
 from llm.base import BaseLLMProvider
+from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
 
@@ -34,14 +35,24 @@ class DeepSeekProvider(BaseLLMProvider):
             self.timeout_seconds,
         )
 
-    async def generate(self, messages: List[BaseMessage]) -> str:
+    async def generate(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> str:
         openai_messages: Any = [self._to_openai_message(m) for m in messages]
+
+        temperature = profile.temperature if profile and profile.temperature is not None else self.temperature
+        max_tokens = profile.max_tokens if profile else self.max_tokens
+        timeout = profile.timeout if profile and profile.timeout is not None else self.timeout_seconds
 
         completion = await self.client.chat.completions.create(
             model=self.model_name,
             messages=openai_messages,
-            max_tokens=self.max_tokens,
-            temperature=self.temperature,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            timeout=timeout,
         )
 
         content: Any = completion.choices[0].message.content

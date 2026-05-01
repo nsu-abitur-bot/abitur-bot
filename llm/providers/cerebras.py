@@ -1,11 +1,12 @@
 import asyncio
 import logging
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from llm.base import BaseLLMProvider
+from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
 
@@ -54,20 +55,29 @@ class CerebrasProvider(BaseLLMProvider):
             self.max_retries,
         )
 
-    async def generate(self, messages: List[BaseMessage]) -> str:
+    async def generate(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> str:
         cerebras_messages: Any = [
             self._to_cerebras_message(message) for message in messages
         ]
+
+        temperature = profile.temperature if profile and profile.temperature is not None else self.temperature
+        max_completion_tokens = profile.max_tokens if profile else self.max_completion_tokens
+        timeout = profile.timeout if profile and profile.timeout is not None else self.timeout_seconds
 
         completion: Any = await asyncio.to_thread(
             self.client.chat.completions.create,
             messages=cerebras_messages,
             model=self.model_name,
-            max_completion_tokens=self.max_completion_tokens,
-            temperature=self.temperature,
+            max_completion_tokens=max_completion_tokens,
+            temperature=temperature,
             top_p=self.top_p,
             stream=False,
-            timeout=self.timeout_seconds,
+            timeout=timeout,
         )
 
         content: Any = completion.choices[0].message.content

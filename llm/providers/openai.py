@@ -1,13 +1,15 @@
 import logging
 import os
-from typing import Any, List
+from typing import Any, List, Optional
 from urllib.parse import urlsplit
 
 import httpx
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
 
 from llm.base import BaseLLMProvider
+from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
 
@@ -73,15 +75,38 @@ class OpenAIProvider(BaseLLMProvider):
             _mask_proxy_url(self.proxy_url),
         )
 
-    async def generate(self, messages: List[BaseMessage]) -> str:
+    async def generate(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> str:
         openai_messages: Any = [self._to_openai_message(m) for m in messages]
+
+        temperature = (
+            profile.temperature
+            if profile and profile.temperature is not None
+            else self.temperature
+        )
+        max_tokens = (
+            profile.max_tokens
+            if profile and profile.max_tokens is not None
+            else self.max_tokens
+        )
+
+        timeout = (
+            profile.timeout
+            if profile and profile.timeout is not None
+            else self.timeout_seconds
+        )
 
         try:
             completion = await self.client.responses.create(
                 model=self.model_name,
                 input=openai_messages,
-                max_output_tokens=self.max_tokens,
-                temperature=self.temperature,
+                max_output_tokens=max_tokens,
+                temperature=temperature,
+                timeout=timeout,
             )
         except Exception:
             logger.exception(
@@ -94,8 +119,6 @@ class OpenAIProvider(BaseLLMProvider):
         return content.strip() if isinstance(content, str) else str(content or "")
 
     def get_embeddings_model(self) -> Any:
-        from langchain_openai import OpenAIEmbeddings
-
         embedding_kwargs: dict[str, Any] = {
             "api_key": os.getenv("OPENAI_API_KEY"),
             "model": os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),

@@ -4,6 +4,8 @@ from typing import List
 from google import genai
 from google.genai import types
 
+from llm.profiles import LLMProfiles
+
 logger = logging.getLogger(__name__)
 
 GEMINI_EMBEDDING_DIMS: dict[str, int] = {
@@ -16,10 +18,11 @@ class GeminiLLM:
     """LLM-адаптер для LightRAG на базе Google Gemini."""
 
     def __init__(
-        self, api_key: str, model: str = "gemini-3.1-flash-lite-preview"
+        self, api_key: str, model: str = "gemini-2.5-flash-lite"
     ) -> None:
         self.model = model
         self.client = genai.Client(api_key=api_key)
+        self.profile = LLMProfiles.GRAPH
 
     async def __call__(self, prompt: str, **kwargs) -> str:
         try:
@@ -27,7 +30,8 @@ class GeminiLLM:
             # In google-genai, system instructions can be passed via config.
             system_prompt = kwargs.get("system_prompt")
             config = types.GenerateContentConfig(
-                temperature=kwargs.get("temperature", 0.2),
+                temperature=kwargs.get("temperature", self.profile.temperature),
+                max_output_tokens=kwargs.get("max_tokens", self.profile.max_tokens)
             )
 
             if system_prompt:
@@ -52,6 +56,7 @@ class GeminiEmbedding:
         self.model = model
         self.client = genai.Client(api_key=api_key)
         self.embedding_dim = GEMINI_EMBEDDING_DIMS.get(model, 768)
+        self.profile = LLMProfiles.EMBEDDING
 
     async def __call__(self, texts: List[str]) -> List[List[float]]:
         try:

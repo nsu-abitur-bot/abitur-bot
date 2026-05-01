@@ -6,6 +6,8 @@ from urllib.parse import urlsplit
 import httpx
 from openai import AsyncOpenAI
 
+from llm.profiles import LLMProfiles
+
 logger = logging.getLogger(__name__)
 
 
@@ -41,10 +43,14 @@ class OpenAILLM:
         proxy_url: str | None = None,
     ) -> None:
         self.model = model
+        self.profile = LLMProfiles.GRAPH
         self._async_http_client: httpx.AsyncClient | None = None
         effective_proxy = proxy_url or os.getenv("OPENAI_SOCKS5_PROXY")
 
-        client_kwargs: dict[str, Any] = {"api_key": api_key}
+        client_kwargs: dict[str, Any] = {
+            "api_key": api_key,
+            "timeout": float(self.profile.timeout or 120),
+        }
         if effective_proxy:
             try:
                 self._async_http_client = httpx.AsyncClient(proxy=effective_proxy)
@@ -73,8 +79,12 @@ class OpenAILLM:
             response = await self.client.responses.create(
                 model=self.model,
                 input=messages,
-                max_output_tokens=int(kwargs.get("max_tokens", 2000)),
-                temperature=float(kwargs.get("temperature", 0.2)),
+                max_output_tokens=int(
+                    kwargs.get("max_tokens", self.profile.max_tokens or 2000)
+                ),
+                temperature=float(
+                    kwargs.get("temperature", self.profile.temperature or 0.2)
+                ),
             )
 
             return response.output_text.strip()
@@ -93,10 +103,14 @@ class OpenAIEmbedding:
         proxy_url: str | None = None,
     ) -> None:
         self.model = model
+        self.profile = LLMProfiles.EMBEDDING
         self._async_http_client: httpx.AsyncClient | None = None
         effective_proxy = proxy_url or os.getenv("OPENAI_SOCKS5_PROXY")
 
-        client_kwargs: dict[str, Any] = {"api_key": api_key}
+        client_kwargs: dict[str, Any] = {
+            "api_key": api_key,
+            "timeout": float(self.profile.timeout or 60),
+        }
         if effective_proxy:
             try:
                 self._async_http_client = httpx.AsyncClient(proxy=effective_proxy)

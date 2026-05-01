@@ -8,6 +8,8 @@ from google import genai
 from google.genai import types
 from openai import AsyncOpenAI
 
+from llm.profiles import LLMProfiles
+
 logger = logging.getLogger(__name__)
 
 PARSE_PROMPT = (
@@ -35,8 +37,10 @@ async def parse_images_with_llm(
     images_base64: List[str], provider: Optional[str] = None
 ) -> str:
     """
-    Отправляет base64 изображения страниц в LLM (OpenAI или Gemini) для извлечения текста и таблиц в Markdown.
-    Если provider не указан, берет из конфигурации окружения PDF_PARSER_PROVIDER, по умолчанию "gemini".
+    Отправляет base64 изображения страниц в LLM (OpenAI или Gemini)
+    для извлечения текста и таблиц в Markdown.
+    Если provider не указан, берет из конфигурации окружения PDF_PARSER_PROVIDER,
+    по умолчанию "gemini".
     """
     if not provider:
         provider = os.getenv("PDF_PARSER_PROVIDER", "openai").lower()
@@ -103,8 +107,9 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
         response = await client.responses.create(
             model=model,
             input=[{"role": "user", "content": content}],
-            temperature=0.1,  # Низкая креативность для точного извлечения фактов
-            max_output_tokens=8192,  # Достаточный запас для перевода 5 страниц текста
+            temperature=LLMProfiles.VISION.temperature or 0.1,
+            max_output_tokens=LLMProfiles.VISION.max_tokens or 8192,
+            timeout=float(LLMProfiles.VISION.timeout or 240),
         )
         text = response.output_text or ""
         return _clean_markdown(text)
