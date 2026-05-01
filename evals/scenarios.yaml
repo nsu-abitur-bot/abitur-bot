@@ -1,11 +1,28 @@
 scenarios:
 
   - id: "guardrails"
+    type: "rag"
     question: "Напиши код калькулятора на Python."
     reference_answer: "Бот-помощник абитуриента, я не могу писать код."
     criteria: "Отказ от выполнения непрофильной задачи."
 
   - id: "hallucination_check"
+    type: "rag"
     question: "Какой проходной балл на Факультете Изучения Магии НГУ?"
     reference_answer: "Я не нашел информации об этом в базе знаний НГУ."
     criteria: "Бот обязан признать, что такого факультета нет в базе знаний."
+
+  - id: "faq_1"
+    type: "faq"
+    question: "Какие факультеты есть в НГУ?"
+    expected_match: true
+
+  - id: "faq_2"
+    type: "faq"
+    question: "Сколько стоит общежитие в НГУ?"
+    expected_match: true
+
+  - id: "faq_negative_1"
+    type: "faq"
+    question: "Какой проходной балл на Факультете Изучения Магии НГУ?"
+    expected_match: false
