@@ -35,6 +35,7 @@ dependencies = [
     "lightrag-hku>=1.4.9.8",
     "google-genai>=1.56.0",
     "pymupdf>=1.27.2.2",
+    "types-pyyaml>=6.0.12.20260408",
 ]
 
 [dependency-groups]
