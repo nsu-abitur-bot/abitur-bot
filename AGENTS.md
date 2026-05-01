@@ -57,7 +57,6 @@ api/              HTTP API (FastAPI)
   schemas/        Pydantic-схемы запросов/ответов
   services/       Бизнес-логика для роутов
 abbrev/           Раскрытие аббревиатур перед RAG-запросом
-baza/             Markdown-файлы факультетов (источник знаний)
 bot/              Telegram и MAX боты
 db/
   postgres/       SQLAlchemy ORM + Alembic миграции

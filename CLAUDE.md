@@ -41,7 +41,6 @@ uv run alembic downgrade -1                            # откатить пос
 api/          FastAPI: routes/, schemas/, services/
 abbrev/       Раскрытие аббревиатур (expander.py)
 bot/          Telegram + MAX боты
-baza/         Markdown-файлы с данными по факультетам (источник для RAG)
 db/
   postgres/   SQLAlchemy модели, сервисы, Alembic миграции
   redis/      Redis-клиент для истории чатов
