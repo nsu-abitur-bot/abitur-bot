@@ -25,8 +25,8 @@ from api.schemas.rag import (
 from api.services.rag_upload import RagUploadService
 from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu import parse_page
-from parser.parser_to_rag import parse_and_save_url
 from parser.url import process_pdf_bytes
+from parser.url_to_rag import parse_and_save_url
 from rag.graph_memory import get_graph_memory
 from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
 
@@ -301,16 +301,12 @@ async def upload_csv_documents(
         content = await file.read()
         text = content.decode("utf-8-sig")
     except UnicodeDecodeError:
-        raise HTTPException(
-            status_code=400, detail="Файл должен быть в кодировке UTF-8"
-        )
+        raise HTTPException(status_code=400, detail="Файл должен быть в кодировке UTF-8")
 
     reader = csv.DictReader(io.StringIO(text))
     # Проверяем наличие колонки Link
     if not reader.fieldnames or "Link" not in reader.fieldnames:
-        raise HTTPException(
-            status_code=400, detail="CSV должен содержать колонку 'Link'"
-        )
+        raise HTTPException(status_code=400, detail="CSV должен содержать колонку 'Link'")
 
     results = []
 
@@ -388,15 +384,11 @@ async def preview_csv_documents(
         content = await file.read()
         text = content.decode("utf-8-sig")
     except UnicodeDecodeError:
-        raise HTTPException(
-            status_code=400, detail="Файл должен быть в кодировке UTF-8"
-        )
+        raise HTTPException(status_code=400, detail="Файл должен быть в кодировке UTF-8")
 
     reader = csv.DictReader(io.StringIO(text))
     if not reader.fieldnames or "Link" not in reader.fieldnames:
-        raise HTTPException(
-            status_code=400, detail="CSV должен содержать колонку 'Link'"
-        )
+        raise HTTPException(status_code=400, detail="CSV должен содержать колонку 'Link'")
 
     results = []
     for row in reader:
