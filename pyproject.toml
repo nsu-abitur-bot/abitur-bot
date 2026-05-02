@@ -46,6 +46,11 @@ asyncio_default_fixture_loop_scope = "function"
 pythonpath = ["."]
 testpaths = ["tests"]
 markers = ["asyncio: mark test as async"]
+filterwarnings = [
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+    "ignore:builtin type Swig:DeprecationWarning",
+    "ignore:builtin type swigvarlink:DeprecationWarning",
+]
 
 [tool.ruff]
 line-length = 90
