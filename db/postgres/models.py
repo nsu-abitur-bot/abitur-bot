@@ -1,3 +1,4 @@
+import enum
 from datetime import UTC, datetime
 from typing import List, Optional
 
@@ -14,6 +15,12 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
+
+
+class AdminRole(str, enum.Enum):
+    superadmin = "superadmin"
+    admin = "admin"
+    viewer = "viewer"
 
 
 def timestamp():
@@ -206,3 +213,73 @@ class Settings(Base):
 
     def __repr__(self) -> str:
         return f"<Settings(key='{self.key}', value='{self.value}')>"
+
+
+class Admin(Base):
+    """Администраторы системы (не путать с User — это пользователи бота)."""
+
+    __tablename__ = "admins"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    role: Mapped[str] = mapped_column(
+        String(50), nullable=False, default=AdminRole.admin
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    created_by_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("admins.id"), nullable=True
+    )
+
+    created_by: Mapped[Optional["Admin"]] = relationship(
+        "Admin",
+        remote_side=[id],
+        foreign_keys=[created_by_id],
+    )
+    invite_codes: Mapped[List["InviteCode"]] = relationship(
+        "InviteCode",
+        back_populates="creator",
+        foreign_keys="InviteCode.created_by_id",
+    )
+
+    __table_args__ = (Index("idx_admin_username", "username"),)
+
+    def __repr__(self) -> str:
+        return f"<Admin(id='{self.id}', username='{self.username}', role='{self.role}')>"
+
+
+class InviteCode(Base):
+    """Одноразовые коды для регистрации новых администраторов."""
+
+    __tablename__ = "invite_codes"
+
+    code: Mapped[str] = mapped_column(String(64), primary_key=True)
+    created_by_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("admins.id"), nullable=False
+    )
+    role: Mapped[str] = mapped_column(
+        String(50), nullable=False, default=AdminRole.admin
+    )
+    used_by_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("admins.id"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    creator: Mapped["Admin"] = relationship(
+        "Admin",
+        back_populates="invite_codes",
+        foreign_keys=[created_by_id],
+    )
+    used_by: Mapped[Optional["Admin"]] = relationship(
+        "Admin",
+        foreign_keys=[used_by_id],
+    )
+
+    def __repr__(self) -> str:
+        used = self.used_at is not None
+        return f"<InviteCode(code='{self.code}', role='{self.role}', used={used})>"

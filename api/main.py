@@ -8,12 +8,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.dependencies import get_current_admin, require_admin
+from api.auth.router import router as auth_router
 from api.routes.abbrev import router as abbrev_router
 from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
 from db.postgres.db import get_async_session
+from db.postgres.models import Admin
 from db.postgres.services.message import MessageService
 from db.postgres.services.user import UserService
 
@@ -51,17 +54,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Регистрируем роутеры
-app.include_router(abbrev_router, prefix="/api/v1")
-app.include_router(faq_router, prefix="/api/v1")
-app.include_router(message_log_router, prefix="/api/v1")
-app.include_router(rag_router, prefix="/api/v1")
-app.include_router(evals_router, prefix="/api/v1")
+# Auth роутер — публичные эндпоинты /login и /register, остальное защищено внутри
+app.include_router(auth_router, prefix="/api/v1")
+
+# Все остальные роутеры требуют аутентификации
+# Мутации (abbrev, faq, rag, evals) требуют роль admin или superadmin
+# Аналитика (message_log) доступна любому авторизованному, включая viewer
+app.include_router(
+    abbrev_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    faq_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    message_log_router,
+    prefix="/api/v1",
+    dependencies=[Depends(get_current_admin)],
+)
+app.include_router(
+    rag_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    evals_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
 
 
 @app.get("/api/v1/users/count-stats", response_model=UserCountStatsResponse)
 async def get_users_count_stats(
     session: AsyncSession = Depends(get_async_session),
+    _: Admin = Depends(get_current_admin),
 ) -> UserCountStatsResponse:
     service = UserService(session)
     try:
@@ -77,6 +106,7 @@ async def get_messages(
     limit: int = Query(50, ge=1, le=500, description="Количество записей"),
     offset: int = Query(0, ge=0, description="Смещение"),
     session: AsyncSession = Depends(get_async_session),
+    _: Admin = Depends(get_current_admin),
 ) -> List[MessageResponse]:
     """Возвращает список сообщений и ответов бота."""
     service = MessageService(session)
@@ -106,7 +136,7 @@ async def get_messages(
                 user_id=msg.user_id,
                 username=username,
                 session_id=msg.session_id,
-                user_text=user_text,  # Возвращаем основной текст без префикса
+                user_text=user_text,
                 bot_response=msg.bot_response,
                 created_at=msg.created_at,
             )

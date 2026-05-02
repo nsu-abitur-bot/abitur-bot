@@ -17,7 +17,7 @@ dependencies = [
     "requests>=2.32.5",
     "pyyaml>=6.0.3",
     "redis>=7.0.1",
-"langchain-huggingface>=0.1.0",
+    "langchain-huggingface>=0.1.0",
     "chromadb>=1.2.1",
     "langchain-chroma>=0.1.0",
     "langchain-core>=0.3.79",
@@ -34,6 +34,8 @@ dependencies = [
     "google-genai>=1.56.0",
     "pymupdf>=1.27.2.2",
     "types-pyyaml>=6.0.12.20260408",
+    "pyjwt>=2.9.0",
+    "bcrypt>=4.0.0",
 ]
 
 [dependency-groups]
