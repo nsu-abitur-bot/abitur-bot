@@ -77,8 +77,8 @@ llm/
   factory.py      get_llm_provider() — синглтон через LLM_PROVIDER
   llm_client.py   Основная логика: FAQ → RAG → LLM
   profiles.py     Профили параметров (CHAT, INTENT, EVAL)
-  vision_parser.py  Парсинг PDF через Vision
 parser/           Парсеры сайта НГУ и рейтинговых таблиц
+  vision.py       Парсинг PDF-страниц через Vision LLM
 rag/
   graph_memory.py   LightRAG (граф знаний)
   retriever.py      ChromaDB (векторный поиск)
@@ -129,6 +129,24 @@ PK-соглашение: `BigInteger autoincrement` для числовых ID, 
 - **Типизация**: аннотации типов обязательны для публичных функций
 - **Комментарии**: только когда «почему» неочевидно, не «что делает»
 - **Тесты БД**: реальная тестовая база (`TEST_DB_NAME`), без mock'ов
+
+## Логи
+
+Файлы пишутся в `logs/` (гитигнорен). Настройка через `LOG_LEVEL` и `LOG_DIR` в `.env`.
+
+| Файл | Уровень | Лимит | Назначение |
+|------|---------|-------|-----------|
+| `logs/abitur_bot.log` | DEBUG+ | 10 MB × 5 | Основной лог всего приложения |
+| `logs/rag_llm_detailed.log` | DEBUG+ | 50 MB × 10 | RAG-контекст, LLM-ответы, FAQ-матчи |
+| `logs/errors.log` | ERROR+ | 5 MB × 3 | Только ошибки |
+
+Полезные команды для отладки:
+```bash
+tail -f logs/rag_llm_detailed.log | grep "<session_id>"   # вся цепочка одного запроса
+tail -f logs/rag_llm_detailed.log | grep "RAG retrieval"  # что достал RAG
+tail -f logs/rag_llm_detailed.log | grep "LLM response"   # что ответил LLM
+tail -f logs/errors.log                                   # текущие ошибки
+```
 
 ## Линтер и тайп-чекер
 

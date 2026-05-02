@@ -12,9 +12,9 @@ from api.schemas.rag import UploadedDocumentResult
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
 from llm.preprocessor import generate_title_from_text
-from llm.vision_parser import parse_images_with_llm
 from parser.pdf import pdf_to_base64_images
 from parser.utils import extract_sources
+from parser.vision import parse_images_with_llm
 from rag.loader import add_texts_async
 
 SUPPORTED_EXTENSIONS = {

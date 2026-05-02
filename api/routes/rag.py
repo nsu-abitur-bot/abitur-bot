@@ -23,10 +23,10 @@ from api.schemas.rag import (
     RagUploadResponse,
 )
 from api.services.rag_upload import RagUploadService
+from api.services.url_to_rag import parse_and_save_url
 from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu import parse_page
 from parser.url import process_pdf_bytes
-from parser.url_to_rag import parse_and_save_url
 from rag.graph_memory import get_graph_memory
 from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
 

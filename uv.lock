@@ -36,7 +36,6 @@ dependencies = [
     { name = "pyyaml" },
     { name = "redis" },
     { name = "requests" },
-    { name = "ruff" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "types-pyyaml" },
     { name = "uuid6" },
@@ -49,6 +48,7 @@ dev = [
     { name = "pyrefly" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+    { name = "ruff" },
 ]
 
 [package.metadata]
@@ -78,7 +78,6 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.3" },
     { name = "redis", specifier = ">=7.0.1" },
     { name = "requests", specifier = ">=2.32.5" },
-    { name = "ruff" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.44" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20260408" },
     { name = "uuid6", specifier = ">=2024.1.12" },
@@ -91,6 +90,7 @@ dev = [
     { name = "pyrefly", specifier = ">=0.56.0" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+    { name = "ruff" },
 ]
 
 [[package]]
