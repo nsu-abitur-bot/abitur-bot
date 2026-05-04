@@ -65,6 +65,10 @@ class AbbrevExpander:
         def _replace(match: re.Match) -> str:
             short = match.group(1)
             full = self._abbrev.get(short, "")
+            if full:
+                tail = text[match.end() :]
+                if re.match(rf"\s*\({re.escape(full)}\)", tail):
+                    return short
             return f"{short} ({full})" if full else short
 
         try:

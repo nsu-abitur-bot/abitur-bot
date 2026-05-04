@@ -219,8 +219,9 @@ async def confirm_rag_upload(request: ConfirmUploadRequest):
     try:
         # 1. Загружаем текст страницы (если он есть и не пуст)
         if request.text and request.text.strip():
+            prepared_text = get_abbrev_expander().expand(request.text.strip())
             await add_texts_async(
-                texts=[request.text],
+                texts=[prepared_text],
                 graph_id=DEFAULT_GRAPH_ID,
                 source_ids=[request.title],
                 file_paths=[request.url],

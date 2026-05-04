@@ -50,11 +50,12 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
 
     try:
         response_text = await llm.generate(messages, profile=LLMProfiles.PARSER)
-        return response_text
+        return get_abbrev_expander().expand(response_text)
     except Exception as e:
         logger.error(f"Ошибка при очистке текста через LLM: {e}")
-        # Возвращаем сырой текст в случае ошибки, чтобы цепочка не прервалась полностью
-        return raw_text
+        # Возвращаем текст после локальной инъекции, чтобы цепочка сохранила
+        # расшифровки даже при недоступности LLM-cleaner.
+        return expanded_text
 
 
 async def generate_title_from_text(text: str) -> str:
