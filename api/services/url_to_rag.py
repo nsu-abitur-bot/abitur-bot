@@ -2,6 +2,7 @@
 
 import logging
 
+from abbrev.expander import get_abbrev_expander
 from parser.url import process_url
 from rag.loader import add_texts_async
 
@@ -17,14 +18,18 @@ async def parse_and_save_url(url: str, title: str) -> bool:
         logger.error(f"Не удалось получить контент по URL: {url}")
         return False
 
-    logger.info(f"Получен текст длиной {len(text)} символов. Сохранение в RAG...")
+    prepared_text = get_abbrev_expander().expand(text.strip())
+
+    logger.info(
+        f"Получен текст длиной {len(prepared_text)} символов. Сохранение в RAG..."
+    )
 
     # В качестве source_id используем заголовок или сам URL, если заголовка нет
     source_id = title if title else url
 
     try:
         saved_count = await add_texts_async(
-            texts=[text], source_ids=[source_id], file_paths=[url]
+            texts=[prepared_text], source_ids=[source_id], file_paths=[url]
         )
         if saved_count > 0:
             logger.info(f"Успешно сохранён документ {url} в RAG")
@@ -35,5 +40,4 @@ async def parse_and_save_url(url: str, title: str) -> bool:
     except Exception as e:
         logger.error(f"Ошибка при сохранении документа в RAG ({url}): {e}")
         return False
-
 
