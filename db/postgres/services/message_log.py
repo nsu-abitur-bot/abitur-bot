@@ -114,21 +114,16 @@ class MessageLogService:
         except Exception as e:
             logger.error(f"Ошибка обновления topic_id в логе: {e}")
             return False
-        self,
-        message_type: str,
-        limit: int = 100,
-        offset: int = 0,
-    ) -> Sequence[MessageLog]:
+
+    async def get_logs_by_type(self, message_type: str, limit: int = 100, offset: int = 0) -> Sequence[MessageLog]:
         """Получает логи по типу сообщения."""
         stmt = (
             select(MessageLog)
-            .where(MessageLog.message_type == message_type)
-            .order_by(MessageLog.created_at.desc())
+            .where(MessageLog.type == message_type)
             .limit(limit)
             .offset(offset)
         )
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
+        return stmt
 
     async def get_recent_logs(
         self,

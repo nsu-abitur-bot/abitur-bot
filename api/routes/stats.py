@@ -17,7 +17,7 @@ async def get_topic_stats(db: AsyncSession = Depends(get_db)):
     stmt = (
         select(Topic.label, func.count(MessageLog.id).label("count"))
         .join(MessageLog, Topic.id == MessageLog.topic_id, isouter=True)
-        .where(Topic.is_active == True)
+        .where(Topic.is_active)
         .group_by(Topic.id, Topic.label)
         .order_by(func.count(MessageLog.id).desc())
     )

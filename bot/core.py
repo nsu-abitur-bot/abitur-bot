@@ -2,9 +2,11 @@ import logging
 from dataclasses import dataclass
 
 from db.postgres.db import AsyncSessionLocal
+from db.postgres.models import MessageLog
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from llm.llm_client import ask_local_llm, classify_topic_message
+from db.redis.client import get_redis_client
 
 logger = logging.getLogger(__name__)
 
