@@ -1,14 +1,13 @@
-import logging
-from dataclasses import dataclass
+from typing import Optional
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
-from llm.llm_client import ask_local_llm, classify_topic_message
 from db.redis.client import get_redis_client
+from llm.llm_client import ask_local_llm, classify_topic_message
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)  # type: ignore
 
 
 WELCOME_TEXT = (
@@ -35,11 +34,16 @@ WELCOME_TEXT = (
 )
 
 
-@dataclass
 class BotReply:
-    text: str
-    parse_mode: str | None = None
-    fallback_plain_on_format_error: bool = False
+    def __init__(
+        self,
+        text: str,
+        parse_mode: str | None = None,
+        fallback_plain_on_format_error: bool = False,
+    ):
+        self.text = text
+        self.parse_mode = parse_mode
+        self.fallback_plain_on_format_error = fallback_plain_on_format_error
 
 
 class BotCore:
@@ -62,7 +66,7 @@ class BotCore:
 
     async def _save_user_message_to_db(
         self, user_id: int, session_id: str, message: str, source: str
-    ) -> MessageLog:
+    ) -> Optional[MessageLog]:
         try:
             async with AsyncSessionLocal() as db_session:
                 log_service = MessageLogService(db_session)

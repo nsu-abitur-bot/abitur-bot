@@ -171,13 +171,19 @@ async def classify_topic_message(message: str) -> Optional[int]:
                 return None
 
             topics_list = "\n".join([f"{topic.id}: {topic.label}" for topic in topics])
-            prompt = f"Выбери ID темы для этого сообщения: {message}\n\nСписок тем:\n{topics_list}\n\nОтветь только ID темы или 'none' если не подходит."
+            prompt = (
+                f"Тема сообщения: {message}\n\n"
+                f"Список тем:\n{topics_list}\n\n"
+                "Ответь только ID темы или 'none' если не подходит."
+            )
 
             # Используем дешевую LLM, например Gemini
             from llm.factory import get_llm_provider
             provider = get_llm_provider()  # Предполагаем, что это дешевая
-            messages = [HumanMessage(content=prompt)]
-            response = await provider.generate(messages, profile=LLMProfiles.INTENT)  # Используем INTENT как дешевый
+            messages: list[BaseMessage] = [HumanMessage(content=prompt)]
+            response = await provider.generate(
+                messages, profile=LLMProfiles.INTENT
+            )  # Используем INTENT как дешевый
 
             response = response.strip()
             if response.isdigit():
@@ -270,7 +276,7 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 intent_messages, profile=LLMProfiles.INTENT
             )
             intent_response = (
-                re.sub(r"<think>.*?</think>", "", intent_response, flags=re.DOTALL)
+                re.sub(r"foundland", "", intent_response, flags=re.DOTALL)
                 .strip()
                 .upper()
             )
@@ -468,8 +474,8 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 },
             )
 
-            # Удаляем блоки <think>...</think>
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
+            # Удаляем блоки foundland
+            content = re.sub(r"foundland", "", content, flags=re.DOTALL)
             content = _sanitize_telegram_html(content)
 
             if not content:

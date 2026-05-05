@@ -52,13 +52,19 @@ def upgrade() -> None:
         [
             {"id": 1, "label": "Общежитие", "description": "Вопросы об общежитии",
              "is_active": True, "created_at": sa.func.now()},
-            {"id": 2, "label": "Проходные баллы", "description": "Вопросы о проходных баллах",
+            {"id": 2,
+             "label": "Проходные баллы",
+             "description": "Вопросы о проходных баллах",
              "is_active": True, "created_at": sa.func.now()},
             {"id": 3, "label": "Документы", "description": "Вопросы о документах",
              "is_active": True, "created_at": sa.func.now()},
-            {"id": 4, "label": "Специальности", "description": "Вопросы о специальностях",
+            {"id": 4,
+             "label": "Специальности",
+             "description": "Вопросы о специальностях",
              "is_active": True, "created_at": sa.func.now()},
-            {"id": 5, "label": "Поступление", "description": "Общие вопросы о поступлении",
+            {"id": 5,
+             "label": "Поступление",
+             "description": "Общие вопросы о поступлении",
              "is_active": True, "created_at": sa.func.now()},
         ]
     )

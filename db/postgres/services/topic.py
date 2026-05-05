@@ -43,7 +43,7 @@ class TopicService:
 
     async def get_all_active_topics(self) -> Sequence[Topic]:
         """Получает все активные темы."""
-        stmt = select(Topic).where(Topic.is_active == True)
+        stmt = select(Topic).where(Topic.is_active)
         result = await self.session.execute(stmt)
         return result.scalars().all()
 

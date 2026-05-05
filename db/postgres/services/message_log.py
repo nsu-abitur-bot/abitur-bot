@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, TypedDict
 
@@ -5,7 +6,10 @@ from sqlalchemy import Sequence, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
+
+logger = logging.getLogger(__name__)
 
 
 def _truncate_dt(dt: datetime, group_by: str) -> datetime:
@@ -115,11 +119,13 @@ class MessageLogService:
             logger.error(f"Ошибка обновления topic_id в логе: {e}")
             return False
 
-    async def get_logs_by_type(self, message_type: str, limit: int = 100, offset: int = 0) -> Sequence[MessageLog]:
+    async def get_logs_by_type(
+        self, message_type: str, limit: int = 100, offset: int = 0
+    ) -> Sequence[MessageLog]:
         """Получает логи по типу сообщения."""
         stmt = (
             select(MessageLog)
-            .where(MessageLog.type == message_type)
+            .where(MessageLog.message_type == message_type)
             .limit(limit)
             .offset(offset)
         )

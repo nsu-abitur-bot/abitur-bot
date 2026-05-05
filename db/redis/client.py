@@ -147,3 +147,15 @@ class RedisClient:
             logger.debug("Соединение с Redis закрыто")
         except redis.RedisError as e:
             logger.error("Ошибка закрытия соединения с Redis: %s", e)
+
+
+# Singleton instance
+_redis_client: RedisClient | None = None
+
+
+async def get_redis_client() -> RedisClient:
+    """Получить экземпляр Redis клиента (singleton)."""
+    global _redis_client
+    if _redis_client is None:
+        _redis_client = RedisClient()
+    return _redis_client
