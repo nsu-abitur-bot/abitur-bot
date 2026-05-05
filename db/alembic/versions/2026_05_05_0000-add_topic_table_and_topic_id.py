@@ -6,11 +6,11 @@ Create Date: 2026-05-05 00:00:00.000000
 
 """
 
+from datetime import datetime
 from typing import Sequence, Union
 
 import sqlalchemy as sa
 from alembic import op
-from datetime import datetime
 
 revision: str = "3a4b5c6d7e8f"
 down_revision: Union[str, None] = "2a3b4c5d6e7f"
