@@ -49,6 +49,7 @@ class MessageLogService:
         message_type: str,
         content: str,
         message_metadata: Optional[dict] = None,
+        topic_id: Optional[int] = None,
     ) -> MessageLog:
         """Создает запись в логе сообщений."""
         log_entry = MessageLog(
@@ -57,6 +58,7 @@ class MessageLogService:
             message_type=message_type,
             content=content,
             message_metadata=message_metadata,
+            topic_id=topic_id,
         )
         self.session.add(log_entry)
         await self.session.commit()
@@ -97,7 +99,21 @@ class MessageLogService:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def get_logs_by_type(
+    async def update_log_topic(self, log_id: int, topic_id: Optional[int]) -> bool:
+        """Обновляет topic_id для лога."""
+        try:
+            async with AsyncSessionLocal() as session:
+                stmt = select(MessageLog).where(MessageLog.id == log_id)
+                result = await session.execute(stmt)
+                log_entry = result.scalar_one_or_none()
+                if log_entry:
+                    log_entry.topic_id = topic_id
+                    await session.commit()
+                    return True
+                return False
+        except Exception as e:
+            logger.error(f"Ошибка обновления topic_id в логе: {e}")
+            return False
         self,
         message_type: str,
         limit: int = 100,

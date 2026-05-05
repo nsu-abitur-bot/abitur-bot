@@ -12,6 +12,7 @@ from bot.utils import normalize_url_for_messaging
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
+from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import get_faq_matcher
@@ -158,6 +159,37 @@ async def _save_log_to_db(
             )
     except Exception as e:
         logger.error(f"Ошибка сохранения лога в БД: {e}")
+
+
+async def classify_topic_message(message: str) -> Optional[int]:
+    """Классифицирует сообщение по теме с помощью дешевой LLM."""
+    try:
+        async with AsyncSessionLocal() as session:
+            topic_service = TopicService(session)
+            topics = await topic_service.get_all_active_topics()
+            if not topics:
+                return None
+
+            topics_list = "\n".join([f"{topic.id}: {topic.label}" for topic in topics])
+            prompt = f"Выбери ID темы для этого сообщения: {message}\n\nСписок тем:\n{topics_list}\n\nОтветь только ID темы или 'none' если не подходит."
+
+            # Используем дешевую LLM, например Gemini
+            from llm.factory import get_llm_provider
+            provider = get_llm_provider()  # Предполагаем, что это дешевая
+            messages = [HumanMessage(content=prompt)]
+            response = await provider.generate(messages, profile=LLMProfiles.INTENT)  # Используем INTENT как дешевый
+
+            response = response.strip()
+            if response.isdigit():
+                topic_id = int(response)
+                # Проверим, что такой topic_id существует
+                topic = await topic_service.get_topic_by_id(topic_id)
+                if topic and topic.is_active:
+                    return topic_id
+            return None
+    except Exception as e:
+        logger.error(f"Topic classification error: {e}")
+        return None
 
 
 async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:

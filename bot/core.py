@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
-from llm.llm_client import ask_local_llm, get_redis_client
+from llm.llm_client import ask_local_llm, classify_topic_message
 
 logger = logging.getLogger(__name__)
 
@@ -60,19 +60,21 @@ class BotCore:
 
     async def _save_user_message_to_db(
         self, user_id: int, session_id: str, message: str, source: str
-    ) -> None:
+    ) -> MessageLog:
         try:
             async with AsyncSessionLocal() as db_session:
                 log_service = MessageLogService(db_session)
-                await log_service.create_log(
+                log_entry = await log_service.create_log(
                     user_id=user_id,
                     session_id=session_id,
                     message_type="user_input",
                     content=message,
                     message_metadata={"source": source},
                 )
+                return log_entry
         except Exception as e:
             logger.error(f"Ошибка сохранения входящего сообщения в БД: {e}")
+            return None
 
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str
@@ -152,12 +154,19 @@ class BotCore:
             user_text,
         )
 
-        await self._save_user_message_to_db(
+        log_entry = await self._save_user_message_to_db(
             user_id=internal_user_id,
             session_id=session_id,
             message=formatted_message,
             source=channel,
         )
+
+        # Классифицируем тему сообщения
+        topic_id = await classify_topic_message(user_text)
+        if topic_id and log_entry:
+            async with AsyncSessionLocal() as db_session:
+                log_service = MessageLogService(db_session)
+                await log_service.update_log_topic(log_entry.id, topic_id)
 
         redis_client = await get_redis_client()
         is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
