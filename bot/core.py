@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from db.postgres.db import AsyncSessionLocal
@@ -7,7 +8,7 @@ from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
 from llm.llm_client import ask_local_llm, classify_topic_message
 
-logger = logging.getLogger(__name__)  # type: ignore
+logger = logging.getLogger(__name__)
 
 
 WELCOME_TEXT = (

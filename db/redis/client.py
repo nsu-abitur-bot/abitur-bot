@@ -159,3 +159,6 @@ async def get_redis_client() -> RedisClient:
     if _redis_client is None:
         _redis_client = RedisClient()
     return _redis_client
+
+
+__all__ = ["RedisClient", "get_redis_client"]
