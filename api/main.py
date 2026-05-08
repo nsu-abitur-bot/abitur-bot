@@ -33,6 +33,7 @@ class MessageResponse(BaseModel):
     id: str
     user_id: int
     username: Optional[str] = None
+    messenger: Optional[str] = None
     session_id: str
     user_text: str
     bot_response: str
@@ -130,11 +131,19 @@ async def get_messages(
             username = match.group(1)
             user_text = match.group(2)
 
+        if msg.user.telegram_id is not None:
+            messenger = "Telegram"
+        elif msg.user.max_id is not None:
+            messenger = "MAX"
+        else:
+            messenger = None
+
         result.append(
             MessageResponse(
                 id=msg.id,
                 user_id=msg.user_id,
                 username=username,
+                messenger=messenger,
                 session_id=msg.session_id,
                 user_text=user_text,
                 bot_response=msg.bot_response,
