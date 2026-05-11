@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 
 from api.auth.dependencies import require_admin
 
@@ -43,3 +44,22 @@ async def list_log_files() -> List[str]:
     if not LOG_DIR.exists():
         return []
     return [f.name for f in LOG_DIR.glob("*.log*") if f.is_file()]
+
+
+@router.get("/download", dependencies=[Depends(require_admin)])
+async def download_system_logs(
+    filename: str = Query("abitur_bot.log", description="Имя лог файла"),
+) -> FileResponse:
+    """Скачивает указанный файл логов."""
+    log_file = LOG_DIR / filename
+
+    if not log_file.exists():
+        raise HTTPException(status_code=404, detail="Файл логов не найден")
+
+    # Защита от выхода за пределы директории
+    try:
+        log_file.resolve().relative_to(LOG_DIR.resolve())
+    except ValueError:
+        raise HTTPException(status_code=403, detail="Доступ запрещен")
+
+    return FileResponse(path=log_file, filename=filename, media_type="text/plain")
