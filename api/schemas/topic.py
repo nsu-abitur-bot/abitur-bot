@@ -17,7 +17,9 @@ class TopicCreate(TopicBase):
 
 class TopicUpdate(BaseModel):
     """Модель для обновления темы."""
-    label: Optional[str] = Field(None, min_length=1, max_length=255, description="Название темы")
+    label: Optional[str] = Field(
+        None, min_length=1, max_length=255, description="Название темы"
+    )
     description: Optional[str] = Field(None, description="Описание темы")
     is_active: Optional[bool] = Field(None, description="Активна ли тема")
 
