@@ -99,6 +99,38 @@ class GraphMemory:
             pass
         return latest_mtime, file_count
 
+    def _remove_doc_metadata(self, graph_id: str, doc_id: str) -> None:
+        """Best-effort cleanup for LightRAG metadata files."""
+        import json
+
+        workspace_path = self._get_workspace_path(graph_id)
+        metadata_files = [
+            "kv_store_doc_status.json",
+            "kv_store_full_docs.json",
+        ]
+
+        for filename in metadata_files:
+            file_path = os.path.join(workspace_path, filename)
+            if not os.path.exists(file_path):
+                continue
+
+            try:
+                with open(file_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+            except Exception as exc:
+                logger.warning(f"Failed to read {file_path} for deletion: {exc}")
+                continue
+
+            if not isinstance(data, dict) or doc_id not in data:
+                continue
+
+            data.pop(doc_id, None)
+            try:
+                with open(file_path, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False)
+            except Exception as exc:
+                logger.warning(f"Failed to update {file_path} after deletion: {exc}")
+
     async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
         rag_to_finalize = None
 
@@ -441,6 +473,7 @@ class GraphMemory:
 
             # Обновляем кэш сигнатуры
             async with self._get_lock(graph_id):
+                self._remove_doc_metadata(graph_id, doc_id)
                 self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
                 self._last_disk_check[graph_id] = time.monotonic()
 
