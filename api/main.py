@@ -15,8 +15,12 @@ from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
+<<<<<<< category
 from api.routes.stats import router as stats_router
 from api.routes.topic import router as topic_router
+=======
+from api.routes.system_logs import router as system_logs_router
+>>>>>>> main
 from db.postgres.db import get_async_session
 from db.postgres.models import Admin
 from db.postgres.services.message import MessageService
@@ -35,6 +39,7 @@ class MessageResponse(BaseModel):
     id: str
     user_id: int
     username: Optional[str] = None
+    messenger: Optional[str] = None
     session_id: str
     user_text: str
     bot_response: str
@@ -91,9 +96,15 @@ app.include_router(
     dependencies=[Depends(require_admin)],
 )
 app.include_router(
+<<<<<<< category
     stats_router,
     prefix="/api/v1",
     dependencies=[Depends(get_current_admin)],
+=======
+    system_logs_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+>>>>>>> main
 )
 
 
@@ -140,11 +151,22 @@ async def get_messages(
             username = match.group(1)
             user_text = match.group(2)
 
+        if getattr(msg, "user", None):
+            if msg.user.telegram_id is not None:
+                messenger = "Telegram"
+            elif msg.user.max_id is not None:
+                messenger = "MAX"
+            else:
+                messenger = None
+        else:
+            messenger = None
+
         result.append(
             MessageResponse(
                 id=msg.id,
                 user_id=msg.user_id,
                 username=username,
+                messenger=messenger,
                 session_id=msg.session_id,
                 user_text=user_text,
                 bot_response=msg.bot_response,

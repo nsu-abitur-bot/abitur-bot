@@ -299,7 +299,7 @@ async def ask_local_llm(
                 logger.error(f"Failed to update topic id in log: {e}")
 
         # 4. Получаем контекст из LightRAG (если нужно)
-        rag_sources: list[str] = []
+        rag_sources: list[dict] = []
         rag_context = ""
         if need_rag:
             logger.info(f"[{session_id}] Querying LightRAG for context.")
@@ -370,36 +370,17 @@ async def ask_local_llm(
         # 5. Формируем сообщения и отправляем в LLM провайдер
         try:
             logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
-            valid_urls = [
-                url
-                for url in rag_sources
-                if url.startswith("http://") or url.startswith("https://")
+            valid_sources = [
+                s for s in rag_sources
+                if s.get("url", "").startswith("http://") or s.get("url", "").startswith("https://")
             ]
-            if valid_urls:
-                links_text = "\n".join([f"- {url}" for url in valid_urls[:5]])
-                sources_hint = (
-                    "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
-                    "ЕСЛИ ты использовал информацию из блока 'Контекст из базы знаний"
-                    + " об НГУ' для ответа, "
-                    "внимательно просмотри список доступных ссылок ниже."
-                    + " Выбери из них ТОЛЬКО те, "
-                    "которые непосредственно относятся к твоему ответу.\n"
-                    "Затем обязательно добавь в самый конец своего ответа"
-                    + " выбранные ссылки в следующем формате:\n\n"
-                    "<b>Источники:</b>\n"
-                    '<a href="URL_1">Название документа или страницы</a>\n'
-                    '<a href="URL_2">Понятное описание источника</a>\n\n'
-                    "(Но если ты просто здороваешься, говоришь на отвлеченные темы или"
-                    + " не нашел ответа в Контексте - блок "
-                    + "'Источники:' ВООБЩЕ НЕ добавляй!)\n"
-                    "КАТЕГОРИЧЕСКИ ЗАПРЕЩАЕТСЯ придумывать свои ссылки или брать "
-                    "их из истории переписки. "
-                    "Используй ТОЛЬКО ссылки из списка ниже.\n\n"
-                    "СПИСОК ДОСТУПНЫХ ССЫЛОК ИЗ БАЗЫ ЗНАНИЙ (выбери подходящие):\n"
-                    f"{links_text}"
-                )
-            else:
-                sources_hint = ""
+            
+            sources_hint = (
+                "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
+                "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать блок 'Источники' или перечислять ссылки. "
+                "Просто ответь на вопрос пользователя, опираясь на контекст!"
+            )
+            
             system_prompt = SYSTEM_PROMPT_BASE.format(
                 context=rag_context, sources_hint=sources_hint
             )
@@ -433,27 +414,31 @@ async def ask_local_llm(
             )
             content = await provider.generate(messages, profile=LLMProfiles.CHAT)
 
-            # Пост-процессинг: удаляем "левые" ссылки, которых не было в valid_urls
-            if valid_urls:
-                # Находим все ссылки вида <a href="...">...</a>
-                def _filter_links(match):
-                    link_html = match.group(0)
-                    href_val = re.search(r'href=["\']([^"\']+)["\']', link_html, re.I)
-                    if href_val:
-                        found_url = href_val.group(1).strip()
-                        # Если URL не из нашего списка базы знаний, вырезаем его из ответа
-                        if found_url not in valid_urls:
-                            return match.group(
-                                2
-                            )  # возвращаем только текст ссылки без тега
-                    return link_html
+            # Удаляем любые левые ссылки, которые могла придумать LLM
+            content = re.sub(
+                r'<a\s+[^>]*href=["\'][^"\']+["\'][^>]*>(.*?)</a>',
+                r'\1',
+                content,
+                flags=re.IGNORECASE
+            )
 
-                content = re.sub(
-                    r'<a\s+[^>]*href=["\']([^"\']+)["\'][^>]*>(.*?)</a>',
-                    _filter_links,
-                    content,
-                    flags=re.IGNORECASE,
-                )
+            # Добавляем свои источники (максимум 5 штук)
+            lower_content = content.lower()
+            not_found = (
+                "не нашел информации" in lower_content
+                or "не найдена" in lower_content
+            )
+            if valid_sources and not not_found:
+                links_html = []
+                for s in valid_sources[:5]:
+                    url = str(s.get("url", ""))
+                    if not url:
+                        continue
+                    title = str(s.get("title") or "Источник информации")
+                    safe_url = escape(normalize_url_for_messaging(url), quote=True)
+                    links_html.append(f'<a href="{safe_url}">{escape(title)}</a>')
+                
+                content += "\n\n<b>Источники:</b>\n" + "\n".join(links_html)
 
             logger.info(f"[{session_id}] Received response from LLM.")
 
