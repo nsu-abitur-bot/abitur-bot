@@ -12,6 +12,7 @@ class MessageLogResponse(BaseModel):
     message_type: str
     content: str
     message_metadata: Optional[dict] = None
+    topic_id: Optional[int] = None
     created_at: datetime
 
     class Config:

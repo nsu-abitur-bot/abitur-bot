@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 from contextlib import suppress
@@ -12,6 +13,7 @@ from bot.utils import normalize_url_for_messaging
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
+from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import get_faq_matcher
@@ -160,7 +162,9 @@ async def _save_log_to_db(
         logger.error(f"Ошибка сохранения лога в БД: {e}")
 
 
-async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
+async def ask_local_llm(
+    message: str, session_id: str, user_id: int = 0, log_entry_id: Optional[int] = None
+) -> str:
     """
     message - сообщение от пользователя
     session_id - идентификатор переписки,
@@ -215,19 +219,37 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
         except Exception as e:
             logger.warning(f"FAQ matcher error: {e}")
 
-        # 3. Быстрая проверка на необходимость RAG
-        # (чтобы экономить вызовы графа для "привет", "как дела" и пр.)
+        # 3. Быстрая проверка на необходимость RAG и определение топика
         need_rag = True
+        topic_id = None
         try:
+            # Получаем список тем
+            async with AsyncSessionLocal() as session:
+                topic_service = TopicService(session)
+                topics = await topic_service.get_all_active_topics()
+
+            topics_list = (
+                "\n".join([f"{topic.id}: {topic.label}" for topic in topics])
+                if topics
+                else "Нет доступных тем."
+            )
+            valid_topic_ids = {topic.id for topic in topics} if topics else set()
+
             intent_prompt = (
                 "Ты — маршрутизатор. Определи, нужно ли искать информацию "
-                "в базе знаний НГУ, чтобы ответить на сообщение пользователя.\n"
-                "Ответь ТОЛЬКО 'YES', если вопрос касается НГУ, учебы, "
+                "в базе знаний НГУ, и выбери подходящую тему для сообщения"
+                "пользователя.\n"
+                "Ответь СТРОГО в формате JSON:\n"
+                '{"is_nsu": true, "topic_id": 123}\n'
+                "Где 'is_nsu' = true, если вопрос касается НГУ, учебы, "
                 "поступления, общежитий, или любых фактов.\n"
-                "Ответь ТОЛЬКО 'NO', если это простое приветствие, разговор "
+                "Где 'is_nsu' = false, если это простое приветствие, разговор "
                 "на отвлеченные темы (chit-chat), "
-                "вопрос о собеседнике, или благодарность.\n"
-                "Не пиши ничего кроме 'YES' или 'NO'."
+                "вопрос о собеседнике, или благодарность.\n\n"
+                "Список тем для 'topic_id':\n"
+                f"{topics_list}\n\n"
+                "Выбери наиболее подходящий 'topic_id', либо null,"
+                "если ни одна тема не подходит или is_nsu = false."
             )
             intent_messages: list[BaseMessage] = [
                 SystemMessage(content=intent_prompt),
@@ -237,26 +259,44 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
             intent_response = await intent_provider.generate(
                 intent_messages, profile=LLMProfiles.INTENT
             )
-            intent_response = (
-                re.sub(r"<think>.*?</think>", "", intent_response, flags=re.DOTALL)
-                .strip()
-                .upper()
-            )
-            # Извлекаем только "YES" или "NO" из ответа
-            match_yes = re.search(r"\bYES\b", intent_response)
-            match_no = re.search(r"\bNO\b", intent_response)
 
-            if match_no and not match_yes:
-                need_rag = False
-                logger.info(f"Skipping RAG for conversational query: {message}")
-            elif not match_yes and not match_no:
+            try:
+                # Попытка найти JSON в ответе, если модель добавила текст вокруг
+                json_match = re.search(r"(\{.*\})", intent_response, re.DOTALL)
+                if json_match:
+                    parsed = json.loads(json_match.group(1))
+                else:
+                    parsed = json.loads(intent_response)
+
+                need_rag = parsed.get("is_nsu", True)
+                topic_id = parsed.get("topic_id")
+
+                if topic_id is not None and topic_id not in valid_topic_ids:
+                    logger.warning(
+                        f"[{session_id}] LLM hallucinated topic_id={topic_id}. "
+                        + "Ignoring it."
+                    )
+                    topic_id = None
+
+                if not need_rag:
+                    logger.info(f"Skipping RAG for conversational query: {message}")
+
+            except json.JSONDecodeError:
                 logger.warning(
-                    f"Unexpected intent response: {intent_response},"
+                    f"Failed to parse JSON from intent response: {intent_response},"
                     + " falling back to full RAG"
                 )
-
         except Exception as e:
             logger.warning(f"Intent classification error: {e}, falling back to full RAG")
+
+        # Обновляем topic_id в БД для лога юзера, если есть
+        if topic_id and log_entry_id:
+            try:
+                async with AsyncSessionLocal() as session:
+                    log_service = MessageLogService(session)
+                    await log_service.update_log_topic(log_entry_id, topic_id)
+            except Exception as e:
+                logger.error(f"Failed to update topic id in log: {e}")
 
         # 4. Получаем контекст из LightRAG (если нужно)
         rag_sources: list[dict] = []
@@ -421,8 +461,8 @@ async def ask_local_llm(message: str, session_id: str, user_id: int = 0) -> str:
                 },
             )
 
-            # Удаляем блоки <think>...</think>
-            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL)
+            # Удаляем блоки foundland
+            content = re.sub(r"foundland", "", content, flags=re.DOTALL)
             content = _sanitize_telegram_html(content)
 
             if not content:
