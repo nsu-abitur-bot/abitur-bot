@@ -1,5 +1,7 @@
+import logging
 import os
 import re
+from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import List, Optional
 
@@ -8,6 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from abbrev.expander import get_abbrev_expander
 from api.auth.dependencies import get_current_admin, require_admin
 from api.auth.router import router as auth_router
 from api.routes.abbrev import router as abbrev_router
@@ -15,10 +18,16 @@ from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
+from db.postgres.db import AsyncSessionLocal
 from db.postgres.db import get_async_session
 from db.postgres.models import Admin
+from db.postgres.services.abbrev import AbbrevDbService
+from db.postgres.services.faq import FaqDbService
 from db.postgres.services.message import MessageService
 from db.postgres.services.user import UserService
+from faq.matcher import get_faq_matcher
+
+logger = logging.getLogger(__name__)
 
 
 class UserCountStatsResponse(BaseModel):
@@ -39,7 +48,28 @@ class MessageResponse(BaseModel):
     created_at: datetime
 
 
-app = FastAPI(title="Abitur API")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with AsyncSessionLocal() as session:
+        try:
+            faq_entries = await FaqDbService(session).get_all()
+            get_faq_matcher().load_items(
+                [{"question": e.question, "aliases": e.aliases, "answer": e.answer}
+                 for e in faq_entries]
+            )
+            logger.info("FAQ загружен из БД: %d записей", len(faq_entries))
+
+            abbrev_entries = await AbbrevDbService(session).get_all()
+            get_abbrev_expander().load_items(
+                [{"short": e.short, "full": e.full} for e in abbrev_entries]
+            )
+            logger.info("Аббревиатуры загружены из БД: %d записей", len(abbrev_entries))
+        except Exception as e:
+            logger.error("Ошибка загрузки FAQ/аббревиатур из БД при старте: %s", e)
+    yield
+
+
+app = FastAPI(title="Abitur API", lifespan=lifespan)
 
 cors_origins_env = os.getenv("CORS_ALLOW_ORIGINS", "*")
 cors_origins = [

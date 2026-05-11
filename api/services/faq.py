@@ -1,97 +1,61 @@
-import threading
-from typing import List
-
-import yaml
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas.faq import FaqItem
-from faq.matcher import FAQ_DATA_PATH, get_faq_matcher
+from db.postgres.services.faq import FaqDbService
+from faq.matcher import get_faq_matcher
 
 
 class FaqService:
-    """Сервис для управления FAQ (чтение, добавление, обновление, удаление)."""
+    def __init__(self, session: AsyncSession):
+        self._db = FaqDbService(session)
 
-    def __init__(self):
-        # Используем lock, чтобы избежать конфликтов при одновременной записи в файл
-        self._lock = threading.Lock()
+    async def get_all(self) -> list[FaqItem]:
+        entries = await self._db.get_all()
+        return [
+            FaqItem(id=e.id, question=e.question, aliases=e.aliases, answer=e.answer)
+            for e in entries
+        ]
 
-    def get_all(self) -> List[FaqItem]:
-        """Возвращает список всех FAQ из файла."""
-        with self._lock:
-            data = self._read_data()
-            return [FaqItem(**item) for item in data.get("faq", [])]
+    async def create(self, item: FaqItem) -> FaqItem:
+        entry = await self._db.create(item.question, item.aliases, item.answer)
+        await self._reload_matcher()
+        return FaqItem(
+            id=entry.id, question=entry.question,
+            aliases=entry.aliases, answer=entry.answer
+        )
 
-    def create(self, item: FaqItem) -> FaqItem:
-        """Создает новый вопрос FAQ и перезагружает matcher."""
-        with self._lock:
-            data = self._read_data()
-            if "faq" not in data:
-                data["faq"] = []
+    async def create_many(self, items: list[FaqItem]) -> list[FaqItem]:
+        raw = [
+            {"question": i.question, "aliases": i.aliases, "answer": i.answer}
+            for i in items
+        ]
+        entries = await self._db.create_many(raw)
+        await self._reload_matcher()
+        return [
+            FaqItem(id=e.id, question=e.question, aliases=e.aliases, answer=e.answer)
+            for e in entries
+        ]
 
-            data["faq"].append(item.model_dump())
-            self._write_data(data)
+    async def update(self, item_id: str, item: FaqItem) -> FaqItem:
+        entry = await self._db.update(item_id, item.question, item.aliases, item.answer)
+        if not entry:
+            raise KeyError(item_id)
+        await self._reload_matcher()
+        return FaqItem(
+            id=entry.id, question=entry.question,
+            aliases=entry.aliases, answer=entry.answer
+        )
 
-        self._reload_matcher()
-        return item
+    async def delete(self, item_id: str) -> None:
+        deleted = await self._db.delete(item_id)
+        if not deleted:
+            raise KeyError(item_id)
+        await self._reload_matcher()
 
-    def create_many(self, items: List[FaqItem]) -> List[FaqItem]:
-        """Создает несколько вопросов FAQ и один раз перезагружает matcher."""
-        with self._lock:
-            data = self._read_data()
-            if "faq" not in data:
-                data["faq"] = []
-
-            for item in items:
-                data["faq"].append(item.model_dump())
-            self._write_data(data)
-
-        self._reload_matcher()
-        return items
-
-    def update(self, index: int, item: FaqItem) -> FaqItem:
-        """Обновляет существующий FAQ элемент по индексу."""
-        with self._lock:
-            data = self._read_data()
-            if "faq" not in data or index < 0 or index >= len(data["faq"]):
-                raise IndexError(f"FAQ item with index {index} not found")
-
-            data["faq"][index] = item.model_dump()
-            self._write_data(data)
-
-        self._reload_matcher()
-        return item
-
-    def delete(self, index: int) -> None:
-        """Удаляет существующий FAQ элемент по индексу."""
-        with self._lock:
-            data = self._read_data()
-            if "faq" not in data or index < 0 or index >= len(data["faq"]):
-                raise IndexError(f"FAQ item with index {index} not found")
-
-            del data["faq"][index]
-            self._write_data(data)
-
-        self._reload_matcher()
-
-    def _read_data(self) -> dict:
-        """Читает YAML файл с FAQ. Возвращает dict."""
-        if not FAQ_DATA_PATH.exists():
-            return {"faq": []}
-
-        try:
-            with open(FAQ_DATA_PATH, encoding="utf-8") as f:
-                data = yaml.safe_load(f)
-                return data or {"faq": []}
-        except Exception:
-            # При ошибке чтения можно вернуть пустой или бросить дальше
-            return {"faq": []}
-
-    def _write_data(self, data: dict) -> None:
-        """Записывает dict обратно в YAML файл."""
-        # Используем allow_unicode для сохранения кириллицы
-        # yaml.dump стандартный стирает комментарии
-        with open(FAQ_DATA_PATH, "w", encoding="utf-8") as f:
-            yaml.dump(data, f, allow_unicode=True, sort_keys=False)
-
-    def _reload_matcher(self) -> None:
-        """Оповещает FAQMatcher о необходимости перезагрузить данные из файла."""
-        get_faq_matcher().reload()
+    async def _reload_matcher(self) -> None:
+        entries = await self._db.get_all()
+        items = [
+            {"question": e.question, "aliases": e.aliases, "answer": e.answer}
+            for e in entries
+        ]
+        get_faq_matcher().load_items(items)

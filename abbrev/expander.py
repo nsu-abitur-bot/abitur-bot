@@ -34,8 +34,15 @@ class AbbrevExpander:
             logger.error(f"Ошибка загрузки словаря аббревиатур: {e}")
             return
 
+        items = [
+            {"short": item.get("short", ""), "full": item.get("full", "")}
+            for item in data.get("abbreviations", [])
+        ]
+        self._build_index(items)
+
+    def _build_index(self, items: list[dict]) -> None:
         abbrev: dict[str, str] = {}
-        for item in data.get("abbreviations", []):
+        for item in items:
             short = (item.get("short") or "").strip()
             full = (item.get("full") or "").strip()
             if short and full:
@@ -56,6 +63,11 @@ class AbbrevExpander:
     def reload(self) -> None:
         with self._lock:
             self._load()
+
+    def load_items(self, items: list[dict]) -> None:
+        """Загружает аббревиатуры из списка словарей {short, full} (из БД)."""
+        with self._lock:
+            self._build_index(items)
 
     def expand(self, text: str) -> str:
         """Заменяет аббревиатуры в тексте на форму «АББР (полная расшифровка)»."""

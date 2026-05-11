@@ -1,7 +1,10 @@
+from typing import Optional
+
 from pydantic import BaseModel, Field
 
 
 class AbbrevItem(BaseModel):
+    id: Optional[str] = Field(None, description="UUID записи (заполняется при ответе)")
     short: str = Field(..., description="Аббревиатура (например, НГУ)")
     full: str = Field(
         ...,

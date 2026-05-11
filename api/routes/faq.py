@@ -2,31 +2,29 @@ import csv
 import io
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas.faq import FaqItem, FaqListResponse
 from api.services.faq import FaqService
+from db.postgres.db import get_async_session
 
 router = APIRouter(prefix="/faq", tags=["FAQ Management"])
 
 
-# Зависимость для получения сервиса (в будущем: кэширование / DI container)
-def get_faq_service() -> FaqService:
-    return FaqService()
+def get_faq_service(session: AsyncSession = Depends(get_async_session)) -> FaqService:
+    return FaqService(session)
 
 
 @router.get("", response_model=FaqListResponse, summary="Получить все FAQ")
-def get_all_faqs(service: FaqService = Depends(get_faq_service)):
-    """Возвращает список всех вопросов и ответов FAQ, которые использует бот."""
-    items = service.get_all()
+async def get_all_faqs(service: FaqService = Depends(get_faq_service)):
+    items = await service.get_all()
     return FaqListResponse(items=items)
 
 
 @router.post("", response_model=FaqItem, status_code=201, summary="Создать FAQ")
-def create_faq(item: FaqItem, service: FaqService = Depends(get_faq_service)):
-    """Создает новый вопрос FAQ и автоматически применяет для новых запросов к боту."""
+async def create_faq(item: FaqItem, service: FaqService = Depends(get_faq_service)):
     try:
-        created = service.create(item)
-        return created
+        return await service.create(item)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -54,7 +52,7 @@ async def upload_faq_csv(
 
     content = await file.read()
     try:
-        text = content.decode("utf-8-sig")  # Поддержка UTF-8 с BOM или без
+        text = content.decode("utf-8-sig")
     except UnicodeDecodeError:
         try:
             text = content.decode("cp1251")
@@ -77,16 +75,14 @@ async def upload_faq_csv(
             detail="Неверный формат CSV. Нужно хотя бы 2 колонки: 'Вопросы', 'Ответы'.",
         )
 
-    # Пытаемся найти колонки по названиям, иначе берем первые две
     q_idx = headers.index("Вопросы") if "Вопросы" in headers else 0
     a_idx = headers.index("Ответы") if "Ответы" in headers else 1
 
     items_to_create = []
-    current_questions = []
+    current_questions: list[str] = []
     current_answer = ""
 
     for row in reader:
-        # Если строка физически пустая (например, [])
         if not row:
             if current_questions and current_answer:
                 items_to_create.append(
@@ -103,7 +99,6 @@ async def upload_faq_csv(
         q = row[q_idx].strip() if len(row) > q_idx else ""
         a = row[a_idx].strip() if len(row) > a_idx else ""
 
-        # Если в строке обе ячейки пусты, это тоже разделитель блоков
         if not q and not a:
             if current_questions and current_answer:
                 items_to_create.append(
@@ -116,13 +111,11 @@ async def upload_faq_csv(
             current_questions = []
             current_answer = ""
         else:
-            if q:
-                if q not in current_questions:
-                    current_questions.append(q)
+            if q and q not in current_questions:
+                current_questions.append(q)
             if a and not current_answer:
                 current_answer = a
 
-    # Обрабатываем последний блок, если файл не заканчивался пустой строкой
     if current_questions and current_answer:
         items_to_create.append(
             FaqItem(
@@ -138,36 +131,29 @@ async def upload_faq_csv(
         )
 
     try:
-        created = service.create_many(items_to_create)
+        created = await service.create_many(items_to_create)
         return FaqListResponse(items=created)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка сохранения: {str(e)}")
 
 
-@router.put("/{index}", response_model=FaqItem, summary="Обновить FAQ по индексу")
-def update_faq(
-    index: int, item: FaqItem, service: FaqService = Depends(get_faq_service)
+@router.put("/{item_id}", response_model=FaqItem, summary="Обновить FAQ по ID")
+async def update_faq(
+    item_id: str, item: FaqItem, service: FaqService = Depends(get_faq_service)
 ):
-    """Обновляет существующий FAQ элемент по его позиции (индексу) в списке."""
     try:
-        updated = service.update(index, item)
-        return updated
-    except IndexError:
-        raise HTTPException(
-            status_code=404, detail=f"FAQ item at index {index} not found"
-        )
+        return await service.update(item_id, item)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"FAQ item {item_id} not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/{index}", status_code=204, summary="Удалить FAQ по индексу")
-def delete_faq(index: int, service: FaqService = Depends(get_faq_service)):
-    """Удаляет существующий FAQ элемент по его позиции (индексу) в списке."""
+@router.delete("/{item_id}", status_code=204, summary="Удалить FAQ по ID")
+async def delete_faq(item_id: str, service: FaqService = Depends(get_faq_service)):
     try:
-        service.delete(index)
-    except IndexError:
-        raise HTTPException(
-            status_code=404, detail=f"FAQ item at index {index} not found"
-        )
+        await service.delete(item_id)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"FAQ item {item_id} not found")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
