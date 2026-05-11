@@ -6,7 +6,7 @@ from db.postgres.models import MessageLog
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
-from llm.llm_client import ask_local_llm, classify_topic_message
+from llm.llm_client import ask_local_llm
 
 logger = logging.getLogger(__name__)
 
@@ -168,13 +168,6 @@ class BotCore:
             source=channel,
         )
 
-        # Классифицируем тему сообщения
-        topic_id = await classify_topic_message(user_text)
-        if topic_id and log_entry:
-            async with AsyncSessionLocal() as db_session:
-                log_service = MessageLogService(db_session)
-                await log_service.update_log_topic(log_entry.id, topic_id)
-
         redis_client = await get_redis_client()
         is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
 
@@ -218,6 +211,7 @@ class BotCore:
             formatted_message,
             session_id=session_id,
             user_id=internal_user_id,
+            log_entry_id=log_entry.id if log_entry else None,
         )
 
         if not response:
