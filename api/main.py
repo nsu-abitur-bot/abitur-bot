@@ -131,10 +131,13 @@ async def get_messages(
             username = match.group(1)
             user_text = match.group(2)
 
-        if msg.user.telegram_id is not None:
-            messenger = "Telegram"
-        elif msg.user.max_id is not None:
-            messenger = "MAX"
+        if getattr(msg, "user", None):
+            if msg.user.telegram_id is not None:
+                messenger = "Telegram"
+            elif msg.user.max_id is not None:
+                messenger = "MAX"
+            else:
+                messenger = None
         else:
             messenger = None
 
