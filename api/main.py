@@ -15,6 +15,7 @@ from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
+from api.routes.system_logs import router as system_logs_router
 from db.postgres.db import get_async_session
 from db.postgres.models import Admin
 from db.postgres.services.message import MessageService
@@ -82,6 +83,11 @@ app.include_router(
 )
 app.include_router(
     evals_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    system_logs_router,
     prefix="/api/v1",
     dependencies=[Depends(require_admin)],
 )
