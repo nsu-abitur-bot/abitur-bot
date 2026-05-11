@@ -32,7 +32,7 @@ class _TelegramPollingLock:
         Path(self.lock_path).parent.mkdir(parents=True, exist_ok=True)
         self._fd = open(self.lock_path, "w")
         try:
-            fcntl.flock(self._fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(self._fd.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)  # type: ignore
             self._fd.write("telegram-polling-lock\n")
             self._fd.flush()
             return True
@@ -43,7 +43,7 @@ class _TelegramPollingLock:
         if self._fd is None:
             return
         try:
-            fcntl.flock(self._fd.fileno(), fcntl.LOCK_UN)
+            fcntl.flock(self._fd.fileno(), fcntl.LOCK_UN)  # type: ignore
         finally:
             self._fd.close()
             self._fd = None

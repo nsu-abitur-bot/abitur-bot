@@ -314,22 +314,37 @@ class GraphMemory:
         graph_id: str,
         question: str,
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
-    ) -> tuple[str, list[str]]:
+    ) -> tuple[str, list[dict]]:
         try:
             async with self._use_graph(graph_id) as rag:
                 result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
                 answer = result.get("llm_response", {}).get("content", "") or ""
 
                 references = result.get("data", {}).get("references", [])
-                sources_set: set[str] = set()
+                urls_set: set[str] = set()
                 for ref in references:
                     file_paths_value = ref.get("file_path", "") or ""
                     for source in file_paths_value.split(","):
                         source = source.strip()
                         if source.startswith("http://") or source.startswith("https://"):
-                            sources_set.add(source)
+                            urls_set.add(source)
 
-                return str(answer), list(sources_set)
+                # Fetch document titles to map URLs
+                docs = await self.get_list_docs(graph_id)
+                url_to_title = {}
+                for doc in docs:
+                    doc_url = doc.get("url", "")
+                    doc_title = doc.get("id", "Источник информации")
+                    if doc_url:
+                        for part in str(doc_url).split(","):
+                            url_to_title[part.strip()] = str(doc_title).strip()
+
+                sources_list = []
+                for url in urls_set:
+                    title = url_to_title.get(url, "Источник информации")
+                    sources_list.append({"url": url, "title": title})
+
+                return str(answer), sources_list
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
