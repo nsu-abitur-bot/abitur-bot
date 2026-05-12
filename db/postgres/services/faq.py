@@ -28,9 +28,14 @@ class FaqDbService:
     ) -> FaqEntry:
         entry = FaqEntry(question=question, aliases=aliases, answer=answer)
         self.session.add(entry)
-        await self.session.commit()
-        await self.session.refresh(entry)
-        return entry
+        try:
+            await self.session.commit()
+            await self.session.refresh(entry)
+            return entry
+        except Exception as e:
+            await self.session.rollback()
+            logger.error(f"Ошибка создания FAQ: {e}")
+            raise
 
     async def create_many(
         self, items: list[dict]
