@@ -64,8 +64,8 @@ async def lifespan(app: FastAPI):
                 [{"short": e.short, "full": e.full} for e in abbrev_entries]
             )
             logger.info("Аббревиатуры загружены из БД: %d записей", len(abbrev_entries))
-        except Exception as e:
-            logger.error("Ошибка загрузки FAQ/аббревиатур из БД при старте: %s", e)
+        except Exception:
+            logger.exception("Ошибка загрузки FAQ/аббревиатур из БД при старте")
     yield
 
 
