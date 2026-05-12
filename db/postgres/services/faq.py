@@ -87,5 +87,9 @@ class FaqDbService:
         if not entry:
             return False
         await self.session.delete(entry)
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except Exception:
+            await self.session.rollback()
+            raise
         return True
