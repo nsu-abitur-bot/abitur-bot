@@ -32,6 +32,9 @@ class AbbrevDbService:
         except IntegrityError:
             await self.session.rollback()
             raise ValueError(f"Аббревиатура '{short}' уже существует")
+        except Exception:
+            await self.session.rollback()
+            raise
         await self.session.refresh(entry)
         return entry
 
@@ -52,6 +55,9 @@ class AbbrevDbService:
         except IntegrityError:
             await self.session.rollback()
             raise ValueError(f"Аббревиатура '{short}' уже существует")
+        except Exception:
+            await self.session.rollback()
+            raise
         await self.session.refresh(entry)
         return entry
 
