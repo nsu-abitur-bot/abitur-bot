@@ -49,9 +49,14 @@ class FaqDbService:
             for item in items
         ]
         self.session.add_all(entries)
-        await self.session.commit()
-        for entry in entries:
-            await self.session.refresh(entry)
+        try:
+            await self.session.commit()
+            for entry in entries:
+                await self.session.refresh(entry)
+        except Exception:
+            await self.session.rollback()
+            logger.exception("Ошибка массового создания FAQ")
+            raise
         return entries
 
     async def get(self, item_id: str) -> Optional[FaqEntry]:
