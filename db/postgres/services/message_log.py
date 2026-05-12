@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, TypedDict
 
@@ -5,7 +6,10 @@ from sqlalchemy import Sequence, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
+
+logger = logging.getLogger(__name__)
 
 
 def _truncate_dt(dt: datetime, group_by: str) -> datetime:
@@ -49,6 +53,7 @@ class MessageLogService:
         message_type: str,
         content: str,
         message_metadata: Optional[dict] = None,
+        topic_id: Optional[int] = None,
     ) -> MessageLog:
         """Создает запись в логе сообщений."""
         log_entry = MessageLog(
@@ -57,6 +62,7 @@ class MessageLogService:
             message_type=message_type,
             content=content,
             message_metadata=message_metadata,
+            topic_id=topic_id,
         )
         self.session.add(log_entry)
         await self.session.commit()
@@ -97,22 +103,33 @@ class MessageLogService:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
+    async def update_log_topic(self, log_id: int, topic_id: Optional[int]) -> bool:
+        """Обновляет topic_id для лога."""
+        try:
+            async with AsyncSessionLocal() as session:
+                stmt = select(MessageLog).where(MessageLog.id == log_id)
+                result = await session.execute(stmt)
+                log_entry = result.scalar_one_or_none()
+                if log_entry:
+                    log_entry.topic_id = topic_id
+                    await session.commit()
+                    return True
+                return False
+        except Exception as e:
+            logger.error(f"Ошибка обновления topic_id в логе: {e}")
+            return False
+
     async def get_logs_by_type(
-        self,
-        message_type: str,
-        limit: int = 100,
-        offset: int = 0,
+        self, message_type: str, limit: int = 100, offset: int = 0
     ) -> Sequence[MessageLog]:
         """Получает логи по типу сообщения."""
         stmt = (
             select(MessageLog)
             .where(MessageLog.message_type == message_type)
-            .order_by(MessageLog.created_at.desc())
             .limit(limit)
             .offset(offset)
         )
-        result = await self.session.execute(stmt)
-        return result.scalars().all()
+        return stmt
 
     async def get_recent_logs(
         self,

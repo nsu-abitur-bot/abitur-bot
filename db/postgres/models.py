@@ -183,13 +183,19 @@ class MessageLog(Base):
     message_metadata: Mapped[Optional[dict]] = mapped_column(
         JSON, nullable=True
     )  # для источников, длины ответа и т.д.
+    topic_id: Mapped[Optional[int]] = mapped_column(
+        BigInteger, ForeignKey("topic.id"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+
+    topic: Mapped[Optional["Topic"]] = relationship("Topic")
 
     __table_args__ = (
         Index("ix_message_logs_user_id", "user_id"),
         Index("ix_message_logs_session_id", "session_id"),
         Index("ix_message_logs_created_at", "created_at"),
         Index("ix_message_logs_message_type", "message_type"),
+        Index("ix_message_logs_topic_id", "topic_id"),
     )
 
     def __repr__(self) -> str:
@@ -254,6 +260,21 @@ class Abbreviation(Base):
 
     def __repr__(self) -> str:
         return f"<Abbreviation(id='{self.id}', short='{self.short}')>"
+
+
+class Topic(Base):
+    """Справочник тем сообщений."""
+
+    __tablename__ = "topic"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    label: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+
+    def __repr__(self) -> str:
+        return f"<Topic(id={self.id}, label='{self.label}')>"
 
 
 class Admin(Base):

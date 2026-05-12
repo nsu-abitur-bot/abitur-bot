@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from ..models import Message
 
@@ -47,6 +48,7 @@ class MessageService:
         try:
             result = await self.session.execute(
                 select(Message)
+                .options(joinedload(Message.user))
                 .where(Message.user_id == user_id)
                 .order_by(Message.created_at.desc())
                 .limit(limit)
@@ -64,6 +66,7 @@ class MessageService:
         try:
             result = await self.session.execute(
                 select(Message)
+                .options(joinedload(Message.user))
                 .where(Message.session_id == session_id)
                 .order_by(Message.created_at.desc())
                 .limit(limit)
@@ -81,6 +84,7 @@ class MessageService:
         try:
             result = await self.session.execute(
                 select(Message)
+                .options(joinedload(Message.user))
                 .order_by(Message.created_at.desc())
                 .limit(limit)
                 .offset(offset)

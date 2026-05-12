@@ -314,22 +314,37 @@ class GraphMemory:
         graph_id: str,
         question: str,
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
-    ) -> tuple[str, list[str]]:
+    ) -> tuple[str, list[dict]]:
         try:
             async with self._use_graph(graph_id) as rag:
                 result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
                 answer = result.get("llm_response", {}).get("content", "") or ""
 
                 references = result.get("data", {}).get("references", [])
-                sources_set: set[str] = set()
+                urls_set: set[str] = set()
                 for ref in references:
                     file_paths_value = ref.get("file_path", "") or ""
                     for source in file_paths_value.split(","):
                         source = source.strip()
                         if source.startswith("http://") or source.startswith("https://"):
-                            sources_set.add(source)
+                            urls_set.add(source)
 
-                return str(answer), list(sources_set)
+                # Fetch document titles to map URLs
+                docs = await self.get_list_docs(graph_id)
+                url_to_title = {}
+                for doc in docs:
+                    doc_url = doc.get("url", "")
+                    doc_title = doc.get("id", "Источник информации")
+                    if doc_url:
+                        for part in str(doc_url).split(","):
+                            url_to_title[part.strip()] = str(doc_title).strip()
+
+                sources_list = []
+                for url in urls_set:
+                    title = url_to_title.get(url, "Источник информации")
+                    sources_list.append({"url": url, "title": title})
+
+                return str(answer), sources_list
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
@@ -444,9 +459,7 @@ class GraphMemory:
                 self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
                 self._last_disk_check[graph_id] = time.monotonic()
 
-            # Очищаем LLM кеш,
-            # чтобы новые запросы не брались из него после удаления документов
-            await self.clear_cache(graph_id)
+            # Очищаем LLM кеш вынесено в отдельную ручку API
             return True
         except Exception as e:
             logger.error(f"Error deleting doc {doc_id} from {graph_id}: {e}")
@@ -501,18 +514,23 @@ class GraphMemory:
 
     async def clear_cache(self, graph_id: str) -> None:
         """
-        Удаляет файл кеша ответов LLM (kv_store_llm_response_cache.json)
-        для указанного графа, чтобы после обновления базы знаний агент
-        перестал отдавать старые (кешированные) ответы "Не знаю".
+        Очищает кеш ответов LLM (kv_store_llm_response_cache.json)
+        для указанного графа. Для этого сначала выгружаем граф из памяти,
+        чтобы он сохранил текущие данные на диск, после чего удаляем файл кеша.
         """
+        # 1. Выгружаем граф из памяти, чтобы он сохранил данные на диск.
+        # Если этого не сделать, после удаления файла граф при выгрузке 
+        # может записать кеш обратно из памяти.
+        await self.cleanup(graph_id)
+
+        # 2. Удаляем файл кеша
         workspace_path = self._get_workspace_path(graph_id)
-        # В LightRAG кеш ответов обычно хранится в этом файле
         cache_file = os.path.join(workspace_path, "kv_store_llm_response_cache.json")
         try:
             if os.path.exists(cache_file):
                 os.remove(cache_file)
                 logger.info(
-                    f"Очищен кеш ответов LLM для графа {graph_id}:"
+                    f"Очищен кеш ответов LLM для графа {graph_id}: "
                     f"удален файл {cache_file}"
                 )
             else:

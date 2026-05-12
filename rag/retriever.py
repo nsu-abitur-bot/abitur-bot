@@ -16,6 +16,6 @@ async def query_graph(
 async def query_graph_with_sources(
     query: str,
     mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
-) -> tuple[str, list[str]]:
+) -> tuple[str, list[dict]]:
     graph_memory = get_graph_memory()
     return await graph_memory.query_with_sources(DEFAULT_GRAPH_ID, query, mode=mode)

@@ -408,3 +408,18 @@ async def preview_csv_documents(
         results.append(CsvImportPreviewResult(title=title, url=url, comment=comment))
 
     return CsvImportPreviewResponse(total_found=len(results), results=results)
+
+
+@router.post(
+    "/cache/clear",
+    summary="Очистить кэш ответов RAG",
+)
+async def clear_rag_cache():
+    """
+    Очищает кэш ответов LLM (kv_store_llm_response_cache.json)
+    для графа, чтобы агент перестал отдавать старые ответы по старым данным.
+    Очистка вызывается по нажатию кнопки администратором.
+    """
+    memory = get_graph_memory()
+    await memory.clear_cache(DEFAULT_GRAPH_ID)
+    return {"message": "RAG cache cleared successfully"}

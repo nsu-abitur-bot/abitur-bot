@@ -18,6 +18,9 @@ from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
+from api.routes.stats import router as stats_router
+from api.routes.system_logs import router as system_logs_router
+from api.routes.topic import router as topic_router
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.db import get_async_session
 from db.postgres.models import Admin
@@ -42,6 +45,7 @@ class MessageResponse(BaseModel):
     id: str
     user_id: int
     username: Optional[str] = None
+    messenger: Optional[str] = None
     session_id: str
     user_text: str
     bot_response: str
@@ -87,9 +91,12 @@ app.add_middleware(
 # Auth роутер — публичные эндпоинты /login и /register, остальное защищено внутри
 app.include_router(auth_router, prefix="/api/v1")
 
+# Публичные роуты
+app.include_router(topic_router, prefix="/api/v1")
+
 # Все остальные роутеры требуют аутентификации
 # Мутации (abbrev, faq, rag, evals) требуют роль admin или superadmin
-# Аналитика (message_log) доступна любому авторизованному, включая viewer
+# Аналитика (message_log, stats) доступна любому авторизованному, включая viewer
 app.include_router(
     abbrev_router,
     prefix="/api/v1",
@@ -112,6 +119,16 @@ app.include_router(
 )
 app.include_router(
     evals_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    stats_router,
+    prefix="/api/v1",
+    dependencies=[Depends(get_current_admin)],
+)
+app.include_router(
+    system_logs_router,
     prefix="/api/v1",
     dependencies=[Depends(require_admin)],
 )
@@ -160,11 +177,22 @@ async def get_messages(
             username = match.group(1)
             user_text = match.group(2)
 
+        if getattr(msg, "user", None):
+            if msg.user.telegram_id is not None:
+                messenger = "Telegram"
+            elif msg.user.max_id is not None:
+                messenger = "MAX"
+            else:
+                messenger = None
+        else:
+            messenger = None
+
         result.append(
             MessageResponse(
                 id=msg.id,
                 user_id=msg.user_id,
                 username=username,
+                messenger=messenger,
                 session_id=msg.session_id,
                 user_text=user_text,
                 bot_response=msg.bot_response,
