@@ -74,8 +74,12 @@ class FaqDbService:
         entry.question = question
         entry.aliases = aliases
         entry.answer = answer
-        await self.session.commit()
-        await self.session.refresh(entry)
+        try:
+            await self.session.commit()
+            await self.session.refresh(entry)
+        except Exception:
+            await self.session.rollback()
+            raise
         return entry
 
     async def delete(self, item_id: str) -> bool:
