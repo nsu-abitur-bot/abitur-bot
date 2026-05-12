@@ -220,13 +220,18 @@ class FAQMatcher:
             logger.info(f"FAQ: Embedding {len(to_embed_phrases)} new phrases...")
             try:
                 new_embeddings = self._embedder.embed_documents(to_embed_phrases)
-                for phrase, emb in zip(to_embed_phrases, new_embeddings):
-                    cache[phrase] = emb
-                with open(cache_path, "wb") as f:
-                    pickle.dump(cache, f)
             except Exception as e:
                 logger.error(f"FAQ: Failed to embed new phrases: {e}")
                 raise
+
+            for phrase, emb in zip(to_embed_phrases, new_embeddings):
+                cache[phrase] = emb
+
+            try:
+                with open(cache_path, "wb") as f:
+                    pickle.dump(cache, f)
+            except Exception as e:
+                logger.warning(f"Failed to save FAQ embeddings cache: {e}")
 
         vectors_list = [cache[phrase] for phrase in self._questions]
         vectors = np.array(vectors_list, dtype=float)
