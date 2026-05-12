@@ -33,7 +33,7 @@ async def _load_faq_and_abbrev() -> None:
             )
             logger.info("Аббревиатуры загружены из БД: %d записей", len(abbrev_entries))
         except Exception as e:
-            logger.error("Ошибка загрузки FAQ/аббревиатур из БД: %s", e)
+            logger.exception("Ошибка загрузки FAQ/аббревиатур из БД: %s", e)
 
 
 async def main():
