@@ -219,7 +219,7 @@ async def ask_local_llm(
         except Exception as e:
             logger.warning(f"FAQ matcher error: {e}")
 
-        # 3. Быстрая проверка на необходимость RAG и определение топика
+        # 3. Определение топика для лога. RAG всегда выполняется ниже.
         need_rag = True
         topic_id = None
         try:
@@ -236,20 +236,15 @@ async def ask_local_llm(
             valid_topic_ids = {topic.id for topic in topics} if topics else set()
 
             intent_prompt = (
-                "Ты — маршрутизатор. Определи, нужно ли искать информацию "
-                "в базе знаний НГУ, и выбери подходящую тему для сообщения"
+                "Ты — маршрутизатор. Выбери подходящую тему для сообщения "
                 "пользователя.\n"
                 "Ответь СТРОГО в формате JSON:\n"
                 '{"is_nsu": true, "topic_id": 123}\n'
-                "Где 'is_nsu' = true, если вопрос касается НГУ, учебы, "
-                "поступления, общежитий, или любых фактов.\n"
-                "Где 'is_nsu' = false, если это простое приветствие, разговор "
-                "на отвлеченные темы (chit-chat), "
-                "вопрос о собеседнике, или благодарность.\n\n"
+                "Где 'is_nsu' всегда true.\n\n"
                 "Список тем для 'topic_id':\n"
                 f"{topics_list}\n\n"
                 "Выбери наиболее подходящий 'topic_id', либо null,"
-                "если ни одна тема не подходит или is_nsu = false."
+                "если ни одна тема не подходит."
             )
             intent_messages: list[BaseMessage] = [
                 SystemMessage(content=intent_prompt),
@@ -268,7 +263,6 @@ async def ask_local_llm(
                 else:
                     parsed = json.loads(intent_response)
 
-                need_rag = parsed.get("is_nsu", True)
                 topic_id = parsed.get("topic_id")
 
                 if topic_id is not None and topic_id not in valid_topic_ids:
@@ -277,9 +271,6 @@ async def ask_local_llm(
                         + "Ignoring it."
                     )
                     topic_id = None
-
-                if not need_rag:
-                    logger.info(f"Skipping RAG for conversational query: {message}")
 
             except json.JSONDecodeError:
                 logger.warning(
