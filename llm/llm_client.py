@@ -2,8 +2,9 @@ import json
 import logging
 import re
 from contextlib import suppress
-from html import escape
+from html import escape, unescape
 from typing import Optional
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -58,6 +59,8 @@ LIGHTRAG_FORMAT_HINT = (
     'Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.'
 )
 
+DEFAULT_SOURCE_TITLE = "Источник информации"
+
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
 
@@ -110,6 +113,66 @@ def _sanitize_telegram_html(text: str) -> str:
 
     text = re.sub(r"<[^>]+>", replace_tag, text)
     return text.strip()
+
+
+def _clean_source_url(url: str) -> str:
+    url = unescape(url).strip().strip("<>\"'")
+    url = url.rstrip(".,;:!?")
+
+    while url.endswith(")") and url.count(")") > url.count("("):
+        url = url[:-1].rstrip()
+
+    return url
+
+
+def _source_title_from_url(url: str) -> str:
+    parsed = urlsplit(url)
+    if parsed.netloc:
+        return parsed.netloc
+    return DEFAULT_SOURCE_TITLE
+
+
+def _add_source(
+    sources: list[dict[str, str]],
+    seen_urls: set[str],
+    url: str,
+    title: str | None = None,
+) -> None:
+    clean_url = _clean_source_url(url)
+    if not clean_url.startswith(("http://", "https://")) or clean_url in seen_urls:
+        return
+
+    clean_title = (title or "").strip()
+    if not clean_title or clean_title.startswith(("http://", "https://")):
+        clean_title = _source_title_from_url(clean_url)
+
+    seen_urls.add(clean_url)
+    sources.append({"url": clean_url, "title": clean_title})
+
+
+def _extract_sources_from_rag_context(context: str) -> list[dict[str, str]]:
+    """Достает ссылки из текста, который вернул LightRAG, без metadata references."""
+    sources: list[dict[str, str]] = []
+    seen_urls: set[str] = set()
+
+    for match in re.finditer(
+        r"<a\s+[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
+        context,
+        flags=re.IGNORECASE | re.DOTALL,
+    ):
+        title = re.sub(r"<[^>]+>", "", match.group(2)).strip()
+        _add_source(sources, seen_urls, match.group(1), title)
+
+    for match in re.finditer(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", context):
+        _add_source(sources, seen_urls, match.group(2), match.group(1))
+
+    for match in re.finditer(r"(?m)^\s*[-*]?\s*\[(\d+)\]\s+(https?://\S+)", context):
+        _add_source(sources, seen_urls, match.group(2), f"Источник {match.group(1)}")
+
+    for match in re.finditer(r"https?://[^\s<>{}\"']+", context):
+        _add_source(sources, seen_urls, match.group(0))
+
+    return sources
 
 
 async def get_redis_client() -> RedisClient:
@@ -296,7 +359,9 @@ async def ask_local_llm(
             logger.info(f"[{session_id}] Querying LightRAG for context.")
             try:
                 rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
-                rag_context_raw, rag_sources = await query_graph_with_sources(rag_query)
+                rag_context_raw, _metadata_sources = await query_graph_with_sources(
+                    rag_query
+                )
                 if not rag_context_raw or rag_context_raw.startswith(
                     "Error executing query"
                 ):
@@ -305,6 +370,7 @@ async def ask_local_llm(
                     rag_sources = []
                     logger.info(f"[{session_id}] RAG retrieval result: No context found")
                 else:
+                    rag_sources = _extract_sources_from_rag_context(rag_context_raw)
                     logger.info(
                         f"[{session_id}] Retrieved context from RAG "
                         f"(sources: {len(rag_sources)})."
@@ -361,17 +427,14 @@ async def ask_local_llm(
         # 5. Формируем сообщения и отправляем в LLM провайдер
         try:
             logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
-            valid_sources = [
-                s for s in rag_sources
-                if s.get("url", "").startswith("http://") or s.get("url", "").startswith("https://")
-            ]
-            
+            valid_sources = rag_sources
+
             sources_hint = (
                 "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
                 "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать блок 'Источники' или перечислять ссылки. "
                 "Просто ответь на вопрос пользователя, опираясь на контекст!"
             )
-            
+
             system_prompt = SYSTEM_PROMPT_BASE.format(
                 context=rag_context, sources_hint=sources_hint
             )
@@ -408,16 +471,15 @@ async def ask_local_llm(
             # Удаляем любые левые ссылки, которые могла придумать LLM
             content = re.sub(
                 r'<a\s+[^>]*href=["\'][^"\']+["\'][^>]*>(.*?)</a>',
-                r'\1',
+                r"\1",
                 content,
-                flags=re.IGNORECASE
+                flags=re.IGNORECASE,
             )
 
             # Добавляем свои источники (максимум 5 штук)
             lower_content = content.lower()
             not_found = (
-                "не нашел информации" in lower_content
-                or "не найдена" in lower_content
+                "не нашел информации" in lower_content or "не найдена" in lower_content
             )
             if valid_sources and not not_found:
                 links_html = []
@@ -425,10 +487,10 @@ async def ask_local_llm(
                     url = str(s.get("url", ""))
                     if not url:
                         continue
-                    title = str(s.get("title") or "Источник информации")
+                    title = str(s.get("title") or DEFAULT_SOURCE_TITLE)
                     safe_url = escape(normalize_url_for_messaging(url), quote=True)
                     links_html.append(f'<a href="{safe_url}">{escape(title)}</a>')
-                
+
                 content += "\n\n<b>Источники:</b>\n" + "\n".join(links_html)
 
             logger.info(f"[{session_id}] Received response from LLM.")
