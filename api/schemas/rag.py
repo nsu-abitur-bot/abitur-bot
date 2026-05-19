@@ -31,6 +31,15 @@ class ConfirmUploadRequest(BaseModel):
     )
 
 
+class PreprocessDocumentRequest(BaseModel):
+    text: str = Field(..., description="Текст документа для предобработки")
+
+
+class PreprocessDocumentResponse(BaseModel):
+    text: str = Field(..., description="Текст после расширения аббревиатур и очистки")
+    chars: int = Field(..., description="Количество символов в обработанном тексте")
+
+
 class RagUploadResponse(BaseModel):
     accepted_formats: list[str] = Field(
         ..., description="Поддерживаемые расширения файлов"

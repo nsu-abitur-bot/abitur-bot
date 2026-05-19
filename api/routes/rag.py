@@ -18,6 +18,8 @@ from api.schemas.rag import (
     CsvImportResult,
     ParsedDocument,
     ParsedPageResult,
+    PreprocessDocumentRequest,
+    PreprocessDocumentResponse,
     RagDocumentContentResponse,
     RagDocumentListResponse,
     RagUploadResponse,
@@ -237,6 +239,28 @@ async def confirm_rag_upload(request: ConfirmUploadRequest):
     except Exception as e:
         logger.error(f"Error during RAG confirmation upload: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to upload: {str(e)}")
+
+
+@router.post(
+    "/preprocess",
+    response_model=PreprocessDocumentResponse,
+    summary="Предобработать текст документа для RAG",
+)
+async def preprocess_document_for_rag(
+    request: PreprocessDocumentRequest,
+) -> PreprocessDocumentResponse:
+    """Расширяет аббревиатуры и добавляет локальный контекст смысловым блокам."""
+    raw_text = request.text.strip()
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="Text must not be empty")
+
+    try:
+        prepared_text = await clean_and_structure_text(raw_text)
+    except Exception as e:
+        logger.error(f"Error during RAG document preprocessing: {e}")
+        raise HTTPException(status_code=503, detail="Document preprocessing unavailable")
+
+    return PreprocessDocumentResponse(text=prepared_text, chars=len(prepared_text))
 
 
 @router.get(

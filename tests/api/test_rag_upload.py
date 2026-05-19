@@ -5,6 +5,7 @@ from fastapi import UploadFile
 from fastapi.testclient import TestClient
 
 from api.main import app
+from api.routes import rag
 from api.routes.rag import get_rag_upload_service
 from api.schemas.rag import UploadedDocumentResult
 from api.services.rag_upload import RagUploadService
@@ -61,6 +62,45 @@ class TestRagUploadEndpoint:
         assert data["indexed_count"] == 0
         assert data["skipped_count"] == 1
         assert data["results"][0]["status"] == "skipped"
+
+
+class TestRagPreprocessEndpoint:
+    def setup_method(self):
+        self.client = TestClient(app)
+
+    def test_preprocess_document_success(self, monkeypatch):
+        async def fake_clean_and_structure_text(text: str) -> str:
+            assert text == "Документы принимает НГУ."
+            return (
+                "Документы принимает НГУ "
+                "(Новосибирский государственный университет)."
+            )
+
+        monkeypatch.setattr(
+            rag, "clean_and_structure_text", fake_clean_and_structure_text
+        )
+
+        response = self.client.post(
+            "/api/v1/rag/preprocess",
+            json={"text": "  Документы принимает НГУ.  "},
+        )
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["text"] == (
+            "Документы принимает НГУ "
+            "(Новосибирский государственный университет)."
+        )
+        assert data["chars"] == len(data["text"])
+
+    def test_preprocess_document_empty_text(self):
+        response = self.client.post(
+            "/api/v1/rag/preprocess",
+            json={"text": "   "},
+        )
+
+        assert response.status_code == 400
+        assert response.json()["detail"] == "Text must not be empty"
 
 
 @pytest.fixture
