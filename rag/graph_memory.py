@@ -459,7 +459,7 @@ class GraphMemory:
                 self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
                 self._last_disk_check[graph_id] = time.monotonic()
 
-            # Очищаем LLM кеш вынесено в отдельную ручку API
+            await self.clear_cache(graph_id)
             return True
         except Exception as e:
             logger.error(f"Error deleting doc {doc_id} from {graph_id}: {e}")
