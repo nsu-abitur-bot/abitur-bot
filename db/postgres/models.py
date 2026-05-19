@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -219,6 +220,39 @@ class Settings(Base):
 
     def __repr__(self) -> str:
         return f"<Settings(key='{self.key}', value='{self.value}')>"
+
+
+class Document(Base):
+    """Документы, проиндексированные в RAG."""
+
+    __tablename__ = "document"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    source_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    graph_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    rag_doc_id: Mapped[str] = mapped_column(String(500), nullable=False)
+    content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    content_length: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
+    last_indexed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    __table_args__ = (
+        UniqueConstraint("graph_id", "rag_doc_id", name="uq_document_graph_rag_doc_id"),
+        Index("ix_document_graph_id", "graph_id"),
+        Index("ix_document_source_url", "source_url"),
+        Index("ix_document_content_hash", "content_hash"),
+        Index("ix_document_status", "status"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<Document(id='{self.id}', title='{self.title}', status='{self.status}')>"
 
 
 class Topic(Base):

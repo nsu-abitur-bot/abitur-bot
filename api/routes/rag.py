@@ -6,8 +6,9 @@ from urllib.parse import unquote
 import httpx
 import requests
 from bs4 import BeautifulSoup
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
 from pydantic import HttpUrl
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import (
@@ -16,14 +17,25 @@ from api.schemas.rag import (
     CsvImportPreviewResult,
     CsvImportResponse,
     CsvImportResult,
+    DocumentBackfillResponse,
+    DocumentCheckRequest,
+    DocumentCheckResponse,
+    DocumentUpdateResponse,
     ParsedDocument,
     ParsedPageResult,
     RagDocumentContentResponse,
     RagDocumentListResponse,
     RagUploadResponse,
 )
+from api.services.document_update import (
+    DocumentUpdateService,
+    calculate_content_hash,
+    fetch_url_bytes,
+)
 from api.services.rag_upload import RagUploadService
 from api.services.url_to_rag import parse_and_save_url
+from db.postgres.db import get_async_session
+from db.postgres.services.document import DocumentService
 from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu import parse_page
 from parser.url import process_pdf_bytes
@@ -213,18 +225,48 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 
 
 @router.post("/confirm", status_code=201, summary="Подтвердить загрузку в RAG")
-async def confirm_rag_upload(request: ConfirmUploadRequest):
+async def confirm_rag_upload(
+    request: ConfirmUploadRequest,
+    session: AsyncSession = Depends(get_async_session),
+):
     """Загружает отредактированный текст и выбранные документы в RAG."""
 
     try:
         # 1. Загружаем текст страницы (если он есть и не пуст)
         if request.text and request.text.strip():
             prepared_text = get_abbrev_expander().expand(request.text.strip())
-            await add_texts_async(
+            try:
+                raw = await fetch_url_bytes(request.url)
+                content_hash = calculate_content_hash(raw)
+            except Exception:
+                content_hash = calculate_content_hash(prepared_text.encode("utf-8"))
+
+            document_service = DocumentService(session)
+            document = await document_service.create_or_update_for_source(
+                graph_id=DEFAULT_GRAPH_ID,
+                title=request.title,
+                source_url=request.url,
+                content_hash=content_hash,
+                content_length=len(prepared_text),
+            )
+            old_rag_doc_id = document.rag_doc_id
+
+            memory = get_graph_memory()
+            await memory.delete_doc(DEFAULT_GRAPH_ID, old_rag_doc_id)
+            saved_count = await add_texts_async(
                 texts=[prepared_text],
                 graph_id=DEFAULT_GRAPH_ID,
-                source_ids=[request.title],
+                source_ids=[document.id],
                 file_paths=[request.url],
+            )
+            if saved_count == 0:
+                await document_service.mark_error(document.id)
+                raise HTTPException(status_code=500, detail="Failed to upload")
+            await document_service.mark_indexed(
+                document.id,
+                content_hash=content_hash,
+                content_length=len(prepared_text),
+                rag_doc_id=document.id,
             )
 
         # 2. Вложенные документы больше не загружаем (по запросу)
@@ -242,10 +284,40 @@ async def confirm_rag_upload(request: ConfirmUploadRequest):
 @router.get(
     "/docs", response_model=RagDocumentListResponse, summary="Список документов в RAG"
 )
-async def list_rag_documents():
+async def list_rag_documents(
+    session: AsyncSession = Depends(get_async_session),
+):
     """Возвращает список всех загруженных в RAG документов."""
+    document_service = DocumentService(session)
+    documents = await document_service.list_active(DEFAULT_GRAPH_ID)
+
     memory = get_graph_memory()
-    docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
+    rag_docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
+    rag_by_id = {str(doc.get("id")): doc for doc in rag_docs}
+    docs = []
+    for document in documents:
+        rag_doc = rag_by_id.get(document.rag_doc_id, {})
+        docs.append(
+            {
+                "id": document.id,
+                "title": document.title,
+                "url": document.source_url,
+                "status": document.status,
+                "content_hash": document.content_hash,
+                "content_summary": rag_doc.get("content_summary"),
+                "content_length": document.content_length
+                or rag_doc.get("content_length"),
+                "created_at": document.created_at.isoformat()
+                if document.created_at
+                else None,
+                "updated_at": document.updated_at.isoformat()
+                if document.updated_at
+                else None,
+                "last_indexed_at": document.last_indexed_at.isoformat()
+                if document.last_indexed_at
+                else None,
+            }
+        )
     return RagDocumentListResponse(documents=docs)
 
 
@@ -254,10 +326,17 @@ async def list_rag_documents():
     response_model=RagDocumentContentResponse,
     summary="Получить полный текст документа",
 )
-async def get_rag_document_content(doc_id: str):
+async def get_rag_document_content(
+    doc_id: str,
+    session: AsyncSession = Depends(get_async_session),
+):
     """Возвращает полный исходный текст документа по его ID."""
+    document = await DocumentService(session).get_by_id(doc_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
+
     memory = get_graph_memory()
-    content = await memory.get_doc_full_text(DEFAULT_GRAPH_ID, doc_id)
+    content = await memory.get_doc_full_text(DEFAULT_GRAPH_ID, document.rag_doc_id)
 
     if content is None:
         raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
@@ -269,16 +348,77 @@ async def get_rag_document_content(doc_id: str):
     "/docs/{doc_id:path}",
     summary="Удалить документ из RAG",
 )
-async def delete_rag_document(doc_id: str):
+async def delete_rag_document(
+    doc_id: str,
+    session: AsyncSession = Depends(get_async_session),
+):
     """Удаляет документ из базы знаний RAG."""
+    document_service = DocumentService(session)
+    document = await document_service.get_by_id(doc_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
+
     memory = get_graph_memory()
-    success = await memory.delete_doc(DEFAULT_GRAPH_ID, doc_id)
+    success = await memory.delete_doc(DEFAULT_GRAPH_ID, document.rag_doc_id)
     if not success:
         raise HTTPException(
             status_code=500, detail=f"Failed to delete document '{doc_id}'"
         )
+    await document_service.mark_deleted(doc_id)
 
     return {"status": "success", "message": f"Document '{doc_id}' deleted."}
+
+
+@router.post(
+    "/docs/check",
+    response_model=DocumentCheckResponse,
+    summary="Проверить документы RAG на изменения",
+)
+async def check_rag_documents(
+    request: DocumentCheckRequest = Body(default_factory=DocumentCheckRequest),
+    session: AsyncSession = Depends(get_async_session),
+) -> DocumentCheckResponse:
+    service = DocumentUpdateService(session)
+    results = await service.check_documents(request.document_ids)
+    return DocumentCheckResponse(
+        checked_count=len(results),
+        changed_count=sum(1 for item in results if item["status"] == "changed"),
+        results=results,
+    )
+
+
+@router.post(
+    "/docs/update-changed",
+    response_model=DocumentUpdateResponse,
+    summary="Обновить измененные документы RAG",
+)
+async def update_changed_rag_documents(
+    request: DocumentCheckRequest = Body(default_factory=DocumentCheckRequest),
+    session: AsyncSession = Depends(get_async_session),
+) -> DocumentUpdateResponse:
+    service = DocumentUpdateService(session)
+    results = await service.update_changed_documents(request.document_ids)
+    return DocumentUpdateResponse(
+        checked_count=len(results),
+        updated_count=sum(1 for item in results if item["status"] == "updated"),
+        results=results,
+    )
+
+
+@router.post(
+    "/docs/backfill",
+    response_model=DocumentBackfillResponse,
+    summary="Импортировать старые документы LightRAG в таблицу document",
+)
+async def backfill_rag_documents(
+    session: AsyncSession = Depends(get_async_session),
+) -> DocumentBackfillResponse:
+    memory = get_graph_memory()
+    rag_docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
+    created_count = await DocumentService(session).backfill_from_rag_docs(
+        DEFAULT_GRAPH_ID, rag_docs
+    )
+    return DocumentBackfillResponse(created_count=created_count)
 
 
 @router.post(
