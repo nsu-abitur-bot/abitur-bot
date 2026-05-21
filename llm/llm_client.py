@@ -358,9 +358,20 @@ async def ask_local_llm(
         if need_rag:
             logger.info(f"[{session_id}] Querying LightRAG for context.")
             try:
+                history_entries = await redis_client.get_history(session_id)
+                history_lines = []
+                for entry in history_entries[-6:]:
+                    role = entry.get("role", "")
+                    content = entry.get("content", "")
+                    if not content:
+                        continue
+                    history_lines.append(f"{role}: {content}")
+                history_text = "\n".join(history_lines).strip()
+
                 rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
-                rag_context_raw, _metadata_sources = await query_graph_with_sources(
-                    rag_query
+                rag_context_raw, metadata_sources = await query_graph_with_sources(
+                    rag_query,
+                    conversation_history=history_text or None,
                 )
                 if not rag_context_raw or rag_context_raw.startswith(
                     "Error executing query"
@@ -370,7 +381,7 @@ async def ask_local_llm(
                     rag_sources = []
                     logger.info(f"[{session_id}] RAG retrieval result: No context found")
                 else:
-                    rag_sources = _extract_sources_from_rag_context(rag_context_raw)
+                    rag_sources = metadata_sources
                     logger.info(
                         f"[{session_id}] Retrieved context from RAG "
                         f"(sources: {len(rag_sources)})."
@@ -476,14 +487,14 @@ async def ask_local_llm(
                 flags=re.IGNORECASE,
             )
 
-            # Добавляем свои источники (максимум 5 штук)
+            # Добавляем свои источники (максимум 3 штуки)
             lower_content = content.lower()
             not_found = (
                 "не нашел информации" in lower_content or "не найдена" in lower_content
             )
             if valid_sources and not not_found:
                 links_html = []
-                for s in valid_sources[:5]:
+                for s in valid_sources[:3]:
                     url = str(s.get("url", ""))
                     if not url:
                         continue

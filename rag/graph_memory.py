@@ -1,11 +1,14 @@
 import asyncio
+import json
 import logging
 import os
+import re
 import time
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
@@ -43,6 +46,11 @@ class GraphMemory:
         self._graph_signatures: Dict[str, tuple[float, int]] = {}
         self._locks: Dict[tuple[asyncio.AbstractEventLoop, str], asyncio.Lock] = {}
         self._last_disk_check: Dict[str, float] = {}
+        self._clearing_events: Dict[str, asyncio.Event] = {}
+        self._last_cache_clear_marker: Dict[str, float] = {}
+        self._cache_clear_timeout: float = float(
+            os.getenv("LIGHTRAG_CACHE_CLEAR_TIMEOUT", "10")
+        )
         self._check_interval: float = 2.0  # limit disk scanning (os.scandir) frequency
 
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
@@ -67,6 +75,72 @@ class GraphMemory:
         if key not in self._locks:
             self._locks[key] = asyncio.Lock()
         return self._locks[key]
+
+    def _get_cache_clear_marker_path(self, graph_id: str) -> str:
+        workspace_path = self._get_workspace_path(graph_id)
+        return os.path.join(workspace_path, "llm_cache_clear.marker")
+
+    def _get_cache_clear_marker_mtime(self, graph_id: str) -> float:
+        marker_path = self._get_cache_clear_marker_path(graph_id)
+        try:
+            with open(marker_path, "r", encoding="utf-8") as marker_file:
+                raw_value = marker_file.read().strip()
+                if raw_value:
+                    return float(raw_value)
+        except (OSError, ValueError):
+            pass
+        try:
+            return os.path.getmtime(marker_path)
+        except OSError:
+            return 0.0
+
+    async def _await_cache_clear_if_needed(self, graph_id: str) -> None:
+        marker_mtime = self._get_cache_clear_marker_mtime(graph_id)
+        last_seen = self._last_cache_clear_marker.get(graph_id, 0.0)
+
+        if marker_mtime <= last_seen:
+            return
+
+        rag_to_clear = None
+
+        start_time = time.monotonic()
+        while True:
+            async with self._get_lock(graph_id):
+                wrapper = self._graphs.get(graph_id)
+                if wrapper is None:
+                    self._last_cache_clear_marker[graph_id] = marker_mtime
+                    break
+
+                if wrapper.usage_count <= 0:
+                    rag_to_clear = wrapper.rag
+                    self._last_cache_clear_marker[graph_id] = marker_mtime
+                    break
+
+            if time.monotonic() - start_time >= self._cache_clear_timeout:
+                logger.warning(
+                    f"Таймаут ожидания очистки кеша для графа {graph_id} (marker)"
+                )
+                self._last_cache_clear_marker[graph_id] = marker_mtime
+                break
+
+            await asyncio.sleep(0.05)
+
+        if rag_to_clear is not None:
+            try:
+                await rag_to_clear.aclear_cache()
+                logger.info(
+                    f"Очищен in-memory кеш LLM для графа: {graph_id} (marker)"
+                )
+            except Exception as e:
+                logger.warning(
+                    f"Ошибка при очистке in-memory кеша {graph_id} по marker: {e}"
+                )
+
+        # Гарантируем, что на следующем запросе граф будет перечитан с диска,
+        # иначе новый документ может не попасть в in-memory состояние.
+        async with self._get_lock(graph_id):
+            self._graph_signatures[graph_id] = (-1.0, -1)
+            self._last_disk_check[graph_id] = 0.0
 
     def _get_workspace_signature(self, graph_id: str) -> tuple[float, int]:
         """Получает максимальное mtime и количество файлов для графа."""
@@ -101,6 +175,12 @@ class GraphMemory:
 
     async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
         rag_to_finalize = None
+
+        clearing_event = self._clearing_events.get(graph_id)
+        if clearing_event is not None and not clearing_event.is_set():
+            await clearing_event.wait()
+
+        await self._await_cache_clear_if_needed(graph_id)
 
         async with self._get_lock(graph_id):
             now = time.monotonic()
@@ -314,20 +394,24 @@ class GraphMemory:
         graph_id: str,
         question: str,
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
+        max_sources: int = 3,
+        conversation_history: str | None = None,
     ) -> tuple[str, list[dict]]:
         try:
             async with self._use_graph(graph_id) as rag:
-                result = await rag.aquery_llm(question, param=QueryParam(mode=mode))
+                query_param = QueryParam(mode=mode)
+                for attr_name, attr_value in (
+                    ("enable_rerank", True),
+                    ("chunk_top_k", 12),
+                    ("min_rerank_score", 0.0),
+                ):
+                    if hasattr(query_param, attr_name):
+                        setattr(query_param, attr_name, attr_value)
+
+                result = await rag.aquery_llm(question, param=query_param)
                 answer = result.get("llm_response", {}).get("content", "") or ""
 
-                references = result.get("data", {}).get("references", [])
-                urls_set: set[str] = set()
-                for ref in references:
-                    file_paths_value = ref.get("file_path", "") or ""
-                    for source in file_paths_value.split(","):
-                        source = source.strip()
-                        if source.startswith("http://") or source.startswith("https://"):
-                            urls_set.add(source)
+                chunks = result.get("data", {}).get("chunks", [])
 
                 # Fetch document titles to map URLs
                 docs = await self.get_list_docs(graph_id)
@@ -339,15 +423,139 @@ class GraphMemory:
                         for part in str(doc_url).split(","):
                             url_to_title[part.strip()] = str(doc_title).strip()
 
-                sources_list = []
-                for url in urls_set:
-                    title = url_to_title.get(url, "Источник информации")
-                    sources_list.append({"url": url, "title": title})
+                aggregated: dict[str, dict] = {}
+                for idx, chunk in enumerate(chunks):
+                    file_path_value = str(chunk.get("file_path", "") or "").strip()
+                    if not file_path_value:
+                        continue
 
-                return str(answer), sources_list
+                    chunk_text = (
+                        chunk.get("content")
+                        or chunk.get("text")
+                        or chunk.get("chunk_content")
+                        or ""
+                    )
+                    if chunk_text:
+                        chunk_text = str(chunk_text).strip()
+
+                    for source in file_path_value.split(","):
+                        source = source.strip()
+                        if not source.startswith("http://") and not source.startswith(
+                            "https://"
+                        ):
+                            continue
+
+                        current = aggregated.get(source)
+                        if current is None:
+                            aggregated[source] = {
+                                "count": 1,
+                                "first_index": idx,
+                                "snippet": chunk_text,
+                            }
+                        else:
+                            current["count"] += 1
+                            if not current.get("snippet") and chunk_text:
+                                current["snippet"] = chunk_text
+
+                ordered_candidates = sorted(
+                    aggregated.items(), key=lambda item: item[1]["first_index"]
+                )
+                sources_candidates = []
+                for url, metrics in ordered_candidates:
+                    title = url_to_title.get(url, "Источник информации")
+                    snippet = str(metrics.get("snippet") or "").strip()
+                    if len(snippet) > 500:
+                        snippet = snippet[:500] + "..."
+                    sources_candidates.append(
+                        {"url": url, "title": title, "snippet": snippet}
+                    )
+
+                reranked_sources = await self._rerank_sources_with_llm(
+                    question=question,
+                    conversation_history=conversation_history,
+                    sources=sources_candidates,
+                    max_sources=max_sources,
+                )
+
+                return str(answer), reranked_sources
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
+
+    async def _rerank_sources_with_llm(
+        self,
+        question: str,
+        conversation_history: str | None,
+        sources: list[dict],
+        max_sources: int,
+    ) -> list[dict]:
+        if not sources:
+            return []
+
+        from llm.factory import get_llm_provider
+        from llm.profiles import LLMProfiles
+
+        history_block = conversation_history.strip() if conversation_history else ""
+        sources_block = "\n".join(
+            [
+                f"- URL: {s['url']}\n  Title: {s['title']}\n  Snippet: {s['snippet']}"
+                for s in sources
+            ]
+        )
+
+        system_prompt = (
+            "Ты — ассистент для ранжирования источников. "
+            "Верни JSON-массив URL в порядке убывания релевантности. "
+            "Используй только URL из списка источников. "
+            "Никакого текста вокруг JSON."
+        )
+
+        user_parts = [f"Вопрос: {question}"]
+        if history_block:
+            user_parts.append(f"История переписки:\n{history_block}")
+        user_parts.append(f"Источники:\n{sources_block}")
+        user_prompt = "\n\n".join(user_parts)
+
+        logger.info(
+            "LLM rerank sources: candidates=%d, history_present=%s",
+            len(sources),
+            bool(history_block),
+        )
+
+        provider = get_llm_provider()
+        raw = await provider.generate(
+            [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
+            profile=LLMProfiles.CHAT,
+        )
+
+        logger.debug("LLM rerank raw response: %s", raw)
+
+        urls = None
+        match = re.search(r"\[[\s\S]*\]", raw)
+        if match:
+            try:
+                urls = json.loads(match.group(0))
+            except json.JSONDecodeError:
+                urls = None
+
+        if not isinstance(urls, list):
+            logger.warning("LLM rerank fallback: invalid JSON list")
+            return [{"url": s["url"], "title": s["title"]} for s in sources[:max_sources]]
+
+        allowed = {s["url"]: s["title"] for s in sources}
+        ordered = []
+        for url in urls:
+            if not isinstance(url, str):
+                continue
+            if url in allowed and url not in {item["url"] for item in ordered}:
+                ordered.append({"url": url, "title": allowed[url]})
+
+        if not ordered:
+            logger.warning("LLM rerank fallback: no usable URLs")
+            return [{"url": s["url"], "title": s["title"]} for s in sources[:max_sources]]
+
+        logger.info("LLM rerank result: selected=%d", len(ordered[:max_sources]))
+        return ordered[:max_sources]
 
     async def get_list_docs(self, graph_id: str) -> list[dict]:
         """Возвращает список документов из KV-хранилища статусов."""
@@ -515,28 +723,82 @@ class GraphMemory:
     async def clear_cache(self, graph_id: str) -> None:
         """
         Очищает кеш ответов LLM (kv_store_llm_response_cache.json)
-        для указанного графа. Для этого сначала выгружаем граф из памяти,
-        чтобы он сохранил текущие данные на диск, после чего удаляем файл кеша.
+        для указанного графа. Для этого очищаем in-memory кеш LightRAG,
+        затем удаляем файл кеша на диске.
         """
-        # 1. Выгружаем граф из памяти, чтобы он сохранил данные на диск.
-        # Если этого не сделать, после удаления файла граф при выгрузке 
-        # может записать кеш обратно из памяти.
-        await self.cleanup(graph_id)
+        clearing_event = self._clearing_events.get(graph_id)
+        if clearing_event is None or clearing_event.is_set():
+            clearing_event = asyncio.Event()
+            self._clearing_events[graph_id] = clearing_event
 
-        # 2. Удаляем файл кеша
-        workspace_path = self._get_workspace_path(graph_id)
-        cache_file = os.path.join(workspace_path, "kv_store_llm_response_cache.json")
         try:
-            if os.path.exists(cache_file):
-                os.remove(cache_file)
-                logger.info(
-                    f"Очищен кеш ответов LLM для графа {graph_id}: "
-                    f"удален файл {cache_file}"
+            rag_to_clear = None
+
+            workspace_path = self._get_workspace_path(graph_id)
+            marker_path = self._get_cache_clear_marker_path(graph_id)
+            try:
+                marker_value = str(time.time())
+                with open(marker_path, "w", encoding="utf-8") as marker_file:
+                    marker_file.write(marker_value)
+                self._last_cache_clear_marker[graph_id] = float(marker_value)
+            except Exception as e:
+                logger.warning(
+                    f"Не удалось обновить marker очистки кеша для {graph_id}: {e}"
                 )
-            else:
-                logger.debug(f"Файл кеша не найден, очистка не требуется: {cache_file}")
-        except Exception as e:
-            logger.error(f"Ошибка при удалении файла кеша {cache_file}: {e}")
+
+            start_time = time.monotonic()
+            timed_out = False
+            while True:
+                async with self._get_lock(graph_id):
+                    wrapper = self._graphs.get(graph_id)
+                    if wrapper is None:
+                        break
+                    if wrapper.usage_count <= 0:
+                        rag_to_clear = wrapper.rag
+                        break
+
+                if time.monotonic() - start_time >= self._cache_clear_timeout:
+                    logger.warning(
+                        f"Таймаут ожидания очистки кеша для графа {graph_id}"
+                    )
+                    timed_out = True
+                    break
+
+                await asyncio.sleep(0.05)
+
+            if timed_out:
+                raise TimeoutError(
+                    f"Cache clear timeout for graph {graph_id} after "
+                    f"{self._cache_clear_timeout:.0f}s"
+                )
+
+            if rag_to_clear is not None:
+                try:
+                    await rag_to_clear.aclear_cache()
+                    logger.info(f"Очищен in-memory кеш LLM для графа: {graph_id}")
+                except Exception as e:
+                    logger.warning(
+                        f"Ошибка при очистке in-memory кеша {graph_id}: {e}"
+                    )
+
+            cache_file = os.path.join(
+                workspace_path, "kv_store_llm_response_cache.json"
+            )
+            try:
+                if os.path.exists(cache_file):
+                    os.remove(cache_file)
+                    logger.info(
+                        f"Очищен кеш ответов LLM для графа {graph_id}: "
+                        f"удален файл {cache_file}"
+                    )
+                else:
+                    logger.debug(
+                        f"Файл кеша не найден, очистка не требуется: {cache_file}"
+                    )
+            except Exception as e:
+                logger.error(f"Ошибка при удалении файла кеша {cache_file}: {e}")
+        finally:
+            clearing_event.set()
 
 
 _graph_memory_instance = None

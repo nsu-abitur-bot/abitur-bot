@@ -445,5 +445,8 @@ async def clear_rag_cache():
     Очистка вызывается по нажатию кнопки администратором.
     """
     memory = get_graph_memory()
-    await memory.clear_cache(DEFAULT_GRAPH_ID)
+    try:
+        await memory.clear_cache(DEFAULT_GRAPH_ID)
+    except TimeoutError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
     return {"message": "RAG cache cleared successfully"}
