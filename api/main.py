@@ -21,8 +21,7 @@ from api.routes.rag import router as rag_router
 from api.routes.stats import router as stats_router
 from api.routes.system_logs import router as system_logs_router
 from api.routes.topic import router as topic_router
-from db.postgres.db import AsyncSessionLocal
-from db.postgres.db import get_async_session
+from db.postgres.db import AsyncSessionLocal, get_async_session
 from db.postgres.models import Admin
 from db.postgres.services.abbrev import AbbrevDbService
 from db.postgres.services.faq import FaqDbService
@@ -58,8 +57,10 @@ async def lifespan(app: FastAPI):
         try:
             faq_entries = await FaqDbService(session).get_all()
             get_faq_matcher().load_items(
-                [{"question": e.question, "aliases": e.aliases, "answer": e.answer}
-                 for e in faq_entries]
+                [
+                    {"question": e.question, "aliases": e.aliases, "answer": e.answer}
+                    for e in faq_entries
+                ]
             )
             logger.info("FAQ загружен из БД: %d записей", len(faq_entries))
 
