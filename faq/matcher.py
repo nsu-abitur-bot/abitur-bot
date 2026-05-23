@@ -153,7 +153,7 @@ class FAQMatcher:
             return None
 
     def _load_faq(self) -> None:
-        """Загружает FAQ из YAML и вычисляет embeddings."""
+        """Загружает FAQ из YAML (используется в тестах)."""
         if self._embedder is None:
             logger.warning("FAQ embedder не инициализирован, FAQ matching отключен")
             return
@@ -170,72 +170,82 @@ class FAQMatcher:
             logger.warning("FAQ file is empty")
             return
 
+        self._process_items(faq_items)
+
+    def _process_items(self, faq_items: list[dict]) -> None:
+        """Строит in-memory индекс из списка FAQ-элементов."""
+        if self._embedder is None:
+            return
+
+        self._questions.clear()
+        self._answers.clear()
+        self._embeddings = None
+
         for item in faq_items:
-            question = item.get("question", "").strip()
-            answer = item.get("answer", "").strip()
-            aliases = item.get("aliases", [])
+            question = (item.get("question") or "").strip()
+            answer = (item.get("answer") or "").strip()
+            aliases = item.get("aliases") or []
 
             if not question or not answer:
                 continue
 
-            # Основной вопрос
             self._questions.append(question)
             self._answers.append(answer)
 
-            # Альтернативные формулировки (aliases)
             for alias in aliases:
                 alias = alias.strip()
                 if alias:
                     self._questions.append(alias)
                     self._answers.append(answer)
 
-        if self._questions:
-            import pickle
-
-            cache_path = self._faq_path.with_name("faq_cache.pkl")
-            cache = {}
-            if cache_path.exists():
-                try:
-                    with open(cache_path, "rb") as f:
-                        cache = pickle.load(f)
-                except Exception as e:
-                    logger.warning(f"Failed to load FAQ embeddings cache: {e}")
-
-            # Ищем уникальные фразы, которых нет в кэше
-            needed_phrases = list(set(self._questions))
-            to_embed_phrases = [p for p in needed_phrases if p not in cache]
-
-            if to_embed_phrases:
-                logger.info(f"FAQ: Embedding {len(to_embed_phrases)} new phrases...")
-                try:
-                    new_embeddings = self._embedder.embed_documents(to_embed_phrases)
-                    for phrase, emb in zip(to_embed_phrases, new_embeddings):
-                        cache[phrase] = emb
-
-                    # Сохраняем обновленный кэш
-                    with open(cache_path, "wb") as f:
-                        pickle.dump(cache, f)
-                except Exception as e:
-                    logger.error(f"FAQ: Failed to embed new phrases: {e}")
-                    # В случае ошибки лучше остановить загрузку/вернуть как было, но
-                    # в текущем коде мы просто не сможем обработать эти фразы.
-                    # Позволим коду упасть или продолжить - если continue,
-                    # то будут пропущены. Лучше позволим выбросить исключение.
-                    raise
-
-            # Собираем векторы для всех вопросов
-            vectors_list = [cache[phrase] for phrase in self._questions]
-            vectors = np.array(vectors_list, dtype=float)
-
-            norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-            self._embeddings = vectors / np.maximum(norms, 1e-10)
-            logger.info(
-                f"FAQ loaded: {len(faq_items)} entries, "
-                f"{len(self._questions)} total phrases"
-                f"(cached {len(self._questions) - len(to_embed_phrases)})"
-            )
-        else:
+        if not self._questions:
             logger.warning("No valid FAQ entries found")
+            return
+
+        import pickle
+
+        cache_path = self._faq_path.with_name("faq_cache.pkl")
+        cache = {}
+        if cache_path.exists():
+            try:
+                with open(cache_path, "rb") as f:
+                    cache = pickle.load(f)
+            except Exception as e:
+                logger.warning(f"Failed to load FAQ embeddings cache: {e}")
+
+        needed_phrases = list(set(self._questions))
+        to_embed_phrases = [p for p in needed_phrases if p not in cache]
+
+        if to_embed_phrases:
+            logger.info(f"FAQ: Embedding {len(to_embed_phrases)} new phrases...")
+            try:
+                new_embeddings = self._embedder.embed_documents(to_embed_phrases)
+            except Exception as e:
+                logger.error(f"FAQ: Failed to embed new phrases: {e}")
+                raise
+
+            for phrase, emb in zip(to_embed_phrases, new_embeddings):
+                cache[phrase] = emb
+
+            try:
+                with open(cache_path, "wb") as f:
+                    pickle.dump(cache, f)
+            except Exception as e:
+                logger.warning(f"Failed to save FAQ embeddings cache: {e}")
+
+        vectors_list = [cache[phrase] for phrase in self._questions]
+        vectors = np.array(vectors_list, dtype=float)
+        norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+        self._embeddings = vectors / np.maximum(norms, 1e-10)
+        logger.info(
+            f"FAQ loaded: {len(faq_items)} entries, "
+            f"{len(self._questions)} total phrases "
+            f"(cached {len(self._questions) - len(to_embed_phrases)})"
+        )
+
+    def load_items(self, items: list[dict]) -> None:
+        """Загружает FAQ из списка словарей (из БД)."""
+        self._process_items(items)
 
     def match(self, user_question: str) -> Optional[str]:
         """
@@ -289,10 +299,7 @@ class FAQMatcher:
         return None
 
     def reload(self) -> None:
-        """Перезагружает FAQ из файла (hot-reload)."""
-        self._questions.clear()
-        self._answers.clear()
-        self._embeddings = None
+        """Перезагружает FAQ из файла (для тестов с faq_path)."""
         self._load_faq()
 
     @property

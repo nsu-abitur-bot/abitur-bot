@@ -221,6 +221,47 @@ class Settings(Base):
         return f"<Settings(key='{self.key}', value='{self.value}')>"
 
 
+class FaqEntry(Base):
+    """FAQ вопросы и ответы."""
+
+    __tablename__ = "faq_entry"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    aliases: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    answer: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    def __repr__(self) -> str:
+        return f"<FaqEntry(id='{self.id}', question='{self.question[:50]}')>"
+
+
+class Abbreviation(Base):
+    """Словарь аббревиатур."""
+
+    __tablename__ = "abbreviation"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    short: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    full: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    __table_args__ = (Index("idx_abbreviation_short", "short"),)
+
+    def __repr__(self) -> str:
+        return f"<Abbreviation(id='{self.id}', short='{self.short}')>"
+
+
 class Topic(Base):
     """Справочник тем сообщений."""
 
