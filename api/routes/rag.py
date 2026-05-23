@@ -296,6 +296,16 @@ async def get_rag_document_content(doc_id: str):
 async def delete_rag_document(doc_id: str):
     """Удаляет документ из базы знаний RAG."""
     memory = get_graph_memory()
+    docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
+    if docs:
+        resolved_id = next((doc["id"] for doc in docs if doc.get("id") == doc_id), None)
+        if not resolved_id:
+            resolved_id = next(
+                (doc["id"] for doc in docs if doc.get("url") == doc_id), None
+            )
+        if resolved_id:
+            doc_id = resolved_id
+
     success = await memory.delete_doc(DEFAULT_GRAPH_ID, doc_id)
     if not success:
         raise HTTPException(
