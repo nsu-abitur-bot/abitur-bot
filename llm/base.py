@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, List, Optional
+from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 
 from langchain_core.messages import BaseMessage
 
@@ -77,6 +77,27 @@ class BaseLLMProvider(ABC):
         content = await self.generate(messages, profile=profile, **kwargs)
         if content:
             yield content
+
+    async def generate_stream_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        """Стримит ответ и возвращает итоговый текст вместе с usage.
+
+        Провайдеры, которые умеют отдавать usage в streaming API, переопределяют
+        этот метод. Дефолт оставляет старое поведение без статистики токенов.
+        """
+        chunks: list[str] = []
+        async for delta in self.generate_stream(messages, profile=profile, **kwargs):
+            if not delta:
+                continue
+            chunks.append(delta)
+            if on_delta is not None:
+                await on_delta(delta)
+        return LLMResult(text="".join(chunks).strip(), usage=LLMUsage())
 
     def get_embeddings_model(self) -> Any:
         """Возвращает объект для работы с эмбеддингами.

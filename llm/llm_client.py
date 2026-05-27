@@ -563,11 +563,11 @@ async def ask_local_llm(
             llm_usage = LLMUsage()
             if stream_callback is not None:
                 content = ""
-                async for delta in provider.generate_stream(
-                    messages, profile=LLMProfiles.CHAT
-                ):
+
+                async def on_stream_delta(delta: str) -> None:
+                    nonlocal content
                     if not delta:
-                        continue
+                        return
                     content += delta
                     try:
                         await stream_callback(content)
@@ -576,7 +576,14 @@ async def ask_local_llm(
                         logger.warning(
                             f"[{session_id}] stream_callback error: {cb_exc}"
                         )
-                content = content.strip()
+
+                llm_result = await provider.generate_stream_with_usage(
+                    messages,
+                    profile=LLMProfiles.CHAT,
+                    on_delta=on_stream_delta,
+                )
+                content = llm_result.text or content.strip()
+                llm_usage = llm_result.usage
             else:
                 llm_result = await provider.generate_with_usage(
                     messages, profile=LLMProfiles.CHAT

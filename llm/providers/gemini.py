@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, AsyncIterator, List, Optional
+from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 
 from google import genai
 from google.genai import types
@@ -90,19 +90,7 @@ class GeminiProvider(BaseLLMProvider):
         usage = LLMUsage()
         raw_usage = getattr(response, "usage_metadata", None)
         if raw_usage is not None:
-            prompt_tokens = int(getattr(raw_usage, "prompt_token_count", 0) or 0)
-            completion_tokens = int(
-                getattr(raw_usage, "candidates_token_count", 0) or 0
-            )
-            total_tokens = int(
-                getattr(raw_usage, "total_token_count", 0)
-                or (prompt_tokens + completion_tokens)
-            )
-            usage = LLMUsage(
-                prompt_tokens=prompt_tokens,
-                completion_tokens=completion_tokens,
-                total_tokens=total_tokens,
-            )
+            usage = _usage_from_gemini_metadata(raw_usage)
 
         return LLMResult(text=text, usage=usage)
 
@@ -123,6 +111,36 @@ class GeminiProvider(BaseLLMProvider):
             text = getattr(chunk, "text", None)
             if text:
                 yield text
+
+    async def generate_stream_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        gemini_messages, config = self._build_request(messages, profile)
+
+        chunks: list[str] = []
+        usage = LLMUsage()
+        stream = await self.client.aio.models.generate_content_stream(
+            model=self.model_name,
+            contents=gemini_messages,
+            config=config,
+        )
+        async for chunk in stream:
+            raw_usage = getattr(chunk, "usage_metadata", None)
+            if raw_usage is not None:
+                usage = _usage_from_gemini_metadata(raw_usage)
+
+            text = getattr(chunk, "text", None)
+            if not text:
+                continue
+            chunks.append(text)
+            if on_delta is not None:
+                await on_delta(text)
+
+        return LLMResult(text="".join(chunks).strip(), usage=usage)
 
     def get_embeddings_model(self) -> Any:
         return GeminiEmbeddings(self.client)
@@ -145,3 +163,17 @@ class GeminiEmbeddings:
         if not response.embeddings:
             return []
         return [list(e.values or []) for e in response.embeddings]
+
+
+def _usage_from_gemini_metadata(raw_usage: Any) -> LLMUsage:
+    prompt_tokens = int(getattr(raw_usage, "prompt_token_count", 0) or 0)
+    completion_tokens = int(getattr(raw_usage, "candidates_token_count", 0) or 0)
+    total_tokens = int(
+        getattr(raw_usage, "total_token_count", 0)
+        or (prompt_tokens + completion_tokens)
+    )
+    return LLMUsage(
+        prompt_tokens=prompt_tokens,
+        completion_tokens=completion_tokens,
+        total_tokens=total_tokens,
+    )

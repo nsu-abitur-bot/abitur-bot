@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, AsyncIterator, List, Optional
+from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 from urllib.parse import urlsplit
 
 import httpx
@@ -125,25 +125,7 @@ class OpenAIProvider(BaseLLMProvider):
         usage = LLMUsage()
         raw_usage = getattr(completion, "usage", None)
         if raw_usage is not None:
-            input_tokens = (
-                getattr(raw_usage, "input_tokens", None)
-                or getattr(raw_usage, "prompt_tokens", None)
-                or 0
-            )
-            output_tokens = (
-                getattr(raw_usage, "output_tokens", None)
-                or getattr(raw_usage, "completion_tokens", None)
-                or 0
-            )
-            total_tokens = (
-                getattr(raw_usage, "total_tokens", None)
-                or (int(input_tokens) + int(output_tokens))
-            )
-            usage = LLMUsage(
-                prompt_tokens=int(input_tokens),
-                completion_tokens=int(output_tokens),
-                total_tokens=int(total_tokens),
-            )
+            usage = _usage_from_openai_metadata(raw_usage)
 
         return LLMResult(text=text, usage=usage)
 
@@ -176,6 +158,49 @@ class OpenAIProvider(BaseLLMProvider):
             )
             raise
 
+    async def generate_stream_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        openai_messages: Any = [self._to_openai_message(m) for m in messages]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
+
+        chunks: list[str] = []
+        usage = LLMUsage()
+        try:
+            async with self.client.responses.stream(
+                model=self.model_name,
+                input=openai_messages,
+                max_output_tokens=max_tokens,
+                temperature=temperature,
+                timeout=timeout,
+            ) as stream:
+                async for event in stream:
+                    event_type = getattr(event, "type", None)
+                    if event_type == "response.output_text.delta":
+                        delta = getattr(event, "delta", "")
+                        if not delta:
+                            continue
+                        chunks.append(delta)
+                        if on_delta is not None:
+                            await on_delta(delta)
+                    elif event_type == "response.completed":
+                        response = getattr(event, "response", None)
+                        raw_usage = getattr(response, "usage", None)
+                        if raw_usage is not None:
+                            usage = _usage_from_openai_metadata(raw_usage)
+        except Exception:
+            logger.exception(
+                "Ошибка стриминга OpenAI (proxy=%s)",
+                _mask_proxy_url(self.proxy_url),
+            )
+            raise
+
+        return LLMResult(text="".join(chunks).strip(), usage=usage)
+
     def get_embeddings_model(self) -> Any:
         embedding_kwargs: dict[str, Any] = {
             "api_key": os.getenv("OPENAI_API_KEY"),
@@ -205,3 +230,25 @@ class OpenAIProvider(BaseLLMProvider):
             else str(message.content)
         )
         return {"role": role, "content": content}
+
+
+def _usage_from_openai_metadata(raw_usage: Any) -> LLMUsage:
+    input_tokens = (
+        getattr(raw_usage, "input_tokens", None)
+        or getattr(raw_usage, "prompt_tokens", None)
+        or 0
+    )
+    output_tokens = (
+        getattr(raw_usage, "output_tokens", None)
+        or getattr(raw_usage, "completion_tokens", None)
+        or 0
+    )
+    total_tokens = (
+        getattr(raw_usage, "total_tokens", None)
+        or (int(input_tokens) + int(output_tokens))
+    )
+    return LLMUsage(
+        prompt_tokens=int(input_tokens),
+        completion_tokens=int(output_tokens),
+        total_tokens=int(total_tokens),
+    )
