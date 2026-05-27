@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import List
 
@@ -8,7 +9,7 @@ from api.auth.dependencies import require_admin
 
 router = APIRouter(prefix="/system-logs", tags=["System Logs"])
 
-LOG_DIR = Path("logs")
+LOG_DIR = Path(os.getenv("LOG_DIR", "logs"))
 
 
 @router.get("/", dependencies=[Depends(require_admin)])

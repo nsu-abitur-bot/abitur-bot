@@ -12,7 +12,7 @@ def setup_logging():
     """Настраивает централизованное логирование для всего проекта."""
     
     # Создаем директорию для логов
-    log_dir = Path("logs")
+    log_dir = Path(os.getenv("LOG_DIR", "logs"))
     log_dir.mkdir(exist_ok=True)
     
     # Получаем уровень логирования из переменных окружения
