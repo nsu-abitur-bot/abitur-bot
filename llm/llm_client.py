@@ -226,6 +226,7 @@ async def _save_log_to_db(
     message_type: str,
     content: str,
     message_metadata: dict,
+    tokens_used: Optional[int] = None,
 ) -> None:
     """Сохраняет лог в таблицу message_logs."""
     try:
@@ -237,6 +238,7 @@ async def _save_log_to_db(
                 message_type=message_type,
                 content=content,
                 message_metadata=message_metadata,
+                tokens_used=tokens_used,
             )
     except Exception as e:
         logger.error(f"Ошибка сохранения лога в БД: {e}")
@@ -526,7 +528,11 @@ async def ask_local_llm(
             logger.info(
                 f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
             )
-            content = await provider.generate(messages, profile=LLMProfiles.CHAT)
+            llm_result = await provider.generate_with_usage(
+                messages, profile=LLMProfiles.CHAT
+            )
+            content = llm_result.text
+            llm_usage = llm_result.usage
 
             # Удаляем любые левые ссылки, которые могла придумать LLM
             content = re.sub(
@@ -568,7 +574,9 @@ async def ask_local_llm(
                     message_metadata={
                         "response_length": len(content),
                         "provider": provider.__class__.__name__,
+                        "tokens": llm_usage.to_dict(),
                     },
+                    tokens_used=llm_usage.total_tokens or None,
                 )
             )
 

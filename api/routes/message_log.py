@@ -7,6 +7,7 @@ from api.schemas.message_log import (
     MessageLogQueryParams,
     MessageLogResponse,
     RequestCountStatsResponse,
+    TokenUsageStatsResponse,
 )
 from api.schemas.popular_questions import PopularQuestion, PopularQuestionsResponse
 from db.postgres.db import get_async_session
@@ -66,6 +67,54 @@ async def get_request_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Ошибка получения статистики: {str(e)}",
+        )
+
+
+@router.get(
+    "/token-stats",
+    response_model=TokenUsageStatsResponse,
+    summary="Статистика потребления токенов",
+)
+async def get_token_stats(
+    start: datetime | None = Query(None, description="Начало периода (ISO 8601)"),
+    end: datetime | None = Query(None, description="Конец периода (ISO 8601)"),
+    group_by: str = Query(
+        "day",
+        description="Группировка: hour, day, week, month",
+    ),
+    log_service: MessageLogService = Depends(get_message_log_service),
+):
+    """Возвращает суммарное потребление токенов LLM, сгруппированное по периодам."""
+    allowed_groups = {"hour", "day", "week", "month"}
+    if group_by not in allowed_groups:
+        raise HTTPException(
+            status_code=400,
+            detail=f"group_by должен быть одним из {sorted(allowed_groups)}",
+        )
+
+    if start is not None and end is not None and start > end:
+        raise HTTPException(
+            status_code=400,
+            detail="start не может быть позже end",
+        )
+
+    try:
+        stats = await log_service.get_token_usage_stats(
+            start=start,
+            end=end,
+            group_by=group_by,
+        )
+        return TokenUsageStatsResponse(
+            total=stats["total"],
+            group_by=group_by,
+            start=start,
+            end=end,
+            buckets=stats["buckets"],
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения статистики токенов: {str(e)}",
         )
 
 
