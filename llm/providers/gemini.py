@@ -6,7 +6,7 @@ from google import genai
 from google.genai import types
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
-from llm.base import BaseLLMProvider
+from llm.base import BaseLLMProvider, LLMResult, LLMUsage
 from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
@@ -70,12 +70,12 @@ class GeminiProvider(BaseLLMProvider):
 
         return gemini_messages, config
 
-    async def generate(
+    async def generate_with_usage(
         self,
         messages: List[BaseMessage],
         profile: Optional[LLMProfile] = None,
         **kwargs,
-    ) -> str:
+    ) -> LLMResult:
         gemini_messages, config = self._build_request(messages, profile)
 
         response = await self.client.aio.models.generate_content(
@@ -85,7 +85,26 @@ class GeminiProvider(BaseLLMProvider):
         )
 
         content = response.text
-        return content.strip() if isinstance(content, str) else str(content or "")
+        text = content.strip() if isinstance(content, str) else str(content or "")
+
+        usage = LLMUsage()
+        raw_usage = getattr(response, "usage_metadata", None)
+        if raw_usage is not None:
+            prompt_tokens = int(getattr(raw_usage, "prompt_token_count", 0) or 0)
+            completion_tokens = int(
+                getattr(raw_usage, "candidates_token_count", 0) or 0
+            )
+            total_tokens = int(
+                getattr(raw_usage, "total_token_count", 0)
+                or (prompt_tokens + completion_tokens)
+            )
+            usage = LLMUsage(
+                prompt_tokens=prompt_tokens,
+                completion_tokens=completion_tokens,
+                total_tokens=total_tokens,
+            )
+
+        return LLMResult(text=text, usage=usage)
 
     async def generate_stream(
         self,

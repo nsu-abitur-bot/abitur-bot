@@ -8,7 +8,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
 
-from llm.base import BaseLLMProvider
+from llm.base import BaseLLMProvider, LLMResult, LLMUsage
 from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
@@ -95,12 +95,12 @@ class OpenAIProvider(BaseLLMProvider):
         )
         return temperature, max_tokens, timeout
 
-    async def generate(
+    async def generate_with_usage(
         self,
         messages: List[BaseMessage],
         profile: Optional[LLMProfile] = None,
         **kwargs,
-    ) -> str:
+    ) -> LLMResult:
         openai_messages: Any = [self._to_openai_message(m) for m in messages]
         temperature, max_tokens, timeout = self._resolve_params(profile)
 
@@ -120,7 +120,32 @@ class OpenAIProvider(BaseLLMProvider):
             raise
 
         content: Any = completion.output_text
-        return content.strip() if isinstance(content, str) else str(content or "")
+        text = content.strip() if isinstance(content, str) else str(content or "")
+
+        usage = LLMUsage()
+        raw_usage = getattr(completion, "usage", None)
+        if raw_usage is not None:
+            input_tokens = (
+                getattr(raw_usage, "input_tokens", None)
+                or getattr(raw_usage, "prompt_tokens", None)
+                or 0
+            )
+            output_tokens = (
+                getattr(raw_usage, "output_tokens", None)
+                or getattr(raw_usage, "completion_tokens", None)
+                or 0
+            )
+            total_tokens = (
+                getattr(raw_usage, "total_tokens", None)
+                or (int(input_tokens) + int(output_tokens))
+            )
+            usage = LLMUsage(
+                prompt_tokens=int(input_tokens),
+                completion_tokens=int(output_tokens),
+                total_tokens=int(total_tokens),
+            )
+
+        return LLMResult(text=text, usage=usage)
 
     async def generate_stream(
         self,

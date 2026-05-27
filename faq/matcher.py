@@ -9,6 +9,7 @@ FAQ Matcher — модуль для поиска готовых ответов �
 без обращения к LLM.
 """
 
+import asyncio
 import logging
 import re
 from pathlib import Path
@@ -279,6 +280,46 @@ class FAQMatcher:
         query_embedding = query_vec / max(float(np.linalg.norm(query_vec)), 1e-10)
 
         # Косинусное сходство со всеми FAQ-фразами
+        similarities = _cosine_similarity(query_embedding, self._embeddings)
+
+        best_idx = int(np.argmax(similarities))
+        best_score = float(similarities[best_idx])
+
+        logger.info(
+            f"[FAQ] Match result: best='{self._questions[best_idx]}' "
+            f"score={best_score:.4f} threshold={self._threshold}"
+        )
+
+        if best_score >= self._threshold:
+            logger.info(
+                f"[FAQ] HIT: '{cleaned}' → '{self._questions[best_idx]}' "
+                f"(score={best_score:.4f})"
+            )
+            return self._answers[best_idx]
+
+        return None
+
+    async def match_async(self, user_question: str) -> Optional[str]:
+        """Async-вариант match: выносит синхронный embed_documents в отдельный поток,
+        чтобы не блокировать event loop."""
+        if self._embeddings is None or len(self._questions) == 0:
+            return None
+
+        cleaned = clean_user_input(user_question)
+        if not cleaned:
+            return None
+
+        logger.info(f"[FAQ] Input cleaned: '{user_question}' → '{cleaned}'")
+
+        if self._embedder is None:
+            return None
+
+        embed_result = await asyncio.to_thread(
+            self._embedder.embed_documents, [cleaned]
+        )
+        query_vec = np.array(embed_result[0], dtype=float)
+        query_embedding = query_vec / max(float(np.linalg.norm(query_vec)), 1e-10)
+
         similarities = _cosine_similarity(query_embedding, self._embeddings)
 
         best_idx = int(np.argmax(similarities))

@@ -187,6 +187,9 @@ class MessageLog(Base):
     topic_id: Mapped[Optional[int]] = mapped_column(
         BigInteger, ForeignKey("topic.id"), nullable=True
     )
+    tokens_used: Mapped[Optional[int]] = mapped_column(
+        Integer, nullable=True
+    )  # суммарное количество токенов на генерацию (для message_type='llm_response')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
     topic: Mapped[Optional["Topic"]] = relationship("Topic")
