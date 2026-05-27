@@ -32,6 +32,64 @@ UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
     re.IGNORECASE,
 )
+LOG_TEXT_PREVIEW_LIMIT = int(os.getenv("RAG_LOG_TEXT_PREVIEW_LIMIT", "2000"))
+LOG_CHUNKS_LIMIT = int(os.getenv("RAG_LOG_CHUNKS_LIMIT", "10"))
+
+
+def _clip_for_log(value: Any, limit: int = LOG_TEXT_PREVIEW_LIMIT) -> str:
+    text = str(value or "")
+    if len(text) <= limit:
+        return text
+    return f"{text[:limit]}... <truncated {len(text) - limit} chars>"
+
+
+def _json_for_log(value: Any, limit: int = LOG_TEXT_PREVIEW_LIMIT) -> str:
+    try:
+        text = json.dumps(value, ensure_ascii=False, default=str)
+    except TypeError:
+        text = str(value)
+    return _clip_for_log(text, limit)
+
+
+def _summarize_rag_chunk(chunk: dict, idx: int) -> dict[str, Any]:
+    content = chunk.get("content") or chunk.get("text") or chunk.get("chunk_content")
+    return {
+        "index": idx,
+        "file_path": chunk.get("file_path"),
+        "source_id": chunk.get("source_id") or chunk.get("id"),
+        "score": chunk.get("score") or chunk.get("distance"),
+        "content": _clip_for_log(content, 700),
+    }
+
+
+def _log_rag_data_summary(
+    *,
+    graph_id: str,
+    chunks: list,
+    entities: list | None,
+    relations: list | None,
+) -> None:
+    chunk_summaries = [
+        _summarize_rag_chunk(chunk, idx)
+        for idx, chunk in enumerate(chunks[:LOG_CHUNKS_LIMIT])
+        if isinstance(chunk, dict)
+    ]
+    logger.info(
+        (
+            "RAG retrieval data: graph_id=%s chunks=%d entities=%d relations=%d "
+            "logged_chunks=%d"
+        ),
+        graph_id,
+        len(chunks),
+        len(entities or []),
+        len(relations or []),
+        len(chunk_summaries),
+    )
+    logger.debug(
+        "RAG retrieval chunks preview: graph_id=%s chunks=%s",
+        graph_id,
+        _json_for_log(chunk_summaries, limit=6000),
+    )
 
 
 def _clean_source_title(title: str | None) -> str | None:
@@ -452,7 +510,20 @@ class GraphMemory:
     ) -> str:
         try:
             async with self._use_graph(graph_id) as rag:
+                logger.info(
+                    "RAG query start: graph_id=%s mode=%s question=%s",
+                    graph_id,
+                    mode,
+                    _clip_for_log(question),
+                )
                 result = await rag.aquery(question, param=QueryParam(mode=mode))
+                logger.info(
+                    "RAG query response: graph_id=%s mode=%s length=%d content=%s",
+                    graph_id,
+                    mode,
+                    len(str(result)),
+                    _clip_for_log(result),
+                )
                 return str(result)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
@@ -477,10 +548,62 @@ class GraphMemory:
                     if hasattr(query_param, attr_name):
                         setattr(query_param, attr_name, attr_value)
 
+                query_settings = {
+                    "mode": mode,
+                    "enable_rerank": getattr(query_param, "enable_rerank", None),
+                    "chunk_top_k": getattr(query_param, "chunk_top_k", None),
+                    "top_k": getattr(query_param, "top_k", None),
+                    "min_rerank_score": getattr(
+                        query_param, "min_rerank_score", None
+                    ),
+                }
+                logger.info(
+                    (
+                        "RAG retrieval query: graph_id=%s settings=%s "
+                        "history_present=%s question=%s"
+                    ),
+                    graph_id,
+                    _json_for_log(query_settings),
+                    bool(conversation_history),
+                    _clip_for_log(question),
+                )
+                if conversation_history:
+                    logger.debug(
+                        "RAG retrieval conversation history: graph_id=%s history=%s",
+                        graph_id,
+                        _clip_for_log(conversation_history),
+                    )
+
                 result = await rag.aquery_llm(question, param=query_param)
                 answer = result.get("llm_response", {}).get("content", "") or ""
+                data = result.get("data", {})
+                chunks = data.get("chunks", [])
+                entities = data.get("entities")
+                relations = data.get("relations")
 
-                chunks = result.get("data", {}).get("chunks", [])
+                logger.info(
+                    (
+                        "RAG retrieval response: graph_id=%s answer_length=%d "
+                        "answer=%s"
+                    ),
+                    graph_id,
+                    len(str(answer)),
+                    _clip_for_log(answer),
+                )
+                logger.debug(
+                    "RAG retrieval raw response: graph_id=%s result=%s",
+                    graph_id,
+                    _json_for_log(result, limit=10000),
+                )
+                _log_rag_data_summary(
+                    graph_id=graph_id,
+                    chunks=chunks if isinstance(chunks, list) else [],
+                    entities=entities if isinstance(entities, list) else None,
+                    relations=relations if isinstance(relations, list) else None,
+                )
+
+                if not isinstance(chunks, list):
+                    chunks = []
 
                 url_to_title = await self._get_source_titles(graph_id)
 
@@ -536,6 +659,16 @@ class GraphMemory:
                     conversation_history=conversation_history,
                     sources=sources_candidates,
                     max_sources=max_sources,
+                )
+                logger.info(
+                    (
+                        "RAG retrieval sources: graph_id=%s candidates=%d "
+                        "selected=%d selected_sources=%s"
+                    ),
+                    graph_id,
+                    len(sources_candidates),
+                    len(reranked_sources),
+                    _json_for_log(reranked_sources, limit=4000),
                 )
 
                 return str(answer), reranked_sources

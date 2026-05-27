@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 import re
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from html import escape, unescape
 from typing import Awaitable, Callable, Optional
 from urllib.parse import urlsplit
@@ -62,6 +62,8 @@ LIGHTRAG_FORMAT_HINT = (
 )
 
 DEFAULT_SOURCE_TITLE = "Источник информации"
+RAG_LOG_CONTENT_LIMIT = 12000
+RAG_INTERNAL_LOG_LIMIT = 120
 
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
@@ -357,6 +359,60 @@ def _clean_rag_context(rag_context: str) -> str:
     return rag_context.strip()
 
 
+def _truncate_log_content(content: str, limit: int = RAG_LOG_CONTENT_LIMIT) -> str:
+    if len(content) <= limit:
+        return content
+    return f"{content[:limit]}\n\n... [truncated {len(content) - limit} chars]"
+
+
+class _RagTraceLogHandler(logging.Handler):
+    def __init__(self, limit: int = RAG_INTERNAL_LOG_LIMIT) -> None:
+        super().__init__(level=logging.INFO)
+        self.limit = limit
+        self.lines: list[str] = []
+        self.dropped = 0
+
+    def emit(self, record: logging.LogRecord) -> None:
+        try:
+            line = f"{record.levelname}: {record.getMessage()}"
+        except Exception:
+            return
+        if len(self.lines) < self.limit:
+            self.lines.append(line)
+        else:
+            self.dropped += 1
+
+    def get_lines(self) -> list[str]:
+        if self.dropped <= 0:
+            return self.lines
+        return [*self.lines, f"... [truncated {self.dropped} internal RAG log lines]"]
+
+
+@contextmanager
+def _capture_lightrag_logs():
+    lightrag_logger = logging.getLogger("lightrag")
+    handler = _RagTraceLogHandler()
+    previous_level = lightrag_logger.level
+    previous_propagate = lightrag_logger.propagate
+    lightrag_logger.setLevel(logging.INFO)
+    lightrag_logger.propagate = True
+    lightrag_logger.addHandler(handler)
+    try:
+        yield handler
+    finally:
+        lightrag_logger.removeHandler(handler)
+        lightrag_logger.setLevel(previous_level)
+        lightrag_logger.propagate = previous_propagate
+
+
+def _format_rag_response_log(context: str, trace_lines: list[str]) -> str:
+    blocks = []
+    if trace_lines:
+        blocks.append("Трассировка поиска в базе знаний:\n" + "\n".join(trace_lines))
+    blocks.append("Ответ базы знаний:\n" + context)
+    return _truncate_log_content("\n\n".join(blocks))
+
+
 StreamCallback = Callable[[str], Awaitable[None]]
 StatusCallback = Callable[[str], Awaitable[None]]
 
@@ -469,14 +525,30 @@ async def ask_local_llm(
         # 7. FAQ промахнулся — запускаем и ждём RAG.
         rag_sources: list[dict] = []
         rag_context = ""
+        rag_trace_lines: list[str] = []
         await _emit_status(STATUS_RAG)
         try:
             logger.info(f"[{session_id}] Querying LightRAG for context.")
             rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
-            rag_context_raw, metadata_sources = await query_graph_with_sources(
-                rag_query,
-                conversation_history=history_text or None,
+            _spawn_bg(
+                _save_log_to_db(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="rag_query",
+                    content=_truncate_log_content(rag_query),
+                    message_metadata={
+                        "title": "Запрос к базе знаний",
+                        "query_length": len(rag_query),
+                        "history_present": bool(history_text),
+                    },
+                )
             )
+            with _capture_lightrag_logs() as rag_trace:
+                rag_context_raw, metadata_sources = await query_graph_with_sources(
+                    rag_query,
+                    conversation_history=history_text or None,
+                )
+            rag_trace_lines = rag_trace.get_lines()
             if not rag_context_raw or rag_context_raw.startswith(
                 "Error executing query"
             ):
@@ -498,23 +570,46 @@ async def ask_local_llm(
                     f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}"
                 )
 
-                _spawn_bg(
-                    _save_log_to_db(
-                        user_id=user_id,
-                        session_id=session_id,
-                        message_type="rag_context",
-                        content=rag_context_raw[:1000],
-                        message_metadata={
-                            "sources": rag_sources,
-                            "context_length": len(rag_context_raw),
-                            "sources_count": len(rag_sources),
-                        },
-                    )
+            _spawn_bg(
+                _save_log_to_db(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="rag_response",
+                    content=_format_rag_response_log(
+                        rag_context_raw or rag_context,
+                        rag_trace_lines,
+                    ),
+                    message_metadata={
+                        "title": "Ответ базы знаний",
+                        "sources": rag_sources,
+                        "context_length": len(rag_context_raw or rag_context),
+                        "sources_count": len(rag_sources),
+                        "internal_logs_count": len(rag_trace_lines),
+                        "found_context": bool(
+                            rag_context_raw
+                            and not rag_context_raw.startswith("Error executing query")
+                        ),
+                    },
                 )
+            )
             rag_context = _clean_rag_context(rag_context)
         except Exception as e:
             logger.warning(f"[{session_id}] LightRAG query error: {e}")
             rag_context = "База знаний временно недоступна."
+            _spawn_bg(
+                _save_log_to_db(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="rag_response",
+                    content=rag_context,
+                    message_metadata={
+                        "title": "Ответ базы знаний",
+                        "error": str(e),
+                        "internal_logs_count": len(rag_trace_lines),
+                        "found_context": False,
+                    },
+                )
+            )
 
         # 8. Формируем промпт и зовём основную LLM-генерацию.
         try:

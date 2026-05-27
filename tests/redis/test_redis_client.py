@@ -64,3 +64,20 @@ async def test_clear_history(redis_client):
 
     history = await redis_client.get_history(session_id)
     assert len(history) == 0
+
+
+@pytest.mark.asyncio
+async def test_reset_dialog_session_rotates_history_session(redis_client):
+    base_session_id = "test-session"
+
+    assert await redis_client.get_dialog_session_id(base_session_id) == base_session_id
+    await redis_client.add_message(
+        base_session_id, {"role": "user", "content": "old question"}
+    )
+
+    new_session_id = await redis_client.reset_dialog_session(base_session_id)
+
+    assert new_session_id == "test-session:dialog:1"
+    assert await redis_client.get_dialog_session_id(base_session_id) == new_session_id
+    assert await redis_client.get_history(base_session_id) == []
+    assert await redis_client.get_history(new_session_id) == []

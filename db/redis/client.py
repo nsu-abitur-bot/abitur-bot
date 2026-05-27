@@ -80,6 +80,44 @@ class RedisClient:
             logger.error("Ошибка очистки истории для сессии %s: %s", session_id, e)
             raise
 
+    async def get_dialog_session_id(self, base_session_id: str) -> str:
+        """Возвращает активный идентификатор диалога для логов и истории."""
+        generation_key = f"session_state:{base_session_id}:dialog_generation"
+        try:
+            generation = await self.client.get(generation_key)
+        except redis.RedisError as e:
+            logger.error(
+                "Ошибка получения поколения диалога для %s: %s",
+                base_session_id,
+                e,
+            )
+            return base_session_id
+
+        if not generation or generation == "0":
+            return base_session_id
+        return f"{base_session_id}:dialog:{generation}"
+
+    async def reset_dialog_session(self, base_session_id: str) -> str:
+        """Начинает новый диалог после /reset и возвращает новый session_id."""
+        generation_key = f"session_state:{base_session_id}:dialog_generation"
+        old_session_id = await self.get_dialog_session_id(base_session_id)
+        try:
+            generation = await self.client.incr(generation_key)
+        except redis.RedisError as e:
+            logger.error("Ошибка сброса диалога для %s: %s", base_session_id, e)
+            raise
+
+        new_session_id = f"{base_session_id}:dialog:{generation}"
+        await self.clear_history(old_session_id)
+        await self.clear_history(new_session_id)
+        logger.info(
+            "Диалог сброшен: base_session_id=%s old_session_id=%s new_session_id=%s",
+            base_session_id,
+            old_session_id,
+            new_session_id,
+        )
+        return new_session_id
+
     async def set_awaiting_applicant_id(self, session_id: str, value: bool) -> None:
         """Устанавливает флаг ожидания идентификатора абитуриента."""
         key = f"session_state:{session_id}:awaiting_applicant_id"
