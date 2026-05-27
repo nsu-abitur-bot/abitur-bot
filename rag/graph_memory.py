@@ -16,6 +16,7 @@ from lightrag.utils import wrap_embedding_func_with_attrs
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
+from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 
@@ -700,7 +701,7 @@ class GraphMemory:
             async with AsyncSessionLocal() as session:
                 stmt = select(Document).where(
                     Document.graph_id == graph_id,
-                    Document.status == "active",
+                    Document.status.in_(ACTIVE_DOCUMENT_STATUSES),
                 )
                 result = await session.execute(stmt)
                 for document in result.scalars().all():

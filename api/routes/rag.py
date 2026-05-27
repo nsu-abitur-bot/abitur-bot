@@ -24,8 +24,10 @@ from api.schemas.rag import (
     ParsedPageResult,
     PreprocessDocumentRequest,
     PreprocessDocumentResponse,
+    RagDocument,
     RagDocumentContentResponse,
     RagDocumentListResponse,
+    RagDocumentUpdateRequest,
     RagUploadResponse,
 )
 from api.services.document_update import (
@@ -36,7 +38,11 @@ from api.services.document_update import (
 from api.services.rag_upload import RagUploadService
 from api.services.url_to_rag import parse_and_save_url
 from db.postgres.db import get_async_session
-from db.postgres.services.document import DocumentService
+from db.postgres.services.document import (
+    DOCUMENT_STATUS_CHANGED,
+    DOCUMENT_STATUS_UPDATED,
+    DocumentService,
+)
 from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu import parse_page
 from parser.url import process_pdf_bytes
@@ -339,6 +345,11 @@ async def list_rag_documents(
                 "last_indexed_at": document.last_indexed_at.isoformat()
                 if document.last_indexed_at
                 else None,
+                "last_checked_at": document.last_checked_at.isoformat()
+                if document.last_checked_at
+                else None,
+                "last_checked_hash": document.last_checked_hash,
+                "last_check_message": document.last_check_message,
             }
         )
     return RagDocumentListResponse(documents=docs)
@@ -365,6 +376,49 @@ async def get_rag_document_content(
         raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
 
     return RagDocumentContentResponse(id=doc_id, content=content)
+
+
+@router.patch(
+    "/docs/{doc_id:path}",
+    response_model=RagDocument,
+    summary="Изменить метаданные документа",
+)
+async def update_rag_document(
+    doc_id: str,
+    request: RagDocumentUpdateRequest,
+    session: AsyncSession = Depends(get_async_session),
+) -> RagDocument:
+    if request.title is None and request.source_url is None:
+        raise HTTPException(status_code=400, detail="Nothing to update")
+
+    document_service = DocumentService(session)
+    document = await document_service.update_metadata(
+        doc_id,
+        title=request.title,
+        source_url=request.source_url,
+    )
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
+
+    return RagDocument(
+        id=document.id,
+        title=document.title,
+        url=document.source_url,
+        status=document.status,
+        content_hash=document.content_hash,
+        content_summary=None,
+        content_length=document.content_length,
+        created_at=document.created_at.isoformat() if document.created_at else None,
+        updated_at=document.updated_at.isoformat() if document.updated_at else None,
+        last_indexed_at=document.last_indexed_at.isoformat()
+        if document.last_indexed_at
+        else None,
+        last_checked_at=document.last_checked_at.isoformat()
+        if document.last_checked_at
+        else None,
+        last_checked_hash=document.last_checked_hash,
+        last_check_message=document.last_check_message,
+    )
 
 
 @router.delete(
@@ -426,7 +480,9 @@ async def check_rag_documents(
     results = await service.check_documents(request.document_ids)
     return DocumentCheckResponse(
         checked_count=len(results),
-        changed_count=sum(1 for item in results if item["status"] == "changed"),
+        changed_count=sum(
+            1 for item in results if item["status"] == DOCUMENT_STATUS_CHANGED
+        ),
         results=results,
     )
 
@@ -444,7 +500,9 @@ async def update_changed_rag_documents(
     results = await service.update_changed_documents(request.document_ids)
     return DocumentUpdateResponse(
         checked_count=len(results),
-        updated_count=sum(1 for item in results if item["status"] == "updated"),
+        updated_count=sum(
+            1 for item in results if item["status"] == DOCUMENT_STATUS_UPDATED
+        ),
         results=results,
     )
 

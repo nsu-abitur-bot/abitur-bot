@@ -270,8 +270,13 @@ class Document(Base):
     rag_doc_id: Mapped[str] = mapped_column(String(500), nullable=False)
     content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     content_length: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
+    status: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="проиндексирован"
+    )
     last_indexed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    last_checked_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    last_checked_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    last_check_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=timestamp, onupdate=timestamp
