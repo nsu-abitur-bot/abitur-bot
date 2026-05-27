@@ -5,6 +5,38 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres.models import Document, timestamp
 
+DOCUMENT_STATUS_INDEXED = "проиндексирован"
+DOCUMENT_STATUS_UNCHANGED = "без изменений"
+DOCUMENT_STATUS_CHANGED = "изменён"
+DOCUMENT_STATUS_SOURCE_UNAVAILABLE = "источник недоступен"
+DOCUMENT_STATUS_NO_SOURCE = "нет ссылки"
+DOCUMENT_STATUS_INDEXING_FAILED = "ошибка индексации"
+DOCUMENT_STATUS_DELETED = "удалён"
+DOCUMENT_STATUS_UPDATED = "обновлён"
+
+CHECK_TO_DOCUMENT_STATUS = {
+    DOCUMENT_STATUS_UNCHANGED: DOCUMENT_STATUS_INDEXED,
+    DOCUMENT_STATUS_CHANGED: DOCUMENT_STATUS_CHANGED,
+    DOCUMENT_STATUS_SOURCE_UNAVAILABLE: DOCUMENT_STATUS_SOURCE_UNAVAILABLE,
+    DOCUMENT_STATUS_NO_SOURCE: DOCUMENT_STATUS_NO_SOURCE,
+    DOCUMENT_STATUS_UPDATED: DOCUMENT_STATUS_INDEXED,
+    DOCUMENT_STATUS_INDEXING_FAILED: DOCUMENT_STATUS_INDEXING_FAILED,
+}
+
+ACTIVE_DOCUMENT_STATUSES = {
+    "active",
+    "indexed",
+    "changed",
+    "source_unavailable",
+    "no_source",
+    "indexing_failed",
+    DOCUMENT_STATUS_INDEXED,
+    DOCUMENT_STATUS_CHANGED,
+    DOCUMENT_STATUS_SOURCE_UNAVAILABLE,
+    DOCUMENT_STATUS_NO_SOURCE,
+    DOCUMENT_STATUS_INDEXING_FAILED,
+}
+
 
 class DocumentService:
     """Сервис для документов, проиндексированных в RAG."""
@@ -33,7 +65,7 @@ class DocumentService:
         stmt = select(Document).where(
             Document.graph_id == graph_id,
             Document.source_url == source_url,
-            Document.status != "deleted",
+            Document.status.not_in({"deleted", DOCUMENT_STATUS_DELETED}),
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
@@ -41,9 +73,14 @@ class DocumentService:
     async def list_active(
         self, graph_id: str, document_ids: Sequence[str] | None = None
     ) -> Sequence[Document]:
+        return await self.list_checkable(graph_id, document_ids)
+
+    async def list_checkable(
+        self, graph_id: str, document_ids: Sequence[str] | None = None
+    ) -> Sequence[Document]:
         stmt = select(Document).where(
             Document.graph_id == graph_id,
-            Document.status == "active",
+            Document.status.in_(ACTIVE_DOCUMENT_STATUSES),
         )
         if document_ids is not None:
             stmt = stmt.where(Document.id.in_(document_ids))
@@ -76,7 +113,7 @@ class DocumentService:
                 rag_doc_id=rag_doc_id or "",
                 content_hash=content_hash,
                 content_length=content_length,
-                status="active",
+                status=DOCUMENT_STATUS_INDEXED,
                 last_indexed_at=timestamp(),
             )
             self.session.add(document)
@@ -88,7 +125,7 @@ class DocumentService:
             document.source_url = source_url
             document.content_hash = content_hash
             document.content_length = content_length
-            document.status = "active"
+            document.status = DOCUMENT_STATUS_INDEXED
             document.last_indexed_at = timestamp()
             if not document.rag_doc_id:
                 document.rag_doc_id = document.id
@@ -118,7 +155,9 @@ class DocumentService:
             document.rag_doc_id = rag_doc_id
         document.content_hash = content_hash
         document.content_length = content_length
-        document.status = "active"
+        document.status = DOCUMENT_STATUS_INDEXED
+        document.last_checked_hash = content_hash
+        document.last_check_message = None
         document.last_indexed_at = timestamp()
         await self.session.commit()
         await self.session.refresh(document)
@@ -128,7 +167,8 @@ class DocumentService:
         document = await self.get_by_id(document_id)
         if document is None:
             return False
-        document.status = "error"
+        document.status = DOCUMENT_STATUS_INDEXING_FAILED
+        document.last_check_message = "Не удалось проиндексировать документ"
         await self.session.commit()
         return True
 
@@ -136,6 +176,49 @@ class DocumentService:
         document = await self.get_by_id(document_id)
         if document is None:
             return False
-        document.status = "deleted"
+        document.status = DOCUMENT_STATUS_DELETED
         await self.session.commit()
         return True
+
+    async def update_metadata(
+        self,
+        document_id: str,
+        *,
+        title: str | None = None,
+        source_url: str | None = None,
+    ) -> Optional[Document]:
+        document = await self.get_by_id(document_id)
+        if document is None:
+            return None
+
+        source_url_changed = source_url is not None and source_url != document.source_url
+        if title is not None:
+            document.title = title
+        if source_url is not None:
+            document.source_url = source_url
+        if source_url_changed:
+            document.status = (
+                DOCUMENT_STATUS_CHANGED if source_url else DOCUMENT_STATUS_NO_SOURCE
+            )
+            document.last_checked_hash = None
+            document.last_check_message = "Ссылка на источник изменена"
+
+        await self.session.commit()
+        await self.session.refresh(document)
+        return document
+
+    async def save_check_results(self, results: Sequence[dict]) -> None:
+        checked_at = timestamp()
+        for result in results:
+            document_id = result["id"]
+            document = await self.get_by_id(document_id)
+            if document is None:
+                continue
+            document_status = CHECK_TO_DOCUMENT_STATUS.get(result["status"])
+            if document_status is not None:
+                document.status = document_status
+            document.last_checked_at = checked_at
+            document.last_checked_hash = result.get("content_hash")
+            document.last_check_message = result.get("message")
+
+        await self.session.commit()

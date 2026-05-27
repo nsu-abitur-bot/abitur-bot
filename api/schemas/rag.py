@@ -64,6 +64,11 @@ class RagDocument(BaseModel):
     created_at: str | None = Field(None, description="Дата создания")
     updated_at: str | None = Field(None, description="Дата обновления")
     last_indexed_at: str | None = Field(None, description="Дата последней индексации")
+    last_checked_at: str | None = Field(None, description="Дата последней проверки")
+    last_checked_hash: str | None = Field(None, description="SHA-256 последней проверки")
+    last_check_message: str | None = Field(
+        None, description="Ошибка или пояснение последней проверки"
+    )
 
 
 class RagDocumentListResponse(BaseModel):
@@ -111,11 +116,22 @@ class DocumentCheckRequest(BaseModel):
     )
 
 
+class RagDocumentUpdateRequest(BaseModel):
+    title: str | None = Field(None, description="Новое название документа")
+    source_url: str | None = Field(None, description="Новая ссылка на источник")
+
+
 class DocumentCheckResult(BaseModel):
     id: str = Field(..., description="ID документа")
     title: str = Field(..., description="Название документа")
     source_url: str | None = Field(None, description="URL источника")
-    status: str = Field(..., description="changed, unchanged, skipped, failed, updated")
+    status: str = Field(
+        ...,
+        description=(
+            "без изменений, изменён, источник недоступен, нет ссылки, "
+            "обновлён, ошибка индексации"
+        ),
+    )
     content_hash: str | None = Field(None, description="Новый SHA-256")
     previous_hash: str | None = Field(None, description="Сохраненный SHA-256")
     message: str | None = Field(None, description="Ошибка или пояснение")
