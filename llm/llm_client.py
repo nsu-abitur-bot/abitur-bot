@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 import re
@@ -63,6 +64,22 @@ DEFAULT_SOURCE_TITLE = "Источник информации"
 
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
+
+# Реестр фоновых задач (write-операций, intent-классификации и т.п.),
+# которые не блокируют возврат ответа пользователю.
+# Держим strong-ref, чтобы GC не убил задачу до завершения.
+_background_tasks: set[asyncio.Task] = set()
+
+
+def _spawn_bg(coro) -> None:
+    """Запустить корутину как fire-and-forget background-задачу.
+
+    Задача регистрируется в глобальном set, чтобы избежать преждевременной
+    очистки сборщиком мусора (см. asyncio.create_task doc warning).
+    """
+    task = asyncio.create_task(coro)
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
 
 
 def _sanitize_telegram_html(text: str) -> str:
@@ -225,6 +242,118 @@ async def _save_log_to_db(
         logger.error(f"Ошибка сохранения лога в БД: {e}")
 
 
+async def _classify_intent_bg(
+    expanded_message: str,
+    log_entry_id: Optional[int],
+    session_id: str,
+) -> None:
+    """Фоновая классификация topic_id для аналитики.
+
+    Результат используется только для записи в message_logs.update_log_topic,
+    на ответ бота не влияет (need_rag всегда True).
+    """
+    try:
+        async with AsyncSessionLocal() as session:
+            topic_service = TopicService(session)
+            topics = await topic_service.get_all_active_topics()
+
+        topics_list = (
+            "\n".join([f"{topic.id}: {topic.label}" for topic in topics])
+            if topics
+            else "Нет доступных тем."
+        )
+        valid_topic_ids = {topic.id for topic in topics} if topics else set()
+
+        intent_prompt = (
+            "Ты — маршрутизатор. Выбери подходящую тему для сообщения "
+            "пользователя.\n"
+            "Ответь СТРОГО в формате JSON:\n"
+            '{"is_nsu": true, "topic_id": 123}\n'
+            "Где 'is_nsu' всегда true.\n\n"
+            "Список тем для 'topic_id':\n"
+            f"{topics_list}\n\n"
+            "Выбери наиболее подходящий 'topic_id', либо null,"
+            "если ни одна тема не подходит."
+        )
+        intent_messages: list[BaseMessage] = [
+            SystemMessage(content=intent_prompt),
+            HumanMessage(content=expanded_message),
+        ]
+        intent_provider = get_llm_provider()
+        intent_response = await intent_provider.generate(
+            intent_messages, profile=LLMProfiles.INTENT
+        )
+
+        topic_id = None
+        try:
+            json_match = re.search(r"(\{.*\})", intent_response, re.DOTALL)
+            if json_match:
+                parsed = json.loads(json_match.group(1))
+            else:
+                parsed = json.loads(intent_response)
+            topic_id = parsed.get("topic_id")
+            if topic_id is not None and topic_id not in valid_topic_ids:
+                logger.warning(
+                    f"[{session_id}] LLM hallucinated topic_id={topic_id}. Ignoring."
+                )
+                topic_id = None
+        except json.JSONDecodeError:
+            logger.warning(
+                f"[{session_id}] Failed to parse JSON from intent response: "
+                f"{intent_response}"
+            )
+            return
+
+        if topic_id and log_entry_id:
+            try:
+                async with AsyncSessionLocal() as session:
+                    log_service = MessageLogService(session)
+                    await log_service.update_log_topic(log_entry_id, topic_id)
+            except Exception as e:
+                logger.error(
+                    f"[{session_id}] Failed to update topic id in log: {e}"
+                )
+    except Exception as e:
+        logger.warning(f"[{session_id}] Background intent classification error: {e}")
+
+
+def _build_history_text(history_entries: list[dict], limit: int = 6) -> str:
+    """Собирает текст последних N сообщений истории для передачи в RAG-запрос."""
+    history_lines = []
+    for entry in history_entries[-limit:]:
+        role = entry.get("role", "")
+        content = entry.get("content", "")
+        if not content:
+            continue
+        history_lines.append(f"{role}: {content}")
+    return "\n".join(history_lines).strip()
+
+
+def _clean_rag_context(rag_context: str) -> str:
+    """Убирает из RAG-контекста все виды ссылок, которые LightRAG вставляет,
+    чтобы LLM использовала только те URL, что мы передадим явно."""
+    # 1. Блок «Источники: ...» и аналогичные до конца строки
+    rag_context = re.sub(
+        r"(?im)^.*?(?:###\s*)?(?:Источники?|References?|Ссылки):?\s*[^\n]*",
+        "",
+        rag_context,
+    )
+    # 2. «Источник информации (https://...)"
+    rag_context = re.sub(
+        r"\s*Источник\s+информации\s*\([^)]*\)",
+        "",
+        rag_context,
+        flags=re.IGNORECASE,
+    )
+    # 3. Нумерованные ссылки «[N] https://..."
+    rag_context = re.sub(
+        r"\n*\[\d+\]\s+https?://\S+",
+        "",
+        rag_context,
+    )
+    return rag_context.strip()
+
+
 async def ask_local_llm(
     message: str, session_id: str, user_id: int = 0, log_entry_id: Optional[int] = None
 ) -> str:
@@ -242,200 +371,122 @@ async def ask_local_llm(
     try:
         redis_client = await get_redis_client()
 
-        # 1. Сначала сохраняем сообщение пользователя в историю
+        # 1. Сохраняем сообщение пользователя в Redis-историю.
         logger.info(f"[{session_id}] Saving user message to Redis history.")
         await redis_client.add_message(session_id, {"role": "user", "content": message})
 
-        # 2. Расширяем аббревиатуры для улучшения FAQ-матчинга и RAG-запросов
+        # 2. Расширяем аббревиатуры для улучшения FAQ-матчинга и RAG-запросов.
         try:
             expanded_message = get_abbrev_expander().expand(message)
         except Exception:
             expanded_message = message
 
-        # 3. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
-        logger.info(f"[{session_id}] Checking FAQ for match.")
-        try:
-            faq_matcher = get_faq_matcher()
-            faq_answer = faq_matcher.match(expanded_message)
-            if faq_answer:
-                logger.info(
-                    f"[{session_id}] FAQ match found, returning predefined answer."
-                )
-                # Логируем что решил ответить из FAQ
-                logger.info(f"[{session_id}] FAQ result:")
-                logger.info(f"[{session_id}] - Matched FAQ answer: {faq_answer}")
+        # 3. Intent-классификация уезжает в фон — она нужна только для
+        # аналитического лога (update_log_topic) и не влияет на ответ.
+        _spawn_bg(_classify_intent_bg(expanded_message, log_entry_id, session_id))
 
-                # Сохраняем лог в БД
-                await _save_log_to_db(
+        # 4. Параллельно стартуем FAQ-матч и чтение истории.
+        # FAQ обычно отвечает за 0.3-1с, history — за ~10мс.
+        faq_matcher = get_faq_matcher()
+        task_faq = asyncio.create_task(faq_matcher.match_async(expanded_message))
+        task_history = asyncio.create_task(redis_client.get_history(session_id))
+
+        # Получаем историю (нужна и для RAG, и для финального промпта).
+        try:
+            history_entries = await task_history
+        except Exception as e:
+            logger.warning(f"[{session_id}] Redis get_history error: {e}")
+            history_entries = []
+        history_text = _build_history_text(history_entries)
+
+        # 5. Запускаем LightRAG параллельно с ожиданием FAQ.
+        rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
+        task_rag = asyncio.create_task(
+            query_graph_with_sources(
+                rag_query, conversation_history=history_text or None
+            )
+        )
+
+        # 6. Ждём FAQ. Если матч найден — отменяем RAG и быстро возвращаем ответ.
+        try:
+            faq_answer = await task_faq
+        except Exception as e:
+            logger.warning(f"[{session_id}] FAQ matcher error: {e}")
+            faq_answer = None
+
+        if faq_answer:
+            logger.info(f"[{session_id}] FAQ match found, returning predefined answer.")
+            task_rag.cancel()
+            with suppress(asyncio.CancelledError, Exception):
+                await task_rag
+
+            # Запись лога FAQ + истории + PG — fire-and-forget.
+            _spawn_bg(
+                _save_log_to_db(
                     user_id=user_id,
                     session_id=session_id,
                     message_type="faq_match",
                     content=faq_answer,
                     message_metadata={"source": "faq"},
                 )
-                await redis_client.add_message(
+            )
+            _spawn_bg(
+                redis_client.add_message(
                     session_id, {"role": "assistant", "content": faq_answer}
                 )
-                if user_id:
-                    await _save_message_to_pg(user_id, session_id, message, faq_answer)
-                return faq_answer
-        except Exception as e:
-            logger.warning(f"FAQ matcher error: {e}")
-
-        # 3. Определение топика для лога. RAG всегда выполняется ниже.
-        need_rag = True
-        topic_id = None
-        try:
-            # Получаем список тем
-            async with AsyncSessionLocal() as session:
-                topic_service = TopicService(session)
-                topics = await topic_service.get_all_active_topics()
-
-            topics_list = (
-                "\n".join([f"{topic.id}: {topic.label}" for topic in topics])
-                if topics
-                else "Нет доступных тем."
             )
-            valid_topic_ids = {topic.id for topic in topics} if topics else set()
-
-            intent_prompt = (
-                "Ты — маршрутизатор. Выбери подходящую тему для сообщения "
-                "пользователя.\n"
-                "Ответь СТРОГО в формате JSON:\n"
-                '{"is_nsu": true, "topic_id": 123}\n'
-                "Где 'is_nsu' всегда true.\n\n"
-                "Список тем для 'topic_id':\n"
-                f"{topics_list}\n\n"
-                "Выбери наиболее подходящий 'topic_id', либо null,"
-                "если ни одна тема не подходит."
-            )
-            intent_messages: list[BaseMessage] = [
-                SystemMessage(content=intent_prompt),
-                HumanMessage(content=expanded_message),
-            ]
-            intent_provider = get_llm_provider()
-            intent_response = await intent_provider.generate(
-                intent_messages, profile=LLMProfiles.INTENT
-            )
-
-            try:
-                # Попытка найти JSON в ответе, если модель добавила текст вокруг
-                json_match = re.search(r"(\{.*\})", intent_response, re.DOTALL)
-                if json_match:
-                    parsed = json.loads(json_match.group(1))
-                else:
-                    parsed = json.loads(intent_response)
-
-                topic_id = parsed.get("topic_id")
-
-                if topic_id is not None and topic_id not in valid_topic_ids:
-                    logger.warning(
-                        f"[{session_id}] LLM hallucinated topic_id={topic_id}. "
-                        + "Ignoring it."
-                    )
-                    topic_id = None
-
-            except json.JSONDecodeError:
-                logger.warning(
-                    f"Failed to parse JSON from intent response: {intent_response},"
-                    + " falling back to full RAG"
+            if user_id:
+                _spawn_bg(
+                    _save_message_to_pg(user_id, session_id, message, faq_answer)
                 )
-        except Exception as e:
-            logger.warning(f"Intent classification error: {e}, falling back to full RAG")
+            return faq_answer
 
-        # Обновляем topic_id в БД для лога юзера, если есть
-        if topic_id and log_entry_id:
-            try:
-                async with AsyncSessionLocal() as session:
-                    log_service = MessageLogService(session)
-                    await log_service.update_log_topic(log_entry_id, topic_id)
-            except Exception as e:
-                logger.error(f"Failed to update topic id in log: {e}")
-
-        # 4. Получаем контекст из LightRAG (если нужно)
+        # 7. FAQ промахнулся — ждём RAG.
         rag_sources: list[dict] = []
         rag_context = ""
-        if need_rag:
-            logger.info(f"[{session_id}] Querying LightRAG for context.")
-            try:
-                history_entries = await redis_client.get_history(session_id)
-                history_lines = []
-                for entry in history_entries[-6:]:
-                    role = entry.get("role", "")
-                    content = entry.get("content", "")
-                    if not content:
-                        continue
-                    history_lines.append(f"{role}: {content}")
-                history_text = "\n".join(history_lines).strip()
-
-                rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
-                rag_context_raw, metadata_sources = await query_graph_with_sources(
-                    rag_query,
-                    conversation_history=history_text or None,
+        try:
+            logger.info(f"[{session_id}] Awaiting LightRAG context.")
+            rag_context_raw, metadata_sources = await task_rag
+            if not rag_context_raw or rag_context_raw.startswith(
+                "Error executing query"
+            ):
+                logger.info(f"[{session_id}] No relevant context found in RAG.")
+                rag_context = "Релевантный контекст из базы знаний не найден."
+                rag_sources = []
+            else:
+                rag_sources = metadata_sources
+                rag_context = rag_context_raw
+                logger.info(
+                    f"[{session_id}] Retrieved context from RAG "
+                    f"(sources: {len(rag_sources)})."
                 )
-                if not rag_context_raw or rag_context_raw.startswith(
-                    "Error executing query"
-                ):
-                    logger.info(f"[{session_id}] No relevant context found in RAG.")
-                    rag_context = "Релевантный контекст из базы знаний не найден."
-                    rag_sources = []
-                    logger.info(f"[{session_id}] RAG retrieval result: No context found")
-                else:
-                    rag_sources = metadata_sources
-                    logger.info(
-                        f"[{session_id}] Retrieved context from RAG "
-                        f"(sources: {len(rag_sources)})."
-                    )
-                    rag_context = rag_context_raw
-                    # Логируем что достали из RAG
-                    logger.info(f"[{session_id}] RAG retrieval result:")
-                    logger.info(
-                        f"[{session_id}] - Context (first 500 chars): "
-                        f"{rag_context_raw[:500]}..."
-                    )
-                    logger.info(
-                        f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}"
-                    )
+                logger.info(
+                    f"[{session_id}] - Context (first 500 chars): "
+                    f"{rag_context_raw[:500]}..."
+                )
+                logger.info(
+                    f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}"
+                )
 
-                    # Сохраняем лог RAG в БД
-                    await _save_log_to_db(
+                _spawn_bg(
+                    _save_log_to_db(
                         user_id=user_id,
                         session_id=session_id,
                         message_type="rag_context",
-                        content=rag_context_raw[:1000],  # ограничиваем размер
+                        content=rag_context_raw[:1000],
                         message_metadata={
                             "sources": rag_sources,
                             "context_length": len(rag_context_raw),
                             "sources_count": len(rag_sources),
                         },
                     )
-                # Убираем все виды ссылок, которые LightRAG вставляет в ответ,
-                # чтобы LLM использовала только те URL, что мы передадим явно.
-                # 1. Блок «Источники: ...» и аналогичные до конца строки
-                rag_context = re.sub(
-                    r"(?im)^.*?(?:###\s*)?(?:Источники?|References?|Ссылки):?\s*[^\n]*",
-                    "",
-                    rag_context,
                 )
-                # 2. «Источник информации (https://...)"
-                rag_context = re.sub(
-                    r"\s*Источник\s+информации\s*\([^)]*\)",
-                    "",
-                    rag_context,
-                    flags=re.IGNORECASE,
-                )
-                # 3. Нумерованные ссылки «[N] https://..."
-                rag_context = re.sub(
-                    r"\n*\[\d+\]\s+https?://\S+",
-                    "",
-                    rag_context,
-                )
-                rag_context = rag_context.strip()
-            except Exception as e:
-                logger.warning(f"LightRAG query error: {e}")
-                rag_context = "База знаний временно недоступна."
+            rag_context = _clean_rag_context(rag_context)
+        except Exception as e:
+            logger.warning(f"[{session_id}] LightRAG query error: {e}")
+            rag_context = "База знаний временно недоступна."
 
-        # 5. Формируем сообщения и отправляем в LLM провайдер
+        # 8. Формируем промпт и зовём основную LLM-генерацию.
         try:
             logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
             valid_sources = rag_sources
@@ -451,9 +502,8 @@ async def ask_local_llm(
             )
             messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
-            # Добавляем историю переписки
-            history = await redis_client.get_history(session_id)
-            for entry in history:
+            # Переиспользуем уже полученную историю (без второго Redis-вызова).
+            for entry in history_entries:
                 role = entry.get("role", "")
                 entry_content = entry.get("content", "")
 
@@ -467,7 +517,6 @@ async def ask_local_llm(
                         "",
                         entry_content,
                     )
-                    # Также удаляем любые оставшиеся HTML-ссылки
                     entry_clean = re.sub(
                         r"<a\s+href=[^>]+>.*?</a>", "", entry_clean
                     ).strip()
@@ -505,27 +554,24 @@ async def ask_local_llm(
                 content += "\n\n<b>Источники:</b>\n" + "\n".join(links_html)
 
             logger.info(f"[{session_id}] Received response from LLM.")
-
-            # Логируем что решил ответить LLM
-            logger.info(f"[{session_id}] LLM response result:")
             logger.info(
                 f"[{session_id}] - Raw response (first 500 chars): {content[:500]}..."
             )
             logger.info(f"[{session_id}] - Response length: {len(content)} characters")
 
-            # Сохраняем лог LLM ответа в БД
-            await _save_log_to_db(
-                user_id=user_id,
-                session_id=session_id,
-                message_type="llm_response",
-                content=content[:2000],  # ограничиваем размер
-                message_metadata={
-                    "response_length": len(content),
-                    "provider": provider.__class__.__name__,
-                },
+            _spawn_bg(
+                _save_log_to_db(
+                    user_id=user_id,
+                    session_id=session_id,
+                    message_type="llm_response",
+                    content=content[:2000],
+                    message_metadata={
+                        "response_length": len(content),
+                        "provider": provider.__class__.__name__,
+                    },
+                )
             )
 
-            # Удаляем блоки foundland
             content = re.sub(r"foundland", "", content, flags=re.DOTALL)
             content = _sanitize_telegram_html(content)
 
@@ -534,9 +580,6 @@ async def ask_local_llm(
                     f"[{session_id}] LLM returned empty content after sanitization."
                 )
                 content = "Ответ не найден"
-                logger.info(
-                    f"[{session_id}] Final LLM response after sanitization: {content}"
-                )
             else:
                 logger.info(
                     f"[{session_id}] Final LLM response after sanitization "
@@ -545,18 +588,15 @@ async def ask_local_llm(
         except Exception as e:
             logger.warning(f"[{session_id}] Provider generation error: {e}")
             content = "LLM временно недоступна."
-            logger.info(f"[{session_id}] Fallback response due to error: {content}")
 
-        # Сохраняем ответ бота в историю
-        logger.info(f"[{session_id}] Saving bot response to Redis history.")
-        await redis_client.add_message(
-            session_id, {"role": "assistant", "content": content}
+        # 9. Сохраняем ответ в Redis + PG в фоне — пользователю отвечаем сразу.
+        _spawn_bg(
+            redis_client.add_message(
+                session_id, {"role": "assistant", "content": content}
+            )
         )
-
-        # Сохраняем в PostgreSQL
         if user_id:
-            logger.info(f"[{session_id}] Saving message pair to PostgreSQL.")
-            await _save_message_to_pg(user_id, session_id, message, content)
+            _spawn_bg(_save_message_to_pg(user_id, session_id, message, content))
 
         logger.info(f"[{session_id}] Message processing complete.")
         return content
