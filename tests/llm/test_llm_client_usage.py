@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from collections.abc import Coroutine
 from typing import Any
 
@@ -50,6 +51,12 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         return _FakeRedis()
 
     async def fake_query_graph_with_sources(*args, **kwargs):
+        logging.getLogger("lightrag").info(
+            "Query nodes: IT, факультеты (top_k:40, cosine:0.2)"
+        )
+        logging.getLogger("lightrag").warning(
+            "Rerank is enabled but no rerank model is configured"
+        )
         return "Контекст", []
 
     async def fake_save_log_to_db(**kwargs) -> None:
@@ -99,3 +106,20 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         "completion_tokens": 10,
         "total_tokens": 50,
     }
+
+    rag_query_logs = [
+        log for log in saved_logs if log["message_type"] == "rag_query"
+    ]
+    rag_response_logs = [
+        log for log in saved_logs if log["message_type"] == "rag_response"
+    ]
+    assert len(rag_query_logs) == 1
+    assert len(rag_response_logs) == 1
+    assert "Когда прием?" in rag_query_logs[0]["content"]
+    assert rag_query_logs[0]["message_metadata"]["title"] == "Запрос к базе знаний"
+    assert "Трассировка поиска в базе знаний" in rag_response_logs[0]["content"]
+    assert "INFO: Query nodes: IT, факультеты" in rag_response_logs[0]["content"]
+    assert "WARNING: Rerank is enabled" in rag_response_logs[0]["content"]
+    assert "Ответ базы знаний:\nКонтекст" in rag_response_logs[0]["content"]
+    assert rag_response_logs[0]["message_metadata"]["title"] == "Ответ базы знаний"
+    assert rag_response_logs[0]["message_metadata"]["internal_logs_count"] == 2

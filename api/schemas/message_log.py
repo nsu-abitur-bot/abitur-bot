@@ -31,7 +31,6 @@ class MessageLogQueryParams(BaseModel):
     """Параметры запроса для получения логов."""
     user_id: Optional[int] = Field(None, description="ID пользователя")
     session_id: Optional[str] = Field(None, description="ID сессии")
-    message_type: Optional[str] = Field(None, description="Тип сообщения")
     limit: int = Field(50, ge=1, le=1000, description="Лимит записей")
     offset: int = Field(0, ge=0, description="Сдвиг")
 

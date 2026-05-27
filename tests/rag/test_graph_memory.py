@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 import pytest
@@ -86,3 +87,62 @@ async def test_query_with_sources_uses_document_title(monkeypatch):
 
     assert answer == "Ответ"
     assert sources == [{"url": source_url, "title": "Правила приема"}]
+
+
+@pytest.mark.asyncio
+async def test_query_with_sources_logs_rag_query_and_response(monkeypatch, caplog):
+    memory = GraphMemory()
+    source_url = "https://example.test/rules.pdf"
+
+    class FakeRag:
+        async def aquery_llm(self, question, param):
+            return {
+                "llm_response": {"content": "Ответ из RAG"},
+                "data": {
+                    "chunks": [
+                        {
+                            "file_path": source_url,
+                            "content": "Фрагмент правил приема",
+                            "score": 0.91,
+                        }
+                    ],
+                    "entities": [{"entity_name": "НГУ"}],
+                    "relations": [{"src_id": "НГУ", "tgt_id": "прием"}],
+                },
+            }
+
+    @asynccontextmanager
+    async def fake_use_graph(graph_id: str):
+        assert graph_id == "test_graph"
+        yield FakeRag()
+
+    async def fake_get_source_titles(graph_id: str):
+        assert graph_id == "test_graph"
+        return {source_url: "Правила приема"}
+
+    async def fake_rerank_sources_with_llm(**kwargs):
+        return [{"url": source_url, "title": "Правила приема"}]
+
+    monkeypatch.setattr(memory, "_use_graph", fake_use_graph)
+    monkeypatch.setattr(memory, "_get_source_titles", fake_get_source_titles)
+    monkeypatch.setattr(
+        memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm
+    )
+
+    with caplog.at_level(logging.DEBUG, logger="rag.graph_memory"):
+        answer, sources = await memory.query_with_sources(
+            "test_graph",
+            "Какие документы нужны?",
+            conversation_history="user: До этого спрашивал про сроки",
+        )
+
+    assert answer == "Ответ из RAG"
+    assert sources == [{"url": source_url, "title": "Правила приема"}]
+    log_text = caplog.text
+    assert "RAG retrieval query" in log_text
+    assert "Какие документы нужны?" in log_text
+    assert "RAG retrieval response" in log_text
+    assert "Ответ из RAG" in log_text
+    assert "RAG retrieval data" in log_text
+    assert "chunks=1 entities=1 relations=1" in log_text
+    assert "RAG retrieval sources" in log_text

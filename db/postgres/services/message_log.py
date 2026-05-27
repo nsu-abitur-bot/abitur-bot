@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Optional, TypedDict
 
-from sqlalchemy import Sequence, func
+from sqlalchemy import Sequence, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -93,9 +93,16 @@ class MessageLogService:
         offset: int = 0,
     ) -> Sequence[MessageLog]:
         """Получает логи для конкретной сессии."""
+        session_filter = MessageLog.session_id == session_id
+        if ":dialog:" not in session_id:
+            session_filter = or_(
+                session_filter,
+                MessageLog.session_id.like(f"{session_id}:dialog:%"),
+            )
+
         stmt = (
             select(MessageLog)
-            .where(MessageLog.session_id == session_id)
+            .where(session_filter)
             .order_by(MessageLog.created_at.desc())
             .limit(limit)
             .offset(offset)

@@ -132,7 +132,6 @@ async def get_message_logs(
 
     - **user_id**: фильтр по ID пользователя
     - **session_id**: фильтр по ID сессии
-    - **message_type**: фильтр по типу сообщения
     - **limit**: количество записей (макс. 1000)
     - **offset**: сдвиг для пагинации
     """
@@ -146,12 +145,6 @@ async def get_message_logs(
         elif params.session_id:
             logs = await log_service.get_logs_by_session(
                 session_id=params.session_id,
-                limit=params.limit,
-                offset=params.offset,
-            )
-        elif params.message_type:
-            logs = await log_service.get_logs_by_type(
-                message_type=params.message_type,
                 limit=params.limit,
                 offset=params.offset,
             )
@@ -230,45 +223,6 @@ async def get_user_logs(
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Ошибка получения логов пользователя: {str(e)}"
-        )
-
-
-@router.get(
-    "/type/{message_type}",
-    response_model=MessageLogListResponse,
-    summary="Получить логи по типу сообщения",
-)
-async def get_type_logs(
-    message_type: str,
-    limit: int = Query(50, ge=1, le=1000),
-    offset: int = Query(0, ge=0),
-    log_service: MessageLogService = Depends(get_message_log_service),
-):
-    """
-    Получает логи по типу сообщения.
-
-    Возможные типы:
-    - `user_input` - входящие сообщения от пользователей
-    - `rag_context` - контекст полученный из RAG
-    - `llm_response` - ответы от LLM
-    - `faq_match` - совпадения из FAQ
-    """
-    try:
-        logs = await log_service.get_logs_by_type(
-            message_type=message_type,
-            limit=limit,
-            offset=offset,
-        )
-
-        return MessageLogListResponse(
-            logs=[MessageLogResponse.model_validate(log) for log in logs],
-            total=len(logs),
-            limit=limit,
-            offset=offset,
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Ошибка получения логов по типу: {str(e)}"
         )
 
 
