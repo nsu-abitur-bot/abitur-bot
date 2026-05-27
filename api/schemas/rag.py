@@ -55,11 +55,15 @@ class RagUploadResponse(BaseModel):
 
 class RagDocument(BaseModel):
     id: str = Field(..., description="Идентификатор документа (обычно URL или имя файла)")
+    title: str | None = Field(None, description="Название документа")
     url: str | None = Field(None, description="Оригинальный URL или путь к файлу")
     status: str = Field(..., description="Статус обработки")
+    content_hash: str | None = Field(None, description="SHA-256 сырого контента")
     content_summary: str | None = Field(None, description="Краткое содержание")
     content_length: int | None = Field(None, description="Длина контента")
     created_at: str | None = Field(None, description="Дата создания")
+    updated_at: str | None = Field(None, description="Дата обновления")
+    last_indexed_at: str | None = Field(None, description="Дата последней индексации")
 
 
 class RagDocumentListResponse(BaseModel):
@@ -99,3 +103,31 @@ class CsvImportPreviewResponse(BaseModel):
     results: list[CsvImportPreviewResult] = Field(
         ..., description="Список найденных документов для превью"
     )
+
+
+class DocumentCheckRequest(BaseModel):
+    document_ids: list[str] | None = Field(
+        None, description="ID документов для проверки; если не переданы, проверяются все"
+    )
+
+
+class DocumentCheckResult(BaseModel):
+    id: str = Field(..., description="ID документа")
+    title: str = Field(..., description="Название документа")
+    source_url: str | None = Field(None, description="URL источника")
+    status: str = Field(..., description="changed, unchanged, skipped, failed, updated")
+    content_hash: str | None = Field(None, description="Новый SHA-256")
+    previous_hash: str | None = Field(None, description="Сохраненный SHA-256")
+    message: str | None = Field(None, description="Ошибка или пояснение")
+
+
+class DocumentCheckResponse(BaseModel):
+    checked_count: int = Field(..., description="Количество проверенных документов")
+    changed_count: int = Field(..., description="Количество измененных документов")
+    results: list[DocumentCheckResult] = Field(..., description="Результаты проверки")
+
+
+class DocumentUpdateResponse(BaseModel):
+    checked_count: int = Field(..., description="Количество проверенных документов")
+    updated_count: int = Field(..., description="Количество обновленных документов")
+    results: list[DocumentCheckResult] = Field(..., description="Результаты обновления")

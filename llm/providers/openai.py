@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, List, Optional
+from typing import Any, AsyncIterator, List, Optional
 from urllib.parse import urlsplit
 
 import httpx
@@ -75,14 +75,9 @@ class OpenAIProvider(BaseLLMProvider):
             _mask_proxy_url(self.proxy_url),
         )
 
-    async def generate_with_usage(
-        self,
-        messages: List[BaseMessage],
-        profile: Optional[LLMProfile] = None,
-        **kwargs,
-    ) -> LLMResult:
-        openai_messages: Any = [self._to_openai_message(m) for m in messages]
-
+    def _resolve_params(
+        self, profile: Optional[LLMProfile]
+    ) -> tuple[float, int, float]:
         temperature = (
             profile.temperature
             if profile and profile.temperature is not None
@@ -93,12 +88,21 @@ class OpenAIProvider(BaseLLMProvider):
             if profile and profile.max_tokens is not None
             else self.max_tokens
         )
-
         timeout = (
             profile.timeout
             if profile and profile.timeout is not None
             else self.timeout_seconds
         )
+        return temperature, max_tokens, timeout
+
+    async def generate_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> LLMResult:
+        openai_messages: Any = [self._to_openai_message(m) for m in messages]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
 
         try:
             completion = await self.client.responses.create(
@@ -142,6 +146,35 @@ class OpenAIProvider(BaseLLMProvider):
             )
 
         return LLMResult(text=text, usage=usage)
+
+    async def generate_stream(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> AsyncIterator[str]:
+        openai_messages: Any = [self._to_openai_message(m) for m in messages]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
+
+        try:
+            async with self.client.responses.stream(
+                model=self.model_name,
+                input=openai_messages,
+                max_output_tokens=max_tokens,
+                temperature=temperature,
+                timeout=timeout,
+            ) as stream:
+                async for event in stream:
+                    if getattr(event, "type", None) == "response.output_text.delta":
+                        delta = getattr(event, "delta", "")
+                        if delta:
+                            yield delta
+        except Exception:
+            logger.exception(
+                "Ошибка стриминга OpenAI (proxy=%s)",
+                _mask_proxy_url(self.proxy_url),
+            )
+            raise
 
     def get_embeddings_model(self) -> Any:
         embedding_kwargs: dict[str, Any] = {

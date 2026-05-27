@@ -4,7 +4,7 @@ import logging
 import re
 from contextlib import suppress
 from html import escape, unescape
-from typing import Optional
+from typing import Awaitable, Callable, Optional
 from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
@@ -19,6 +19,7 @@ from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import get_faq_matcher
+from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from rag.retriever import query_graph_with_sources
@@ -356,8 +357,22 @@ def _clean_rag_context(rag_context: str) -> str:
     return rag_context.strip()
 
 
+StreamCallback = Callable[[str], Awaitable[None]]
+StatusCallback = Callable[[str], Awaitable[None]]
+
+STATUS_FAQ_LOOKUP = "🔎 Поиск готового ответа…"
+STATUS_INTENT = "🧭 Анализ вопроса…"
+STATUS_RAG = "📚 Поиск в базе знаний…"
+STATUS_GENERATING = "✍️ Готовлю ответ…"
+
+
 async def ask_local_llm(
-    message: str, session_id: str, user_id: int = 0, log_entry_id: Optional[int] = None
+    message: str,
+    session_id: str,
+    user_id: int = 0,
+    log_entry_id: Optional[int] = None,
+    stream_callback: Optional[StreamCallback] = None,
+    status_callback: Optional[StatusCallback] = None,
 ) -> str:
     """
     message - сообщение от пользователя
@@ -365,10 +380,23 @@ async def ask_local_llm(
     используется для получения и сохранения истории переписки (контекста)
     между пользователем и ассистентом
     user_id - внутренний идентификатор пользователя для сохранения в БД
+    stream_callback - опциональная асинхронная функция, вызываемая с накопленным
+    текстом ответа по мере его генерации LLM. Используется для прогрессивного
+    отображения ответа (например, edit_message_text в Telegram). Колбэк
+    вызывается только во время генерации основного LLM-ответа: при FAQ-матче и
+    awaiting-applicant-id веток LLM не вызывается, и колбэк не срабатывает.
     """
     logger.info(
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
     )
+
+    async def _emit_status(text: str) -> None:
+        if status_callback is None:
+            return
+        try:
+            await status_callback(text)
+        except Exception as exc:
+            logger.warning(f"[{session_id}] status_callback error: {exc}")
 
     try:
         redis_client = await get_redis_client()
@@ -386,6 +414,8 @@ async def ask_local_llm(
         # 3. Intent-классификация уезжает в фон — она нужна только для
         # аналитического лога (update_log_topic) и не влияет на ответ.
         _spawn_bg(_classify_intent_bg(expanded_message, log_entry_id, session_id))
+
+        await _emit_status(STATUS_FAQ_LOOKUP)
 
         # 4. Параллельно стартуем FAQ-матч и чтение истории.
         # FAQ обычно отвечает за 0.3-1с, history — за ~10мс.
@@ -446,6 +476,7 @@ async def ask_local_llm(
         # 7. FAQ промахнулся — ждём RAG.
         rag_sources: list[dict] = []
         rag_context = ""
+        await _emit_status(STATUS_RAG)
         try:
             logger.info(f"[{session_id}] Awaiting LightRAG context.")
             rag_context_raw, metadata_sources = await task_rag
@@ -528,11 +559,30 @@ async def ask_local_llm(
             logger.info(
                 f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
             )
-            llm_result = await provider.generate_with_usage(
-                messages, profile=LLMProfiles.CHAT
-            )
-            content = llm_result.text
-            llm_usage = llm_result.usage
+            await _emit_status(STATUS_GENERATING)
+            llm_usage = LLMUsage()
+            if stream_callback is not None:
+                content = ""
+                async for delta in provider.generate_stream(
+                    messages, profile=LLMProfiles.CHAT
+                ):
+                    if not delta:
+                        continue
+                    content += delta
+                    try:
+                        await stream_callback(content)
+                    except Exception as cb_exc:
+                        # стриминг в транспорт не должен ломать LLM-ответ
+                        logger.warning(
+                            f"[{session_id}] stream_callback error: {cb_exc}"
+                        )
+                content = content.strip()
+            else:
+                llm_result = await provider.generate_with_usage(
+                    messages, profile=LLMProfiles.CHAT
+                )
+                content = llm_result.text
+                llm_usage = llm_result.usage
 
             # Удаляем любые левые ссылки, которые могла придумать LLM
             content = re.sub(

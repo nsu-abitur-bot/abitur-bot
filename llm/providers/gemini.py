@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, List, Optional
+from typing import Any, AsyncIterator, List, Optional
 
 from google import genai
 from google.genai import types
@@ -30,14 +30,13 @@ class GeminiProvider(BaseLLMProvider):
             self.model_name,
         )
 
-    async def generate_with_usage(
+    def _build_request(
         self,
         messages: List[BaseMessage],
-        profile: Optional[LLMProfile] = None,
-        **kwargs,
-    ) -> LLMResult:
+        profile: Optional[LLMProfile],
+    ) -> tuple[list[dict[str, Any]], types.GenerateContentConfig]:
         system_instruction = None
-        gemini_messages = []
+        gemini_messages: list[dict[str, Any]] = []
 
         for msg in messages:
             if isinstance(msg, SystemMessage):
@@ -69,6 +68,16 @@ class GeminiProvider(BaseLLMProvider):
         if system_instruction:
             config.system_instruction = system_instruction
 
+        return gemini_messages, config
+
+    async def generate_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> LLMResult:
+        gemini_messages, config = self._build_request(messages, profile)
+
         response = await self.client.aio.models.generate_content(
             model=self.model_name,
             contents=gemini_messages,
@@ -96,6 +105,24 @@ class GeminiProvider(BaseLLMProvider):
             )
 
         return LLMResult(text=text, usage=usage)
+
+    async def generate_stream(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> AsyncIterator[str]:
+        gemini_messages, config = self._build_request(messages, profile)
+
+        stream = await self.client.aio.models.generate_content_stream(
+            model=self.model_name,
+            contents=gemini_messages,
+            config=config,
+        )
+        async for chunk in stream:
+            text = getattr(chunk, "text", None)
+            if text:
+                yield text
 
     def get_embeddings_model(self) -> Any:
         return GeminiEmbeddings(self.client)
