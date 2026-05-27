@@ -17,7 +17,6 @@ from api.schemas.rag import (
     CsvImportPreviewResult,
     CsvImportResponse,
     CsvImportResult,
-    DocumentBackfillResponse,
     DocumentCheckRequest,
     DocumentCheckResponse,
     DocumentUpdateResponse,
@@ -448,22 +447,6 @@ async def update_changed_rag_documents(
         updated_count=sum(1 for item in results if item["status"] == "updated"),
         results=results,
     )
-
-
-@router.post(
-    "/docs/backfill",
-    response_model=DocumentBackfillResponse,
-    summary="Импортировать старые документы LightRAG в таблицу document",
-)
-async def backfill_rag_documents(
-    session: AsyncSession = Depends(get_async_session),
-) -> DocumentBackfillResponse:
-    memory = get_graph_memory()
-    rag_docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
-    created_count = await DocumentService(session).backfill_from_rag_docs(
-        DEFAULT_GRAPH_ID, rag_docs
-    )
-    return DocumentBackfillResponse(created_count=created_count)
 
 
 @router.post(

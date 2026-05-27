@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional, Sequence
 
 from sqlalchemy import select
@@ -140,39 +139,3 @@ class DocumentService:
         document.status = "deleted"
         await self.session.commit()
         return True
-
-    async def backfill_from_rag_docs(
-        self, graph_id: str, rag_docs: Sequence[dict]
-    ) -> int:
-        created = 0
-        for rag_doc in rag_docs:
-            rag_doc_id = str(rag_doc.get("id") or "")
-            if not rag_doc_id:
-                continue
-            existing = await self.get_by_rag_doc_id(graph_id, rag_doc_id)
-            if existing is not None:
-                continue
-            document = Document(
-                title=rag_doc_id,
-                source_url=rag_doc.get("url"),
-                graph_id=graph_id,
-                rag_doc_id=rag_doc_id,
-                content_hash=None,
-                content_length=rag_doc.get("content_length"),
-                status="active",
-                created_at=_parse_datetime(rag_doc.get("created_at")) or timestamp(),
-                last_indexed_at=None,
-            )
-            self.session.add(document)
-            created += 1
-        await self.session.commit()
-        return created
-
-
-def _parse_datetime(value: object) -> datetime | None:
-    if not isinstance(value, str) or not value:
-        return None
-    try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00")).replace(tzinfo=None)
-    except ValueError:
-        return None

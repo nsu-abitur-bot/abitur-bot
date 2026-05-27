@@ -131,7 +131,3 @@ class DocumentUpdateResponse(BaseModel):
     checked_count: int = Field(..., description="Количество проверенных документов")
     updated_count: int = Field(..., description="Количество обновленных документов")
     results: list[DocumentCheckResult] = Field(..., description="Результаты обновления")
-
-
-class DocumentBackfillResponse(BaseModel):
-    created_count: int = Field(..., description="Количество созданных Document-записей")
