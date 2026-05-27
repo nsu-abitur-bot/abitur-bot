@@ -1,4 +1,4 @@
-"""Утилита для прогрессивного редактирования одного Telegram/MAX-сообщения."""
+"""Утилита для прогрессивного показа ответа в Telegram/MAX."""
 
 import logging
 import re
@@ -16,15 +16,14 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_MIN_EDIT_INTERVAL = 1.2  # Telegram рекомендует ≤ 1 edit/сек на сообщение
+DEFAULT_MIN_EDIT_INTERVAL = 1.2  # Не спамим Telegram draft-обновлениями
 
 
 class TelegramStreamer:
-    """Шлёт первое сообщение и затем троттлит edit_message_text.
+    """Показывает промежуточный ответ через Telegram draft.
 
-    Промежуточные правки идут plain text (без parse_mode), потому что
-    частичный HTML с незакрытыми тегами (<b>, <a>) валит Telegram-парсер.
-    Финальное сообщение перерисовывается с нужным parse_mode в finalize().
+    Draft ephemeral: Telegram показывает его как временный 30-секундный preview,
+    а финальный ответ нужно отправлять обычным send_message().
     """
 
     def __init__(
@@ -34,17 +33,31 @@ class TelegramStreamer:
         min_interval: float = DEFAULT_MIN_EDIT_INTERVAL,
     ) -> None:
         self._bot = bot
-        self._chat_id = chat_id
+        self._chat_id = int(chat_id)
         self._min_interval = min_interval
-        self._message_id: Optional[int] = None
+        self._draft_id = time.time_ns() % 2_147_483_647 or 1
         self._last_sent_text: str = ""
         self._last_edit_monotonic: float = 0.0
+
+    async def _send_draft(self, text: str) -> bool:
+        try:
+            await self._bot.send_message_draft(
+                chat_id=self._chat_id,
+                draft_id=self._draft_id,
+                text=text,
+            )
+        except Exception as exc:
+            logger.debug("TelegramStreamer: draft update failed (%s)", exc)
+            return False
+        self._last_sent_text = text
+        self._last_edit_monotonic = time.monotonic()
+        return True
 
     async def set_status(self, text: str) -> None:
         """Мгновенно ставит текст-статус (без throttle и без parse_mode).
 
         Используется для промежуточных фраз вроде "Поиск в базе знаний…": между
-        статусами проходит сотни мс — секунды, throttle здесь только мешает.
+        статусами проходит сотни мс - секунды, throttle здесь только мешает.
         Обновляет _last_edit_monotonic, чтобы первый последующий update() не
         выстрелил мгновенно и не словил Telegram rate-limit.
         """
@@ -52,35 +65,10 @@ class TelegramStreamer:
         if not plain:
             return
 
-        if self._message_id is None:
-            try:
-                msg = await self._bot.send_message(self._chat_id, plain)
-            except Exception as exc:
-                logger.warning(
-                    "TelegramStreamer: failed to send status message: %s", exc
-                )
-                return
-            self._message_id = msg.message_id
-            self._last_sent_text = plain
-            self._last_edit_monotonic = time.monotonic()
-            return
-
         if plain == self._last_sent_text:
             return
 
-        try:
-            await self._bot.edit_message_text(
-                text=plain,
-                chat_id=self._chat_id,
-                message_id=self._message_id,
-            )
-            self._last_sent_text = plain
-            self._last_edit_monotonic = time.monotonic()
-        except TelegramBadRequest as exc:
-            if "not modified" not in str(exc).lower():
-                logger.debug("TelegramStreamer: status edit failed (%s)", exc)
-        except Exception as exc:
-            logger.debug("TelegramStreamer: status edit failed (%s)", exc)
+        await self._send_draft(plain)
 
     async def update(self, text: str) -> None:
         """Принимает накопленный текст ответа LLM. Безопасно для частых вызовов."""
@@ -90,39 +78,13 @@ class TelegramStreamer:
 
         plain = normalize_links_for_messaging(text)
 
-        if self._message_id is None:
-            try:
-                msg = await self._bot.send_message(self._chat_id, plain)
-            except Exception as exc:
-                logger.warning(
-                    "TelegramStreamer: failed to send initial message: %s", exc
-                )
-                return
-            self._message_id = msg.message_id
-            self._last_sent_text = plain
-            self._last_edit_monotonic = time.monotonic()
-            return
-
         now = time.monotonic()
         if now - self._last_edit_monotonic < self._min_interval:
             return
         if plain == self._last_sent_text:
             return
 
-        try:
-            await self._bot.edit_message_text(
-                text=plain,
-                chat_id=self._chat_id,
-                message_id=self._message_id,
-            )
-            self._last_sent_text = plain
-            self._last_edit_monotonic = now
-        except TelegramBadRequest as exc:
-            # "message is not modified" безобидно — просто пропускаем
-            if "not modified" not in str(exc).lower():
-                logger.debug("TelegramStreamer: edit failed (%s)", exc)
-        except Exception as exc:
-            logger.debug("TelegramStreamer: edit failed (%s)", exc)
+        await self._send_draft(plain)
 
     async def finalize(
         self,
@@ -130,60 +92,28 @@ class TelegramStreamer:
         parse_mode: Optional[str] = None,
         fallback_plain: bool = False,
     ) -> None:
-        """Принудительный финальный send/edit с нужным parse_mode."""
+        """Отправляет финальный сохраненный ответ с нужным parse_mode."""
         final_text = normalize_links_for_messaging(text)
         aiogram_parse_mode = ParseMode.HTML if parse_mode == "HTML" else None
 
-        if self._message_id is None:
-            # стрима не было (FAQ / awaiting / пустой стрим) — шлём как обычное сообщение
-            try:
-                msg = await self._bot.send_message(
-                    self._chat_id, final_text, parse_mode=aiogram_parse_mode
-                )
-                self._message_id = msg.message_id
-                self._last_sent_text = final_text
-                return
-            except TelegramBadRequest:
-                if not fallback_plain:
-                    raise
-                logger.warning(
-                    "TelegramStreamer: HTML parse failed on send, "
-                    "sending plain text"
-                )
-                plain = re.sub(r"<[^>]+>", "", final_text)
-                msg = await self._bot.send_message(
-                    self._chat_id, normalize_links_for_messaging(plain)
-                )
-                self._message_id = msg.message_id
-                return
-
         try:
-            await self._bot.edit_message_text(
-                text=final_text,
-                chat_id=self._chat_id,
-                message_id=self._message_id,
+            await self._bot.send_message(
+                self._chat_id,
+                final_text,
                 parse_mode=aiogram_parse_mode,
             )
             self._last_sent_text = final_text
-        except TelegramBadRequest as exc:
-            err = str(exc).lower()
-            if "not modified" in err:
-                return
+        except TelegramBadRequest:
             if not fallback_plain:
                 raise
             logger.warning(
-                "TelegramStreamer: HTML parse failed on edit, falling back to plain"
+                "TelegramStreamer: HTML parse failed on send, sending plain text"
             )
             plain = re.sub(r"<[^>]+>", "", final_text)
-            try:
-                await self._bot.edit_message_text(
-                    text=normalize_links_for_messaging(plain),
-                    chat_id=self._chat_id,
-                    message_id=self._message_id,
-                )
-            except TelegramBadRequest as exc2:
-                if "not modified" not in str(exc2).lower():
-                    raise
+            await self._bot.send_message(
+                self._chat_id,
+                normalize_links_for_messaging(plain),
+            )
 
 
 class MaxStreamer:
@@ -223,7 +153,7 @@ class MaxStreamer:
             except Exception as exc:
                 logger.warning("MaxStreamer: failed to send status message: %s", exc)
                 return
-            if sent is None or sent.message is None:
+            if sent is None or sent.message is None or sent.message.body is None:
                 return
             self._message_id = sent.message.body.mid
             self._last_sent_text = plain
@@ -268,7 +198,11 @@ class MaxStreamer:
                 sent = await self._client.send_message(
                     chat_id=self._chat_id, text=plain
                 )
-            if sent is not None and sent.message is not None:
+            if (
+                sent is not None
+                and sent.message is not None
+                and sent.message.body is not None
+            ):
                 self._message_id = sent.message.body.mid
                 self._last_sent_text = final_text
             return
