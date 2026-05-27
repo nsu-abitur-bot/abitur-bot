@@ -224,9 +224,14 @@ class BotCore:
 
     async def cmd_reset(self, session_id: str) -> BotReply:
         redis_client = await get_redis_client()
-        await redis_client.clear_history(session_id)
+        new_session_id = await redis_client.reset_dialog_session(session_id)
         await redis_client.set_awaiting_applicant_id(session_id, False)
         await redis_client.set_awaiting_feedback(session_id, False)
+        logger.info(
+            "Команда /reset: base_session_id=%s new_session_id=%s",
+            session_id,
+            new_session_id,
+        )
         return BotReply(text="История переписки очищена")
 
     async def cmd_feedback(self, session_id: str) -> BotReply:
@@ -273,12 +278,17 @@ class BotCore:
             channel, external_user_id
         )
         redis_client = await get_redis_client()
+        dialog_session_id = await redis_client.get_dialog_session_id(session_id)
 
         logger.info(
-            "Сообщение: channel=%s external_user_id=%s session_id=%s text=%s",
+            (
+                "Сообщение: channel=%s external_user_id=%s "
+                "base_session_id=%s dialog_session_id=%s text=%s"
+            ),
             channel,
             external_user_id,
             session_id,
+            dialog_session_id,
             user_text,
         )
 
@@ -294,7 +304,7 @@ class BotCore:
 
             await self._save_feedback_report(
                 user_id=internal_user_id,
-                session_id=session_id,
+                session_id=dialog_session_id,
                 channel=channel,
                 comment=user_text,
             )
@@ -353,14 +363,14 @@ class BotCore:
 
         log_entry = await self._save_user_message_to_db(
             user_id=internal_user_id,
-            session_id=session_id,
+            session_id=dialog_session_id,
             message=formatted_message,
             source=channel,
         )
 
         response = await ask_local_llm(
             formatted_message,
-            session_id=session_id,
+            session_id=dialog_session_id,
             user_id=internal_user_id,
             log_entry_id=log_entry.id if log_entry else None,
             stream_callback=stream_callback,

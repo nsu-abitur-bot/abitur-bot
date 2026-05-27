@@ -10,6 +10,8 @@ class FakeRedis:
         self.awaiting_feedback = False
         self.awaiting_applicant_id = False
         self.history_cleared = False
+        self.dialog_session_id = "session-1"
+        self.reset_dialog_called_with: str | None = None
 
     async def set_awaiting_feedback(self, session_id: str, value: bool) -> None:
         self.awaiting_feedback = value
@@ -25,6 +27,15 @@ class FakeRedis:
 
     async def clear_history(self, session_id: str) -> None:
         self.history_cleared = True
+
+    async def get_dialog_session_id(self, session_id: str) -> str:
+        return self.dialog_session_id
+
+    async def reset_dialog_session(self, session_id: str) -> str:
+        self.history_cleared = True
+        self.reset_dialog_called_with = session_id
+        self.dialog_session_id = f"{session_id}:dialog:1"
+        return self.dialog_session_id
 
 
 @pytest.mark.asyncio
@@ -240,8 +251,54 @@ async def test_cmd_reset_has_no_feedback_footer(monkeypatch):
     reply = await BotCore().cmd_reset("session-1")
 
     assert redis.history_cleared
+    assert redis.reset_dialog_called_with == "session-1"
     assert "История переписки очищена" in reply.text
     assert FEEDBACK_FOOTER not in reply.text
+
+
+@pytest.mark.asyncio
+async def test_normal_message_uses_dialog_session_for_logs_and_llm(monkeypatch):
+    redis = FakeRedis()
+    redis.dialog_session_id = "session-1:dialog:2"
+    core = BotCore()
+    user_log = type("Log", (), {"id": 10})()
+    saved_session_ids: list[str] = []
+    ask_llm = AsyncMock(return_value="Ответ бота")
+
+    async def fake_get_redis_client():
+        return redis
+
+    async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
+        return 42
+
+    async def fake_save_user_message_to_db(
+        user_id: int, session_id: str, message: str, source: str
+    ):
+        saved_session_ids.append(session_id)
+        return user_log
+
+    monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
+    monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
+    monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
+    monkeypatch.setattr(
+        core,
+        "_check_rate_limit",
+        AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
+    )
+    monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
+
+    await core.handle_message(
+        channel="telegram",
+        external_user_id="123",
+        session_id="session-1",
+        user_name="user",
+        user_text="Как поступить?",
+    )
+
+    assert saved_session_ids == ["session-1:dialog:2"]
+    await_args = ask_llm.await_args
+    assert await_args is not None
+    assert await_args.kwargs["session_id"] == "session-1:dialog:2"
 
 
 @pytest.mark.asyncio
