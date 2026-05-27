@@ -191,6 +191,24 @@ async def run_telegram_bot() -> bool | None:
                 str(message.chat.id), "Произошла ошибка при очистке истории"
             )
 
+    @dp.message(Command("feedback"))
+    async def cmd_feedback(message: Message):
+        if not message.from_user:
+            return
+        reply = await core.cmd_feedback(session_id=get_session_id(message))
+        await bot.send_message(
+            str(message.chat.id), normalize_links_for_messaging(reply.text)
+        )
+
+    @dp.message(Command("cancel"))
+    async def cmd_cancel(message: Message):
+        if not message.from_user:
+            return
+        reply = await core.cmd_cancel(session_id=get_session_id(message))
+        await bot.send_message(
+            str(message.chat.id), normalize_links_for_messaging(reply.text)
+        )
+
     @dp.message()
     async def handle_message(message: Message):
         if not message.from_user:

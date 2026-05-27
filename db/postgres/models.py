@@ -205,6 +205,37 @@ class MessageLog(Base):
         )
 
 
+class FeedbackReport(Base):
+    """Обратная связь пользователей о некорректных ответах бота."""
+
+    __tablename__ = "feedback_report"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    session_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    channel: Mapped[str] = mapped_column(String(50), nullable=False)
+    comment: Mapped[str] = mapped_column(Text, nullable=False)
+    question: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    bot_response: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    logs_snapshot: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="open")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ix_feedback_report_user_id", "user_id"),
+        Index("ix_feedback_report_session_id", "session_id"),
+        Index("ix_feedback_report_status", "status"),
+        Index("ix_feedback_report_created_at", "created_at"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<FeedbackReport(id={self.id}, user_id={self.user_id}, "
+            f"status='{self.status}', session_id='{self.session_id}')>"
+        )
+
+
 class Settings(Base):
     """Настройки приложения."""
 

@@ -75,6 +75,16 @@ async def run_max_bot() -> bool | None:
                 await message.answer(text="Произошла ошибка при очистке истории")
             return
 
+        if user_text == "/feedback":
+            reply = await core.cmd_feedback(session_id)
+            await message.answer(text=reply.text)
+            return
+
+        if user_text == "/cancel":
+            reply = await core.cmd_cancel(session_id)
+            await message.answer(text=reply.text)
+            return
+
         # show typing action similar to Telegram
         try:
             # chat_id may be None for some update types, guard against that
