@@ -1,6 +1,5 @@
 import fcntl
 import logging
-import re
 import tempfile
 from os import getenv
 from pathlib import Path
@@ -10,12 +9,12 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
-from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
 from bot.core import BotCore
+from bot.streaming import TelegramStreamer
 from bot.utils import normalize_links_for_messaging
 
 logger = logging.getLogger(__name__)
@@ -222,29 +221,22 @@ async def run_telegram_bot() -> bool | None:
         session_id = get_session_id(message)
 
         await bot.send_chat_action(chat_id, "typing")
+        streamer = TelegramStreamer(bot, chat_id)
         reply = await core.handle_message(
             channel="telegram",
             external_user_id=str(message.from_user.id),
             session_id=session_id,
             user_name=user_name,
             user_text=user_text,
+            stream_callback=streamer.update,
+            status_callback=streamer.set_status,
         )
 
-        try:
-            await bot.send_message(
-                chat_id,
-                normalize_links_for_messaging(reply.text),
-                parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
-            )
-        except TelegramBadRequest:
-            if reply.fallback_plain_on_format_error:
-                logger.warning(
-                    "[%s] HTML parsing failed, sending plain text", session_id
-                )
-                plain = re.sub(r"<[^>]+>", "", reply.text)
-                await bot.send_message(chat_id, normalize_links_for_messaging(plain))
-            else:
-                raise
+        await streamer.finalize(
+            text=reply.text,
+            parse_mode=reply.parse_mode,
+            fallback_plain=reply.fallback_plain_on_format_error,
+        )
 
     logger.info("Telegram bot started")
     try:

@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import Awaitable, Callable, Optional
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
@@ -8,6 +8,9 @@ from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
 from llm.llm_client import ask_local_llm
+
+StreamCallback = Callable[[str], Awaitable[None]]
+StatusCallback = Callable[[str], Awaitable[None]]
 
 logger = logging.getLogger(__name__)
 
@@ -213,6 +216,8 @@ class BotCore:
         session_id: str,
         user_name: str,
         user_text: str,
+        stream_callback: Optional[StreamCallback] = None,
+        status_callback: Optional[StatusCallback] = None,
     ) -> BotReply:
         internal_user_id = await self.resolve_internal_user_id(
             channel, external_user_id
@@ -301,6 +306,8 @@ class BotCore:
             session_id=session_id,
             user_id=internal_user_id,
             log_entry_id=log_entry.id if log_entry else None,
+            stream_callback=stream_callback,
+            status_callback=status_callback,
         )
 
         if not response:
