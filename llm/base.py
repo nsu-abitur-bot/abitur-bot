@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional
+from typing import Any, AsyncIterator, List, Optional
 
 from langchain_core.messages import BaseMessage
 
@@ -27,6 +27,21 @@ class BaseLLMProvider(ABC):
             Текст ответа от модели
         """
         pass
+
+    async def generate_stream(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> AsyncIterator[str]:
+        """Стримит ответ по кусочкам (дельтам).
+
+        Дефолтная реализация — fallback на generate() с одной финальной дельтой,
+        чтобы провайдеры без честной поддержки стриминга продолжали работать.
+        """
+        content = await self.generate(messages, profile=profile, **kwargs)
+        if content:
+            yield content
 
     def get_embeddings_model(self) -> Any:
         """Возвращает объект для работы с эмбеддингами.

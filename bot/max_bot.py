@@ -9,6 +9,7 @@ from maxapi.enums.sender_action import SenderAction
 from maxapi.types.updates.message_created import MessageCreated
 
 from bot.core import BotCore
+from bot.streaming import MaxStreamer
 from bot.utils import normalize_links_for_messaging
 
 logger = logging.getLogger(__name__)
@@ -84,14 +85,26 @@ async def run_max_bot() -> bool | None:
             # non-fatal: continue even if action can't be sent
             logger.debug("Failed to send typing action for session %s", session_id)
 
+        streamer: MaxStreamer | None = (
+            MaxStreamer(client, chat_id) if chat_id is not None else None
+        )
         reply = await core.handle_message(
             channel="max",
             external_user_id=external_user_id,
             session_id=session_id,
             user_name=user_name,
             user_text=user_text,
+            stream_callback=streamer.update if streamer else None,
+            status_callback=streamer.set_status if streamer else None,
         )
-        await message.answer(text=normalize_links_for_messaging(reply.text))
+        if streamer is not None:
+            await streamer.finalize(
+                text=reply.text,
+                parse_mode=reply.parse_mode,
+                fallback_plain=reply.fallback_plain_on_format_error,
+            )
+        else:
+            await message.answer(text=normalize_links_for_messaging(reply.text))
 
         # Уступка API лимитам до внедрения адаптивного backoff.
         await asyncio.sleep(0)
