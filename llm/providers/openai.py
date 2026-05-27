@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, List, Optional
+from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 from urllib.parse import urlsplit
 
 import httpx
@@ -8,7 +8,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
 
-from llm.base import BaseLLMProvider
+from llm.base import BaseLLMProvider, LLMResult, LLMUsage
 from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
@@ -75,14 +75,9 @@ class OpenAIProvider(BaseLLMProvider):
             _mask_proxy_url(self.proxy_url),
         )
 
-    async def generate(
-        self,
-        messages: List[BaseMessage],
-        profile: Optional[LLMProfile] = None,
-        **kwargs,
-    ) -> str:
-        openai_messages: Any = [self._to_openai_message(m) for m in messages]
-
+    def _resolve_params(
+        self, profile: Optional[LLMProfile]
+    ) -> tuple[float, int, float]:
         temperature = (
             profile.temperature
             if profile and profile.temperature is not None
@@ -93,12 +88,21 @@ class OpenAIProvider(BaseLLMProvider):
             if profile and profile.max_tokens is not None
             else self.max_tokens
         )
-
         timeout = (
             profile.timeout
             if profile and profile.timeout is not None
             else self.timeout_seconds
         )
+        return temperature, max_tokens, timeout
+
+    async def generate_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> LLMResult:
+        openai_messages: Any = [self._to_openai_message(m) for m in messages]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
 
         try:
             completion = await self.client.responses.create(
@@ -116,7 +120,86 @@ class OpenAIProvider(BaseLLMProvider):
             raise
 
         content: Any = completion.output_text
-        return content.strip() if isinstance(content, str) else str(content or "")
+        text = content.strip() if isinstance(content, str) else str(content or "")
+
+        usage = LLMUsage()
+        raw_usage = getattr(completion, "usage", None)
+        if raw_usage is not None:
+            usage = _usage_from_openai_metadata(raw_usage)
+
+        return LLMResult(text=text, usage=usage)
+
+    async def generate_stream(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> AsyncIterator[str]:
+        openai_messages: Any = [self._to_openai_message(m) for m in messages]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
+
+        try:
+            async with self.client.responses.stream(
+                model=self.model_name,
+                input=openai_messages,
+                max_output_tokens=max_tokens,
+                temperature=temperature,
+                timeout=timeout,
+            ) as stream:
+                async for event in stream:
+                    if getattr(event, "type", None) == "response.output_text.delta":
+                        delta = getattr(event, "delta", "")
+                        if delta:
+                            yield delta
+        except Exception:
+            logger.exception(
+                "Ошибка стриминга OpenAI (proxy=%s)",
+                _mask_proxy_url(self.proxy_url),
+            )
+            raise
+
+    async def generate_stream_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        openai_messages: Any = [self._to_openai_message(m) for m in messages]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
+
+        chunks: list[str] = []
+        usage = LLMUsage()
+        try:
+            async with self.client.responses.stream(
+                model=self.model_name,
+                input=openai_messages,
+                max_output_tokens=max_tokens,
+                temperature=temperature,
+                timeout=timeout,
+            ) as stream:
+                async for event in stream:
+                    event_type = getattr(event, "type", None)
+                    if event_type == "response.output_text.delta":
+                        delta = getattr(event, "delta", "")
+                        if not delta:
+                            continue
+                        chunks.append(delta)
+                        if on_delta is not None:
+                            await on_delta(delta)
+                    elif event_type == "response.completed":
+                        response = getattr(event, "response", None)
+                        raw_usage = getattr(response, "usage", None)
+                        if raw_usage is not None:
+                            usage = _usage_from_openai_metadata(raw_usage)
+        except Exception:
+            logger.exception(
+                "Ошибка стриминга OpenAI (proxy=%s)",
+                _mask_proxy_url(self.proxy_url),
+            )
+            raise
+
+        return LLMResult(text="".join(chunks).strip(), usage=usage)
 
     def get_embeddings_model(self) -> Any:
         embedding_kwargs: dict[str, Any] = {
@@ -147,3 +230,25 @@ class OpenAIProvider(BaseLLMProvider):
             else str(message.content)
         )
         return {"role": role, "content": content}
+
+
+def _usage_from_openai_metadata(raw_usage: Any) -> LLMUsage:
+    input_tokens = (
+        getattr(raw_usage, "input_tokens", None)
+        or getattr(raw_usage, "prompt_tokens", None)
+        or 0
+    )
+    output_tokens = (
+        getattr(raw_usage, "output_tokens", None)
+        or getattr(raw_usage, "completion_tokens", None)
+        or 0
+    )
+    total_tokens = (
+        getattr(raw_usage, "total_tokens", None)
+        or (int(input_tokens) + int(output_tokens))
+    )
+    return LLMUsage(
+        prompt_tokens=int(input_tokens),
+        completion_tokens=int(output_tokens),
+        total_tokens=int(total_tokens),
+    )

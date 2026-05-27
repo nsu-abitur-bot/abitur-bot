@@ -1,6 +1,7 @@
 import asyncio
 
 from llm import llm_client
+from llm.base import LLMResult
 
 
 class _FakeRedis:
@@ -24,8 +25,8 @@ class _FakeAbbrevExpander:
 
 
 class _FakeProvider:
-    async def generate(self, messages, profile) -> str:
-        return "Ответ из LLM"
+    async def generate_with_usage(self, messages, profile) -> LLMResult:
+        return LLMResult(text="Ответ из LLM")
 
 
 def _close_background_coro(coro) -> None:

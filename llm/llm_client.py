@@ -4,7 +4,7 @@ import logging
 import re
 from contextlib import suppress
 from html import escape, unescape
-from typing import Optional
+from typing import Awaitable, Callable, Optional
 from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
@@ -19,6 +19,7 @@ from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import get_faq_matcher
+from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from rag.retriever import query_graph_with_sources
@@ -226,6 +227,7 @@ async def _save_log_to_db(
     message_type: str,
     content: str,
     message_metadata: dict,
+    tokens_used: Optional[int] = None,
 ) -> None:
     """Сохраняет лог в таблицу message_logs."""
     try:
@@ -237,6 +239,7 @@ async def _save_log_to_db(
                 message_type=message_type,
                 content=content,
                 message_metadata=message_metadata,
+                tokens_used=tokens_used,
             )
     except Exception as e:
         logger.error(f"Ошибка сохранения лога в БД: {e}")
@@ -310,7 +313,9 @@ async def _classify_intent_bg(
                     log_service = MessageLogService(session)
                     await log_service.update_log_topic(log_entry_id, topic_id)
             except Exception as e:
-                logger.error(f"[{session_id}] Failed to update topic id in log: {e}")
+                logger.error(
+                    f"[{session_id}] Failed to update topic id in log: {e}"
+                )
     except Exception as e:
         logger.warning(f"[{session_id}] Background intent classification error: {e}")
 
@@ -352,8 +357,22 @@ def _clean_rag_context(rag_context: str) -> str:
     return rag_context.strip()
 
 
+StreamCallback = Callable[[str], Awaitable[None]]
+StatusCallback = Callable[[str], Awaitable[None]]
+
+STATUS_FAQ_LOOKUP = "🔎 Поиск готового ответа…"
+STATUS_INTENT = "🧭 Анализ вопроса…"
+STATUS_RAG = "📚 Поиск в базе знаний…"
+STATUS_GENERATING = "✍️ Готовлю ответ…"
+
+
 async def ask_local_llm(
-    message: str, session_id: str, user_id: int = 0, log_entry_id: Optional[int] = None
+    message: str,
+    session_id: str,
+    user_id: int = 0,
+    log_entry_id: Optional[int] = None,
+    stream_callback: Optional[StreamCallback] = None,
+    status_callback: Optional[StatusCallback] = None,
 ) -> str:
     """
     message - сообщение от пользователя
@@ -361,10 +380,23 @@ async def ask_local_llm(
     используется для получения и сохранения истории переписки (контекста)
     между пользователем и ассистентом
     user_id - внутренний идентификатор пользователя для сохранения в БД
+    stream_callback - опциональная асинхронная функция, вызываемая с накопленным
+    текстом ответа по мере его генерации LLM. Используется для прогрессивного
+    отображения ответа (например, edit_message_text в Telegram). Колбэк
+    вызывается только во время генерации основного LLM-ответа: при FAQ-матче и
+    awaiting-applicant-id веток LLM не вызывается, и колбэк не срабатывает.
     """
     logger.info(
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
     )
+
+    async def _emit_status(text: str) -> None:
+        if status_callback is None:
+            return
+        try:
+            await status_callback(text)
+        except Exception as exc:
+            logger.warning(f"[{session_id}] status_callback error: {exc}")
 
     try:
         redis_client = await get_redis_client()
@@ -382,6 +414,8 @@ async def ask_local_llm(
         # 3. Intent-классификация уезжает в фон — она нужна только для
         # аналитического лога (update_log_topic) и не влияет на ответ.
         _spawn_bg(_classify_intent_bg(expanded_message, log_entry_id, session_id))
+
+        await _emit_status(STATUS_FAQ_LOOKUP)
 
         # 4. Параллельно стартуем FAQ-матч и чтение истории.
         # FAQ обычно отвечает за 0.3-1с, history — за ~10мс.
@@ -418,7 +452,9 @@ async def ask_local_llm(
                 )
             )
             if user_id:
-                _spawn_bg(_save_message_to_pg(user_id, session_id, message, faq_answer))
+                _spawn_bg(
+                    _save_message_to_pg(user_id, session_id, message, faq_answer)
+                )
             return faq_answer
 
         # Получаем историю (нужна и для RAG, и для финального промпта) только
@@ -430,9 +466,10 @@ async def ask_local_llm(
             history_entries = []
         history_text = _build_history_text(history_entries)
 
-        # 6. FAQ промахнулся — теперь можно запускать LightRAG.
+        # 7. FAQ промахнулся — запускаем и ждём RAG.
         rag_sources: list[dict] = []
         rag_context = ""
+        await _emit_status(STATUS_RAG)
         try:
             logger.info(f"[{session_id}] Querying LightRAG for context.")
             rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
@@ -440,7 +477,9 @@ async def ask_local_llm(
                 rag_query,
                 conversation_history=history_text or None,
             )
-            if not rag_context_raw or rag_context_raw.startswith("Error executing query"):
+            if not rag_context_raw or rag_context_raw.startswith(
+                "Error executing query"
+            ):
                 logger.info(f"[{session_id}] No relevant context found in RAG.")
                 rag_context = "Релевантный контекст из базы знаний не найден."
                 rag_sources = []
@@ -517,7 +556,37 @@ async def ask_local_llm(
             logger.info(
                 f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
             )
-            content = await provider.generate(messages, profile=LLMProfiles.CHAT)
+            await _emit_status(STATUS_GENERATING)
+            llm_usage = LLMUsage()
+            if stream_callback is not None:
+                content = ""
+
+                async def on_stream_delta(delta: str) -> None:
+                    nonlocal content
+                    if not delta:
+                        return
+                    content += delta
+                    try:
+                        await stream_callback(content)
+                    except Exception as cb_exc:
+                        # стриминг в транспорт не должен ломать LLM-ответ
+                        logger.warning(
+                            f"[{session_id}] stream_callback error: {cb_exc}"
+                        )
+
+                llm_result = await provider.generate_stream_with_usage(
+                    messages,
+                    profile=LLMProfiles.CHAT,
+                    on_delta=on_stream_delta,
+                )
+                content = llm_result.text or content.strip()
+                llm_usage = llm_result.usage
+            else:
+                llm_result = await provider.generate_with_usage(
+                    messages, profile=LLMProfiles.CHAT
+                )
+                content = llm_result.text
+                llm_usage = llm_result.usage
 
             # Удаляем любые левые ссылки, которые могла придумать LLM
             content = re.sub(
@@ -559,7 +628,9 @@ async def ask_local_llm(
                     message_metadata={
                         "response_length": len(content),
                         "provider": provider.__class__.__name__,
+                        "tokens": llm_usage.to_dict(),
                     },
+                    tokens_used=llm_usage.total_tokens or None,
                 )
             )
 

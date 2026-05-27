@@ -16,8 +16,10 @@ from api.auth.router import router as auth_router
 from api.routes.abbrev import router as abbrev_router
 from api.routes.evals import router as evals_router
 from api.routes.faq import router as faq_router
+from api.routes.feedback_report import router as feedback_report_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
+from api.routes.settings import router as settings_router
 from api.routes.stats import router as stats_router
 from api.routes.system_logs import router as system_logs_router
 from api.routes.topic import router as topic_router
@@ -114,6 +116,11 @@ app.include_router(
     dependencies=[Depends(get_current_admin)],
 )
 app.include_router(
+    feedback_report_router,
+    prefix="/api/v1",
+    dependencies=[Depends(get_current_admin)],
+)
+app.include_router(
     rag_router,
     prefix="/api/v1",
     dependencies=[Depends(require_admin)],
@@ -130,6 +137,11 @@ app.include_router(
 )
 app.include_router(
     system_logs_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    settings_router,
     prefix="/api/v1",
     dependencies=[Depends(require_admin)],
 )

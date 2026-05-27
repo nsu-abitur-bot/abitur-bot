@@ -54,6 +54,7 @@ class MessageLogService:
         content: str,
         message_metadata: Optional[dict] = None,
         topic_id: Optional[int] = None,
+        tokens_used: Optional[int] = None,
     ) -> MessageLog:
         """Создает запись в логе сообщений."""
         log_entry = MessageLog(
@@ -63,11 +64,27 @@ class MessageLogService:
             content=content,
             message_metadata=message_metadata,
             topic_id=topic_id,
+            tokens_used=tokens_used,
         )
         self.session.add(log_entry)
         await self.session.commit()
         await self.session.refresh(log_entry)
         return log_entry
+
+    async def count_user_inputs_since(
+        self,
+        start: datetime,
+        user_id: Optional[int] = None,
+    ) -> int:
+        """Считает пользовательские запросы с указанного времени."""
+        stmt = select(func.count()).select_from(MessageLog).where(
+            MessageLog.message_type == "user_input",
+            MessageLog.created_at >= start,
+        )
+        if user_id is not None:
+            stmt = stmt.where(MessageLog.user_id == user_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one()
 
     async def get_logs_by_session(
         self,
@@ -200,6 +217,71 @@ class MessageLogService:
                     count_value = row._mapping["count"]
                     all_buckets[row.period] = int(count_value)
             buckets = [{"period": k, "count": v} for k, v in sorted(all_buckets.items())]
+        else:
+            buckets = []
+
+        return {"total": total, "buckets": buckets}
+
+    async def get_token_usage_stats(
+        self,
+        start: Optional[datetime],
+        end: Optional[datetime],
+        group_by: str,
+    ) -> dict:
+        """Возвращает статистику суммарного потребления токенов по периодам.
+
+        Считаются только записи, у которых заполнено `tokens_used`
+        (то есть `llm_response`).
+        """
+        if start is not None:
+            start = start.replace(tzinfo=None)
+        if end is not None:
+            end = end.replace(tzinfo=None)
+
+        base_stmt = select(
+            func.coalesce(func.sum(MessageLog.tokens_used), 0)
+        ).where(MessageLog.tokens_used.is_not(None))
+
+        if start is not None:
+            base_stmt = base_stmt.where(MessageLog.created_at >= start)
+        if end is not None:
+            base_stmt = base_stmt.where(MessageLog.created_at <= end)
+
+        total = int((await self.session.execute(base_stmt)).scalar_one() or 0)
+
+        period_expr = func.date_trunc(group_by, MessageLog.created_at).label("period")
+        bucket_stmt = select(
+            period_expr,
+            func.coalesce(func.sum(MessageLog.tokens_used), 0).label("tokens"),
+        ).where(MessageLog.tokens_used.is_not(None))
+
+        if start is not None:
+            bucket_stmt = bucket_stmt.where(MessageLog.created_at >= start)
+        if end is not None:
+            bucket_stmt = bucket_stmt.where(MessageLog.created_at <= end)
+
+        bucket_stmt = bucket_stmt.group_by(period_expr).order_by(period_expr)
+        rows = (await self.session.execute(bucket_stmt)).all()
+
+        valid_rows = [row for row in rows if row.period is not None]
+        if valid_rows:
+            range_start = (
+                _truncate_dt(start, group_by)
+                if start is not None
+                else min(row.period for row in valid_rows)
+            )
+            range_end = end if end is not None else max(row.period for row in valid_rows)
+            all_buckets: dict[datetime, int] = {}
+            current = range_start
+            while current <= range_end:
+                all_buckets[current] = 0
+                current = _advance_dt(current, group_by)
+            for row in valid_rows:
+                if row.period in all_buckets:
+                    all_buckets[row.period] = int(row._mapping["tokens"] or 0)
+            buckets = [
+                {"period": k, "tokens": v} for k, v in sorted(all_buckets.items())
+            ]
         else:
             buckets = []
 

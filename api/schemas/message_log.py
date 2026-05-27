@@ -49,3 +49,18 @@ class RequestCountStatsResponse(BaseModel):
     start: Optional[datetime] = None
     end: Optional[datetime] = None
     buckets: List[RequestCountBucket]
+
+
+class TokenUsageBucket(BaseModel):
+    """Элемент статистики по количеству потраченных токенов."""
+    period: datetime
+    tokens: int
+
+
+class TokenUsageStatsResponse(BaseModel):
+    """Статистика потребления токенов LLM за период времени."""
+    total: int
+    group_by: str
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    buckets: List[TokenUsageBucket]

@@ -12,6 +12,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -186,6 +187,9 @@ class MessageLog(Base):
     topic_id: Mapped[Optional[int]] = mapped_column(
         BigInteger, ForeignKey("topic.id"), nullable=True
     )
+    tokens_used: Mapped[Optional[int]] = mapped_column(
+        Integer, nullable=True
+    )  # суммарное количество токенов на генерацию (для message_type='llm_response')
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
 
     topic: Mapped[Optional["Topic"]] = relationship("Topic")
@@ -205,6 +209,37 @@ class MessageLog(Base):
         )
 
 
+class FeedbackReport(Base):
+    """Обратная связь пользователей о некорректных ответах бота."""
+
+    __tablename__ = "feedback_report"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    session_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    channel: Mapped[str] = mapped_column(String(50), nullable=False)
+    comment: Mapped[str] = mapped_column(Text, nullable=False)
+    question: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    bot_response: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    logs_snapshot: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="open")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ix_feedback_report_user_id", "user_id"),
+        Index("ix_feedback_report_session_id", "session_id"),
+        Index("ix_feedback_report_status", "status"),
+        Index("ix_feedback_report_created_at", "created_at"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<FeedbackReport(id={self.id}, user_id={self.user_id}, "
+            f"status='{self.status}', session_id='{self.session_id}')>"
+        )
+
+
 class Settings(Base):
     """Настройки приложения."""
 
@@ -219,6 +254,39 @@ class Settings(Base):
 
     def __repr__(self) -> str:
         return f"<Settings(key='{self.key}', value='{self.value}')>"
+
+
+class Document(Base):
+    """Документы, проиндексированные в RAG."""
+
+    __tablename__ = "document"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    source_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    graph_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    rag_doc_id: Mapped[str] = mapped_column(String(500), nullable=False)
+    content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    content_length: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
+    last_indexed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    __table_args__ = (
+        UniqueConstraint("graph_id", "rag_doc_id", name="uq_document_graph_rag_doc_id"),
+        Index("ix_document_graph_id", "graph_id"),
+        Index("ix_document_source_url", "source_url"),
+        Index("ix_document_content_hash", "content_hash"),
+        Index("ix_document_status", "status"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<Document(id='{self.id}', title='{self.title}', status='{self.status}')>"
 
 
 class FaqEntry(Base):

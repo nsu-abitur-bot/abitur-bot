@@ -1,12 +1,12 @@
 import logging
 import os
-from typing import Any, List, Optional
+from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 
 from google import genai
 from google.genai import types
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
-from llm.base import BaseLLMProvider
+from llm.base import BaseLLMProvider, LLMResult, LLMUsage
 from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
@@ -30,14 +30,13 @@ class GeminiProvider(BaseLLMProvider):
             self.model_name,
         )
 
-    async def generate(
+    def _build_request(
         self,
         messages: List[BaseMessage],
-        profile: Optional[LLMProfile] = None,
-        **kwargs,
-    ) -> str:
+        profile: Optional[LLMProfile],
+    ) -> tuple[list[dict[str, Any]], types.GenerateContentConfig]:
         system_instruction = None
-        gemini_messages = []
+        gemini_messages: list[dict[str, Any]] = []
 
         for msg in messages:
             if isinstance(msg, SystemMessage):
@@ -69,6 +68,16 @@ class GeminiProvider(BaseLLMProvider):
         if system_instruction:
             config.system_instruction = system_instruction
 
+        return gemini_messages, config
+
+    async def generate_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> LLMResult:
+        gemini_messages, config = self._build_request(messages, profile)
+
         response = await self.client.aio.models.generate_content(
             model=self.model_name,
             contents=gemini_messages,
@@ -76,7 +85,62 @@ class GeminiProvider(BaseLLMProvider):
         )
 
         content = response.text
-        return content.strip() if isinstance(content, str) else str(content or "")
+        text = content.strip() if isinstance(content, str) else str(content or "")
+
+        usage = LLMUsage()
+        raw_usage = getattr(response, "usage_metadata", None)
+        if raw_usage is not None:
+            usage = _usage_from_gemini_metadata(raw_usage)
+
+        return LLMResult(text=text, usage=usage)
+
+    async def generate_stream(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        **kwargs,
+    ) -> AsyncIterator[str]:
+        gemini_messages, config = self._build_request(messages, profile)
+
+        stream = await self.client.aio.models.generate_content_stream(
+            model=self.model_name,
+            contents=gemini_messages,
+            config=config,
+        )
+        async for chunk in stream:
+            text = getattr(chunk, "text", None)
+            if text:
+                yield text
+
+    async def generate_stream_with_usage(
+        self,
+        messages: List[BaseMessage],
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        gemini_messages, config = self._build_request(messages, profile)
+
+        chunks: list[str] = []
+        usage = LLMUsage()
+        stream = await self.client.aio.models.generate_content_stream(
+            model=self.model_name,
+            contents=gemini_messages,
+            config=config,
+        )
+        async for chunk in stream:
+            raw_usage = getattr(chunk, "usage_metadata", None)
+            if raw_usage is not None:
+                usage = _usage_from_gemini_metadata(raw_usage)
+
+            text = getattr(chunk, "text", None)
+            if not text:
+                continue
+            chunks.append(text)
+            if on_delta is not None:
+                await on_delta(text)
+
+        return LLMResult(text="".join(chunks).strip(), usage=usage)
 
     def get_embeddings_model(self) -> Any:
         return GeminiEmbeddings(self.client)
@@ -99,3 +163,17 @@ class GeminiEmbeddings:
         if not response.embeddings:
             return []
         return [list(e.values or []) for e in response.embeddings]
+
+
+def _usage_from_gemini_metadata(raw_usage: Any) -> LLMUsage:
+    prompt_tokens = int(getattr(raw_usage, "prompt_token_count", 0) or 0)
+    completion_tokens = int(getattr(raw_usage, "candidates_token_count", 0) or 0)
+    total_tokens = int(
+        getattr(raw_usage, "total_token_count", 0)
+        or (prompt_tokens + completion_tokens)
+    )
+    return LLMUsage(
+        prompt_tokens=prompt_tokens,
+        completion_tokens=completion_tokens,
+        total_tokens=total_tokens,
+    )

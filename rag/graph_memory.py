@@ -6,6 +6,7 @@ import re
 import time
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Literal, Optional
+from urllib.parse import unquote, urlsplit
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -13,6 +14,8 @@ from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import wrap_embedding_func_with_attrs
 
+from db.postgres.db import AsyncSessionLocal
+from db.postgres.models import Document
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 
@@ -23,6 +26,40 @@ logger = logging.getLogger(__name__)
 GRAPH_QUERY_MODES: frozenset = frozenset(
     ["naive", "local", "global", "hybrid", "mix", "bypass"]
 )
+
+DEFAULT_SOURCE_TITLE = "Источник информации"
+UUID_RE = re.compile(
+    r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+    re.IGNORECASE,
+)
+
+
+def _clean_source_title(title: str | None) -> str | None:
+    if not title:
+        return None
+    title = title.strip()
+    if not title or title.startswith(("http://", "https://")):
+        return None
+    if UUID_RE.match(title):
+        return None
+    return title
+
+
+def _fallback_title_from_source(source: str | None) -> str:
+    if not source:
+        return DEFAULT_SOURCE_TITLE
+
+    source = source.strip()
+    parsed = urlsplit(source)
+    if parsed.path:
+        filename = unquote(parsed.path.rstrip("/").split("/")[-1]).strip()
+        if filename:
+            return filename
+    if parsed.netloc:
+        return parsed.netloc
+
+    clean_source = _clean_source_title(source)
+    return clean_source or DEFAULT_SOURCE_TITLE
 
 
 class _GraphWrapper:
@@ -445,15 +482,7 @@ class GraphMemory:
 
                 chunks = result.get("data", {}).get("chunks", [])
 
-                # Fetch document titles to map URLs
-                docs = await self.get_list_docs(graph_id)
-                url_to_title = {}
-                for doc in docs:
-                    doc_url = doc.get("url", "")
-                    doc_title = doc.get("id", "Источник информации")
-                    if doc_url:
-                        for part in str(doc_url).split(","):
-                            url_to_title[part.strip()] = str(doc_title).strip()
+                url_to_title = await self._get_source_titles(graph_id)
 
                 aggregated: dict[str, dict] = {}
                 for idx, chunk in enumerate(chunks):
@@ -513,6 +542,59 @@ class GraphMemory:
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
+
+    async def _get_source_titles(self, graph_id: str) -> dict[str, str]:
+        docs = await self.get_list_docs(graph_id)
+        rag_doc_titles: dict[str, str] = {}
+        url_to_title: dict[str, str] = {}
+
+        for doc in docs:
+            rag_doc_id = str(doc.get("id") or "").strip()
+            doc_url = doc.get("url", "")
+            if rag_doc_id:
+                rag_doc_titles[rag_doc_id] = _fallback_title_from_source(
+                    str(doc_url or rag_doc_id)
+                )
+            if doc_url:
+                for part in str(doc_url).split(","):
+                    url = part.strip()
+                    if url:
+                        url_to_title[url] = _fallback_title_from_source(url)
+
+        try:
+            from sqlalchemy import select
+
+            async with AsyncSessionLocal() as session:
+                stmt = select(Document).where(
+                    Document.graph_id == graph_id,
+                    Document.status == "active",
+                )
+                result = await session.execute(stmt)
+                for document in result.scalars().all():
+                    title = _clean_source_title(document.title)
+                    if not title:
+                        title = _fallback_title_from_source(
+                            document.source_url or document.rag_doc_id
+                        )
+
+                    rag_doc_titles[document.rag_doc_id] = title
+                    if document.source_url:
+                        url_to_title[document.source_url] = title
+        except Exception as exc:
+            logger.warning("Failed to load document titles for sources: %s", exc)
+
+        for doc in docs:
+            rag_doc_id = str(doc.get("id") or "").strip()
+            doc_url = doc.get("url", "")
+            title = rag_doc_titles.get(rag_doc_id)
+            if not title or not doc_url:
+                continue
+            for part in str(doc_url).split(","):
+                url = part.strip()
+                if url:
+                    url_to_title[url] = title
+
+        return url_to_title
 
     async def _rerank_sources_with_llm(
         self,
