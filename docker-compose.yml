@@ -14,6 +14,7 @@ services:
     volumes:
       - ./faq:/app/faq
       - ./data:/app/data
+      - ./logs:/app/logs
     depends_on:
       redis:
         condition: service_healthy
@@ -37,6 +38,7 @@ services:
     volumes:
       - ./faq:/app/faq
       - ./data:/app/data
+      - ./logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
@@ -53,6 +55,8 @@ services:
       - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
       - DB_HOST=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
+    volumes:
+      - ./logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
