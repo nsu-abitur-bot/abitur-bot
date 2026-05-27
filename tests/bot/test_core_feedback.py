@@ -150,6 +150,11 @@ async def test_normal_reply_has_feedback_footer(monkeypatch):
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
     monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
+    monkeypatch.setattr(
+        core,
+        "_check_rate_limit",
+        AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
+    )
     monkeypatch.setattr("bot.core.ask_local_llm", AsyncMock(return_value="Ответ бота"))
 
     reply = await core.handle_message(
@@ -184,6 +189,11 @@ async def test_report_is_not_feedback_command(monkeypatch):
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
     monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
+    monkeypatch.setattr(
+        core,
+        "_check_rate_limit",
+        AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
+    )
     monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
 
     await core.handle_message(
@@ -196,3 +206,82 @@ async def test_report_is_not_feedback_command(monkeypatch):
 
     ask_llm.assert_awaited_once()
     assert not redis.awaiting_feedback
+
+
+@pytest.mark.asyncio
+async def test_cmd_start_has_no_feedback_footer(monkeypatch):
+    redis = FakeRedis()
+    core = BotCore()
+
+    async def fake_get_redis_client():
+        return redis
+
+    async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
+        return 42
+
+    monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
+    monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
+
+    reply = await core.cmd_start("telegram", "123", "session-1")
+
+    assert "Напишите свой вопрос" in reply.text
+    assert FEEDBACK_FOOTER not in reply.text
+
+
+@pytest.mark.asyncio
+async def test_cmd_reset_has_no_feedback_footer(monkeypatch):
+    redis = FakeRedis()
+
+    async def fake_get_redis_client():
+        return redis
+
+    monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
+
+    reply = await BotCore().cmd_reset("session-1")
+
+    assert redis.history_cleared
+    assert "История переписки очищена" in reply.text
+    assert FEEDBACK_FOOTER not in reply.text
+
+
+@pytest.mark.asyncio
+async def test_rate_limit_skips_llm_and_user_input_log(monkeypatch):
+    redis = FakeRedis()
+    core = BotCore()
+    save_user_message = AsyncMock()
+    ask_llm = AsyncMock(return_value="LLM response")
+
+    async def fake_get_redis_client():
+        return redis
+
+    async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
+        return 42
+
+    monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
+    monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
+    monkeypatch.setattr(core, "_save_user_message_to_db", save_user_message)
+    monkeypatch.setattr(
+        core,
+        "_check_rate_limit",
+        AsyncMock(
+            return_value=type(
+                "RateLimit",
+                (),
+                {"allowed": False, "message": "Лимит исчерпан"},
+            )()
+        ),
+    )
+    monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
+
+    reply = await core.handle_message(
+        channel="telegram",
+        external_user_id="123",
+        session_id="session-1",
+        user_name="user",
+        user_text="Как поступить?",
+    )
+
+    assert reply.text == "Лимит исчерпан"
+    assert FEEDBACK_FOOTER not in reply.text
+    save_user_message.assert_not_awaited()
+    ask_llm.assert_not_awaited()

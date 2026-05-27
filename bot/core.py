@@ -1,10 +1,13 @@
 import logging
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Awaitable, Callable, Optional
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
 from db.postgres.services.feedback_report import FeedbackReportService
 from db.postgres.services.message_log import MessageLogService
+from db.postgres.services.settings import SettingsService
 from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
 from llm.llm_client import ask_local_llm
@@ -45,6 +48,19 @@ FEEDBACK_FOOTER = (
     "Поделитесь обратной связью командой /feedback"
 )
 
+SYSTEM_RATE_LIMIT_MESSAGE = (
+    "Сегодняшний общий лимит запросов к боту исчерпан. Попробуйте завтра."
+)
+USER_RATE_LIMIT_MESSAGE = (
+    "Вы исчерпали дневной лимит запросов к боту. Попробуйте завтра."
+)
+
+
+@dataclass(frozen=True)
+class RateLimitResult:
+    allowed: bool
+    message: str | None = None
+
 
 class BotReply:
     def __init__(
@@ -52,7 +68,7 @@ class BotReply:
         text: str,
         parse_mode: str | None = None,
         fallback_plain_on_format_error: bool = False,
-        include_feedback_footer: bool = True,
+        include_feedback_footer: bool = False,
     ):
         self.text = self._with_feedback_footer(text) if include_feedback_footer else text
         self.parse_mode = parse_mode
@@ -116,6 +132,40 @@ class BotCore:
                 channel=channel,
                 comment=comment,
             )
+
+    async def _check_rate_limit(self, user_id: int) -> RateLimitResult:
+        day_start = datetime.now(UTC).replace(
+            hour=0,
+            minute=0,
+            second=0,
+            microsecond=0,
+            tzinfo=None,
+        )
+        try:
+            async with AsyncSessionLocal() as session:
+                settings = await SettingsService(session).get_rate_limit_settings()
+                log_service = MessageLogService(session)
+                system_count = await log_service.count_user_inputs_since(day_start)
+                if system_count >= settings.system_requests_per_day:
+                    return RateLimitResult(
+                        allowed=False,
+                        message=SYSTEM_RATE_LIMIT_MESSAGE,
+                    )
+
+                user_count = await log_service.count_user_inputs_since(
+                    day_start,
+                    user_id=user_id,
+                )
+                if user_count >= settings.user_requests_per_day:
+                    return RateLimitResult(
+                        allowed=False,
+                        message=USER_RATE_LIMIT_MESSAGE,
+                    )
+        except Exception:
+            logger.exception("Ошибка проверки rate limit для user_id=%s", user_id)
+            return RateLimitResult(allowed=True)
+
+        return RateLimitResult(allowed=True)
 
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str
@@ -254,15 +304,6 @@ class BotCore:
                 include_feedback_footer=False,
             )
 
-        formatted_message = f"[from {user_name}] {user_text}"
-
-        log_entry = await self._save_user_message_to_db(
-            user_id=internal_user_id,
-            session_id=session_id,
-            message=formatted_message,
-            source=channel,
-        )
-
         is_awaiting = await redis_client.is_awaiting_applicant_id(session_id)
 
         if is_awaiting:
@@ -301,6 +342,22 @@ class BotCore:
                 )
             )
 
+        rate_limit = await self._check_rate_limit(internal_user_id)
+        if not rate_limit.allowed:
+            return BotReply(
+                text=rate_limit.message or USER_RATE_LIMIT_MESSAGE,
+                include_feedback_footer=False,
+            )
+
+        formatted_message = f"[from {user_name}] {user_text}"
+
+        log_entry = await self._save_user_message_to_db(
+            user_id=internal_user_id,
+            session_id=session_id,
+            message=formatted_message,
+            source=channel,
+        )
+
         response = await ask_local_llm(
             formatted_message,
             session_id=session_id,
@@ -317,4 +374,5 @@ class BotCore:
             text=response,
             parse_mode="HTML" if channel == "telegram" else None,
             fallback_plain_on_format_error=(channel == "telegram"),
+            include_feedback_footer=True,
         )

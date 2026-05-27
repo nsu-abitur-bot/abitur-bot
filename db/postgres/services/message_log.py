@@ -71,6 +71,21 @@ class MessageLogService:
         await self.session.refresh(log_entry)
         return log_entry
 
+    async def count_user_inputs_since(
+        self,
+        start: datetime,
+        user_id: Optional[int] = None,
+    ) -> int:
+        """Считает пользовательские запросы с указанного времени."""
+        stmt = select(func.count()).select_from(MessageLog).where(
+            MessageLog.message_type == "user_input",
+            MessageLog.created_at >= start,
+        )
+        if user_id is not None:
+            stmt = stmt.where(MessageLog.user_id == user_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one()
+
     async def get_logs_by_session(
         self,
         session_id: str,
