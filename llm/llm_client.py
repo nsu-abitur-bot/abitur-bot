@@ -310,9 +310,7 @@ async def _classify_intent_bg(
                     log_service = MessageLogService(session)
                     await log_service.update_log_topic(log_entry_id, topic_id)
             except Exception as e:
-                logger.error(
-                    f"[{session_id}] Failed to update topic id in log: {e}"
-                )
+                logger.error(f"[{session_id}] Failed to update topic id in log: {e}")
     except Exception as e:
         logger.warning(f"[{session_id}] Background intent classification error: {e}")
 
@@ -391,23 +389,7 @@ async def ask_local_llm(
         task_faq = asyncio.create_task(faq_matcher.match_async(expanded_message))
         task_history = asyncio.create_task(redis_client.get_history(session_id))
 
-        # Получаем историю (нужна и для RAG, и для финального промпта).
-        try:
-            history_entries = await task_history
-        except Exception as e:
-            logger.warning(f"[{session_id}] Redis get_history error: {e}")
-            history_entries = []
-        history_text = _build_history_text(history_entries)
-
-        # 5. Запускаем LightRAG параллельно с ожиданием FAQ.
-        rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
-        task_rag = asyncio.create_task(
-            query_graph_with_sources(
-                rag_query, conversation_history=history_text or None
-            )
-        )
-
-        # 6. Ждём FAQ. Если матч найден — отменяем RAG и быстро возвращаем ответ.
+        # 5. Сначала ждём FAQ. LightRAG нельзя запускать до результата FAQ-матчера.
         try:
             faq_answer = await task_faq
         except Exception as e:
@@ -416,9 +398,9 @@ async def ask_local_llm(
 
         if faq_answer:
             logger.info(f"[{session_id}] FAQ match found, returning predefined answer.")
-            task_rag.cancel()
+            task_history.cancel()
             with suppress(asyncio.CancelledError, Exception):
-                await task_rag
+                await task_history
 
             # Запись лога FAQ + истории + PG — fire-and-forget.
             _spawn_bg(
@@ -436,20 +418,29 @@ async def ask_local_llm(
                 )
             )
             if user_id:
-                _spawn_bg(
-                    _save_message_to_pg(user_id, session_id, message, faq_answer)
-                )
+                _spawn_bg(_save_message_to_pg(user_id, session_id, message, faq_answer))
             return faq_answer
 
-        # 7. FAQ промахнулся — ждём RAG.
+        # Получаем историю (нужна и для RAG, и для финального промпта) только
+        # после того, как FAQ не дал готовый ответ.
+        try:
+            history_entries = await task_history
+        except Exception as e:
+            logger.warning(f"[{session_id}] Redis get_history error: {e}")
+            history_entries = []
+        history_text = _build_history_text(history_entries)
+
+        # 6. FAQ промахнулся — теперь можно запускать LightRAG.
         rag_sources: list[dict] = []
         rag_context = ""
         try:
-            logger.info(f"[{session_id}] Awaiting LightRAG context.")
-            rag_context_raw, metadata_sources = await task_rag
-            if not rag_context_raw or rag_context_raw.startswith(
-                "Error executing query"
-            ):
+            logger.info(f"[{session_id}] Querying LightRAG for context.")
+            rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
+            rag_context_raw, metadata_sources = await query_graph_with_sources(
+                rag_query,
+                conversation_history=history_text or None,
+            )
+            if not rag_context_raw or rag_context_raw.startswith("Error executing query"):
                 logger.info(f"[{session_id}] No relevant context found in RAG.")
                 rag_context = "Релевантный контекст из базы знаний не найден."
                 rag_sources = []
