@@ -23,6 +23,8 @@ from api.schemas.rag import (
     DocumentUpdateResponse,
     ParsedDocument,
     ParsedPageResult,
+    PreprocessDocumentRequest,
+    PreprocessDocumentResponse,
     RagDocumentContentResponse,
     RagDocumentListResponse,
     RagUploadResponse,
@@ -281,6 +283,28 @@ async def confirm_rag_upload(
         raise HTTPException(status_code=500, detail=f"Failed to upload: {str(e)}")
 
 
+@router.post(
+    "/preprocess",
+    response_model=PreprocessDocumentResponse,
+    summary="Предобработать текст документа для RAG",
+)
+async def preprocess_document_for_rag(
+    request: PreprocessDocumentRequest,
+) -> PreprocessDocumentResponse:
+    """Расширяет аббревиатуры и добавляет локальный контекст смысловым блокам."""
+    raw_text = request.text.strip()
+    if not raw_text:
+        raise HTTPException(status_code=400, detail="Text must not be empty")
+
+    try:
+        prepared_text = await clean_and_structure_text(raw_text)
+    except Exception as e:
+        logger.error(f"Error during RAG document preprocessing: {e}")
+        raise HTTPException(status_code=503, detail="Document preprocessing unavailable")
+
+    return PreprocessDocumentResponse(text=prepared_text, chars=len(prepared_text))
+
+
 @router.get(
     "/docs", response_model=RagDocumentListResponse, summary="Список документов в RAG"
 )
@@ -355,16 +379,37 @@ async def delete_rag_document(
     """Удаляет документ из базы знаний RAG."""
     document_service = DocumentService(session)
     document = await document_service.get_by_id(doc_id)
-    if document is None:
-        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
-
     memory = get_graph_memory()
-    success = await memory.delete_doc(DEFAULT_GRAPH_ID, document.rag_doc_id)
+    if document is None:
+        docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
+        resolved_id = None
+        if docs:
+            resolved_id = next(
+                (doc["id"] for doc in docs if doc.get("id") == doc_id),
+                None,
+            )
+            if not resolved_id:
+                resolved_id = next(
+                    (doc["id"] for doc in docs if doc.get("url") == doc_id),
+                    None,
+                )
+        if resolved_id is None:
+            raise HTTPException(
+                status_code=404, detail=f"Document '{doc_id}' not found"
+            )
+        rag_doc_id = resolved_id
+        document_id = None
+    else:
+        rag_doc_id = document.rag_doc_id
+        document_id = document.id
+
+    success = await memory.delete_doc(DEFAULT_GRAPH_ID, rag_doc_id)
     if not success:
         raise HTTPException(
             status_code=500, detail=f"Failed to delete document '{doc_id}'"
         )
-    await document_service.mark_deleted(doc_id)
+    if document_id is not None:
+        await document_service.mark_deleted(document_id)
 
     return {"status": "success", "message": f"Document '{doc_id}' deleted."}
 
@@ -561,5 +606,8 @@ async def clear_rag_cache():
     Очистка вызывается по нажатию кнопки администратором.
     """
     memory = get_graph_memory()
-    await memory.clear_cache(DEFAULT_GRAPH_ID)
+    try:
+        await memory.clear_cache(DEFAULT_GRAPH_ID)
+    except TimeoutError as e:
+        raise HTTPException(status_code=503, detail=str(e)) from e
     return {"message": "RAG cache cleared successfully"}

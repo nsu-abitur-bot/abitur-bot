@@ -3,7 +3,7 @@ import logging
 import re
 from contextlib import suppress
 from html import escape, unescape
-from typing import Optional
+from typing import Awaitable, Callable, Optional
 from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
@@ -225,8 +225,22 @@ async def _save_log_to_db(
         logger.error(f"Ошибка сохранения лога в БД: {e}")
 
 
+StreamCallback = Callable[[str], Awaitable[None]]
+StatusCallback = Callable[[str], Awaitable[None]]
+
+STATUS_FAQ_LOOKUP = "🔎 Поиск готового ответа…"
+STATUS_INTENT = "🧭 Анализ вопроса…"
+STATUS_RAG = "📚 Поиск в базе знаний…"
+STATUS_GENERATING = "✍️ Готовлю ответ…"
+
+
 async def ask_local_llm(
-    message: str, session_id: str, user_id: int = 0, log_entry_id: Optional[int] = None
+    message: str,
+    session_id: str,
+    user_id: int = 0,
+    log_entry_id: Optional[int] = None,
+    stream_callback: Optional[StreamCallback] = None,
+    status_callback: Optional[StatusCallback] = None,
 ) -> str:
     """
     message - сообщение от пользователя
@@ -234,10 +248,23 @@ async def ask_local_llm(
     используется для получения и сохранения истории переписки (контекста)
     между пользователем и ассистентом
     user_id - внутренний идентификатор пользователя для сохранения в БД
+    stream_callback - опциональная асинхронная функция, вызываемая с накопленным
+    текстом ответа по мере его генерации LLM. Используется для прогрессивного
+    отображения ответа (например, edit_message_text в Telegram). Колбэк
+    вызывается только во время генерации основного LLM-ответа: при FAQ-матче и
+    awaiting-applicant-id веток LLM не вызывается, и колбэк не срабатывает.
     """
     logger.info(
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
     )
+
+    async def _emit_status(text: str) -> None:
+        if status_callback is None:
+            return
+        try:
+            await status_callback(text)
+        except Exception as exc:
+            logger.warning(f"[{session_id}] status_callback error: {exc}")
 
     try:
         redis_client = await get_redis_client()
@@ -254,6 +281,7 @@ async def ask_local_llm(
 
         # 3. Проверяем FAQ — если есть заготовленный ответ, возвращаем сразу
         logger.info(f"[{session_id}] Checking FAQ for match.")
+        await _emit_status(STATUS_FAQ_LOOKUP)
         try:
             faq_matcher = get_faq_matcher()
             faq_answer = faq_matcher.match(expanded_message)
@@ -285,6 +313,7 @@ async def ask_local_llm(
         # 3. Определение топика для лога. RAG всегда выполняется ниже.
         need_rag = True
         topic_id = None
+        await _emit_status(STATUS_INTENT)
         try:
             # Получаем список тем
             async with AsyncSessionLocal() as session:
@@ -357,10 +386,22 @@ async def ask_local_llm(
         rag_context = ""
         if need_rag:
             logger.info(f"[{session_id}] Querying LightRAG for context.")
+            await _emit_status(STATUS_RAG)
             try:
+                history_entries = await redis_client.get_history(session_id)
+                history_lines = []
+                for entry in history_entries[-6:]:
+                    role = entry.get("role", "")
+                    content = entry.get("content", "")
+                    if not content:
+                        continue
+                    history_lines.append(f"{role}: {content}")
+                history_text = "\n".join(history_lines).strip()
+
                 rag_query = f"{expanded_message}\n\n{LIGHTRAG_FORMAT_HINT}"
-                rag_context_raw, _metadata_sources = await query_graph_with_sources(
-                    rag_query
+                rag_context_raw, metadata_sources = await query_graph_with_sources(
+                    rag_query,
+                    conversation_history=history_text or None,
                 )
                 if not rag_context_raw or rag_context_raw.startswith(
                     "Error executing query"
@@ -370,7 +411,7 @@ async def ask_local_llm(
                     rag_sources = []
                     logger.info(f"[{session_id}] RAG retrieval result: No context found")
                 else:
-                    rag_sources = _extract_sources_from_rag_context(rag_context_raw)
+                    rag_sources = metadata_sources
                     logger.info(
                         f"[{session_id}] Retrieved context from RAG "
                         f"(sources: {len(rag_sources)})."
@@ -466,7 +507,25 @@ async def ask_local_llm(
             logger.info(
                 f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
             )
-            content = await provider.generate(messages, profile=LLMProfiles.CHAT)
+            await _emit_status(STATUS_GENERATING)
+            if stream_callback is not None:
+                content = ""
+                async for delta in provider.generate_stream(
+                    messages, profile=LLMProfiles.CHAT
+                ):
+                    if not delta:
+                        continue
+                    content += delta
+                    try:
+                        await stream_callback(content)
+                    except Exception as cb_exc:
+                        # стриминг в транспорт не должен ломать LLM-ответ
+                        logger.warning(
+                            f"[{session_id}] stream_callback error: {cb_exc}"
+                        )
+                content = content.strip()
+            else:
+                content = await provider.generate(messages, profile=LLMProfiles.CHAT)
 
             # Удаляем любые левые ссылки, которые могла придумать LLM
             content = re.sub(
@@ -476,14 +535,14 @@ async def ask_local_llm(
                 flags=re.IGNORECASE,
             )
 
-            # Добавляем свои источники (максимум 5 штук)
+            # Добавляем свои источники (максимум 3 штуки)
             lower_content = content.lower()
             not_found = (
                 "не нашел информации" in lower_content or "не найдена" in lower_content
             )
             if valid_sources and not not_found:
                 links_html = []
-                for s in valid_sources[:5]:
+                for s in valid_sources[:3]:
                     url = str(s.get("url", ""))
                     if not url:
                         continue

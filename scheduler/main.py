@@ -19,9 +19,7 @@ async def run_sync_job(bot: TelegramBot | None, max_client: MaxBot | None = None
     """Скрипт одного прогона: парсинг -> обновление БД -> уведомления."""
     logger.info("Начало цикла синхронизации рейтингов...")
     try:
-        url = os.getenv(
-            "MOCK_RATING_URL", "http://host.docker.internal:3000/abitur-web/api/rating"
-        )
+        url = os.getenv("MOCK_RATING_URL", "http://host.docker.internal:3000/api/rating")
         logger.info(f"Парсинг новых данных с мок-URL: {url}")
 
         parsed_entries, page_hash, direction_name = parse_mock_rating_page(url)

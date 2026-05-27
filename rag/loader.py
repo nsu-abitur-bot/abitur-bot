@@ -61,10 +61,9 @@ async def add_texts_async(
     finally:
         # Ensure storages are finalized to persist data
         await graph_memory.cleanup(graph_id)
-        
+
         if saved_count > 0:
-            # Очищаем кеш LLM LightRAG вынесено в отдельный endpoint
-            pass
+            await graph_memory.clear_cache(graph_id)
 
     logger.info(
         f"Тексты добавлены в графовую память: успешно {saved_count} из {len(texts)}"

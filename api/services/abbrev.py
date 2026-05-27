@@ -1,75 +1,37 @@
-import threading
-from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession
 
-import yaml
-
-from abbrev.expander import ABBREV_DATA_PATH, get_abbrev_expander
+from abbrev.expander import get_abbrev_expander
 from api.schemas.abbrev import AbbrevItem
+from db.postgres.services.abbrev import AbbrevDbService
 
 
 class AbbrevService:
-    """Управление словарём аббревиатур: чтение, добавление, обновление, удаление."""
+    def __init__(self, session: AsyncSession):
+        self._db = AbbrevDbService(session)
 
-    def __init__(self):
-        self._lock = threading.Lock()
+    async def get_all(self) -> list[AbbrevItem]:
+        entries = await self._db.get_all()
+        return [AbbrevItem(id=e.id, short=e.short, full=e.full) for e in entries]
 
-    def get_all(self) -> List[AbbrevItem]:
-        with self._lock:
-            data = self._read_data()
-            return [AbbrevItem(**item) for item in data.get("abbreviations", [])]
+    async def create(self, item: AbbrevItem) -> AbbrevItem:
+        entry = await self._db.create(item.short, item.full)
+        await self._reload_expander()
+        return AbbrevItem(id=entry.id, short=entry.short, full=entry.full)
 
-    def create(self, item: AbbrevItem) -> AbbrevItem:
-        with self._lock:
-            data = self._read_data()
-            data.setdefault("abbreviations", [])
-            data["abbreviations"].append(item.model_dump())
-            self._write_data(data)
-        self._reload_expander()
-        return item
+    async def update(self, item_id: str, item: AbbrevItem) -> AbbrevItem:
+        entry = await self._db.update(item_id, item.short, item.full)
+        if not entry:
+            raise KeyError(item_id)
+        await self._reload_expander()
+        return AbbrevItem(id=entry.id, short=entry.short, full=entry.full)
 
-    def create_many(self, items: List[AbbrevItem]) -> List[AbbrevItem]:
-        with self._lock:
-            data = self._read_data()
-            data.setdefault("abbreviations", [])
-            for item in items:
-                data["abbreviations"].append(item.model_dump())
-            self._write_data(data)
-        self._reload_expander()
-        return items
+    async def delete(self, item_id: str) -> None:
+        deleted = await self._db.delete(item_id)
+        if not deleted:
+            raise KeyError(item_id)
+        await self._reload_expander()
 
-    def update(self, index: int, item: AbbrevItem) -> AbbrevItem:
-        with self._lock:
-            data = self._read_data()
-            items = data.get("abbreviations", [])
-            if index < 0 or index >= len(items):
-                raise IndexError(f"Abbreviation at index {index} not found")
-            items[index] = item.model_dump()
-            self._write_data(data)
-        self._reload_expander()
-        return item
-
-    def delete(self, index: int) -> None:
-        with self._lock:
-            data = self._read_data()
-            items = data.get("abbreviations", [])
-            if index < 0 or index >= len(items):
-                raise IndexError(f"Abbreviation at index {index} not found")
-            del items[index]
-            self._write_data(data)
-        self._reload_expander()
-
-    def _read_data(self) -> dict:
-        if not ABBREV_DATA_PATH.exists():
-            return {"abbreviations": []}
-        try:
-            with open(ABBREV_DATA_PATH, encoding="utf-8") as f:
-                return yaml.safe_load(f) or {"abbreviations": []}
-        except Exception:
-            return {"abbreviations": []}
-
-    def _write_data(self, data: dict) -> None:
-        with open(ABBREV_DATA_PATH, "w", encoding="utf-8") as f:
-            yaml.dump(data, f, allow_unicode=True, sort_keys=False)
-
-    def _reload_expander(self) -> None:
-        get_abbrev_expander().reload()
+    async def _reload_expander(self) -> None:
+        entries = await self._db.get_all()
+        items = [{"short": e.short, "full": e.full} for e in entries]
+        get_abbrev_expander().load_items(items)
