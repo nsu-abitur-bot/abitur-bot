@@ -101,6 +101,7 @@ async def run_telegram_bot() -> bool | None:
     bot_token = getenv("BOT_TOKEN")
     if bot_token is None:
         logger.error("Telegram bot skipped: BOT_TOKEN не задан")
+        polling_lock.release()
         return False
 
     telegram_socks5_proxy = getenv("TELEGRAM_SOCKS5_PROXY")
@@ -240,7 +241,7 @@ async def run_telegram_bot() -> bool | None:
 
     logger.info("Telegram bot started")
     try:
-        await dp.start_polling(bot)
+        await dp.start_polling(bot, handle_signals=False)
     finally:
         await bot.session.close()
         polling_lock.release()

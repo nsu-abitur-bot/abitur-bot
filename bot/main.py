@@ -62,9 +62,17 @@ async def main() -> None:
         )
     )
 
+    tasks = (telegram_task, max_task)
     try:
-        await asyncio.gather(telegram_task, max_task)
+        await asyncio.gather(*tasks)
+    except asyncio.CancelledError:
+        logger.info("Остановка bot-core адаптеров...")
+        raise
     finally:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
         logger.info("Закрытие соединений...")
         await cleanup_redis()
 

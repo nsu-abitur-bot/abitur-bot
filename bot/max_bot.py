@@ -119,4 +119,7 @@ async def run_max_bot() -> bool | None:
         # Уступка API лимитам до внедрения адаптивного backoff.
         await asyncio.sleep(0)
 
-    await dp.start_polling(client)
+    try:
+        await dp.start_polling(client)
+    finally:
+        await client.close_session()
