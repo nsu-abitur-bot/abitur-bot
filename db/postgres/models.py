@@ -209,6 +209,41 @@ class MessageLog(Base):
         )
 
 
+class QuestionEmbeddingCache(Base):
+    """Кеш embeddings для семантической группировки пользовательских вопросов."""
+
+    __tablename__ = "question_embedding_cache"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    provider: Mapped[str] = mapped_column(String(50), nullable=False)
+    model: Mapped[str] = mapped_column(String(100), nullable=False)
+    question_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    canonical_question: Mapped[str] = mapped_column(Text, nullable=False)
+    embedding: Mapped[list] = mapped_column(JSON, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "provider",
+            "model",
+            "question_hash",
+            name="uq_question_embedding_cache_provider_model_hash",
+        ),
+        Index("ix_question_embedding_cache_lookup", "provider", "model", "question_hash"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<QuestionEmbeddingCache(id='{self.id}', provider='{self.provider}', "
+            f"model='{self.model}')>"
+        )
+
+
 class FeedbackReport(Base):
     """Обратная связь пользователей о некорректных ответах бота."""
 

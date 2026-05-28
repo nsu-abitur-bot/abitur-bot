@@ -233,18 +233,30 @@ async def get_user_logs(
 )
 async def get_popular_questions(
     limit: int = Query(10, ge=1, le=100),
+    raw_limit: int = Query(500, ge=1, le=5000),
+    similarity_threshold: float = Query(0.86, ge=0.5, le=1.0),
     log_service: MessageLogService = Depends(get_message_log_service),
 ):
     """
     Получает самые часто задаваемые вопросы пользователей.
 
-    - **limit**: максимальное количество возвращаемых вопросов
+    - **limit**: максимальное количество возвращаемых кластеров вопросов
+    - **raw_limit**: сколько исходных формулировок взять для кластеризации
+    - **similarity_threshold**: порог семантической близости формулировок
     """
     try:
-        popular = await log_service.get_popular_questions(limit=limit)
+        popular = await log_service.get_popular_questions(
+            limit=limit,
+            raw_limit=raw_limit,
+            similarity_threshold=similarity_threshold,
+        )
         return PopularQuestionsResponse(
             questions=[
-                PopularQuestion(question=item["question"], count=item["count"])
+                PopularQuestion(
+                    question=item["question"],
+                    count=item["count"],
+                    variants=item["variants"],
+                )
                 for item in popular
             ]
         )
