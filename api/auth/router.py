@@ -12,6 +12,7 @@ from db.postgres.services.admin import AdminService
 from .dependencies import get_current_admin, require_superadmin
 from .schemas import (
     AdminResponse,
+    ChangeRoleRequest,
     InviteCodeRequest,
     InviteCodeResponse,
     LoginRequest,
@@ -30,8 +31,10 @@ async def login(
 ) -> TokenResponse:
     service = AdminService(session)
     admin = await service.get_by_username(body.username)
-    if admin is None or not admin.is_active or not verify_password(
-        body.password, admin.password_hash
+    if (
+        admin is None
+        or not admin.is_active
+        or not verify_password(body.password, admin.password_hash)
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -108,9 +111,9 @@ async def create_invite(
 ) -> InviteCodeResponse:
     expires_at = None
     if body.expires_in_hours:
-        expires_at = (
-            datetime.now(UTC) + timedelta(hours=body.expires_in_hours)
-        ).replace(tzinfo=None)
+        expires_at = (datetime.now(UTC) + timedelta(hours=body.expires_in_hours)).replace(
+            tzinfo=None
+        )
 
     code = secrets.token_urlsafe(16)
     service = AdminService(session)
@@ -150,6 +153,43 @@ async def deactivate_admin(
         )
     service = AdminService(session)
     admin = await service.set_active(admin_id, is_active=False)
+    if admin is None:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    await session.commit()
+    return AdminResponse.model_validate(admin)
+
+
+@router.patch("/admins/{admin_id}/role", response_model=AdminResponse)
+async def change_admin_role(
+    admin_id: str,
+    body: ChangeRoleRequest,
+    current_admin: Admin = Depends(require_superadmin),
+    session: AsyncSession = Depends(get_async_session),
+) -> AdminResponse:
+    if admin_id == current_admin.id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot change your own role",
+        )
+
+    service = AdminService(session)
+    target = await service.get_by_id(admin_id)
+    if target is None:
+        raise HTTPException(status_code=404, detail="Admin not found")
+
+    # Не даём разжаловать последнего суперадмина, иначе систему некому будет
+    # администрировать.
+    demoting_superadmin = (
+        AdminRole(target.role) == AdminRole.superadmin
+        and body.role != AdminRole.superadmin
+    )
+    if demoting_superadmin and await service.count_superadmins() <= 1:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot demote the last superadmin",
+        )
+
+    admin = await service.update_role(admin_id, body.role)
     if admin is None:
         raise HTTPException(status_code=404, detail="Admin not found")
     await session.commit()

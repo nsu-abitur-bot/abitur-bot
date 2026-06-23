@@ -27,6 +27,10 @@ class InviteCodeRequest(BaseModel):
     expires_in_hours: Optional[int] = Field(None, ge=1, le=720)
 
 
+class ChangeRoleRequest(BaseModel):
+    role: AdminRole = Field(..., description="Новая роль администратора")
+
+
 class InviteCodeResponse(BaseModel):
     code: str
     role: AdminRole

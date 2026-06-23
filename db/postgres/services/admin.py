@@ -16,9 +16,7 @@ class AdminService:
         return result.scalar_one()
 
     async def get_by_id(self, admin_id: str) -> Optional[Admin]:
-        result = await self.session.execute(
-            select(Admin).where(Admin.id == admin_id)
-        )
+        result = await self.session.execute(select(Admin).where(Admin.id == admin_id))
         return result.scalar_one_or_none()
 
     async def get_by_username(self, username: str) -> Optional[Admin]:
@@ -46,9 +44,7 @@ class AdminService:
         return admin
 
     async def list_all(self) -> list[Admin]:
-        result = await self.session.execute(
-            select(Admin).order_by(Admin.created_at)
-        )
+        result = await self.session.execute(select(Admin).order_by(Admin.created_at))
         return list(result.scalars().all())
 
     async def set_active(self, admin_id: str, is_active: bool) -> Optional[Admin]:
@@ -58,6 +54,22 @@ class AdminService:
         admin.is_active = is_active
         await self.session.flush()
         return admin
+
+    async def update_role(self, admin_id: str, role: AdminRole) -> Optional[Admin]:
+        admin = await self.get_by_id(admin_id)
+        if admin is None:
+            return None
+        admin.role = role
+        await self.session.flush()
+        return admin
+
+    async def count_superadmins(self) -> int:
+        result = await self.session.execute(
+            select(func.count())
+            .select_from(Admin)
+            .where(Admin.role == AdminRole.superadmin.value)
+        )
+        return result.scalar_one()
 
     async def create_invite_code(
         self,

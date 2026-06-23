@@ -101,6 +101,32 @@ async def test_set_active_not_found(session: AsyncSession):
 
 
 @pytest.mark.asyncio
+async def test_update_role(session: AsyncSession):
+    service = AdminService(session)
+    admin = await service.create(username="mia", password_hash="h", role=AdminRole.viewer)
+    updated = await service.update_role(admin.id, AdminRole.admin)
+    assert updated is not None
+    assert AdminRole(updated.role) == AdminRole.admin
+
+
+@pytest.mark.asyncio
+async def test_update_role_not_found(session: AsyncSession):
+    service = AdminService(session)
+    result = await service.update_role("nonexistent", AdminRole.admin)
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_count_superadmins(session: AsyncSession):
+    service = AdminService(session)
+    assert await service.count_superadmins() == 0
+    await service.create(username="nora", password_hash="h", role=AdminRole.superadmin)
+    await service.create(username="omar", password_hash="h", role=AdminRole.admin)
+    await service.create(username="pia", password_hash="h", role=AdminRole.superadmin)
+    assert await service.count_superadmins() == 2
+
+
+@pytest.mark.asyncio
 async def test_create_invite_code(session: AsyncSession):
     service = AdminService(session)
     admin = await service.create(
@@ -159,9 +185,7 @@ async def test_use_invite_code(session: AsyncSession):
     creator = await service.create(
         username="kate", password_hash="h", role=AdminRole.superadmin
     )
-    user = await service.create(
-        username="liam", password_hash="h", role=AdminRole.admin
-    )
+    user = await service.create(username="liam", password_hash="h", role=AdminRole.admin)
     await service.create_invite_code(
         code="use-me", created_by_id=creator.id, role=AdminRole.admin
     )

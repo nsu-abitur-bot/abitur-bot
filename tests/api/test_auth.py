@@ -283,3 +283,94 @@ class TestProtectedEndpoints:
 
         response = self.client.get("/api/v1/auth/admins")
         assert response.status_code == 403
+
+
+class TestChangeRoleEndpoint:
+    def setup_method(self):
+        self.client = TestClient(app)
+
+    @patch("api.auth.router.AdminService")
+    def test_change_role_success(self, mock_cls):
+        mock_service = AsyncMock()
+        mock_service.get_by_id.return_value = _make_db_admin(
+            admin_id="other-id", username="bob", role=AdminRole.viewer
+        )
+        mock_service.update_role.return_value = _make_db_admin(
+            admin_id="other-id", username="bob", role=AdminRole.admin
+        )
+        mock_cls.return_value = mock_service
+
+        response = self.client.patch(
+            "/api/v1/auth/admins/other-id/role",
+            json={"role": "admin"},
+        )
+        assert response.status_code == 200
+        assert response.json()["role"] == AdminRole.admin
+        mock_service.update_role.assert_awaited_once()
+
+    def test_change_own_role_rejected(self):
+        """Суперадмин не может сменить собственную роль."""
+        response = self.client.patch(
+            "/api/v1/auth/admins/fake-admin-id/role",
+            json={"role": "admin"},
+        )
+        assert response.status_code == 400
+
+    @patch("api.auth.router.AdminService")
+    def test_change_role_admin_not_found(self, mock_cls):
+        mock_service = AsyncMock()
+        mock_service.get_by_id.return_value = None
+        mock_cls.return_value = mock_service
+
+        response = self.client.patch(
+            "/api/v1/auth/admins/ghost-id/role",
+            json={"role": "admin"},
+        )
+        assert response.status_code == 404
+
+    @patch("api.auth.router.AdminService")
+    def test_cannot_demote_last_superadmin(self, mock_cls):
+        mock_service = AsyncMock()
+        mock_service.get_by_id.return_value = _make_db_admin(
+            admin_id="other-id", username="root", role=AdminRole.superadmin
+        )
+        mock_service.count_superadmins.return_value = 1
+        mock_cls.return_value = mock_service
+
+        response = self.client.patch(
+            "/api/v1/auth/admins/other-id/role",
+            json={"role": "admin"},
+        )
+        assert response.status_code == 400
+        mock_service.update_role.assert_not_awaited()
+
+    @patch("api.auth.router.AdminService")
+    def test_can_demote_superadmin_when_others_exist(self, mock_cls):
+        mock_service = AsyncMock()
+        mock_service.get_by_id.return_value = _make_db_admin(
+            admin_id="other-id", username="root2", role=AdminRole.superadmin
+        )
+        mock_service.count_superadmins.return_value = 2
+        mock_service.update_role.return_value = _make_db_admin(
+            admin_id="other-id", username="root2", role=AdminRole.admin
+        )
+        mock_cls.return_value = mock_service
+
+        response = self.client.patch(
+            "/api/v1/auth/admins/other-id/role",
+            json={"role": "admin"},
+        )
+        assert response.status_code == 200
+        assert response.json()["role"] == AdminRole.admin
+
+    def test_admin_cannot_change_roles(self):
+        """Роль admin не имеет доступа к смене ролей (только superadmin)."""
+        fake_admin = FakeAdmin(role=AdminRole.admin)
+        app.dependency_overrides[get_current_admin] = lambda: fake_admin
+        app.dependency_overrides.pop(require_superadmin, None)
+
+        response = self.client.patch(
+            "/api/v1/auth/admins/other-id/role",
+            json={"role": "viewer"},
+        )
+        assert response.status_code == 403
