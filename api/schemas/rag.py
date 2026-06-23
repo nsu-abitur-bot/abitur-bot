@@ -147,3 +147,74 @@ class DocumentUpdateResponse(BaseModel):
     checked_count: int = Field(..., description="Количество проверенных документов")
     updated_count: int = Field(..., description="Количество обновленных документов")
     results: list[DocumentCheckResult] = Field(..., description="Результаты обновления")
+
+
+class DebugQueryRequest(BaseModel):
+    question: str = Field(..., description="Вопрос для проверки поиска по базе знаний")
+    mode: str = Field(
+        "hybrid",
+        description="Режим поиска LightRAG: hybrid, mix, local, global, naive, bypass",
+    )
+
+
+class DebugQuerySettings(BaseModel):
+    mode: str = Field(..., description="Использованный режим поиска")
+    chunk_top_k: int | None = Field(None, description="Сколько чанков извлекается")
+    top_k: int | None = Field(None, description="Top-k для сущностей/связей")
+    enable_rerank: bool | None = Field(None, description="Включён ли реранкинг")
+    min_rerank_score: float | None = Field(None, description="Порог rerank-скора")
+
+
+class DebugChunk(BaseModel):
+    index: int = Field(..., description="Порядковый номер чанка в выдаче")
+    source_url: str | None = Field(None, description="URL источника чанка")
+    file_path: str | None = Field(None, description="Исходное поле file_path чанка")
+    content: str = Field(..., description="Текст чанка")
+    rerank_score: float | None = Field(None, description="Скор реранкинга, если есть")
+
+
+class DebugEntity(BaseModel):
+    name: str = Field(..., description="Имя сущности")
+    type: str | None = Field(None, description="Тип сущности")
+    description: str | None = Field(None, description="Описание сущности")
+
+
+class DebugRelation(BaseModel):
+    source: str | None = Field(None, description="Сущность-источник связи")
+    target: str | None = Field(None, description="Сущность-цель связи")
+    description: str | None = Field(None, description="Описание связи")
+
+
+class DebugSource(BaseModel):
+    url: str = Field(..., description="URL источника")
+    title: str = Field(..., description="Название источника")
+    snippet: str = Field(..., description="Фрагмент текста источника")
+
+
+class DebugQueryResponse(BaseModel):
+    question: str = Field(..., description="Заданный вопрос")
+    mode: str = Field(..., description="Использованный режим поиска")
+    answer: str = Field(..., description="Сгенерированный ответ базы знаний")
+    settings: DebugQuerySettings = Field(..., description="Параметры поиска")
+    chunks: list[DebugChunk] = Field(..., description="Извлечённые чанки")
+    entities: list[DebugEntity] = Field(..., description="Найденные сущности")
+    relations: list[DebugRelation] = Field(..., description="Найденные связи")
+    sources: list[DebugSource] = Field(..., description="Итоговые источники")
+
+
+class DocumentDiagnosticsResponse(BaseModel):
+    id: str = Field(..., description="Идентификатор документа в Postgres")
+    title: str | None = Field(None, description="Название документа")
+    postgres_status: str = Field(..., description="Статус документа в Postgres")
+    lightrag_status: str = Field(
+        ...,
+        description="Статус обработки в LightRAG: processed, failed, "
+        "pending, processing, not_found",
+    )
+    chunks_count: int = Field(..., description="Количество чанков документа")
+    entities_count: int = Field(
+        ..., description="Количество извлечённых сущностей (0 → недостижим в hybrid)"
+    )
+    relations_count: int = Field(..., description="Количество извлечённых связей")
+    content_length: int | None = Field(None, description="Длина контента")
+    error: str | None = Field(None, description="Ошибка обработки в LightRAG, если есть")

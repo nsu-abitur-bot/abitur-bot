@@ -7,6 +7,7 @@ import httpx
 import requests
 from bs4 import BeautifulSoup
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
+from fastapi.responses import Response
 from pydantic import HttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,8 +18,11 @@ from api.schemas.rag import (
     CsvImportPreviewResult,
     CsvImportResponse,
     CsvImportResult,
+    DebugQueryRequest,
+    DebugQueryResponse,
     DocumentCheckRequest,
     DocumentCheckResponse,
+    DocumentDiagnosticsResponse,
     DocumentUpdateResponse,
     ParsedDocument,
     ParsedPageResult,
@@ -447,9 +451,7 @@ async def delete_rag_document(
                     None,
                 )
         if resolved_id is None:
-            raise HTTPException(
-                status_code=404, detail=f"Document '{doc_id}' not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
         rag_doc_id = resolved_id
         document_id = None
     else:
@@ -652,3 +654,86 @@ async def clear_rag_cache():
     except TimeoutError as e:
         raise HTTPException(status_code=503, detail=str(e)) from e
     return {"message": "RAG cache cleared successfully"}
+
+
+_DEBUG_QUERY_MODES = {"local", "global", "hybrid", "naive", "mix", "bypass"}
+
+
+@router.post(
+    "/debug/query",
+    response_model=DebugQueryResponse,
+    summary="Инспектор поиска: сырая выдача ретривала",
+)
+async def debug_rag_query(request: DebugQueryRequest) -> DebugQueryResponse:
+    """Выполняет запрос к базе знаний и возвращает извлечённые чанки, сущности,
+    связи и источники. Позволяет сравнить режимы (hybrid vs mix) и проверить,
+    попадает ли нужный документ в выдачу."""
+    mode = (request.mode or "hybrid").strip().lower()
+    if mode not in _DEBUG_QUERY_MODES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown mode '{mode}'. Allowed: {sorted(_DEBUG_QUERY_MODES)}",
+        )
+    if not request.question.strip():
+        raise HTTPException(status_code=400, detail="Question must not be empty")
+
+    memory = get_graph_memory()
+    try:
+        result = await memory.debug_query(
+            DEFAULT_GRAPH_ID, request.question.strip(), mode=mode
+        )
+    except Exception as e:
+        logger.error(f"Debug query failed: {e}")
+        raise HTTPException(status_code=503, detail="RAG debug query failed") from e
+
+    return DebugQueryResponse(**result)
+
+
+@router.get(
+    "/docs/{doc_id:path}/diagnostics",
+    response_model=DocumentDiagnosticsResponse,
+    summary="Диагностика документа в LightRAG",
+)
+async def get_rag_document_diagnostics(
+    doc_id: str,
+    session: AsyncSession = Depends(get_async_session),
+) -> DocumentDiagnosticsResponse:
+    """Возвращает статус обработки документа в LightRAG, число чанков, сущностей
+    и связей. entities_count == 0 означает, что граф для документа не построен и
+    в режиме hybrid он недостижим."""
+    document = await DocumentService(session).get_by_id(doc_id)
+    if document is None:
+        raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
+
+    memory = get_graph_memory()
+    diagnostics = await memory.get_doc_diagnostics(DEFAULT_GRAPH_ID, document.rag_doc_id)
+
+    return DocumentDiagnosticsResponse(
+        id=document.id,
+        title=document.title,
+        postgres_status=document.status,
+        **diagnostics,
+    )
+
+
+@router.get(
+    "/export",
+    summary="Экспорт базы знаний (без эмбеддингов)",
+)
+async def export_knowledge_base() -> Response:
+    """Отдаёт zip с сервисными сторами LightRAG: исходные тексты, статусы
+    обработки, чанки и граф сущностей. Векторные базы (эмбеддинги) исключены —
+    они привязаны к провайдеру и непереносимы между OpenAI и Gemini."""
+    memory = get_graph_memory()
+    try:
+        archive = await memory.export_stores(DEFAULT_GRAPH_ID)
+    except Exception as e:
+        logger.error(f"Knowledge base export failed: {e}")
+        raise HTTPException(status_code=503, detail="Export failed") from e
+
+    filename = f"{DEFAULT_GRAPH_ID}_export.zip"
+    return Response(
+        content=archive,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

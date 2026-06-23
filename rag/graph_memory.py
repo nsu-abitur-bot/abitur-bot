@@ -5,7 +5,7 @@ import os
 import re
 import time
 from contextlib import asynccontextmanager
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, cast
 from urllib.parse import unquote, urlsplit
 
 from dotenv import load_dotenv
@@ -224,9 +224,7 @@ class GraphMemory:
         if rag_to_clear is not None:
             try:
                 await rag_to_clear.aclear_cache()
-                logger.info(
-                    f"Очищен in-memory кеш LLM для графа: {graph_id} (marker)"
-                )
+                logger.info(f"Очищен in-memory кеш LLM для графа: {graph_id} (marker)")
             except Exception as e:
                 logger.warning(
                     f"Ошибка при очистке in-memory кеша {graph_id} по marker: {e}"
@@ -554,9 +552,7 @@ class GraphMemory:
                     "enable_rerank": getattr(query_param, "enable_rerank", None),
                     "chunk_top_k": getattr(query_param, "chunk_top_k", None),
                     "top_k": getattr(query_param, "top_k", None),
-                    "min_rerank_score": getattr(
-                        query_param, "min_rerank_score", None
-                    ),
+                    "min_rerank_score": getattr(query_param, "min_rerank_score", None),
                 }
                 logger.info(
                     (
@@ -583,10 +579,7 @@ class GraphMemory:
                 relations = data.get("relations")
 
                 logger.info(
-                    (
-                        "RAG retrieval response: graph_id=%s answer_length=%d "
-                        "answer=%s"
-                    ),
+                    ("RAG retrieval response: graph_id=%s answer_length=%d answer=%s"),
                     graph_id,
                     len(str(answer)),
                     _clip_for_log(answer),
@@ -896,6 +889,250 @@ class GraphMemory:
             logger.error(f"Error reading full docs for {doc_id} in {graph_id}: {e}")
             return None
 
+    async def get_doc_diagnostics(self, graph_id: str, doc_id: str) -> dict:
+        """Диагностика документа по данным LightRAG.
+
+        Возвращает статус обработки, число чанков, сущностей и связей,
+        привязанных к документу. Сущностей/связей == 0 означает, что
+        извлечение графа не дало результата и документ недостижим в режиме
+        hybrid (нужен mix/naive).
+        """
+        import json
+
+        workspace_path = self._get_workspace_path(graph_id)
+
+        def _load(name: str) -> dict:
+            path = os.path.join(workspace_path, name)
+            if not os.path.exists(path):
+                return {}
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                logger.error(f"Error reading {name} for {graph_id}: {e}")
+                return {}
+
+        status_data = _load("kv_store_doc_status.json")
+        entities_data = _load("kv_store_full_entities.json")
+        relations_data = _load("kv_store_full_relations.json")
+
+        info = status_data.get(doc_id)
+        if not isinstance(info, dict):
+            return {
+                "lightrag_status": "not_found",
+                "chunks_count": 0,
+                "entities_count": 0,
+                "relations_count": 0,
+                "content_length": None,
+                "error": None,
+            }
+
+        metadata = info.get("metadata")
+        metadata = metadata if isinstance(metadata, dict) else {}
+        error = (
+            info.get("error")
+            or info.get("error_msg")
+            or metadata.get("error")
+            or metadata.get("error_msg")
+        )
+
+        entities_entry = entities_data.get(doc_id)
+        relations_entry = relations_data.get(doc_id)
+        entities_count = (
+            entities_entry.get("count") if isinstance(entities_entry, dict) else 0
+        ) or 0
+        relations_count = (
+            relations_entry.get("count") if isinstance(relations_entry, dict) else 0
+        ) or 0
+
+        return {
+            "lightrag_status": info.get("status") or "unknown",
+            "chunks_count": info.get("chunks_count") or 0,
+            "entities_count": entities_count,
+            "relations_count": relations_count,
+            "content_length": info.get("content_length"),
+            "error": error,
+        }
+
+    async def debug_query(
+        self,
+        graph_id: str,
+        question: str,
+        mode: str = "hybrid",
+        max_sources: int = 5,
+    ) -> dict:
+        """Выполняет запрос к базе знаний и возвращает «сырую» выдачу ретривала.
+
+        Используется для диагностики: видно, какие чанки/сущности/связи нашёл
+        конкретный режим, и попадает ли в выдачу нужный документ.
+        """
+        async with self._use_graph(graph_id) as rag:
+            query_param = QueryParam(mode=cast(Any, mode))
+            for attr_name, attr_value in (
+                ("enable_rerank", True),
+                ("chunk_top_k", 12),
+                ("min_rerank_score", 0.0),
+            ):
+                if hasattr(query_param, attr_name):
+                    setattr(query_param, attr_name, attr_value)
+
+            settings = {
+                "mode": mode,
+                "enable_rerank": getattr(query_param, "enable_rerank", None),
+                "chunk_top_k": getattr(query_param, "chunk_top_k", None),
+                "top_k": getattr(query_param, "top_k", None),
+                "min_rerank_score": getattr(query_param, "min_rerank_score", None),
+            }
+
+            result = await rag.aquery_llm(question, param=query_param)
+            answer = result.get("llm_response", {}).get("content", "") or ""
+            data = result.get("data", {})
+            raw_chunks = data.get("chunks") or []
+            raw_entities = data.get("entities") or []
+            raw_relations = data.get("relations") or []
+            if not isinstance(raw_chunks, list):
+                raw_chunks = []
+
+            url_to_title = await self._get_source_titles(graph_id)
+
+            chunks: list[dict] = []
+            for idx, chunk in enumerate(raw_chunks):
+                if not isinstance(chunk, dict):
+                    continue
+                file_path_value = str(chunk.get("file_path", "") or "").strip()
+                content = (
+                    chunk.get("content")
+                    or chunk.get("text")
+                    or chunk.get("chunk_content")
+                    or ""
+                )
+                source_url = None
+                for part in file_path_value.split(","):
+                    part = part.strip()
+                    if part.startswith("http://") or part.startswith("https://"):
+                        source_url = part
+                        break
+                score = chunk.get("rerank_score")
+                if score is None:
+                    score = chunk.get("score")
+                chunks.append(
+                    {
+                        "index": idx,
+                        "source_url": source_url,
+                        "file_path": file_path_value or None,
+                        "content": str(content).strip(),
+                        "rerank_score": score,
+                    }
+                )
+
+            entities: list[dict] = []
+            if isinstance(raw_entities, list):
+                for e in raw_entities:
+                    if not isinstance(e, dict):
+                        continue
+                    entities.append(
+                        {
+                            "name": e.get("entity_name")
+                            or e.get("name")
+                            or e.get("entity")
+                            or "",
+                            "type": e.get("entity_type") or e.get("type"),
+                            "description": e.get("description"),
+                        }
+                    )
+
+            relations: list[dict] = []
+            if isinstance(raw_relations, list):
+                for r in raw_relations:
+                    if not isinstance(r, dict):
+                        continue
+                    relations.append(
+                        {
+                            "source": r.get("src_id")
+                            or r.get("source")
+                            or r.get("src")
+                            or r.get("entity1"),
+                            "target": r.get("tgt_id")
+                            or r.get("target")
+                            or r.get("tgt")
+                            or r.get("entity2"),
+                            "description": r.get("description"),
+                        }
+                    )
+
+            aggregated: dict[str, dict] = {}
+            for c in chunks:
+                url = c["source_url"]
+                if not url:
+                    continue
+                current = aggregated.get(url)
+                if current is None:
+                    aggregated[url] = {
+                        "count": 1,
+                        "first_index": c["index"],
+                        "snippet": c["content"],
+                    }
+                else:
+                    current["count"] += 1
+                    if not current.get("snippet") and c["content"]:
+                        current["snippet"] = c["content"]
+
+            ordered = sorted(aggregated.items(), key=lambda item: item[1]["first_index"])
+            sources: list[dict] = []
+            for url, metrics in ordered[:max_sources]:
+                snippet = str(metrics.get("snippet") or "").strip()
+                if len(snippet) > 500:
+                    snippet = snippet[:500] + "..."
+                sources.append(
+                    {
+                        "url": url,
+                        "title": url_to_title.get(url, "Источник информации"),
+                        "snippet": snippet,
+                    }
+                )
+
+            return {
+                "question": question,
+                "mode": mode,
+                "answer": str(answer),
+                "settings": settings,
+                "chunks": chunks,
+                "entities": entities,
+                "relations": relations,
+                "sources": sources,
+            }
+
+    async def export_stores(
+        self, graph_id: str, include_embeddings: bool = False
+    ) -> bytes:
+        """Упаковывает сервисные сторы LightRAG в zip.
+
+        По умолчанию исключает векторные базы (vdb_*.json): эмбеддинги
+        привязаны к провайдеру (OpenAI на проде, Gemini локально) и
+        непереносимы. Исходные тексты, статусы, чанки и граф включены.
+        """
+        import io
+        import zipfile
+
+        workspace_path = self._get_workspace_path(graph_id)
+        skip_prefixes = () if include_embeddings else ("vdb_",)
+        skip_files = {"llm_cache_clear.marker"}
+
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            if os.path.isdir(workspace_path):
+                for filename in sorted(os.listdir(workspace_path)):
+                    file_path = os.path.join(workspace_path, filename)
+                    if not os.path.isfile(file_path):
+                        continue
+                    if filename in skip_files:
+                        continue
+                    if any(filename.startswith(p) for p in skip_prefixes):
+                        continue
+                    zf.write(file_path, arcname=os.path.join(graph_id, filename))
+        buffer.seek(0)
+        return buffer.getvalue()
+
     async def delete_doc(self, graph_id: str, doc_id: str) -> bool:
         """Удаляет документ из RAG по его ID."""
         try:
@@ -1007,9 +1244,7 @@ class GraphMemory:
                         break
 
                 if time.monotonic() - start_time >= self._cache_clear_timeout:
-                    logger.warning(
-                        f"Таймаут ожидания очистки кеша для графа {graph_id}"
-                    )
+                    logger.warning(f"Таймаут ожидания очистки кеша для графа {graph_id}")
                     timed_out = True
                     break
 
@@ -1026,13 +1261,9 @@ class GraphMemory:
                     await rag_to_clear.aclear_cache()
                     logger.info(f"Очищен in-memory кеш LLM для графа: {graph_id}")
                 except Exception as e:
-                    logger.warning(
-                        f"Ошибка при очистке in-memory кеша {graph_id}: {e}"
-                    )
+                    logger.warning(f"Ошибка при очистке in-memory кеша {graph_id}: {e}")
 
-            cache_file = os.path.join(
-                workspace_path, "kv_store_llm_response_cache.json"
-            )
+            cache_file = os.path.join(workspace_path, "kv_store_llm_response_cache.json")
             try:
                 if os.path.exists(cache_file):
                     os.remove(cache_file)
