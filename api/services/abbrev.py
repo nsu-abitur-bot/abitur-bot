@@ -18,6 +18,13 @@ class AbbrevService:
         await self._reload_expander()
         return AbbrevItem(id=entry.id, short=entry.short, full=entry.full)
 
+    async def import_many(self, items: list[AbbrevItem]) -> list[AbbrevItem]:
+        raw = [{"short": i.short, "full": i.full} for i in items]
+        await self._db.upsert_many(raw)
+        await self._reload_expander()
+        entries = await self._db.get_all()
+        return [AbbrevItem(id=e.id, short=e.short, full=e.full) for e in entries]
+
     async def update(self, item_id: str, item: AbbrevItem) -> AbbrevItem:
         entry = await self._db.update(item_id, item.short, item.full)
         if not entry:
