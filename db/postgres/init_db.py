@@ -76,6 +76,37 @@ def run_migrations():
         sys.exit(1)
 
 
+def _force_seed_enabled() -> bool:
+    return os.getenv("SEED_FACULTIES_FORCE", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+
+
+async def seed_reference_data():
+    """Заливает справочные данные (факультеты).
+
+    Не критично для работы: при ошибке логируем и продолжаем старт. По умолчанию
+    заливаем только на пустую таблицу (первичный бутстрап), чтобы не затирать
+    правки из админки. SEED_FACULTIES_FORCE=1 — принудительно перезалить из сида.
+    """
+    try:
+        from db.seed.load_faculties import seed_faculties, seed_faculties_if_empty
+
+        if _force_seed_enabled():
+            stats = await seed_faculties()
+            logger.info("Справочник факультетов принудительно перезалит: %s", stats)
+        else:
+            stats = await seed_faculties_if_empty()
+            logger.info("Автозаливка справочника факультетов: %s", stats)
+    except Exception as e:
+        logger.error(
+            "Не удалось загрузить справочник факультетов (старт продолжается): %s", e
+        )
+
+
 async def main():
     """Главная функция инициализации."""
     logger.info("Инициализация базы данных PostgreSQL...")
@@ -85,6 +116,9 @@ async def main():
 
     # Применяем миграции
     run_migrations()
+
+    # Заливаем справочные данные (факультеты) — идемпотентно, только если пусто
+    await seed_reference_data()
 
     logger.info("Инициализация завершена успешно!")
 

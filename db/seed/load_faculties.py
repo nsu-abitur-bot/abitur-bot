@@ -41,6 +41,25 @@ async def seed_faculties(path: str = DEFAULT_SEED_PATH) -> dict[str, int]:
     return stats
 
 
+async def seed_faculties_if_empty(path: str = DEFAULT_SEED_PATH) -> dict[str, int]:
+    """Заливает справочник ТОЛЬКО если таблица факультетов пуста.
+
+    Нужна для автозаливки при старте контейнера: на свежей БД справочник
+    подхватится сам, а на существующей — не затрёт правки, сделанные через
+    админку (справочником владеет админ, сид — лишь первичный бутстрап).
+    """
+    async with AsyncSessionLocal() as session:
+        existing = await FacultyService(session).get_all_faculties(only_active=False)
+    if existing:
+        logger.info(
+            "Справочник факультетов уже заполнен (%d) — автозаливка пропущена",
+            len(existing),
+        )
+        return {"skipped": len(existing)}
+    logger.info("Справочник факультетов пуст — выполняю автозаливку из сида")
+    return await seed_faculties(path)
+
+
 async def _main() -> None:
     logging.basicConfig(level=logging.INFO)
     path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_SEED_PATH
