@@ -79,7 +79,67 @@ class CragConfig:
 
 
 def get_crag_config() -> CragConfig:
+    """Синхронный конфиг из окружения (fallback для тестов/без БД)."""
     return CragConfig()
+
+
+def _parse_bool(raw: Optional[str], default: bool) -> bool:
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on", "да"}
+
+
+def _parse_float(raw: Optional[str], default: float) -> float:
+    try:
+        return float(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return default
+
+
+def _parse_int(raw: Optional[str], default: int) -> int:
+    try:
+        return int(raw)  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return default
+
+
+async def load_crag_config() -> CragConfig:
+    """Эффективный конфиг CRAG: значения из БД (settings) поверх env-дефолтов.
+
+    Настройки управляются через веб-админку (таблица settings). Если ключа в БД
+    нет — берётся значение из окружения/дефолт. При недоступности БД возвращаем
+    env-конфиг (fail-safe), чтобы бот продолжал работать.
+    """
+    cfg = CragConfig()
+    try:
+        from db.postgres.services.settings import SettingsService
+
+        async with AsyncSessionLocal() as session:
+            raw = await SettingsService(session).get_crag_raw()
+    except Exception as exc:
+        logger.warning(
+            "CRAG: не удалось загрузить настройки из БД, используем env/дефолты: %s",
+            exc,
+        )
+        return cfg
+
+    if not raw:
+        return cfg
+
+    return CragConfig(
+        enabled=_parse_bool(raw.get("crag_enabled"), cfg.enabled),
+        relevance_threshold=_parse_float(
+            raw.get("crag_relevance_threshold"), cfg.relevance_threshold
+        ),
+        min_chunks=_parse_int(raw.get("crag_min_chunks"), cfg.min_chunks),
+        allow_refine=_parse_bool(raw.get("crag_allow_refine"), cfg.allow_refine),
+        use_faculty_table=_parse_bool(
+            raw.get("crag_use_faculty_table"), cfg.use_faculty_table
+        ),
+        max_graded_chunks=_parse_int(
+            raw.get("crag_max_graded_chunks"), cfg.max_graded_chunks
+        ),
+    )
 
 
 @dataclass

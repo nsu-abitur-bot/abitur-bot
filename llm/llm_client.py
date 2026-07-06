@@ -22,7 +22,7 @@ from faq.matcher import get_faq_matcher
 from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
-from rag.crag import get_crag_config
+from rag.crag import load_crag_config
 from rag.retriever import query_graph_with_crag, query_graph_with_sources
 
 load_dotenv()
@@ -560,7 +560,7 @@ async def ask_local_llm(
                     },
                 )
             )
-            use_crag = get_crag_config().enabled
+            use_crag = (await load_crag_config()).enabled
             with _capture_lightrag_logs() as rag_trace:
                 if use_crag:
                     logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")

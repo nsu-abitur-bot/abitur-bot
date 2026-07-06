@@ -586,9 +586,9 @@ class GraphMemory:
         а sources — соответствующие URL. Финальную генерацию выполняет вызывающий
         код (llm_client) по этому контексту.
         """
-        from rag.crag import CragChunk, get_crag_config, run_crag
+        from rag.crag import CragChunk, load_crag_config, run_crag
 
-        config = get_crag_config()
+        config = await load_crag_config()
         try:
             async with self._use_graph(graph_id) as rag:
                 logger.info(

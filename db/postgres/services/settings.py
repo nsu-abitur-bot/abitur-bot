@@ -53,6 +53,62 @@ class SettingsService:
         await self.session.commit()
         return await self.get_rate_limit_settings()
 
+    async def get_crag_raw(self) -> dict[str, str]:
+        """Сырые значения CRAG-настроек из БД (только присутствующие ключи)."""
+        settings = await self._get_many(
+            [
+                "crag_enabled",
+                "crag_relevance_threshold",
+                "crag_min_chunks",
+                "crag_allow_refine",
+                "crag_use_faculty_table",
+                "crag_max_graded_chunks",
+            ]
+        )
+        return {key: setting.value for key, setting in settings.items()}
+
+    async def update_crag_settings(
+        self,
+        *,
+        enabled: bool,
+        relevance_threshold: float,
+        min_chunks: int,
+        allow_refine: bool,
+        use_faculty_table: bool,
+        max_graded_chunks: int,
+    ) -> None:
+        await self._upsert(
+            "crag_enabled",
+            "true" if enabled else "false",
+            "CRAG: включён ли корректирующий RAG",
+        )
+        await self._upsert(
+            "crag_relevance_threshold",
+            str(relevance_threshold),
+            "CRAG: порог релевантности чанка (0..1)",
+        )
+        await self._upsert(
+            "crag_min_chunks",
+            str(min_chunks),
+            "CRAG: минимум чанков после фильтра до попытки доретрива",
+        )
+        await self._upsert(
+            "crag_allow_refine",
+            "true" if allow_refine else "false",
+            "CRAG: разрешить переформулировку запроса и доретрив",
+        )
+        await self._upsert(
+            "crag_use_faculty_table",
+            "true" if use_faculty_table else "false",
+            "CRAG: авторитетная фильтрация по таблице факультетов",
+        )
+        await self._upsert(
+            "crag_max_graded_chunks",
+            str(max_graded_chunks),
+            "CRAG: максимум чанков, отправляемых на LLM-грейдинг",
+        )
+        await self.session.commit()
+
     async def _get_many(self, keys: list[str]) -> dict[str, Settings]:
         result = await self.session.execute(
             select(Settings).where(Settings.key.in_(keys))
@@ -60,14 +116,10 @@ class SettingsService:
         return {setting.key: setting for setting in result.scalars().all()}
 
     async def _upsert(self, key: str, value: str, description: str) -> None:
-        result = await self.session.execute(
-            select(Settings).where(Settings.key == key)
-        )
+        result = await self.session.execute(select(Settings).where(Settings.key == key))
         setting = result.scalar_one_or_none()
         if setting is None:
-            self.session.add(
-                Settings(key=key, value=value, description=description)
-            )
+            self.session.add(Settings(key=key, value=value, description=description))
             return
 
         setting.value = value
