@@ -22,7 +22,8 @@ from faq.matcher import get_faq_matcher
 from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
-from rag.retriever import query_graph_with_sources
+from rag.crag import get_crag_config
+from rag.retriever import query_graph_with_crag, query_graph_with_sources
 
 load_dotenv()
 
@@ -37,12 +38,19 @@ SYSTEM_PROMPT_BASE = """
    называет своё имя), обязательно используй историю переписки, чтобы поддержать
    беседу и обратиться по имени.
 2. Вопросы об НГУ: Ищи фактическую информацию ИСКЛЮЧИТЕЛЬНО в блоке
-   "Контекст из базы знаний об НГУ" ниже. Если информации о предмете вопроса
-   (факультет, программа, цифры и любые другие детали) нет в твоем контексте —
-   ОБЯЗАТЕЛЬНО ответь: "Я не нашел информации об этом в базе знаний НГУ".
+   "Контекст из базы знаний об НГУ" ниже. Этот контекст уже прошёл проверку
+   релевантности — отвечай ТОЛЬКО по нему и не додумывай. Если информации о
+   предмете вопроса (факультет, программа, цифры и любые другие детали) нет в
+   твоем контексте — ОБЯЗАТЕЛЬНО ответь:
+   "Я не нашел информации об этом в базе знаний НГУ".
    Категорически запрещено давать общие советы, запрещено давать ссылки
    (если их нет в переданном контексте), и запрещено отвечать,
    используя свои собственные "обученные" общие знания об НГУ.
+   ВАЖНО про факультеты: НЕ приписывай направление (программу) конкретному
+   факультету, если это прямо не подтверждено контекстом. Если пользователь
+   спросил про конкретный факультет, перечисляй ТОЛЬКО те направления, про
+   принадлежность которых этому факультету прямо сказано в контексте. Не
+   подставляй направления с похожим названием с других факультетов.
 3. Оффтоп: Если вопрос вообще не про НГУ и не является поддержанием диалога,
    вежливо скажи, что ты консультируешь только по вопросам НГУ.
 4. Уровень образования: По умолчанию считай, что вопрос касается ПОСТУПЛЕНИЯ В
@@ -326,9 +334,7 @@ async def _classify_intent_bg(
                     log_service = MessageLogService(session)
                     await log_service.update_log_topic(log_entry_id, topic_id)
             except Exception as e:
-                logger.error(
-                    f"[{session_id}] Failed to update topic id in log: {e}"
-                )
+                logger.error(f"[{session_id}] Failed to update topic id in log: {e}")
     except Exception as e:
         logger.warning(f"[{session_id}] Background intent classification error: {e}")
 
@@ -519,9 +525,7 @@ async def ask_local_llm(
                 )
             )
             if user_id:
-                _spawn_bg(
-                    _save_message_to_pg(user_id, session_id, message, faq_answer)
-                )
+                _spawn_bg(_save_message_to_pg(user_id, session_id, message, faq_answer))
             return faq_answer
 
         # Получаем историю (нужна и для RAG, и для финального промпта) только
@@ -556,15 +560,21 @@ async def ask_local_llm(
                     },
                 )
             )
+            use_crag = get_crag_config().enabled
             with _capture_lightrag_logs() as rag_trace:
-                rag_context_raw, metadata_sources = await query_graph_with_sources(
-                    rag_query,
-                    conversation_history=history_text or None,
-                )
+                if use_crag:
+                    logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
+                    rag_context_raw, metadata_sources = await query_graph_with_crag(
+                        rag_query,
+                        conversation_history=history_text or None,
+                    )
+                else:
+                    rag_context_raw, metadata_sources = await query_graph_with_sources(
+                        rag_query,
+                        conversation_history=history_text or None,
+                    )
             rag_trace_lines = rag_trace.get_lines()
-            if not rag_context_raw or rag_context_raw.startswith(
-                "Error executing query"
-            ):
+            if not rag_context_raw or rag_context_raw.startswith("Error executing query"):
                 logger.info(f"[{session_id}] No relevant context found in RAG.")
                 rag_context = "Релевантный контекст из базы знаний не найден."
                 rag_sources = []
@@ -678,9 +688,7 @@ async def ask_local_llm(
                         await stream_callback(content)
                     except Exception as cb_exc:
                         # стриминг в транспорт не должен ломать LLM-ответ
-                        logger.warning(
-                            f"[{session_id}] stream_callback error: {cb_exc}"
-                        )
+                        logger.warning(f"[{session_id}] stream_callback error: {cb_exc}")
 
                 llm_result = await provider.generate_stream_with_usage(
                     messages,

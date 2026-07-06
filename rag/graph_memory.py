@@ -528,6 +528,154 @@ class GraphMemory:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}"
 
+    async def _retrieve_raw_chunks(
+        self,
+        rag: Any,
+        question: str,
+        mode: str,
+    ) -> list[dict]:
+        """Только ретрив: возвращает «сырые» чанки без генерации финального ответа.
+
+        Используется CRAG-слоем, которому нужны кандидаты-чанки до генерации.
+        """
+        query_param = QueryParam(mode=cast(Any, mode))
+        for attr_name, attr_value in (
+            ("enable_rerank", True),
+            ("chunk_top_k", 12),
+            ("min_rerank_score", 0.0),
+            ("only_need_context", True),
+        ):
+            if hasattr(query_param, attr_name):
+                setattr(query_param, attr_name, attr_value)
+
+        result = await rag.aquery_llm(question, param=query_param)
+        data = result.get("data", {}) if isinstance(result, dict) else {}
+        chunks = data.get("chunks", [])
+        if not isinstance(chunks, list):
+            return []
+        return [c for c in chunks if isinstance(c, dict)]
+
+    @staticmethod
+    def _chunk_source_url(chunk: dict) -> str | None:
+        file_path_value = str(chunk.get("file_path", "") or "").strip()
+        for part in file_path_value.split(","):
+            part = part.strip()
+            if part.startswith("http://") or part.startswith("https://"):
+                return part
+        return None
+
+    @staticmethod
+    def _chunk_text(chunk: dict) -> str:
+        text = (
+            chunk.get("content") or chunk.get("text") or chunk.get("chunk_content") or ""
+        )
+        return str(text).strip()
+
+    async def query_with_crag(
+        self,
+        graph_id: str,
+        question: str,
+        mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
+        max_sources: int = 3,
+        conversation_history: str | None = None,
+    ) -> tuple[str, list[dict]]:
+        """CRAG-вариант ретрива: фильтрует чанки до генерации ответа.
+
+        Возвращает (context, sources), где context — текст из чанков, прошедших
+        CRAG-фильтр (грейдинг релевантности + авторитетная таблица факультетов),
+        а sources — соответствующие URL. Финальную генерацию выполняет вызывающий
+        код (llm_client) по этому контексту.
+        """
+        from rag.crag import CragChunk, get_crag_config, run_crag
+
+        config = get_crag_config()
+        try:
+            async with self._use_graph(graph_id) as rag:
+                logger.info(
+                    "CRAG retrieval start: graph_id=%s mode=%s question=%s",
+                    graph_id,
+                    mode,
+                    _clip_for_log(question),
+                )
+                raw_chunks = await self._retrieve_raw_chunks(rag, question, mode)
+
+                def _to_crag_chunks(items: list[dict]) -> list:
+                    out = []
+                    for idx, chunk in enumerate(items):
+                        content = self._chunk_text(chunk)
+                        if not content:
+                            continue
+                        out.append(
+                            CragChunk(
+                                index=idx,
+                                content=content,
+                                source_url=self._chunk_source_url(chunk),
+                                file_path=str(chunk.get("file_path", "") or "") or None,
+                            )
+                        )
+                    return out
+
+                candidates = _to_crag_chunks(raw_chunks)
+
+                async def _retrieve_fn(refined: str) -> list:
+                    more = await self._retrieve_raw_chunks(rag, refined, mode)
+                    return _to_crag_chunks(more)
+
+                kept, hint = await run_crag(
+                    question,
+                    candidates,
+                    retrieve_fn=_retrieve_fn,
+                    config=config,
+                )
+
+                logger.info(
+                    "CRAG retrieval result: graph_id=%s candidates=%d kept=%d "
+                    "faculty=%s level=%s",
+                    graph_id,
+                    len(candidates),
+                    len(kept),
+                    hint.faculty.name if hint.faculty else None,
+                    hint.level,
+                )
+
+                if not kept:
+                    return "Релевантный контекст из базы знаний не найден.", []
+
+                url_to_title = await self._get_source_titles(graph_id)
+
+                context_parts: list[str] = []
+                aggregated: dict[str, dict] = {}
+                for chunk in kept:
+                    context_parts.append(chunk.content)
+                    url = chunk.source_url
+                    if not url:
+                        continue
+                    current = aggregated.get(url)
+                    if current is None:
+                        aggregated[url] = {
+                            "first_index": chunk.index,
+                            "snippet": chunk.content,
+                        }
+
+                context = "\n\n---\n\n".join(context_parts)
+
+                ordered = sorted(
+                    aggregated.items(), key=lambda item: item[1]["first_index"]
+                )
+                sources: list[dict] = []
+                for url, metrics in ordered[:max_sources]:
+                    sources.append(
+                        {
+                            "url": url,
+                            "title": url_to_title.get(url, DEFAULT_SOURCE_TITLE),
+                        }
+                    )
+
+                return context, sources
+        except Exception as e:
+            logger.error(f"Error in CRAG query for graph {graph_id}: {e}")
+            return f"Error executing query: {str(e)}", []
+
     async def query_with_sources(
         self,
         graph_id: str,

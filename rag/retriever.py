@@ -25,3 +25,18 @@ async def query_graph_with_sources(
         mode=mode,
         conversation_history=conversation_history,
     )
+
+
+async def query_graph_with_crag(
+    query: str,
+    mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
+    conversation_history: str | None = None,
+) -> tuple[str, list[dict]]:
+    """CRAG-вариант ретрива: фильтрует чанки до генерации финального ответа."""
+    graph_memory = get_graph_memory()
+    return await graph_memory.query_with_crag(
+        DEFAULT_GRAPH_ID,
+        query,
+        mode=mode,
+        conversation_history=conversation_history,
+    )

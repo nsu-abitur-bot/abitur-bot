@@ -24,6 +24,18 @@ class AdminRole(str, enum.Enum):
     viewer = "viewer"
 
 
+class EducationLevel(str, enum.Enum):
+    """Уровень образования направления подготовки."""
+
+    bachelor = "bachelor"
+    specialist = "specialist"
+    master = "master"
+
+
+# Допустимые значения уровня образования (для валидации сидов/API).
+EDUCATION_LEVELS: frozenset[str] = frozenset(level.value for level in EducationLevel)
+
+
 def timestamp():
     """Генерация текущего времени UTC без timezone info."""
     return datetime.now(UTC).replace(tzinfo=None)
@@ -41,9 +53,7 @@ class User(Base):
     __tablename__ = "user"
 
     # Внутренний идентификатор пользователя (не внешний ID мессенджера)
-    user_id: Mapped[int] = mapped_column(
-        BigInteger, primary_key=True, autoincrement=True
-    )
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     telegram_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     max_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     applicant_id: Mapped[Optional[str]] = mapped_column(String(7), nullable=True)
@@ -395,9 +405,7 @@ class Admin(Base):
     )
     username: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
-    role: Mapped[str] = mapped_column(
-        String(50), nullable=False, default=AdminRole.admin
-    )
+    role: Mapped[str] = mapped_column(String(50), nullable=False, default=AdminRole.admin)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
     created_by_id: Mapped[Optional[str]] = mapped_column(
@@ -430,9 +438,7 @@ class InviteCode(Base):
     created_by_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("admins.id"), nullable=False
     )
-    role: Mapped[str] = mapped_column(
-        String(50), nullable=False, default=AdminRole.admin
-    )
+    role: Mapped[str] = mapped_column(String(50), nullable=False, default=AdminRole.admin)
     used_by_id: Mapped[Optional[str]] = mapped_column(
         String(36), ForeignKey("admins.id"), nullable=True
     )
@@ -453,3 +459,87 @@ class InviteCode(Base):
     def __repr__(self) -> str:
         used = self.used_at is not None
         return f"<InviteCode(code='{self.code}', role='{self.role}', used={used})>"
+
+
+class Faculty(Base):
+    """Факультет/институт НГУ.
+
+    Авторитетный справочник для CRAG-фильтрации: связывает факультет с его
+    направлениями подготовки. Поле ``aliases`` хранит альтернативные названия и
+    аббревиатуры (например, "ФИТ", "Факультет информационных технологий").
+    """
+
+    __tablename__ = "faculty"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    name: Mapped[str] = mapped_column(String(300), nullable=False, unique=True)
+    # Список строк: аббревиатуры и альтернативные названия факультета.
+    aliases: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    programs: Mapped[List["Program"]] = relationship(
+        "Program",
+        back_populates="faculty",
+        cascade="all, delete-orphan",
+    )
+
+    __table_args__ = (
+        Index("ix_faculty_name", "name"),
+        Index("ix_faculty_is_active", "is_active"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<Faculty(id='{self.id}', name='{self.name}')>"
+
+
+class Program(Base):
+    """Направление подготовки (образовательная программа).
+
+    Одно и то же название может существовать на разных уровнях образования
+    (бакалавриат / специалитет / магистратура), поэтому уникальность задаётся
+    тройкой (faculty_id, name, level).
+    """
+
+    __tablename__ = "program"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    faculty_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("faculty.id", ondelete="CASCADE"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(300), nullable=False)
+    # Код направления (ФГОС), например "09.03.01". Необязателен.
+    code: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    # Уровень образования: bachelor / specialist / master.
+    level: Mapped[str] = mapped_column(
+        String(20), nullable=False, default=EducationLevel.bachelor.value
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    faculty: Mapped["Faculty"] = relationship("Faculty", back_populates="programs")
+
+    __table_args__ = (
+        UniqueConstraint(
+            "faculty_id", "name", "level", name="uq_program_faculty_name_level"
+        ),
+        Index("ix_program_faculty_id", "faculty_id"),
+        Index("ix_program_level", "level"),
+        Index("ix_program_name", "name"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<Program(id='{self.id}', name='{self.name}', "
+            f"level='{self.level}', faculty_id='{self.faculty_id}')>"
+        )
