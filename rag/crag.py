@@ -26,7 +26,7 @@ from typing import Awaitable, Callable, Optional
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from db.postgres.db import AsyncSessionLocal
-from db.postgres.models import Faculty, Program
+from db.postgres.models import Faculty
 from db.postgres.services.faculty import FacultyService, normalize_name
 
 logger = logging.getLogger(__name__)
@@ -220,63 +220,135 @@ class CragChunk:
     file_path: Optional[str]
 
 
-async def _faculty_conflict(chunk: CragChunk, hint: FacultyHint) -> bool:
-    """True, если чанк явно говорит про направление ЧУЖОГО факультета.
+_QUOTED_NAME = re.compile(r"«[^»]*»")
 
-    Логика: если в вопросе назван факультет X, а в тексте чанка встречается
-    название направления, которое по справочнику принадлежит факультету Y != X,
-    считаем чанк конфликтующим и отсекаем. Если направление принадлежит X или не
-    найдено в справочнике — конфликта нет (не отсекаем по этому правилу).
+
+def _split_segments(text: str) -> list[str]:
+    """Разбивает текст чанка на предложения/строки — БЕЗ привязки к конкретным
+    формулировкам документа.
+
+    Границы: пустые строки (абзацы), переносы строк и концы предложений
+    («.», «!», «?»), за которыми идёт пробел. Точки внутри кодов направлений
+    (09.03.01) концом предложения не считаются — за ними нет пробела. Названия в
+    «ёлочках» защищаются от разбиения целиком: внутри бывают точки («…техника.
+    Программная инженерия…»), которые не должны рвать название. Так фильтр не
+    зависит от того, как именно сформулирован документ после переразбора.
+    """
+    protected: dict[str, str] = {}
+
+    def _mask(match: "re.Match[str]") -> str:
+        key = f"\x00{len(protected)}\x00"
+        protected[key] = match.group(0)
+        return key
+
+    masked = _QUOTED_NAME.sub(_mask, text)
+
+    segments: list[str] = []
+    for para in re.split(r"\n\s*\n", masked):
+        if not para.strip():
+            continue
+        for part in re.split(r"(?<=[.!?])\s+|\n+", para):
+            if not part or not part.strip():
+                continue
+            for key, value in protected.items():
+                part = part.replace(key, value)
+            segments.append(part)
+    return segments
+
+
+async def _load_scrub_context(
+    hint: FacultyHint,
+) -> Optional[tuple[list[str], list[str]]]:
+    """Готовит нормализованные названия направлений для сегментной вычистки.
+
+    Возвращает (own_names, foreign_names): направления запрошенного факультета и
+    направления ЧУЖИХ факультетов (на нужном уровне). Одноимённые с запрошенным
+    факультетом из foreign исключаются. Оба списка — по убыванию длины, чтобы
+    классификация по самому длинному совпадению работала корректно.
     """
     if hint.faculty is None:
-        return False
-
-    content_norm = normalize_name(chunk.content)
-    if not content_norm:
-        return False
-
+        return None
     try:
         async with AsyncSessionLocal() as session:
             service = FacultyService(session)
-            # Все направления чужих факультетов на нужном уровне.
-            programs = await service.get_all_programs(level=hint.level, only_active=True)
-            for program in programs:
-                if program.faculty_id == hint.faculty.id:
-                    continue
-                prog_norm = normalize_name(program.name)
-                if not prog_norm or len(prog_norm) < 4:
-                    continue
-                if prog_norm in content_norm:
-                    # Убедимся, что направление НЕ принадлежит и нужному факультету
-                    # (одноимённые направления на разных факультетах).
-                    own = await _program_belongs_to_faculty(service, program, hint)
-                    if not own:
-                        logger.info(
-                            "CRAG: чанк #%d отсечён — упоминает '%s' "
-                            "(факультет %s), а спрашивали про %s",
-                            chunk.index,
-                            program.name,
-                            program.faculty_id,
-                            hint.faculty.name,
-                        )
-                        return True
+            own = await service.get_programs_by_faculty(
+                hint.faculty.id, level=hint.level, only_active=True
+            )
+            all_programs = await service.get_all_programs(
+                level=hint.level, only_active=True
+            )
     except Exception as exc:
-        logger.warning("CRAG: ошибка авторитетной фильтрации: %s", exc)
-        return False
-    return False
+        logger.warning("CRAG: не удалось загрузить справочник для фильтрации: %s", exc)
+        return None
 
-
-async def _program_belongs_to_faculty(
-    service: FacultyService, program: Program, hint: FacultyHint
-) -> bool:
-    """Есть ли одноимённое направление и у факультета из вопроса."""
-    if hint.faculty is None:
-        return False
-    own_programs = await service.get_programs_by_faculty(
-        hint.faculty.id, level=hint.level, only_active=True
+    own_names = {n for p in own if (n := normalize_name(p.name)) and len(n) >= 4}
+    foreign_names = {
+        n
+        for p in all_programs
+        if p.faculty_id != hint.faculty.id
+        and (n := normalize_name(p.name))
+        and len(n) >= 4
+        and n not in own_names
+    }
+    return (
+        sorted(own_names, key=len, reverse=True),
+        sorted(foreign_names, key=len, reverse=True),
     )
-    target = normalize_name(program.name)
-    return any(normalize_name(p.name) == target for p in own_programs)
+
+
+def _segment_is_foreign(
+    segment: str, own_names: list[str], foreign_names: list[str]
+) -> bool:
+    """True, если сегмент относится к ЧУЖОМУ направлению.
+
+    Классифицируем по САМОМУ ДЛИННОМУ совпавшему названию направления: так
+    «Прикладные математика и физика» (физфак) не спутается с «математика»
+    (мехмат), а «Юриспруденция. Юрист в сфере...» (эконом) — с «Юриспруденция»
+    (ИФП). При равной длине предпочтение отдаётся своему факультету.
+    """
+    seg_norm = normalize_name(segment)
+    if not seg_norm:
+        return False
+    best_len = 0
+    best_foreign = False
+    for name in own_names:
+        if len(name) > best_len and name in seg_norm:
+            best_len = len(name)
+            best_foreign = False
+    for name in foreign_names:
+        if len(name) > best_len and name in seg_norm:
+            best_len = len(name)
+            best_foreign = True
+    return best_foreign
+
+
+def _scrub_chunk(
+    chunk: CragChunk, own_names: list[str], foreign_names: list[str]
+) -> Optional[CragChunk]:
+    """Вычищает из чанка сегменты про чужие направления.
+
+    Возвращает исходный чанк (чистить нечего), очищенный чанк или None, если
+    после вычистки не осталось содержательного текста.
+    """
+    segments = _split_segments(chunk.content)
+    kept: list[str] = []
+    removed = False
+    for segment in segments:
+        if _segment_is_foreign(segment, own_names, foreign_names):
+            removed = True
+            continue
+        kept.append(segment)
+    if not removed:
+        return chunk
+    new_content = "\n\n".join(s.strip() for s in kept).strip()
+    if not new_content:
+        return None
+    return CragChunk(
+        index=chunk.index,
+        content=new_content,
+        source_url=chunk.source_url,
+        file_path=chunk.file_path,
+    )
 
 
 def _build_grading_prompt(
@@ -387,13 +459,20 @@ async def filter_chunks(
     if not chunks:
         return [], hint
 
-    # 1. Авторитетная фильтрация по факультету (без LLM).
+    # 1. Авторитетная фильтрация по факультету (сентенс-левел, без LLM):
+    # вычищаем из чанков сегменты про чужие направления, а не режем чанк
+    # целиком — иначе теряем данные нужного факультета в смешанных чанках.
     after_authority: list[CragChunk] = []
     if config.use_faculty_table and hint.faculty is not None:
-        for chunk in chunks:
-            if await _faculty_conflict(chunk, hint):
-                continue
-            after_authority.append(chunk)
+        scrub = await _load_scrub_context(hint)
+        if scrub is None:
+            after_authority = list(chunks)
+        else:
+            own_names, foreign_names = scrub
+            for chunk in chunks:
+                scrubbed = _scrub_chunk(chunk, own_names, foreign_names)
+                if scrubbed is not None:
+                    after_authority.append(scrubbed)
     else:
         after_authority = list(chunks)
 
