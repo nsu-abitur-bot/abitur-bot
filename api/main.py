@@ -14,6 +14,7 @@ from abbrev.expander import get_abbrev_expander
 from api.auth.dependencies import get_current_admin, require_admin
 from api.auth.router import router as auth_router
 from api.routes.abbrev import router as abbrev_router
+from api.routes.admission_score import router as admission_score_router
 from api.routes.evals import router as evals_router
 from api.routes.faculty import router as faculty_router
 from api.routes.faq import router as faq_router
@@ -113,6 +114,11 @@ app.include_router(
 )
 app.include_router(
     faculty_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    admission_score_router,
     prefix="/api/v1",
     dependencies=[Depends(require_admin)],
 )
