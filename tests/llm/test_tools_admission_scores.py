@@ -8,7 +8,6 @@ import os
 
 import pytest
 import pytest_asyncio
-from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -16,6 +15,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from db.postgres.models import Base
+from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from db.postgres.services.faculty import FacultyService
 from llm.tools import admission_scores as tool_mod
 from llm.tools import default_tool_executor

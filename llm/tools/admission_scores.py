@@ -8,9 +8,8 @@
 import logging
 from typing import Optional
 
-from db.postgres.services.admission_score import AdmissionScoreService
-
 from db.postgres.db import AsyncSessionLocal
+from db.postgres.services.admission_score import AdmissionScoreService
 from llm.base import ToolSpec
 
 logger = logging.getLogger(__name__)
