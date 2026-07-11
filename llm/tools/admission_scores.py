@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 ADMISSION_SCORES_TOOL = ToolSpec(
     name="get_admission_scores",
     description=(
-        "Проходные и средние баллы прошлых лет по направлениям НГУ (бакалавриат). "
+        "Проходные и средние баллы прошлых лет по направлениям НГУ "
+        "(бакалавриат и специалитет). "
         "Используй для любых вопросов про проходной/средний балл, чтобы не "
         "выдумывать числа."
     ),
@@ -100,7 +101,7 @@ def _format_score_value(row: dict, metric: str) -> str:
 
 def _format_scores(rows: list[dict], metric: str) -> str:
     """Компактный RU-текст, сгруппированный по направлению, затем по году/форме."""
-    header = "Баллы прошлых лет (бакалавриат НГУ):"
+    header = "Проходные баллы прошлых лет (НГУ):"
     lines: list[str] = [header]
 
     current_key: Optional[tuple[str, Optional[str]]] = None
