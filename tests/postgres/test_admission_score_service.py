@@ -202,6 +202,174 @@ async def test_resolve_program_id(session: AsyncSession):
     assert await service.resolve_program_id("ФИТ", "Направление, которого нет") is None
 
 
+async def _seed_granularity(session: AsyncSession) -> FacultyService:
+    """Справочник в гранулярности «Поле. Профиль» + один специалитет.
+
+    Воспроизводит реальное расхождение: справочник хранит склеенные названия,
+    а страница итогов приёма отдаёт «Поле» и «Профиль» отдельными строками.
+    """
+    service = FacultyService(session)
+    await service.upsert_from_seed(
+        [
+            {
+                "name": "Факультет информационных технологий",
+                "aliases": ["ФИТ"],
+                "programs": [
+                    {
+                        "name": "Информатика и вычислительная техника. "
+                        "Компьютерные науки и системотехника",
+                        "code": "09.03.01",
+                        "level": "bachelor",
+                    },
+                    {
+                        "name": "Информатика и вычислительная техника. "
+                        "Программная инженерия и компьютерные науки",
+                        "code": "09.03.01",
+                        "level": "bachelor",
+                    },
+                ],
+            },
+            {
+                "name": "Физический факультет",
+                "aliases": ["ФФ"],
+                "programs": [
+                    {
+                        "name": "Физика. Фундаментальная и экспериментальная физика",
+                        "code": "03.03.02",
+                        "level": "bachelor",
+                    }
+                ],
+            },
+            {
+                "name": "Институт медицины",
+                "aliases": ["мед"],
+                "programs": [
+                    {
+                        "name": "Лечебное дело",
+                        "code": "31.05.01",
+                        "level": "specialist",
+                    }
+                ],
+            },
+        ]
+    )
+    return service
+
+
+@pytest.mark.asyncio
+async def test_strict_matching_profile_field_and_aggregate(session: AsyncSession):
+    await _seed_granularity(session)
+    svc = AdmissionScoreService(session)
+    rows = [
+        # Голые профили (как на странице итогов) → матч на «Поле. Профиль».
+        ScoreRow(
+            "ФИТ",
+            "Компьютерные науки и системотехника",
+            "09.03.01",
+            2024,
+            "budget",
+            260,
+            None,
+        ),
+        ScoreRow(
+            "ФИТ",
+            "Программная инженерия и компьютерные науки",
+            "09.03.01",
+            2024,
+            "budget",
+            246,
+            None,
+        ),
+        # Агрегат поля над двумя профилями → ambiguous_field → пропуск.
+        ScoreRow(
+            "ФИТ",
+            "Информатика и вычислительная техника",
+            "09.03.01",
+            2024,
+            "budget",
+            999,
+            None,
+        ),
+        # Поле над ЕДИНСТВЕННЫМ профилем → field_prefix → матч.
+        ScoreRow("ФФ", "Физика", "03.03.02", 2024, "budget", 190, None),
+    ]
+    stats = await svc.upsert_from_rows(rows)
+    assert stats == {"created": 3, "updated": 0, "skipped": 1}
+
+    fit = await svc.query_scores(faculty="ФИТ", year=2024, form="budget")
+    by = {s["program_name"]: s["passing_score"] for s in fit}
+    assert (
+        by["Информатика и вычислительная техника. Компьютерные науки и системотехника"]
+        == 260
+    )
+    assert (
+        by[
+            "Информатика и вычислительная техника. Программная инженерия и компьютерные науки"
+        ]
+        == 246
+    )
+    # Агрегат 999 никуда не записался (не перезаписал профиль).
+    assert 999 not in by.values()
+
+    ff = await svc.query_scores(faculty="ФФ", year=2024, form="budget")
+    assert len(ff) == 1 and ff[0]["passing_score"] == 190
+
+
+@pytest.mark.asyncio
+async def test_strict_matching_no_substring_collision(session: AsyncSession):
+    """Профиль и агрегат поля не схлопываются в один program_id."""
+    await _seed_granularity(session)
+    svc = AdmissionScoreService(session)
+    stats = await svc.upsert_from_rows(
+        [
+            ScoreRow(
+                "ФИТ",
+                "Компьютерные науки и системотехника",
+                "09.03.01",
+                2024,
+                "budget",
+                260,
+                None,
+            ),
+            ScoreRow(
+                "ФИТ",
+                "Информатика и вычислительная техника",
+                "09.03.01",
+                2024,
+                "budget",
+                111,
+                None,
+            ),  # агрегат → пропуск
+        ]
+    )
+    assert stats["created"] == 1 and stats["skipped"] == 1
+    cs = await svc.query_scores(program="Компьютерные науки и системотехника", year=2024)
+    assert len(cs) == 1 and cs[0]["passing_score"] == 260
+
+
+@pytest.mark.asyncio
+async def test_query_finds_specialist_by_default_level(session: AsyncSession):
+    """level=None по умолчанию находит специалитет (медицина)."""
+    await _seed_granularity(session)
+    svc = AdmissionScoreService(session)
+    await svc.upsert_from_rows(
+        [
+            ScoreRow(
+                "мед",
+                "Лечебное дело",
+                "31.05.01",
+                2024,
+                "budget",
+                258,
+                None,
+                level="specialist",
+            ),
+        ]
+    )
+    res = await svc.query_scores(program="Лечебное дело", year=2024)
+    assert len(res) == 1 and res[0]["passing_score"] == 258
+
+
 @pytest.mark.asyncio
 async def test_get_available_years_descending(session: AsyncSession):
     await _seed_fit(session)

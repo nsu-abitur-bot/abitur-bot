@@ -10,13 +10,30 @@ import logging
 from dataclasses import dataclass
 from typing import Iterable, Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import ADMISSION_FORMS, AdmissionScore, Faculty, Program
 from .faculty import FacultyService, normalize_level, normalize_name
 
 logger = logging.getLogger(__name__)
+
+# Разделитель «Поле. Профиль» в названиях направлений справочника.
+_FIELD_PROFILE_SEP = ". "
+
+
+def _has_field_profile(name: str) -> bool:
+    return _FIELD_PROFILE_SEP in name
+
+
+def _field_part(name: str) -> str:
+    """Часть названия ДО первого «. » (поле/УГСН), нормализованная."""
+    return normalize_name(name.split(_FIELD_PROFILE_SEP, 1)[0])
+
+
+def _profile_part(name: str) -> str:
+    """Часть названия ПОСЛЕ последнего «. » (профиль), нормализованная."""
+    return normalize_name(name.rsplit(_FIELD_PROFILE_SEP, 1)[-1])
 
 
 @dataclass
@@ -40,19 +57,25 @@ class AdmissionScoreService:
         self.session = session
         self.faculty_service = FacultyService(session)
 
-    async def _resolve_program(
-        self, faculty_name: str, program_name: str, level: str
-    ) -> Optional[Program]:
-        """Разрешает (факультет, направление) в объект Program.
+    async def _resolve_program_detailed(
+        self, faculty_name: str, program_name: str, level: Optional[str]
+    ) -> tuple[Optional[Program], str]:
+        """Строго разрешает (факультет, направление) в Program + причину.
 
-        Сначала ищем факультет по названию/алиасу, затем среди его направлений
-        нужного уровня. Совпадение по нормализованному имени — сначала точное,
-        затем (как запасной вариант) самое длинное вхождение подстроки.
-        Возвращает None, если ничего не разрешилось.
+        Две страницы НГУ используют разную гранулярность: страница итогов приёма
+        даёт «Поле» и «Профиль» отдельными строками, а справочник — склеенное
+        «Поле. Профиль». Поэтому матчим по приоритету:
+        1) точное нормализованное имя;
+        2) уникальный ПРОФИЛЬ (суффикс после «. »);
+        3) уникальное ПОЛЕ (префикс до «. »).
+        Substring НЕ используем: для авторитетного хранилища числовых фактов
+        неоднозначное лучше пропустить, чем поставить неверный балл. Строки-
+        агрегаты поля/УГСН (несколько профилей под одним полем) осознанно
+        отсекаются (`ambiguous_field`). Возвращает (program|None, reason).
         """
         faculty = await self.faculty_service.find_faculty_by_alias(faculty_name)
         if faculty is None:
-            return None
+            return None, "faculty_unknown"
 
         canonical_level = normalize_level(level) or level
         programs = await self.faculty_service.get_programs_by_faculty(
@@ -61,24 +84,47 @@ class AdmissionScoreService:
 
         target = normalize_name(program_name)
         if not target:
-            return None
+            return None, "empty"
 
-        # Точное совпадение по нормализованному имени.
-        for program in programs:
-            if normalize_name(program.name) == target:
-                return program
+        # 1. Точное совпадение полного имени.
+        exact = [p for p in programs if normalize_name(p.name) == target]
+        if len(exact) == 1:
+            return exact[0], "exact"
+        if len(exact) > 1:
+            return None, "ambiguous_exact"
 
-        # Запасной вариант: самое длинное вхождение подстроки (детерминировано).
-        best: Optional[Program] = None
-        best_len = 0
-        for program in programs:
-            norm = normalize_name(program.name)
-            if norm and (norm in target or target in norm):
-                overlap = min(len(norm), len(target))
-                if overlap > best_len:
-                    best = program
-                    best_len = overlap
-        return best
+        # 2. Уникальный профиль (суффикс «Поле. ПРОФИЛЬ»).
+        by_profile = [
+            p
+            for p in programs
+            if _has_field_profile(p.name) and _profile_part(p.name) == target
+        ]
+        if len(by_profile) == 1:
+            return by_profile[0], "profile_suffix"
+        if len(by_profile) > 1:
+            return None, "ambiguous_profile"
+
+        # 3. Уникальное поле (префикс «ПОЛЕ. Профиль») — только если ровно одно.
+        by_field = [
+            p
+            for p in programs
+            if _has_field_profile(p.name) and _field_part(p.name) == target
+        ]
+        if len(by_field) == 1:
+            return by_field[0], "field_prefix"
+        if len(by_field) > 1:
+            return None, "ambiguous_field"
+
+        return None, "unknown"
+
+    async def _resolve_program(
+        self, faculty_name: str, program_name: str, level: Optional[str]
+    ) -> Optional[Program]:
+        """Разрешает (факультет, направление) в объект Program или None."""
+        program, _reason = await self._resolve_program_detailed(
+            faculty_name, program_name, level
+        )
+        return program
 
     async def resolve_program_id(
         self, faculty_name: str, program_name: str, level: str = "bachelor"
@@ -91,6 +137,36 @@ class AdmissionScoreService:
         """
         program = await self._resolve_program(faculty_name, program_name, level)
         return program.id if program is not None else None
+
+    async def _match_program_ids_global(
+        self, program_name: str, level: Optional[str]
+    ) -> list[str]:
+        """program_id всех направлений, подходящих под имя, БЕЗ факультета.
+
+        Та же строгая логика (точное имя → профиль-суффикс → филд-префикс), но
+        по всему справочнику. Возвращает ВСЕ id первого сработавшего уровня.
+        """
+        target = normalize_name(program_name)
+        if not target:
+            return []
+        programs = await self.faculty_service.get_all_programs(
+            level=normalize_level(level)
+        )
+        exact = [p.id for p in programs if normalize_name(p.name) == target]
+        if exact:
+            return exact
+        by_profile = [
+            p.id
+            for p in programs
+            if _has_field_profile(p.name) and _profile_part(p.name) == target
+        ]
+        if by_profile:
+            return by_profile
+        return [
+            p.id
+            for p in programs
+            if _has_field_profile(p.name) and _field_part(p.name) == target
+        ]
 
     async def upsert_from_rows(self, rows: Iterable[ScoreRow]) -> dict[str, int]:
         """Идемпотентный upsert по ключу (program_id, year, form).
@@ -116,13 +192,14 @@ class AdmissionScoreService:
                 stats["skipped"] += 1
                 continue
 
-            program = await self._resolve_program(
+            program, reason = await self._resolve_program_detailed(
                 row.faculty_name, row.program_name, row.level
             )
             if program is None:
                 logger.info(
-                    "Пропущена строка проходного балла: не разрешён факультет/"
-                    "направление (факультет=%r, направление=%r, уровень=%r)",
+                    "Пропущена строка проходного балла [%s]: направление не "
+                    "разрешено (факультет=%r, направление=%r, уровень=%r)",
+                    reason,
                     row.faculty_name,
                     row.program_name,
                     row.level,
@@ -165,12 +242,14 @@ class AdmissionScoreService:
         program: Optional[str] = None,
         year: Optional[int] = None,
         form: Optional[str] = None,
-        level: str = "bachelor",
+        level: Optional[str] = None,
     ) -> list[dict]:
         """Выборка проходных баллов с разрешением строковых фильтров.
 
-        Факультет разрешается по алиасу, направление — по нормализованному
-        имени среди направлений факультета. Возвращает список плоских словарей,
+        Факультет разрешается по алиасу, направление — по строгому матчу имени
+        (точное → профиль-суффикс → филд-префикс). ``level=None`` (по умолчанию)
+        означает любой уровень — так находятся и специалитетные программы
+        (медицина), а не только бакалавриат. Возвращает список плоских словарей,
         отсортированный по (program_name, year, form). Пустой список, если
         ничего не найдено.
         """
@@ -191,7 +270,6 @@ class AdmissionScoreService:
             stmt = stmt.where(Program.faculty_id == resolved_faculty.id)
 
         if program is not None:
-            target_program: Optional[Program] = None
             if faculty is not None:
                 # Факультет уже разрешён — ищем направление среди его программ.
                 target_program = await self._resolve_program(faculty, program, level)
@@ -199,8 +277,12 @@ class AdmissionScoreService:
                     return []
                 stmt = stmt.where(AdmissionScore.program_id == target_program.id)
             else:
-                normalized_program = normalize_name(program)
-                stmt = stmt.where(func.lower(Program.name) == normalized_program)
+                # Без факультета — матчим по справочнику глобально (точное имя →
+                # профиль-суффикс → филд-префикс), затем фильтруем по id.
+                ids = await self._match_program_ids_global(program, level)
+                if not ids:
+                    return []
+                stmt = stmt.where(AdmissionScore.program_id.in_(ids))
 
         if year is not None:
             stmt = stmt.where(AdmissionScore.year == year)
