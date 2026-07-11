@@ -31,6 +31,25 @@ class LLMResult:
     usage: LLMUsage = field(default_factory=LLMUsage)
 
 
+@dataclass
+class ToolSpec:
+    """Провайдер-независимое описание инструмента (function calling).
+
+    Attributes:
+        name: Имя функции, которое модель указывает при вызове.
+        description: Описание для модели — когда и зачем вызывать инструмент.
+        parameters: JSON Schema объекта аргументов (тип object).
+    """
+
+    name: str
+    description: str
+    parameters: dict
+
+
+# Исполнитель инструмента: async (name, arguments) -> текст результата.
+ToolExecutor = Callable[[str, dict], Awaitable[str]]
+
+
 class BaseLLMProvider(ABC):
     """Абстрактный интерфейс для LLM провайдера."""
 
@@ -98,6 +117,31 @@ class BaseLLMProvider(ABC):
             if on_delta is not None:
                 await on_delta(delta)
         return LLMResult(text="".join(chunks).strip(), usage=LLMUsage())
+
+    async def generate_with_tools(
+        self,
+        messages: List[BaseMessage],
+        tools: List[ToolSpec],
+        tool_executor: ToolExecutor,
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        """Генерация с поддержкой инструментов (function calling).
+
+        Дефолтная реализация ИГНОРИРУЕТ инструменты и делегирует обычной
+        генерации, чтобы провайдеры без нативной поддержки tool-calling
+        продолжали работать. Провайдеры, умеющие вызывать функции,
+        переопределяют этот метод.
+
+        Если передан ``on_delta`` — финальный ответ стримится по дельтам, чтобы
+        сохранить прогрессивное отображение в Telegram.
+        """
+        if on_delta is not None:
+            return await self.generate_stream_with_usage(
+                messages, profile=profile, on_delta=on_delta, **kwargs
+            )
+        return await self.generate_with_usage(messages, profile=profile, **kwargs)
 
     def get_embeddings_model(self) -> Any:
         """Возвращает объект для работы с эмбеддингами.

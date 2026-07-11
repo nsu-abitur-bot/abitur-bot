@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
@@ -8,8 +9,11 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
 
-from llm.base import BaseLLMProvider, LLMResult, LLMUsage
+from llm.base import BaseLLMProvider, LLMResult, LLMUsage, ToolExecutor, ToolSpec
 from llm.profiles import LLMProfile
+
+# Максимум раундов «модель -> инструменты -> модель» перед финальным ответом.
+_MAX_TOOL_ITERATIONS = 3
 
 logger = logging.getLogger(__name__)
 
@@ -75,9 +79,7 @@ class OpenAIProvider(BaseLLMProvider):
             _mask_proxy_url(self.proxy_url),
         )
 
-    def _resolve_params(
-        self, profile: Optional[LLMProfile]
-    ) -> tuple[float, int, float]:
+    def _resolve_params(self, profile: Optional[LLMProfile]) -> tuple[float, int, float]:
         temperature = (
             profile.temperature
             if profile and profile.temperature is not None
@@ -201,6 +203,120 @@ class OpenAIProvider(BaseLLMProvider):
 
         return LLMResult(text="".join(chunks).strip(), usage=usage)
 
+    async def _run_responses_stream(
+        self,
+        input_list: list[Any],
+        openai_tools: list[dict[str, Any]] | None,
+        temperature: float,
+        max_tokens: int,
+        timeout: float,
+        on_delta: Callable[[str], Awaitable[None]] | None,
+    ) -> tuple[str, list[Any], LLMUsage]:
+        """Один раунд стриминга Responses API.
+
+        Возвращает (текст ответа, список function_call-элементов, usage).
+        Текстовые дельты стримятся в on_delta сразу: при вызове функции модель
+        не эмитит output_text, поэтому преждевременного текста не будет.
+        """
+        text_chunks: list[str] = []
+        usage = LLMUsage()
+        stream_kwargs: dict[str, Any] = {
+            "model": self.model_name,
+            "input": input_list,
+            "max_output_tokens": max_tokens,
+            "temperature": temperature,
+            "timeout": timeout,
+        }
+        if openai_tools:
+            stream_kwargs["tools"] = openai_tools
+
+        try:
+            async with self.client.responses.stream(**stream_kwargs) as stream:
+                async for event in stream:
+                    if getattr(event, "type", None) == "response.output_text.delta":
+                        delta = getattr(event, "delta", "")
+                        if not delta:
+                            continue
+                        text_chunks.append(delta)
+                        if on_delta is not None:
+                            await on_delta(delta)
+                final_response = await stream.get_final_response()
+        except Exception:
+            logger.exception(
+                "Ошибка tool-стриминга OpenAI (proxy=%s)",
+                _mask_proxy_url(self.proxy_url),
+            )
+            raise
+
+        raw_usage = getattr(final_response, "usage", None)
+        if raw_usage is not None:
+            usage = _usage_from_openai_metadata(raw_usage)
+
+        function_calls = [
+            item
+            for item in (getattr(final_response, "output", None) or [])
+            if getattr(item, "type", None) == "function_call"
+        ]
+        return "".join(text_chunks).strip(), function_calls, usage
+
+    async def generate_with_tools(
+        self,
+        messages: List[BaseMessage],
+        tools: List[ToolSpec],
+        tool_executor: ToolExecutor,
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        input_list: list[Any] = [self._to_openai_message(m) for m in messages]
+        openai_tools = [_tool_spec_to_openai(t) for t in tools]
+        temperature, max_tokens, timeout = self._resolve_params(profile)
+        usage = LLMUsage()
+
+        for _ in range(_MAX_TOOL_ITERATIONS):
+            text, function_calls, usage = await self._run_responses_stream(
+                input_list, openai_tools, temperature, max_tokens, timeout, on_delta
+            )
+            if not function_calls:
+                return LLMResult(text=text, usage=usage)
+
+            for call in function_calls:
+                arguments = getattr(call, "arguments", "") or "{}"
+                input_list.append(
+                    {
+                        "type": "function_call",
+                        "call_id": call.call_id,
+                        "name": call.name,
+                        "arguments": arguments,
+                    }
+                )
+                try:
+                    parsed_args = json.loads(arguments) if arguments else {}
+                except json.JSONDecodeError:
+                    logger.warning(
+                        "OpenAI: не удалось разобрать аргументы вызова %s: %r",
+                        call.name,
+                        arguments,
+                    )
+                    parsed_args = {}
+                result = await tool_executor(call.name, parsed_args)
+                input_list.append(
+                    {
+                        "type": "function_call_output",
+                        "call_id": call.call_id,
+                        "output": result,
+                    }
+                )
+
+        # Лимит итераций исчерпан — финальный ответ без инструментов.
+        logger.warning(
+            "OpenAI: достигнут лимит tool-итераций, финализирую без инструментов"
+        )
+        text, _, usage = await self._run_responses_stream(
+            input_list, None, temperature, max_tokens, timeout, on_delta
+        )
+        return LLMResult(text=text, usage=usage)
+
     def get_embeddings_model(self) -> Any:
         embedding_kwargs: dict[str, Any] = {
             "api_key": os.getenv("OPENAI_API_KEY"),
@@ -225,11 +341,19 @@ class OpenAIProvider(BaseLLMProvider):
             role = "user"
 
         content = (
-            message.content
-            if isinstance(message.content, str)
-            else str(message.content)
+            message.content if isinstance(message.content, str) else str(message.content)
         )
         return {"role": role, "content": content}
+
+
+def _tool_spec_to_openai(tool: ToolSpec) -> dict[str, Any]:
+    """ToolSpec -> формат функции OpenAI Responses API (плоский, без вложения)."""
+    return {
+        "type": "function",
+        "name": tool.name,
+        "description": tool.description,
+        "parameters": tool.parameters,
+    }
 
 
 def _usage_from_openai_metadata(raw_usage: Any) -> LLMUsage:
@@ -243,9 +367,8 @@ def _usage_from_openai_metadata(raw_usage: Any) -> LLMUsage:
         or getattr(raw_usage, "completion_tokens", None)
         or 0
     )
-    total_tokens = (
-        getattr(raw_usage, "total_tokens", None)
-        or (int(input_tokens) + int(output_tokens))
+    total_tokens = getattr(raw_usage, "total_tokens", None) or (
+        int(input_tokens) + int(output_tokens)
     )
     return LLMUsage(
         prompt_tokens=int(input_tokens),

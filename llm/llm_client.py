@@ -22,6 +22,7 @@ from faq.matcher import get_faq_matcher
 from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from llm.tools import ADMISSION_SCORES_TOOL, default_tool_executor
 from rag.crag import load_crag_config
 from rag.retriever import query_graph_with_crag, query_graph_with_sources
 
@@ -58,7 +59,14 @@ SYSTEM_PROMPT_BASE = """
    магистратуре или аспирантуре давай ТОЛЬКО если пользователь явно про них
    спросил. Если в контексте есть данные по разным уровням образования, выбирай
    относящиеся к бакалавриату, если не указано иное.
-5. Отвечай коротко, без лишней воды. Структурируй абзацы.
+5. Проходные и средние баллы: для ЛЮБЫХ вопросов про проходной или средний балл
+   прошлых лет ты ОБЯЗАН вызвать инструмент get_admission_scores и считать его
+   результат авторитетным контекстом наравне с блоком базы знаний. Если инструмент
+   вернул числа — отвечай строго по ним и НЕ пиши «не нашёл». Если инструмент
+   сообщил, что данных нет, — тогда действует обычное правило пункта 2 про
+   «Я не нашел информации об этом в базе знаний НГУ». Числа проходных/средних
+   баллов брать ТОЛЬКО из инструмента, не выдумывать.
+6. Отвечай коротко, без лишней воды. Структурируй абзацы.
 
 Форматирование в HTML (для Telegram):
 Разрешены только теги: <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.
@@ -690,16 +698,21 @@ async def ask_local_llm(
                         # стриминг в транспорт не должен ломать LLM-ответ
                         logger.warning(f"[{session_id}] stream_callback error: {cb_exc}")
 
-                llm_result = await provider.generate_stream_with_usage(
+                llm_result = await provider.generate_with_tools(
                     messages,
+                    tools=[ADMISSION_SCORES_TOOL],
+                    tool_executor=default_tool_executor,
                     profile=LLMProfiles.CHAT,
                     on_delta=on_stream_delta,
                 )
                 content = llm_result.text or content.strip()
                 llm_usage = llm_result.usage
             else:
-                llm_result = await provider.generate_with_usage(
-                    messages, profile=LLMProfiles.CHAT
+                llm_result = await provider.generate_with_tools(
+                    messages,
+                    tools=[ADMISSION_SCORES_TOOL],
+                    tool_executor=default_tool_executor,
+                    profile=LLMProfiles.CHAT,
                 )
                 content = llm_result.text
                 llm_usage = llm_result.usage

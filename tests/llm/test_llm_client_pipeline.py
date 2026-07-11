@@ -28,6 +28,11 @@ class _FakeProvider:
     async def generate_with_usage(self, messages, profile) -> LLMResult:
         return LLMResult(text="Ответ из LLM")
 
+    async def generate_with_tools(
+        self, messages, tools, tool_executor, profile=None, on_delta=None
+    ) -> LLMResult:
+        return await self.generate_with_usage(messages, profile)
+
 
 def _close_background_coro(coro) -> None:
     coro.close()

@@ -6,12 +6,13 @@ from google import genai
 from google.genai import types
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
-from llm.base import BaseLLMProvider, LLMResult, LLMUsage
+from llm.base import BaseLLMProvider, LLMResult, LLMUsage, ToolExecutor, ToolSpec
 from llm.profiles import LLMProfile
 
 logger = logging.getLogger(__name__)
 
-logger = logging.getLogger(__name__)
+# Максимум раундов «модель -> инструменты -> модель» перед финальным ответом.
+_MAX_TOOL_ITERATIONS = 3
 
 
 class GeminiProvider(BaseLLMProvider):
@@ -142,6 +143,91 @@ class GeminiProvider(BaseLLMProvider):
 
         return LLMResult(text="".join(chunks).strip(), usage=usage)
 
+    async def _run_gemini_stream(
+        self,
+        contents: list[Any],
+        config: types.GenerateContentConfig,
+        on_delta: Callable[[str], Awaitable[None]] | None,
+    ) -> tuple[str, list[Any], list[types.Part], LLMUsage]:
+        """Один раунд стриминга Gemini.
+
+        Возвращает (текст, список function_call, parts модельного хода, usage).
+        Текстовые части стримятся сразу через on_delta; при вызове функции
+        модель не эмитит текст, поэтому преждевременного текста не будет.
+        """
+        chunks: list[str] = []
+        function_calls: list[Any] = []
+        model_parts: list[types.Part] = []
+        usage = LLMUsage()
+
+        stream = await self.client.aio.models.generate_content_stream(
+            model=self.model_name,
+            contents=contents,
+            config=config,
+        )
+        async for chunk in stream:
+            raw_usage = getattr(chunk, "usage_metadata", None)
+            if raw_usage is not None:
+                usage = _usage_from_gemini_metadata(raw_usage)
+
+            for candidate in getattr(chunk, "candidates", None) or []:
+                content = getattr(candidate, "content", None)
+                for part in getattr(content, "parts", None) or []:
+                    function_call = getattr(part, "function_call", None)
+                    if function_call is not None:
+                        function_calls.append(function_call)
+                        model_parts.append(types.Part(function_call=function_call))
+                        continue
+                    text = getattr(part, "text", None)
+                    if text:
+                        chunks.append(text)
+                        if on_delta is not None:
+                            await on_delta(text)
+
+        return "".join(chunks).strip(), function_calls, model_parts, usage
+
+    async def generate_with_tools(
+        self,
+        messages: List[BaseMessage],
+        tools: List[ToolSpec],
+        tool_executor: ToolExecutor,
+        profile: Optional[LLMProfile] = None,
+        on_delta: Callable[[str], Awaitable[None]] | None = None,
+        **kwargs,
+    ) -> LLMResult:
+        gemini_messages, config = self._build_request(messages, profile)
+        config.tools = [_tools_to_gemini(tools)]
+
+        contents: list[Any] = list(gemini_messages)
+        usage = LLMUsage()
+
+        for _ in range(_MAX_TOOL_ITERATIONS):
+            text, function_calls, model_parts, usage = await self._run_gemini_stream(
+                contents, config, on_delta
+            )
+            if not function_calls:
+                return LLMResult(text=text, usage=usage)
+
+            contents.append(types.Content(role="model", parts=model_parts))
+            response_parts: list[types.Part] = []
+            for call in function_calls:
+                args = dict(call.args) if getattr(call, "args", None) else {}
+                result = await tool_executor(call.name, args)
+                response_parts.append(
+                    types.Part.from_function_response(
+                        name=call.name, response={"result": result}
+                    )
+                )
+            contents.append(types.Content(role="user", parts=response_parts))
+
+        # Лимит итераций исчерпан — финальный ответ без инструментов.
+        logger.warning(
+            "Gemini: достигнут лимит tool-итераций, финализирую без инструментов"
+        )
+        config.tools = None
+        text, _, _, usage = await self._run_gemini_stream(contents, config, on_delta)
+        return LLMResult(text=text, usage=usage)
+
     def get_embeddings_model(self) -> Any:
         return GeminiEmbeddings(self.client)
 
@@ -165,12 +251,24 @@ class GeminiEmbeddings:
         return [list(e.values or []) for e in response.embeddings]
 
 
+def _tools_to_gemini(tools: List[ToolSpec]) -> types.Tool:
+    """ToolSpec[] -> types.Tool с function_declarations (raw JSON Schema)."""
+    declarations = [
+        types.FunctionDeclaration(
+            name=tool.name,
+            description=tool.description,
+            parameters_json_schema=tool.parameters,
+        )
+        for tool in tools
+    ]
+    return types.Tool(function_declarations=declarations)
+
+
 def _usage_from_gemini_metadata(raw_usage: Any) -> LLMUsage:
     prompt_tokens = int(getattr(raw_usage, "prompt_token_count", 0) or 0)
     completion_tokens = int(getattr(raw_usage, "candidates_token_count", 0) or 0)
     total_tokens = int(
-        getattr(raw_usage, "total_token_count", 0)
-        or (prompt_tokens + completion_tokens)
+        getattr(raw_usage, "total_token_count", 0) or (prompt_tokens + completion_tokens)
     )
     return LLMUsage(
         prompt_tokens=prompt_tokens,

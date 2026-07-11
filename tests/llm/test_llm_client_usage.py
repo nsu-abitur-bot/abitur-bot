@@ -40,6 +40,13 @@ class _FakeStreamingProvider:
             usage=LLMUsage(prompt_tokens=40, completion_tokens=10, total_tokens=50),
         )
 
+    async def generate_with_tools(
+        self, messages, tools, tool_executor, profile=None, on_delta=None
+    ):
+        return await self.generate_stream_with_usage(
+            messages, profile=profile, on_delta=on_delta
+        )
+
 
 @pytest.mark.asyncio
 async def test_streaming_llm_usage_is_saved(monkeypatch):
@@ -107,9 +114,7 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         "total_tokens": 50,
     }
 
-    rag_query_logs = [
-        log for log in saved_logs if log["message_type"] == "rag_query"
-    ]
+    rag_query_logs = [log for log in saved_logs if log["message_type"] == "rag_query"]
     rag_response_logs = [
         log for log in saved_logs if log["message_type"] == "rag_response"
     ]
