@@ -7,6 +7,7 @@ from sqlalchemy import (
     BigInteger,
     Boolean,
     DateTime,
+    Float,
     ForeignKey,
     Index,
     Integer,
@@ -34,6 +35,17 @@ class EducationLevel(str, enum.Enum):
 
 # Допустимые значения уровня образования (для валидации сидов/API).
 EDUCATION_LEVELS: frozenset[str] = frozenset(level.value for level in EducationLevel)
+
+
+class AdmissionForm(str, enum.Enum):
+    """Форма обучения для проходных баллов."""
+
+    budget = "budget"
+    paid = "paid"
+
+
+# Допустимые значения формы обучения (для валидации сидов/API).
+ADMISSION_FORMS: frozenset[str] = frozenset(f.value for f in AdmissionForm)
 
 
 def timestamp():
@@ -528,6 +540,11 @@ class Program(Base):
     )
 
     faculty: Mapped["Faculty"] = relationship("Faculty", back_populates="programs")
+    admission_scores: Mapped[List["AdmissionScore"]] = relationship(
+        "AdmissionScore",
+        back_populates="program",
+        cascade="all, delete-orphan",
+    )
 
     __table_args__ = (
         UniqueConstraint(
@@ -542,4 +559,54 @@ class Program(Base):
         return (
             f"<Program(id='{self.id}', name='{self.name}', "
             f"level='{self.level}', faculty_id='{self.faculty_id}')>"
+        )
+
+
+class AdmissionScore(Base):
+    """Проходные баллы направления подготовки за прошлые годы.
+
+    Структурированное хранилище (одна строка на тройку program/year/form),
+    чтобы отвечать на числовые вопросы из SQL, а не из RAG. Формы обучения —
+    только бюджет и платное (``budget`` / ``paid``).
+    """
+
+    __tablename__ = "admission_score"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    program_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("program.id", ondelete="CASCADE"), nullable=False
+    )
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Форма обучения: budget / paid.
+    form: Mapped[str] = mapped_column(String(20), nullable=False)
+    passing_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    average_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    source_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, default=timestamp, onupdate=timestamp
+    )
+
+    program: Mapped["Program"] = relationship(
+        "Program", back_populates="admission_scores"
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "program_id",
+            "year",
+            "form",
+            name="uq_admission_score_program_year_form",
+        ),
+        Index("ix_admission_score_program", "program_id"),
+        Index("ix_admission_score_year", "year"),
+    )
+
+    def __repr__(self) -> str:
+        return (
+            f"<AdmissionScore(id='{self.id}', program_id='{self.program_id}', "
+            f"year={self.year}, form='{self.form}', "
+            f"passing_score={self.passing_score})>"
         )
