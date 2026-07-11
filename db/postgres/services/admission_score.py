@@ -80,6 +80,18 @@ class AdmissionScoreService:
                     best_len = overlap
         return best
 
+    async def resolve_program_id(
+        self, faculty_name: str, program_name: str, level: str = "bachelor"
+    ) -> Optional[str]:
+        """Разрешает (факультет, направление) в program_id без записи в БД.
+
+        Публичная обёртка над :meth:`_resolve_program` для предпросмотра импорта
+        (подсчёт сопоставленных/несопоставленных строк). Возвращает None, если
+        факультет или направление не найдены в справочнике.
+        """
+        program = await self._resolve_program(faculty_name, program_name, level)
+        return program.id if program is not None else None
+
     async def upsert_from_rows(self, rows: Iterable[ScoreRow]) -> dict[str, int]:
         """Идемпотентный upsert по ключу (program_id, year, form).
 

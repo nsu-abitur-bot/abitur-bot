@@ -186,6 +186,23 @@ async def test_query_scores_unknown_returns_empty(session: AsyncSession):
 
 
 @pytest.mark.asyncio
+async def test_resolve_program_id(session: AsyncSession):
+    """Публичный резолвер program_id для предпросмотра импорта."""
+    await _seed_fit(session)
+    service = AdmissionScoreService(session)
+
+    # По алиасу факультета и точному имени направления.
+    resolved = await service.resolve_program_id(
+        "ФИТ", "Компьютерные науки и системотехника"
+    )
+    assert resolved is not None
+
+    # Неизвестный факультет / направление → None (не пишет в БД).
+    assert await service.resolve_program_id("Несуществующий факультет", "Что-то") is None
+    assert await service.resolve_program_id("ФИТ", "Направление, которого нет") is None
+
+
+@pytest.mark.asyncio
 async def test_get_available_years_descending(session: AsyncSession):
     await _seed_fit(session)
     service = AdmissionScoreService(session)
