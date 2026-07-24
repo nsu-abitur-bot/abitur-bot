@@ -109,6 +109,17 @@ class SettingsService:
         )
         await self.session.commit()
 
+    async def get_value(self, key: str) -> str | None:
+        """Значение произвольной настройки по ключу (или None, если её нет)."""
+        result = await self.session.execute(select(Settings).where(Settings.key == key))
+        setting = result.scalar_one_or_none()
+        return setting.value if setting is not None else None
+
+    async def set_value(self, key: str, value: str, description: str = "") -> None:
+        """Записывает произвольную настройку по ключу (upsert + commit)."""
+        await self._upsert(key, value, description)
+        await self.session.commit()
+
     async def _get_many(self, keys: list[str]) -> dict[str, Settings]:
         result = await self.session.execute(
             select(Settings).where(Settings.key.in_(keys))
