@@ -83,8 +83,13 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         "llm.llm_client.get_abbrev_expander", lambda: _FakeAbbrevExpander()
     )
     monkeypatch.setattr("llm.llm_client.get_faq_matcher", lambda: _FakeFaqMatcher())
+    # Мокаем ОБЕ ветки ретрива: какая выполнится, зависит от CRAG_ENABLED,
+    # а тест про usage/логи не должен зависеть от этой настройки.
     monkeypatch.setattr(
         "llm.llm_client.query_graph_with_sources", fake_query_graph_with_sources
+    )
+    monkeypatch.setattr(
+        "llm.llm_client.query_graph_with_crag", fake_query_graph_with_sources
     )
     monkeypatch.setattr(
         "llm.llm_client.get_llm_provider", lambda: _FakeStreamingProvider()

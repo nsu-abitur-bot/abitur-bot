@@ -59,8 +59,13 @@ async def test_rag_does_not_start_before_faq_matcher_finishes(monkeypatch):
     monkeypatch.setattr(llm_client, "get_redis_client", _get_fake_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
     monkeypatch.setattr(llm_client, "get_faq_matcher", lambda: FakeFaqMatcher())
+    # Мокаем ОБЕ ветки ретрива: какая именно выполнится, зависит от CRAG_ENABLED,
+    # а тест проверяет порядок FAQ→RAG и не должен зависеть от этой настройки.
     monkeypatch.setattr(
         llm_client, "query_graph_with_sources", fake_query_graph_with_sources
+    )
+    monkeypatch.setattr(
+        llm_client, "query_graph_with_crag", fake_query_graph_with_sources
     )
     monkeypatch.setattr(llm_client, "get_llm_provider", lambda: _FakeProvider())
     monkeypatch.setattr(llm_client, "_spawn_bg", _close_background_coro)
@@ -85,8 +90,13 @@ async def test_faq_hit_returns_without_rag(monkeypatch):
     monkeypatch.setattr(llm_client, "get_redis_client", _get_fake_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
     monkeypatch.setattr(llm_client, "get_faq_matcher", lambda: FakeFaqMatcher())
+    # Обе ветки ретрива — иначе assert not rag_started прошёл бы вхолостую,
+    # даже если бы RAG реально сходил через CRAG-ветку.
     monkeypatch.setattr(
         llm_client, "query_graph_with_sources", fake_query_graph_with_sources
+    )
+    monkeypatch.setattr(
+        llm_client, "query_graph_with_crag", fake_query_graph_with_sources
     )
     monkeypatch.setattr(llm_client, "_spawn_bg", _close_background_coro)
 
