@@ -1,12 +1,15 @@
 """Загрузчик справочника факультетов и направлений из JSON-сида.
 
-Запуск (через uv, как требует CLAUDE.md)::
+Запуск (через uv, как требует AGENTS.md)::
 
-    uv run python -m db.seed.load_faculties
+    uv run python -m db.seed.load_faculties                  # мягкий режим
+    uv run python -m db.seed.load_faculties --force          # жёсткая перезапись
     uv run python -m db.seed.load_faculties path/to/faculties.json
 
-Скрипт идемпотентен: повторный запуск обновляет существующие записи, а не
-создаёт дубликаты (см. FacultyService.upsert_from_seed).
+По умолчанию режим МЯГКИЙ: добавляется только недостающее (новые факультеты,
+алиасы, направления, код у направления без кода), существующие данные и правки
+из админки не затираются. ``--force`` перезаписывает алиасы/коды значениями из
+сида и включает is_active. См. FacultyService.upsert_from_seed.
 """
 
 import asyncio
@@ -33,11 +36,14 @@ def load_seed_file(path: str) -> list[dict[str, Any]]:
     return faculties
 
 
-async def seed_faculties(path: str = DEFAULT_SEED_PATH) -> dict[str, int]:
+async def seed_faculties(
+    path: str = DEFAULT_SEED_PATH, soft: bool = False
+) -> dict[str, int]:
+    """Заливает справочник из сида. ``soft=True`` — только доливка недостающего."""
     faculties = load_seed_file(path)
     async with AsyncSessionLocal() as session:
         service = FacultyService(session)
-        stats = await service.upsert_from_seed(faculties)
+        stats = await service.upsert_from_seed(faculties, soft=soft)
     return stats
 
 
@@ -62,9 +68,12 @@ async def seed_faculties_if_empty(path: str = DEFAULT_SEED_PATH) -> dict[str, in
 
 async def _main() -> None:
     logging.basicConfig(level=logging.INFO)
-    path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_SEED_PATH
-    logger.info("Загрузка справочника факультетов из %s", path)
-    stats = await seed_faculties(path)
+    args = [a for a in sys.argv[1:] if a != "--force"]
+    force = "--force" in sys.argv[1:]
+    path = args[0] if args else DEFAULT_SEED_PATH
+    mode = "жёсткий (перезапись)" if force else "мягкий (только доливка)"
+    logger.info("Загрузка справочника факультетов из %s, режим: %s", path, mode)
+    stats = await seed_faculties(path, soft=not force)
     logger.info("Готово: %s", stats)
     print(json.dumps(stats, ensure_ascii=False, indent=2))
 

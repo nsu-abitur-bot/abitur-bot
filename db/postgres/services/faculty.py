@@ -252,8 +252,20 @@ class FacultyService:
 
     # --- Наполнение из сида -------------------------------------------------
 
-    async def upsert_from_seed(self, faculties: Sequence[dict]) -> dict[str, int]:
+    async def upsert_from_seed(
+        self, faculties: Sequence[dict], soft: bool = False
+    ) -> dict[str, int]:
         """Идемпотентно загружает справочник из сид-структуры.
+
+        ``soft=True`` — «мягкий» режим: добавляется только то, чего ещё нет
+        (новые факультеты, новые алиасы, новые направления, код у направления
+        без кода). Существующие данные НЕ затираются: алиасы доливаются
+        объединением, ``is_active`` и уже заполненные коды не трогаются. Это
+        безопасно гонять при каждом старте — правки из админки переживают
+        деплой, а новые записи из сида подхватываются.
+
+        ``soft=False`` (по умолчанию) — жёсткая перезапись: алиасы и коды
+        заменяются значениями из сида, ``is_active`` принудительно True.
 
         Формат каждого элемента ``faculties``::
 
@@ -290,6 +302,19 @@ class FacultyService:
                 self.session.add(faculty)
                 await self.session.flush()
                 stats["faculties_created"] += 1
+            elif soft:
+                # Доливаем только недостающие алиасы; is_active не трогаем.
+                existing_aliases = list(faculty.aliases or [])
+                known = {normalize_name(a) for a in existing_aliases}
+                added: list[str] = []
+                for alias in aliases:
+                    alias_key = normalize_name(alias)
+                    if alias_key and alias_key not in known:
+                        known.add(alias_key)
+                        added.append(alias)
+                if added:
+                    faculty.aliases = existing_aliases + added
+                    stats["faculties_updated"] += 1
             else:
                 faculty.aliases = aliases
                 faculty.is_active = True
@@ -324,6 +349,11 @@ class FacultyService:
                         )
                     )
                     stats["programs_created"] += 1
+                elif soft:
+                    # Заполняем только пустой код; is_active не трогаем.
+                    if code and not program.code:
+                        program.code = code
+                        stats["programs_updated"] += 1
                 else:
                     program.code = code
                     program.is_active = True

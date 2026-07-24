@@ -136,3 +136,135 @@ async def test_create_program_rejects_bad_level(session: AsyncSession):
         await service.create_program(
             faculty.id, "Какое-то направление", level="аспирантура"
         )
+
+
+@pytest.mark.asyncio
+async def test_soft_seed_adds_missing_without_overwriting(session: AsyncSession):
+    """Мягкий сид доливает недостающее и НЕ затирает правки из админки."""
+    service = FacultyService(session)
+    await service.upsert_from_seed(
+        [
+            {
+                "name": "Гуманитарный институт",
+                "aliases": ["ГИ"],
+                "programs": [
+                    {"name": "История", "code": "46.03.01", "level": "bachelor"}
+                ],
+            }
+        ]
+    )
+    faculty = await service.get_faculty_by_name("Гуманитарный институт")
+    assert faculty is not None
+
+    # Правки «из админки»: свой алиас и выключенное направление.
+    await service.update_faculty(faculty.id, aliases=["ГИ", "админский-алиас"])
+    programs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+    history = next(p for p in programs if p.name == "История")
+    await service.update_program(history.id, is_active=False)
+
+    stats = await service.upsert_from_seed(
+        [
+            {
+                "name": "Гуманитарный институт",
+                "aliases": ["ГИ", "Гуманитарный институт НГУ"],
+                "programs": [
+                    # Другой код у существующего — НЕ должен перезаписаться.
+                    {"name": "История", "code": "99.99.99", "level": "bachelor"},
+                    {"name": "Журналистика", "code": "42.03.02", "level": "bachelor"},
+                ],
+            }
+        ],
+        soft=True,
+    )
+
+    refreshed = await service.get_faculty_by_name("Гуманитарный институт")
+    assert refreshed is not None
+    assert "админский-алиас" in refreshed.aliases  # правка админа цела
+    assert "Гуманитарный институт НГУ" in refreshed.aliases  # новый долит
+
+    progs = {
+        p.name: p
+        for p in await service.get_programs_by_faculty(refreshed.id, only_active=False)
+    }
+    assert progs["История"].is_active is False  # не включили обратно
+    assert progs["История"].code == "46.03.01"  # код не перезаписан
+    assert "Журналистика" in progs  # новое направление добавлено
+    assert stats["programs_created"] == 1
+
+
+@pytest.mark.asyncio
+async def test_soft_seed_fills_only_empty_code(session: AsyncSession):
+    service = FacultyService(session)
+    await service.upsert_from_seed(
+        [
+            {
+                "name": "Физический факультет",
+                "aliases": ["ФФ"],
+                "programs": [{"name": "Физическая информатика", "level": "bachelor"}],
+            }
+        ]
+    )
+    faculty = await service.get_faculty_by_name("Физический факультет")
+    assert faculty is not None
+    progs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+    assert progs[0].code is None
+
+    await service.upsert_from_seed(
+        [
+            {
+                "name": "Физический факультет",
+                "aliases": ["ФФ"],
+                "programs": [
+                    {
+                        "name": "Физическая информатика",
+                        "code": "03.03.02",
+                        "level": "bachelor",
+                    }
+                ],
+            }
+        ],
+        soft=True,
+    )
+    progs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+    assert progs[0].code == "03.03.02"  # пустой код заполнен
+
+
+@pytest.mark.asyncio
+async def test_hard_seed_still_overwrites(session: AsyncSession):
+    """Жёсткий режим (soft=False) сохраняет прежнее поведение перезаписи."""
+    service = FacultyService(session)
+    await service.upsert_from_seed(
+        [
+            {
+                "name": "Гуманитарный институт",
+                "aliases": ["ГИ"],
+                "programs": [
+                    {"name": "История", "code": "46.03.01", "level": "bachelor"}
+                ],
+            }
+        ]
+    )
+    faculty = await service.get_faculty_by_name("Гуманитарный институт")
+    assert faculty is not None
+    await service.update_faculty(faculty.id, aliases=["ГИ", "админский-алиас"])
+    programs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+    await service.update_program(programs[0].id, is_active=False)
+
+    await service.upsert_from_seed(
+        [
+            {
+                "name": "Гуманитарный институт",
+                "aliases": ["ГИ"],
+                "programs": [
+                    {"name": "История", "code": "46.03.01", "level": "bachelor"}
+                ],
+            }
+        ],
+        soft=False,
+    )
+
+    refreshed = await service.get_faculty_by_name("Гуманитарный институт")
+    assert refreshed is not None
+    assert refreshed.aliases == ["ГИ"]  # алиасы заменены целиком
+    progs = await service.get_programs_by_faculty(refreshed.id, only_active=False)
+    assert progs[0].is_active is True  # принудительно включено обратно

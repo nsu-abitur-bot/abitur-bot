@@ -89,18 +89,20 @@ async def seed_reference_data():
     """Заливает справочные данные (факультеты).
 
     Не критично для работы: при ошибке логируем и продолжаем старт. По умолчанию
-    заливаем только на пустую таблицу (первичный бутстрап), чтобы не затирать
-    правки из админки. SEED_FACULTIES_FORCE=1 — принудительно перезалить из сида.
+    режим МЯГКИЙ: доливаем только недостающее (новые факультеты, алиасы,
+    направления), не затирая правки из админки. На пустой БД это равносильно
+    первичному бутстрапу, а на существующей — подхватывает новые записи сида при
+    каждом деплое. SEED_FACULTIES_FORCE=1 — жёстко перезалить из сида.
     """
     try:
-        from db.seed.load_faculties import seed_faculties, seed_faculties_if_empty
+        from db.seed.load_faculties import seed_faculties
 
         if _force_seed_enabled():
-            stats = await seed_faculties()
+            stats = await seed_faculties(soft=False)
             logger.info("Справочник факультетов принудительно перезалит: %s", stats)
         else:
-            stats = await seed_faculties_if_empty()
-            logger.info("Автозаливка справочника факультетов: %s", stats)
+            stats = await seed_faculties(soft=True)
+            logger.info("Мягкая доливка справочника факультетов: %s", stats)
     except Exception as e:
         logger.error(
             "Не удалось загрузить справочник факультетов (старт продолжается): %s", e
