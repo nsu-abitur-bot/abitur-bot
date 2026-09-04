@@ -21,6 +21,7 @@ import json
 import logging
 import os
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Optional
 
@@ -494,7 +495,14 @@ async def filter_chunks(
             return await grade_chunk(question, hint, chunk, config)
 
     # gather сохраняет порядок to_grade, поэтому итоговый список не переупорядочивается.
+    grading_start = time.monotonic()
     verdicts = await asyncio.gather(*(_grade_with_limit(c) for c in to_grade))
+    logger.info(
+        "CRAG grading: chunks=%d concurrency=%d duration=%.0fms",
+        len(to_grade),
+        max(1, config.grading_concurrency),
+        (time.monotonic() - grading_start) * 1000,
+    )
     kept = [chunk for chunk, keep in zip(to_grade, verdicts) if keep]
     # Чанки за пределами лимита грейдинга оставляем как есть (уже прошли авторитет).
     kept.extend(rest)

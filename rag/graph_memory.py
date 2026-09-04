@@ -19,6 +19,7 @@ from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
+from rag import pg_storage
 
 load_dotenv()
 
@@ -157,7 +158,17 @@ class GraphMemory:
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
 
-        logger.info(f"GraphMemory initialized (async), workspace: {self.workspace_path}")
+        # LIGHTRAG_STORAGE=postgres: KV-стораджи и doc_status — в PostgreSQL
+        # (JSONB), векторный индекс и граф остаются файловыми.
+        self._pg_storage = pg_storage.is_pg_storage_enabled()
+        if self._pg_storage:
+            pg_storage.apply_postgres_env()
+
+        logger.info(
+            "GraphMemory initialized (async), workspace: %s, storage: %s",
+            self.workspace_path,
+            "postgres" if self._pg_storage else "json",
+        )
 
     def _get_workspace_path(self, graph_id: str) -> str:
         path = os.path.join(self.workspace_path, graph_id)
@@ -278,6 +289,11 @@ class GraphMemory:
     def _remove_doc_metadata(self, graph_id: str, doc_id: str) -> None:
         """Best-effort cleanup for LightRAG metadata files."""
         import json
+
+        # В PG-режиме метаданные живут в БД: их удаляет сам LightRAG
+        # (adelete_by_doc_id), файловой подчищать нечего.
+        if self._pg_storage:
+            return
 
         workspace_path = self._get_workspace_path(graph_id)
         metadata_files = [
@@ -420,6 +436,17 @@ class GraphMemory:
                 embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
                 llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
 
+                # PG-режим: KV и doc_status — в PostgreSQL (workspace=graph_id
+                # разделяет базы знаний), векторный стор и граф — файловые.
+                storage_kwargs: dict[str, Any] = {}
+                if self._pg_storage:
+                    await pg_storage.ensure_lightrag_tables()
+                    storage_kwargs = {
+                        "workspace": graph_id,
+                        "kv_storage": "PGKVStorage",
+                        "doc_status_storage": "PGDocStatusStorage",
+                    }
+
                 rag = LightRAG(
                     working_dir=workspace_path,
                     llm_model_func=llm_model_func,
@@ -428,6 +455,7 @@ class GraphMemory:
                     chunk_overlap_token_size=50,
                     embedding_func_max_async=embedding_workers,
                     llm_model_max_async=llm_workers,
+                    **storage_kwargs,
                 )
 
                 await rag.initialize_storages()
@@ -873,10 +901,16 @@ class GraphMemory:
 
         На каждом RAG-запросе проверяем только дешёвую сигнатуру (mtime двух
         KV-файлов + count/max(updated_at) из БД); полное чтение JSON и выборка
-        документов выполняются лишь при её изменении.
+        документов выполняются лишь при её изменении. В PG-режиме роль mtime
+        файлов играет сигнатура lightrag_doc_status (count + max(updated_at)).
         """
-        workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
-        files_sig = await asyncio.to_thread(self._docs_files_signature, workspace_path)
+        if self._pg_storage:
+            files_sig = await pg_storage.doc_status_signature(graph_id)
+        else:
+            workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
+            files_sig = await asyncio.to_thread(
+                self._docs_files_signature, workspace_path
+            )
         db_sig = await self._documents_db_signature(graph_id)
         signature = (files_sig, db_sig)
 
@@ -1086,11 +1120,15 @@ class GraphMemory:
 
     async def get_list_docs(self, graph_id: str) -> list[dict]:
         """Возвращает список документов из KV-хранилища статусов."""
+        if self._pg_storage:
+            return await pg_storage.list_docs(graph_id)
         workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
         return await asyncio.to_thread(self._read_doc_list, workspace_path)
 
     async def get_doc_full_text(self, graph_id: str, doc_id: str) -> Optional[str]:
         """Возвращает полный текст документа по его ID."""
+        if self._pg_storage:
+            return await pg_storage.get_full_doc(graph_id, doc_id)
         workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
         full_docs_file = os.path.join(workspace_path, "kv_store_full_docs.json")
 
@@ -1120,6 +1158,9 @@ class GraphMemory:
         hybrid (нужен mix/naive).
         """
         import json
+
+        if self._pg_storage:
+            return await pg_storage.doc_diagnostics(graph_id, doc_id)
 
         workspace_path = self._get_workspace_path(graph_id)
 
@@ -1332,6 +1373,8 @@ class GraphMemory:
         По умолчанию исключает векторные базы (vdb_*.json): эмбеддинги
         привязаны к провайдеру (OpenAI на проде, Gemini локально) и
         непереносимы. Исходные тексты, статусы, чанки и граф включены.
+        В PG-режиме KV-сторы дампятся из PostgreSQL в kv_store_*.json
+        внутри архива (векторные базы и граф по-прежнему файловые).
         """
         import io
         import zipfile
@@ -1340,8 +1383,15 @@ class GraphMemory:
         skip_prefixes = () if include_embeddings else ("vdb_",)
         skip_files = {"llm_cache_clear.marker"}
 
+        kv_dump: dict[str, str] = {}
+        if self._pg_storage:
+            kv_dump = await pg_storage.dump_kv_stores(graph_id)
+            skip_files = set(skip_files) | set(kv_dump)
+
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            for filename, payload in kv_dump.items():
+                zf.writestr(os.path.join(graph_id, filename), payload)
             if os.path.isdir(workspace_path):
                 for filename in sorted(os.listdir(workspace_path)):
                     file_path = os.path.join(workspace_path, filename)
