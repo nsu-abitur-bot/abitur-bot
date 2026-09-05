@@ -48,6 +48,11 @@ def test_doc_status_row_url_from_metadata_json_string():
     assert doc_status_row_to_dict(row)["url"] == "https://nsu.ru/meta"
 
 
+def test_doc_status_row_url_from_metadata_file_paths_list():
+    row = _Row(metadata={"file_paths": ["https://nsu.ru/a", "https://nsu.ru/b"]})
+    assert doc_status_row_to_dict(row)["url"] == "https://nsu.ru/a, https://nsu.ru/b"
+
+
 def test_doc_status_row_url_fallback_to_http_doc_id():
     row = _Row(id="https://nsu.ru/doc", file_path=None)
     assert doc_status_row_to_dict(row)["url"] == "https://nsu.ru/doc"
@@ -72,6 +77,7 @@ def test_json_parses_strings_and_passes_objects():
             "2026-09-04T10:00:00Z",
             datetime(2026, 9, 4, 10, 0, 0, tzinfo=timezone.utc),
         ),
+        (1725444000, datetime(2024, 9, 4, 10, 0, 0, tzinfo=timezone.utc)),
         (None, None),
         ("not-a-date", None),
     ],

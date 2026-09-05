@@ -19,15 +19,12 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from dotenv import load_dotenv
 from sqlalchemy import text
 
-load_dotenv()
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger("migrate_json_to_pg")
 
 
@@ -48,7 +45,7 @@ def _parse_ts(value: Any) -> datetime | None:
         return value
     if isinstance(value, (int, float)):
         try:
-            return datetime.fromtimestamp(float(value))
+            return datetime.fromtimestamp(float(value), tz=timezone.utc)
         except (ValueError, OSError):
             return None
     if isinstance(value, str) and value:
@@ -66,6 +63,16 @@ def _dump(value: Any) -> str | None:
     return value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
 
 
+def _normalize_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (list, tuple, set)):
+        return ", ".join(str(item) for item in value if item is not None)
+    return str(value)
+
+
 def _doc_status_rows(workspace: str, data: dict) -> list[dict]:
     rows = []
     for doc_id, info in data.items():
@@ -79,7 +86,7 @@ def _doc_status_rows(workspace: str, data: dict) -> list[dict]:
                 metadata = {}
         if not isinstance(metadata, dict):
             metadata = {}
-        file_path = (
+        file_path = _normalize_text(
             info.get("file_path")
             or info.get("file_paths_str")
             or info.get("url")
@@ -327,6 +334,8 @@ async def migrate_graph(session, workspace: str, base: str, dry_run: bool) -> No
 
 
 async def main() -> None:
+    load_dotenv()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--graph-id",

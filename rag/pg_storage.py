@@ -177,18 +177,12 @@ _TABLES_DDL: dict[str, str] = {
         )""",
 }
 
-_INDEXES_DDL: tuple[str, ...] = tuple(
-    f"CREATE INDEX IF NOT EXISTS idx_{name}_workspace_id ON {name} (workspace, id)"
-    for name in _TABLES_DDL
-)
-
-
 async def ensure_lightrag_tables() -> None:
     """Идемпотентно создаёт таблицы LightRAG (без pgvector)."""
     from db.postgres.db import AsyncSessionLocal
 
     async with AsyncSessionLocal() as session:
-        for ddl in (*_TABLES_DDL.values(), *_INDEXES_DDL):
+        for ddl in _TABLES_DDL.values():
             await session.execute(text(ddl))
         await session.commit()
     logger.info("LightRAG PostgreSQL-таблицы готовы (%d шт.)", len(_TABLES_DDL))
@@ -204,12 +198,22 @@ def _json(value: Any, default: Any) -> Any:
     return value if value is not None else default
 
 
+def _normalize_text(value: Any) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (list, tuple, set)):
+        return ", ".join(str(item) for item in value if item is not None)
+    return str(value)
+
+
 def doc_status_row_to_dict(row: Any) -> dict:
     """Строка lightrag_doc_status → формат get_list_docs (совместим с JSON-режимом)."""
     metadata = _json(getattr(row, "metadata", None), {})
     if not isinstance(metadata, dict):
         metadata = {}
-    url = (
+    url = _normalize_text(
         getattr(row, "file_path", None)
         or metadata.get("file_paths")
         or metadata.get("file_path")
@@ -389,8 +393,7 @@ async def dump_kv_stores(workspace: str) -> dict[str, str]:
             for row in rows:
                 item = dict(row)
                 for key, value in list(item.items()):
-                    if isinstance(value, (dict, list)):
-                        item[key] = value
+                    item[key] = _json(value, value)
                 item.pop("id", None)
                 payload[str(row["id"])] = item
             dump[filename] = json.dumps(payload, ensure_ascii=False, default=str)
