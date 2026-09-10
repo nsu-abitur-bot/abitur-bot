@@ -2,15 +2,11 @@
   "mcpServers": {
     "github": {
       "type": "stdio",
-      "command": "github-mcp-server",
+      "command": "sh",
       "args": [
-        "stdio",
-        "--toolsets",
-        "default,projects,labels"
-      ],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
-      }
+        "-c",
+        "GITHUB_PERSONAL_ACCESS_TOKEN=\"$(gh auth token)\" exec github-mcp-server stdio --toolsets default,projects,labels"
+      ]
     }
   }
 }
