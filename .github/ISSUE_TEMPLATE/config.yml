@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Доска проекта
+    url: https://github.com/orgs/nsu-abitur-bot/projects/1
+    about: Спринты, треки и приоритеты. Задача попадает на доску автоматически.
+  - name: Vision и план релиза
+    url: https://github.com/nsu-abitur-bot/abitur-bot/wiki
+    about: Постановка задачи, риски, критерии готовности релиза.
