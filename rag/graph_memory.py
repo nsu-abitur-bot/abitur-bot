@@ -17,8 +17,11 @@ from lightrag.utils import wrap_embedding_func_with_attrs
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
+from llm.factory import get_llm_provider
+from llm.profiles import LLMProfiles
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
+from rag.crag import CragChunk, load_crag_config, run_crag
 
 load_dotenv()
 
@@ -586,8 +589,6 @@ class GraphMemory:
         а sources — соответствующие URL. Финальную генерацию выполняет вызывающий
         код (llm_client) по этому контексту.
         """
-        from rag.crag import CragChunk, load_crag_config, run_crag
-
         config = await load_crag_config()
         try:
             async with self._use_graph(graph_id) as rag:
@@ -880,9 +881,6 @@ class GraphMemory:
     ) -> list[dict]:
         if not sources:
             return []
-
-        from llm.factory import get_llm_provider
-        from llm.profiles import LLMProfiles
 
         history_block = conversation_history.strip() if conversation_history else ""
         sources_block = "\n".join(

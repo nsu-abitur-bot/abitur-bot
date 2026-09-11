@@ -28,6 +28,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Faculty
 from db.postgres.services.faculty import FacultyService, normalize_name
+from db.postgres.services.settings import SettingsService
+from llm.factory import get_llm_provider
+from llm.profiles import LLMProfiles
 
 logger = logging.getLogger(__name__)
 
@@ -112,8 +115,6 @@ async def load_crag_config() -> CragConfig:
     """
     cfg = CragConfig()
     try:
-        from db.postgres.services.settings import SettingsService
-
         async with AsyncSessionLocal() as session:
             raw = await SettingsService(session).get_crag_raw()
     except Exception as exc:
@@ -410,9 +411,6 @@ async def grade_chunk(
     question: str, hint: FacultyHint, chunk: CragChunk, config: CragConfig
 ) -> bool:
     """LLM-грейдинг одного чанка. True — оставить, False — отсеять."""
-    from llm.factory import get_llm_provider
-    from llm.profiles import LLMProfiles
-
     system_prompt, user_prompt = _build_grading_prompt(question, hint, chunk)
     provider = get_llm_provider()
     try:
@@ -499,9 +497,6 @@ async def filter_chunks(
 
 async def refine_query(question: str, hint: FacultyHint) -> str:
     """Одна попытка переформулировать запрос для повторного ретрива."""
-    from llm.factory import get_llm_provider
-    from llm.profiles import LLMProfiles
-
     faculty_clause = (
         f" Сохрани упоминание факультета «{hint.faculty.name}»."
         if hint.faculty is not None

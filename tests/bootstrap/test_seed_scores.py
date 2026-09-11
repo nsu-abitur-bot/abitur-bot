@@ -2,6 +2,11 @@
 
 Без реальной БД и без сети: подменяем parse_scores, AsyncSessionLocal,
 AdmissionScoreService и SettingsService — проверяем управляющую логику.
+
+Подмены идут по именам в bootstrap.seed, а не по исходным модулям: импорты там
+на уровне модуля, и имена связываются один раз при импорте. Раньше модуль
+импортировал parser.scores внутри функции (обход цикла db <-> parser), и
+подмена по источнику работала — после #310 так уже нельзя.
 """
 
 import contextlib
@@ -9,7 +14,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from db.postgres import init_db
+from bootstrap import seed
 
 
 class _DummySession:
@@ -42,11 +47,11 @@ class _FakeSettings:
         pass
 
     async def get_value(self, key):
-        assert key == init_db.LAST_SCORES_IMPORT_KEY
+        assert key == seed.LAST_SCORES_IMPORT_KEY
         return _FakeSettings.stored
 
     async def set_value(self, key, value, description=""):
-        assert key == init_db.LAST_SCORES_IMPORT_KEY
+        assert key == seed.LAST_SCORES_IMPORT_KEY
         _FakeSettings.written = value
 
 
@@ -68,12 +73,10 @@ def _patch(monkeypatch, parse_result=None, parse_error=None):
             raise parse_error
         return parse_result if parse_result is not None else []
 
-    monkeypatch.setattr("db.postgres.db.AsyncSessionLocal", _dummy_session)
-    monkeypatch.setattr(
-        "db.postgres.services.admission_score.AdmissionScoreService", _FakeScoreService
-    )
-    monkeypatch.setattr("db.postgres.services.settings.SettingsService", _FakeSettings)
-    monkeypatch.setattr("parser.scores.parse_scores", fake_parse_scores)
+    monkeypatch.setattr("bootstrap.seed.AsyncSessionLocal", _dummy_session)
+    monkeypatch.setattr("bootstrap.seed.AdmissionScoreService", _FakeScoreService)
+    monkeypatch.setattr("bootstrap.seed.SettingsService", _FakeSettings)
+    monkeypatch.setattr("bootstrap.seed.parse_scores", fake_parse_scores)
     for var in (
         "SEED_ADMISSION_SCORES",
         "SEED_ADMISSION_SCORES_FORCE",
@@ -93,7 +96,7 @@ async def test_disabled_by_env_skips_everything(monkeypatch):
     calls = _patch(monkeypatch, parse_result=["row"])
     monkeypatch.setenv("SEED_ADMISSION_SCORES", "0")
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert calls == []
     assert _FakeScoreService.upserted is None
@@ -105,7 +108,7 @@ async def test_recent_import_skips_fetch(monkeypatch):
     calls = _patch(monkeypatch, parse_result=["row"])
     _FakeSettings.stored = _iso_ago(hours=1)
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert calls == []
     assert _FakeScoreService.upserted is None
@@ -116,7 +119,7 @@ async def test_stale_import_triggers_refresh(monkeypatch):
     calls = _patch(monkeypatch, parse_result=["row-1", "row-2"])
     _FakeSettings.stored = _iso_ago(hours=48)
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert len(calls) == 1
     assert _FakeScoreService.upserted == ["row-1", "row-2"]
@@ -128,7 +131,7 @@ async def test_first_run_imports_and_records_marker(monkeypatch):
     calls = _patch(monkeypatch, parse_result=["row"])
     _FakeSettings.stored = None  # отметки ещё нет
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert len(calls) == 1
     assert _FakeScoreService.upserted == ["row"]
@@ -141,7 +144,7 @@ async def test_force_ignores_freshness(monkeypatch):
     _FakeSettings.stored = _iso_ago(minutes=1)
     monkeypatch.setenv("SEED_ADMISSION_SCORES_FORCE", "1")
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert len(calls) == 1
     assert _FakeScoreService.upserted == ["row"]
@@ -152,7 +155,7 @@ async def test_corrupted_marker_is_treated_as_stale(monkeypatch):
     calls = _patch(monkeypatch, parse_result=["row"])
     _FakeSettings.stored = "не-дата"
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert len(calls) == 1
     assert _FakeScoreService.upserted == ["row"]
@@ -163,7 +166,7 @@ async def test_empty_parse_result_does_not_upsert(monkeypatch):
     """Сайт недоступен (парсер вернул []) — ничего не пишем и отметку не двигаем."""
     calls = _patch(monkeypatch, parse_result=[])
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert len(calls) == 1
     assert _FakeScoreService.upserted is None
@@ -175,7 +178,7 @@ async def test_parser_exception_is_not_fatal(monkeypatch):
     """Исключение внутри заливки не должно ронять старт бота."""
     calls = _patch(monkeypatch, parse_error=RuntimeError("boom"))
 
-    await init_db.seed_admission_scores()  # не бросает
+    await seed.seed_admission_scores()  # не бросает
 
     assert len(calls) == 1
     assert _FakeScoreService.upserted is None
@@ -186,6 +189,6 @@ async def test_custom_url_from_env(monkeypatch):
     calls = _patch(monkeypatch, parse_result=["row"])
     monkeypatch.setenv("ADMISSION_SCORES_URL", "https://example.test/scores")
 
-    await init_db.seed_admission_scores()
+    await seed.seed_admission_scores()
 
     assert calls == ["https://example.test/scores"]
