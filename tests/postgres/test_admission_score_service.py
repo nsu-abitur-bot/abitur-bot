@@ -9,6 +9,10 @@ from db.postgres.services.admission_score import (
 )
 from db.postgres.services.faculty import FacultyService
 
+# Полные имена направлений — так их возвращает сервис: «направление. профиль».
+PIKN = "Информатика и вычислительная техника. Программная инженерия и компьютерные науки"
+KNIS = "Информатика и вычислительная техника. Компьютерные науки и системотехника"
+
 
 async def _seed_fit(session: AsyncSession) -> FacultyService:
     """ФИТ и два его направления бакалавриата."""
@@ -298,16 +302,8 @@ async def test_strict_matching_profile_field_and_aggregate(session: AsyncSession
 
     fit = await svc.query_scores(faculty="ФИТ", year=2024, form="budget")
     by = {s["program_name"]: s["passing_score"] for s in fit}
-    assert (
-        by["Информатика и вычислительная техника. Компьютерные науки и системотехника"]
-        == 260
-    )
-    assert (
-        by[
-            "Информатика и вычислительная техника. Программная инженерия и компьютерные науки"
-        ]
-        == 246
-    )
+    assert by[KNIS] == 260
+    assert by[PIKN] == 246
     # Агрегат 999 никуда не записался (не перезаписал профиль).
     assert 999 not in by.values()
 
