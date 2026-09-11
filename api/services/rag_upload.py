@@ -13,10 +13,10 @@ from api.services.document_update import calculate_content_hash, first_http_url
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
 from db.postgres.services.document import DocumentService
-from llm.preprocessor import generate_title_from_text
 from parser.pdf import pdf_to_base64_images
 from parser.utils import extract_sources
 from parser.vision import parse_images_with_llm
+from pipeline.preprocessor import generate_title_from_text
 from rag.graph_memory import get_graph_memory
 from rag.loader import add_texts_async
 

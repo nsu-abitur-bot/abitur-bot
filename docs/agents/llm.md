@@ -29,9 +29,9 @@
 - `ToolSpec` (name, description, JSON-schema параметров) и
   `BaseLLMProvider.generate_with_tools(...)` — в `llm/base.py`. Провайдеры
   реализуют нативный tool-loop со стримингом финального ответа.
-- Инструменты и диспетчер — в `llm/tools/` (`registry.py`,
+- Инструменты и диспетчер — в `pipeline/tools/` (`registry.py`,
   `default_tool_executor`). Исполнитель открывает свою `AsyncSessionLocal`.
-- Новый инструмент: добавить `ToolSpec` и `async execute_*` в `llm/tools/`,
+- Новый инструмент: добавить `ToolSpec` и `async execute_*` в `pipeline/tools/`,
   зарегистрировать в `registry.py`, передать в `generate_with_tools` в
   `llm_client.py`.
 

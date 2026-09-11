@@ -11,7 +11,7 @@ from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.settings import SettingsService
 from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
-from llm.llm_client import ask_local_llm
+from pipeline.llm_client import ask_local_llm
 
 StreamCallback = Callable[[str], Awaitable[None]]
 StatusCallback = Callable[[str], Awaitable[None]]

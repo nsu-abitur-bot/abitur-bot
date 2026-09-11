@@ -1,4 +1,1 @@
 db <-> parser
-faq <-> llm
-llm <-> parser
-llm <-> rag

@@ -5,7 +5,7 @@ from os import getenv
 
 from bot.max_bot import run_max_bot
 from bot.telegram_bot import run_telegram_bot
-from llm.llm_client import cleanup_redis
+from pipeline.llm_client import cleanup_redis
 
 logger = logging.getLogger(__name__)
 

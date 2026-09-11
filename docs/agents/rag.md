@@ -1,11 +1,11 @@
 # Пайплайн ответа и RAG
 
-Открывай, когда правишь то, как бот ищет и формирует ответ: `llm/llm_client.py`,
+Открывай, когда правишь то, как бот ищет и формирует ответ: `pipeline/llm_client.py`,
 `rag/`, `faq/`, `abbrev/` или справочник факультетов.
 
 ## Порядок слоёв
 
-`llm/llm_client.py:ask_local_llm` — расширение аббревиатур → **FAQ-матчер**
+`pipeline/llm_client.py:ask_local_llm` — расширение аббревиатур → **FAQ-матчер**
 (при попадании отвечает сразу, минуя RAG и LLM) → **RAG** (Corrective RAG
 поверх LightRAG, либо обычный LightRAG) → **LLM-генерация** (OpenAI / Gemini) с
 доступом к function-calling инструментам.
@@ -48,7 +48,7 @@
 ## Проходные баллы
 
 `AdmissionScore`, `db/postgres/services/admission_score.py`, `parser/scores.py`,
-`llm/tools/admission_scores.py`.
+`pipeline/tools/admission_scores.py`.
 
 Числовые баллы вынесены в структурное хранилище и отвечаются function-calling
 инструментом `get_admission_scores` из SQL, а не из RAG.
