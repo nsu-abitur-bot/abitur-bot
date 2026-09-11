@@ -18,10 +18,11 @@ def scores_rows(scores_html):
 
 
 def _find(rows, program, year, form):
+    """Строка итогов приёма или падение: её отсутствие — провал теста, не пустота."""
     for row in rows:
         if row.program_name == program and row.year == year and row.form == form:
             return row
-    return None
+    raise AssertionError(f"нет строки: {program!r}, {year}, {form!r}")
 
 
 class TestParseScores:
@@ -41,9 +42,9 @@ class TestParseScores:
         b2024 = _find(scores_rows, prog, 2024, "budget")
         p2024 = _find(scores_rows, prog, 2024, "paid")
 
-        assert b2023 is not None and b2023.passing_score == 245
-        assert b2024 is not None and b2024.passing_score == 246
-        assert p2024 is not None and p2024.passing_score == 191
+        assert b2023.passing_score == 245
+        assert b2024.passing_score == 246
+        assert p2024.passing_score == 191
 
         assert b2024.faculty_name == "Факультет информационных технологий"
         assert b2024.code == "09.03.01"
