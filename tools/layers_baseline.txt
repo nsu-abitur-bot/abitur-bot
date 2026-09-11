@@ -1,4 +1,3 @@
-db <-> llm
 db <-> parser
 faq <-> llm
 llm <-> parser
