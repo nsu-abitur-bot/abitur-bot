@@ -1,8 +1,8 @@
 import asyncio
 import logging
 
+from bootstrap.init import main as init_db
 from bot.main import main as bot_main
-from db.postgres.init_db import main as init_db
 from logging_config import setup_logging
 
 # Настраиваем логирование в самом начале
