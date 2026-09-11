@@ -32,7 +32,8 @@ jobs:
   tests:
     runs-on: ubuntu-latest
 
-    # БД-тесты работают с реальной тестовой базой, без моков — см. AGENTS.md.
+    # БД-тесты работают с реальной тестовой базой, без моков —
+    # см. docs/agents/testing.md.
     # Образ тот же, что в docker-compose, чтобы поведение совпадало с локальным.
     services:
       postgres:
