@@ -12,8 +12,8 @@
 нельзя было вернуть обратно. Когда baseline опустеет, файл удаляем и запрет
 становится безусловным.
 
-    python tools/check_layers.py                    проверить
-    python tools/check_layers.py --write-baseline   зафиксировать текущее состояние
+    uv run python tools/check_layers.py                    проверить
+    uv run python tools/check_layers.py --write-baseline   зафиксировать состояние
 """
 
 import argparse
@@ -135,7 +135,7 @@ def main() -> int:
         print("\nПара исчезла — цикл починен:")
         for pair in removed:
             print(f"  {pair}")
-        print("\nОбнови baseline: python tools/check_layers.py --write-baseline")
+        print("\nОбнови baseline: uv run python tools/check_layers.py --write-baseline")
         return 1
 
     return 0
