@@ -8,7 +8,7 @@ import pytest
 from llm.base import BaseLLMProvider, LLMResult, ToolSpec
 from llm.providers.gemini import _tools_to_gemini
 from llm.providers.openai import _tool_spec_to_openai
-from llm.tools import ADMISSION_SCORES_TOOL
+from pipeline.tools import ADMISSION_SCORES_TOOL
 
 
 def test_tool_spec_to_openai_format():
@@ -115,7 +115,7 @@ class _FakeFaqMatcher:
 
 @pytest.mark.asyncio
 async def test_ask_local_llm_passes_admission_tool(monkeypatch):
-    from llm import llm_client
+    from pipeline import llm_client
 
     provider = _ToolCallingProvider()
 

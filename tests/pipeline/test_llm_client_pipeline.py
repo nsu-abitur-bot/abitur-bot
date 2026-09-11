@@ -1,7 +1,7 @@
 import asyncio
 
-from llm import llm_client
 from llm.base import LLMResult
+from pipeline import llm_client
 
 
 class _FakeRedis:

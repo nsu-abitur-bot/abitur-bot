@@ -4,7 +4,7 @@ import logging
 from typing import Awaitable, Callable
 
 from llm.base import ToolSpec
-from llm.tools.admission_scores import (
+from pipeline.tools.admission_scores import (
     ADMISSION_SCORES_TOOL,
     execute_admission_scores,
 )

@@ -20,13 +20,14 @@ db/
   seed/           Сид-данные (faculties.json) + автозаливка при старте
 evals/            Оценка качества RAG (evaluator + judge)
 faq/              Семантический матчер FAQ (matcher.py, эмбеддинги)
-llm/
+llm/              Только провайдеры моделей, без логики ответа
   providers/      openai.py / gemini.py (+ *_graph_adapters.py для LightRAG)
-  tools/          Function-calling инструменты (admission_scores.py, registry.py)
   base.py         BaseLLMProvider, LLMResult, ToolSpec, generate_with_tools
   factory.py      get_llm_provider() — синглтон через LLM_PROVIDER
-  llm_client.py   Основная логика: abbrev → FAQ → RAG → LLM(+tools)
   profiles.py     Профили параметров (CHAT, GRAPH, PARSER, VISION, INTENT, TITLE, EMBEDDING)
+pipeline/         Сборка ответа: слой выше rag/faq/abbrev/db и провайдеров llm
+  llm_client.py   ask_local_llm: abbrev → FAQ → RAG → модель(+tools)
+  tools/          Function-calling инструменты (admission_scores.py, registry.py)
   preprocessor.py Очистка/структурирование текста перед загрузкой в RAG
 parser/           Парсеры сайта НГУ и таблиц
   nsu.py          Страницы факультетов НГУ

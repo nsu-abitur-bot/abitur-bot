@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from bot.core import FEEDBACK_FOOTER, BotCore
-from llm.llm_client import LlmAnswer
+from pipeline.llm_client import LlmAnswer
 
 
 class FakeRedis:

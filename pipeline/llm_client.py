@@ -6,7 +6,6 @@ from contextlib import contextmanager, suppress
 from dataclasses import dataclass, field
 from html import unescape
 from typing import Awaitable, Callable, Optional
-from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -22,7 +21,7 @@ from faq.matcher import get_faq_matcher
 from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
-from llm.tools import ADMISSION_SCORES_TOOL, default_tool_executor
+from pipeline.tools import ADMISSION_SCORES_TOOL, default_tool_executor
 from rag.crag import load_crag_config
 from rag.retriever import query_graph_with_crag, query_graph_with_sources
 
@@ -110,7 +109,6 @@ LIGHTRAG_LEVEL_HINT = (
     "бакалавриату, а не по магистратуре или аспирантуре."
 )
 
-DEFAULT_SOURCE_TITLE = "Источник информации"
 RAG_LOG_CONTENT_LIMIT = 12000
 RAG_INTERNAL_LOG_LIMIT = 120
 
@@ -132,66 +130,6 @@ def _spawn_bg(coro) -> None:
     task = asyncio.create_task(coro)
     _background_tasks.add(task)
     task.add_done_callback(_background_tasks.discard)
-
-
-def _clean_source_url(url: str) -> str:
-    url = unescape(url).strip().strip("<>\"'")
-    url = url.rstrip(".,;:!?")
-
-    while url.endswith(")") and url.count(")") > url.count("("):
-        url = url[:-1].rstrip()
-
-    return url
-
-
-def _source_title_from_url(url: str) -> str:
-    parsed = urlsplit(url)
-    if parsed.netloc:
-        return parsed.netloc
-    return DEFAULT_SOURCE_TITLE
-
-
-def _add_source(
-    sources: list[dict[str, str]],
-    seen_urls: set[str],
-    url: str,
-    title: str | None = None,
-) -> None:
-    clean_url = _clean_source_url(url)
-    if not clean_url.startswith(("http://", "https://")) or clean_url in seen_urls:
-        return
-
-    clean_title = (title or "").strip()
-    if not clean_title or clean_title.startswith(("http://", "https://")):
-        clean_title = _source_title_from_url(clean_url)
-
-    seen_urls.add(clean_url)
-    sources.append({"url": clean_url, "title": clean_title})
-
-
-def _extract_sources_from_rag_context(context: str) -> list[dict[str, str]]:
-    """Достает ссылки из текста, который вернул LightRAG, без metadata references."""
-    sources: list[dict[str, str]] = []
-    seen_urls: set[str] = set()
-
-    for match in re.finditer(
-        r"<a\s+[^>]*href=[\"']([^\"']+)[\"'][^>]*>(.*?)</a>",
-        context,
-        flags=re.IGNORECASE | re.DOTALL,
-    ):
-        title = re.sub(r"<[^>]+>", "", match.group(2)).strip()
-        _add_source(sources, seen_urls, match.group(1), title)
-
-    for match in re.finditer(r"\[([^\]]+)\]\((https?://[^)\s]+)\)", context):
-        _add_source(sources, seen_urls, match.group(2), match.group(1))
-
-    for match in re.finditer(r"(?m)^\s*[-*]?\s*\[(\d+)\]\s+(https?://\S+)", context):
-        _add_source(sources, seen_urls, match.group(2), f"Источник {match.group(1)}")
-
-    for match in re.finditer(r"https?://[^\s<>{}\"']+", context):
-        _add_source(sources, seen_urls, match.group(0))
-
-    return sources
 
 
 async def get_redis_client() -> RedisClient:

@@ -16,7 +16,7 @@
 Ответ собирается слоями, от дешёвого к дорогому: расширение аббревиатур →
 FAQ-матчер (при попадании отвечает сразу) → поиск по базе знаний (Corrective RAG
 поверх LightRAG) → генерация модели с доступом к function-calling инструментам.
-Точка входа — `llm/llm_client.py:ask_local_llm`.
+Точка входа — `pipeline/llm_client.py:ask_local_llm`.
 
 Три независимых процесса: `main.py` (бот), `api/main.py` (FastAPI для админки),
 `scheduler/main.py` (конкурсные списки и уведомления).
