@@ -147,7 +147,7 @@ async def test_ask_local_llm_passes_admission_tool(monkeypatch):
     assert provider.tools_seen is not None
     assert provider.tools_seen[0].name == "get_admission_scores"
     assert provider.tool_result == "246 (бюджет, 2024)"
-    assert "246" in response
+    assert "246" in response.text
 
 
 if __name__ == "__main__":

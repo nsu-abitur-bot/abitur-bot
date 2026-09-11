@@ -72,7 +72,7 @@ async def test_rag_does_not_start_before_faq_matcher_finishes(monkeypatch):
 
     response = await llm_client.ask_local_llm("Когда подать документы?", "session-1")
 
-    assert response == "Ответ из LLM"
+    assert response.text == "Ответ из LLM"
 
 
 async def test_faq_hit_returns_without_rag(monkeypatch):
@@ -102,5 +102,5 @@ async def test_faq_hit_returns_without_rag(monkeypatch):
 
     response = await llm_client.ask_local_llm("Какие факультеты есть?", "session-2")
 
-    assert response == "Ответ из FAQ"
+    assert response.text == "Ответ из FAQ"
     assert not rag_started

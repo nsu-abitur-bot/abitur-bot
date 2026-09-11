@@ -107,7 +107,7 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
     if background_tasks:
         await asyncio.gather(*background_tasks)
 
-    assert response == "Ответ бота"
+    assert response.text == "Ответ бота"
     assert streamed_updates == ["Ответ", "Ответ бота"]
 
     llm_logs = [log for log in saved_logs if log["message_type"] == "llm_response"]
