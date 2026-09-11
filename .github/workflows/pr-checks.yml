@@ -29,10 +29,16 @@ jobs:
       - name: Pyrefly check
         run: uv run pyrefly check
 
+      # Кольцевые импорты между пакетами: падает на паре, которой нет в
+      # tools/layers_baseline.txt. См. docs/agents/structure.md.
+      - name: Проверка слоёв
+        run: uv run python tools/check_layers.py
+
   tests:
     runs-on: ubuntu-latest
 
-    # БД-тесты работают с реальной тестовой базой, без моков — см. AGENTS.md.
+    # БД-тесты работают с реальной тестовой базой, без моков —
+    # см. docs/agents/testing.md.
     # Образ тот же, что в docker-compose, чтобы поведение совпадало с локальным.
     services:
       postgres:
