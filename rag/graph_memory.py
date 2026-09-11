@@ -19,6 +19,7 @@ from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
+from rag import pg_storage
 
 load_dotenv()
 
@@ -148,11 +149,26 @@ class GraphMemory:
             os.getenv("LIGHTRAG_CACHE_CLEAR_TIMEOUT", "10")
         )
         self._check_interval: float = 2.0  # limit disk scanning (os.scandir) frequency
+        # Кэш «URL → заголовок» для блока «Источники»: строится из KV-файлов и
+        # таблицы document, инвалидация — по mtime файлов и сигнатуре строк в БД.
+        self._source_titles_cache: Dict[
+            str, tuple[tuple[tuple[float, float], tuple[int, Any]], dict[str, str]]
+        ] = {}
 
         self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
 
-        logger.info(f"GraphMemory initialized (async), workspace: {self.workspace_path}")
+        # LIGHTRAG_STORAGE=postgres: KV-стораджи и doc_status — в PostgreSQL
+        # (JSONB), векторный индекс и граф остаются файловыми.
+        self._pg_storage = pg_storage.is_pg_storage_enabled()
+        if self._pg_storage:
+            pg_storage.apply_postgres_env()
+
+        logger.info(
+            "GraphMemory initialized (async), workspace: %s, storage: %s",
+            self.workspace_path,
+            "postgres" if self._pg_storage else "json",
+        )
 
     def _get_workspace_path(self, graph_id: str) -> str:
         path = os.path.join(self.workspace_path, graph_id)
@@ -191,7 +207,10 @@ class GraphMemory:
             return 0.0
 
     async def _await_cache_clear_if_needed(self, graph_id: str) -> None:
-        marker_mtime = self._get_cache_clear_marker_mtime(graph_id)
+        # Чтение marker-файла — синхронный disk I/O, уводим из event loop.
+        marker_mtime = await asyncio.to_thread(
+            self._get_cache_clear_marker_mtime, graph_id
+        )
         last_seen = self._last_cache_clear_marker.get(graph_id, 0.0)
 
         if marker_mtime <= last_seen:
@@ -271,6 +290,11 @@ class GraphMemory:
         """Best-effort cleanup for LightRAG metadata files."""
         import json
 
+        # В PG-режиме метаданные живут в БД: их удаляет сам LightRAG
+        # (adelete_by_doc_id), файловой подчищать нечего.
+        if self._pg_storage:
+            return
+
         workspace_path = self._get_workspace_path(graph_id)
         metadata_files = [
             "kv_store_doc_status.json",
@@ -318,7 +342,8 @@ class GraphMemory:
                 check_disk = True
 
             if check_disk:
-                sig = self._get_workspace_signature(graph_id)
+                # os.scandir + stat — блокирующий I/O, выполняем в потоке.
+                sig = await asyncio.to_thread(self._get_workspace_signature, graph_id)
                 self._last_disk_check[graph_id] = now
                 current_sig = self._graph_signatures.get(graph_id, (-1.0, -1))
 
@@ -411,6 +436,17 @@ class GraphMemory:
                 embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
                 llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
 
+                # PG-режим: KV и doc_status — в PostgreSQL (workspace=graph_id
+                # разделяет базы знаний), векторный стор и граф — файловые.
+                storage_kwargs: dict[str, Any] = {}
+                if self._pg_storage:
+                    await pg_storage.ensure_lightrag_tables()
+                    storage_kwargs = {
+                        "workspace": graph_id,
+                        "kv_storage": "PGKVStorage",
+                        "doc_status_storage": "PGDocStatusStorage",
+                    }
+
                 rag = LightRAG(
                     working_dir=workspace_path,
                     llm_model_func=llm_model_func,
@@ -419,6 +455,7 @@ class GraphMemory:
                     chunk_overlap_token_size=50,
                     embedding_func_max_async=embedding_workers,
                     llm_model_max_async=llm_workers,
+                    **storage_kwargs,
                 )
 
                 await rag.initialize_storages()
@@ -429,7 +466,9 @@ class GraphMemory:
 
                 # Обновляем сигнатуру после инициализации,
                 # чтобы не триггерить перезагрузку
-                self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
+                self._graph_signatures[graph_id] = await asyncio.to_thread(
+                    self._get_workspace_signature, graph_id
+                )
                 self._last_disk_check[graph_id] = time.monotonic()
                 logger.info(f"Created async LightRAG instance for graph: {graph_id}")
 
@@ -494,7 +533,9 @@ class GraphMemory:
                 )
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
-                self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
+                self._graph_signatures[graph_id] = await asyncio.to_thread(
+                    self._get_workspace_signature, graph_id
+                )
                 self._last_disk_check[graph_id] = time.monotonic()
             return True
         except Exception as e:
@@ -818,7 +859,65 @@ class GraphMemory:
             logger.error(f"Error querying graph {graph_id}: {e}")
             return f"Error executing query: {str(e)}", []
 
+    @staticmethod
+    def _docs_files_signature(workspace_path: str) -> tuple[float, float]:
+        """mtime пары KV-файлов, по которым строятся заголовки источников."""
+
+        def _mtime(name: str) -> float:
+            try:
+                return os.path.getmtime(os.path.join(workspace_path, name))
+            except OSError:
+                return 0.0
+
+        return (
+            _mtime("kv_store_doc_status.json"),
+            _mtime("kv_store_full_docs.json"),
+        )
+
+    async def _documents_db_signature(self, graph_id: str) -> tuple[int, Any]:
+        """Дешёвая сигнатура документов в БД: count + max(updated_at).
+
+        Правка заголовка или смена статуса документа меняет updated_at
+        (onupdate), поэтому пара однозначно определяет актуальность выборки.
+        """
+        from sqlalchemy import func, select
+
+        try:
+            async with AsyncSessionLocal() as session:
+                stmt = select(
+                    func.count(Document.id), func.max(Document.updated_at)
+                ).where(
+                    Document.graph_id == graph_id,
+                    Document.status.in_(ACTIVE_DOCUMENT_STATUSES),
+                )
+                count, max_updated = (await session.execute(stmt)).one()
+                return int(count or 0), max_updated
+        except Exception as exc:
+            logger.warning("Failed to load documents signature for sources: %s", exc)
+            return -1, None
+
     async def _get_source_titles(self, graph_id: str) -> dict[str, str]:
+        """Соответствие «URL → человекочитаемый заголовок» для «Источников».
+
+        На каждом RAG-запросе проверяем только дешёвую сигнатуру (mtime двух
+        KV-файлов + count/max(updated_at) из БД); полное чтение JSON и выборка
+        документов выполняются лишь при её изменении. В PG-режиме роль mtime
+        файлов играет сигнатура lightrag_doc_status (count + max(updated_at)).
+        """
+        if self._pg_storage:
+            files_sig = await pg_storage.doc_status_signature(graph_id)
+        else:
+            workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
+            files_sig = await asyncio.to_thread(
+                self._docs_files_signature, workspace_path
+            )
+        db_sig = await self._documents_db_signature(graph_id)
+        signature = (files_sig, db_sig)
+
+        cached = self._source_titles_cache.get(graph_id)
+        if cached is not None and cached[0] == signature:
+            return cached[1]
+
         docs = await self.get_list_docs(graph_id)
         rag_doc_titles: dict[str, str] = {}
         url_to_title: dict[str, str] = {}
@@ -869,6 +968,7 @@ class GraphMemory:
                 if url:
                     url_to_title[url] = title
 
+        self._source_titles_cache[graph_id] = (signature, url_to_title)
         return url_to_title
 
     async def _rerank_sources_with_llm(
@@ -946,11 +1046,13 @@ class GraphMemory:
         logger.info("LLM rerank result: selected=%d", len(ordered[:max_sources]))
         return ordered[:max_sources]
 
-    async def get_list_docs(self, graph_id: str) -> list[dict]:
-        """Возвращает список документов из KV-хранилища статусов."""
-        import json
+    @staticmethod
+    def _read_doc_list(workspace_path: str) -> list[dict]:
+        """Синхронное чтение списка документов из KV-хранилищ.
 
-        workspace_path = self._get_workspace_path(graph_id)
+        Выполняется через asyncio.to_thread: kv_store_*.json могут быть
+        большими, их чтение не должно блокировать event loop.
+        """
         status_file = os.path.join(workspace_path, "kv_store_doc_status.json")
         full_docs_file = os.path.join(workspace_path, "kv_store_full_docs.json")
 
@@ -1013,29 +1115,39 @@ class GraphMemory:
             result.sort(key=lambda x: x.get("created_at") or "", reverse=True)
             return result
         except Exception as e:
-            logger.error(f"Error reading doc status for {graph_id}: {e}")
+            logger.error(f"Error reading doc status for {workspace_path}: {e}")
             return []
+
+    async def get_list_docs(self, graph_id: str) -> list[dict]:
+        """Возвращает список документов из KV-хранилища статусов."""
+        if self._pg_storage:
+            return await pg_storage.list_docs(graph_id)
+        workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
+        return await asyncio.to_thread(self._read_doc_list, workspace_path)
 
     async def get_doc_full_text(self, graph_id: str, doc_id: str) -> Optional[str]:
         """Возвращает полный текст документа по его ID."""
-        import json
-
-        workspace_path = self._get_workspace_path(graph_id)
+        if self._pg_storage:
+            return await pg_storage.get_full_doc(graph_id, doc_id)
+        workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
         full_docs_file = os.path.join(workspace_path, "kv_store_full_docs.json")
 
-        if not os.path.exists(full_docs_file):
-            return None
+        def _read_full_doc() -> Optional[str]:
+            if not os.path.exists(full_docs_file):
+                return None
+            try:
+                with open(full_docs_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                doc_data = data.get(doc_id)
+                if doc_data:
+                    return doc_data.get("content")
+                return None
+            except Exception as e:
+                logger.error(f"Error reading full docs for {doc_id} in {graph_id}: {e}")
+                return None
 
-        try:
-            with open(full_docs_file, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            doc_data = data.get(doc_id)
-            if doc_data:
-                return doc_data.get("content")
-            return None
-        except Exception as e:
-            logger.error(f"Error reading full docs for {doc_id} in {graph_id}: {e}")
-            return None
+        # kv_store_full_docs.json содержит все тексты целиком — читаем в потоке.
+        return await asyncio.to_thread(_read_full_doc)
 
     async def get_doc_diagnostics(self, graph_id: str, doc_id: str) -> dict:
         """Диагностика документа по данным LightRAG.
@@ -1046,6 +1158,9 @@ class GraphMemory:
         hybrid (нужен mix/naive).
         """
         import json
+
+        if self._pg_storage:
+            return await pg_storage.doc_diagnostics(graph_id, doc_id)
 
         workspace_path = self._get_workspace_path(graph_id)
 
@@ -1258,6 +1373,8 @@ class GraphMemory:
         По умолчанию исключает векторные базы (vdb_*.json): эмбеддинги
         привязаны к провайдеру (OpenAI на проде, Gemini локально) и
         непереносимы. Исходные тексты, статусы, чанки и граф включены.
+        В PG-режиме KV-сторы дампятся из PostgreSQL в kv_store_*.json
+        внутри архива (векторные базы и граф по-прежнему файловые).
         """
         import io
         import zipfile
@@ -1266,8 +1383,15 @@ class GraphMemory:
         skip_prefixes = () if include_embeddings else ("vdb_",)
         skip_files = {"llm_cache_clear.marker"}
 
+        kv_dump: dict[str, str] = {}
+        if self._pg_storage:
+            kv_dump = await pg_storage.dump_kv_stores(graph_id)
+            skip_files = set(skip_files) | set(kv_dump)
+
         buffer = io.BytesIO()
         with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            for filename, payload in kv_dump.items():
+                zf.writestr(os.path.join(graph_id, filename), payload)
             if os.path.isdir(workspace_path):
                 for filename in sorted(os.listdir(workspace_path)):
                     file_path = os.path.join(workspace_path, filename)
@@ -1297,8 +1421,11 @@ class GraphMemory:
 
             # Обновляем кэш сигнатуры
             async with self._get_lock(graph_id):
-                self._remove_doc_metadata(graph_id, doc_id)
-                self._graph_signatures[graph_id] = self._get_workspace_signature(graph_id)
+                # Перезапись KV-файлов и обход воркспейса — блокирующий I/O.
+                await asyncio.to_thread(self._remove_doc_metadata, graph_id, doc_id)
+                self._graph_signatures[graph_id] = await asyncio.to_thread(
+                    self._get_workspace_signature, graph_id
+                )
                 self._last_disk_check[graph_id] = time.monotonic()
 
             await self.clear_cache(graph_id)

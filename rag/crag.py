@@ -16,10 +16,12 @@
 его можно было быстро откатить (CRAG_ENABLED=false).
 """
 
+import asyncio
 import json
 import logging
 import os
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Awaitable, Callable, Optional
 
@@ -75,6 +77,11 @@ class CragConfig:
     # Максимум чанков, отправляемых на LLM-грейдинг (контроль латентности).
     max_graded_chunks: int = field(
         default_factory=lambda: _env_int("CRAG_MAX_GRADED_CHUNKS", 12)
+    )
+    # Сколько чанков грейдить параллельно: снимает последовательные LLM-раунды,
+    # но упирается в rate-limit провайдера, поэтому ограничено семафором.
+    grading_concurrency: int = field(
+        default_factory=lambda: _env_int("CRAG_GRADING_CONCURRENCY", 5)
     )
 
 
@@ -476,13 +483,27 @@ async def filter_chunks(
     else:
         after_authority = list(chunks)
 
-    # 2. LLM-грейдинг релевантности.
+    # 2. LLM-грейдинг релевантности — параллельно (asyncio.gather): до
+    # max_graded_chunks независимых LLM-вызовов не обязаны ждать друг друга.
+    # Семафор ограничивает одновременность, чтобы не ловить rate-limit.
     to_grade = after_authority[: config.max_graded_chunks]
     rest = after_authority[config.max_graded_chunks :]
-    kept: list[CragChunk] = []
-    for chunk in to_grade:
-        if await grade_chunk(question, hint, chunk, config):
-            kept.append(chunk)
+    semaphore = asyncio.Semaphore(max(1, config.grading_concurrency))
+
+    async def _grade_with_limit(chunk: CragChunk) -> bool:
+        async with semaphore:
+            return await grade_chunk(question, hint, chunk, config)
+
+    # gather сохраняет порядок to_grade, поэтому итоговый список не переупорядочивается.
+    grading_start = time.monotonic()
+    verdicts = await asyncio.gather(*(_grade_with_limit(c) for c in to_grade))
+    logger.info(
+        "CRAG grading: chunks=%d concurrency=%d duration=%.0fms",
+        len(to_grade),
+        max(1, config.grading_concurrency),
+        (time.monotonic() - grading_start) * 1000,
+    )
+    kept = [chunk for chunk, keep in zip(to_grade, verdicts) if keep]
     # Чанки за пределами лимита грейдинга оставляем как есть (уже прошли авторитет).
     kept.extend(rest)
 
