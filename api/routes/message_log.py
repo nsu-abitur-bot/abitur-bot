@@ -10,6 +10,7 @@ from api.schemas.message_log import (
     TokenUsageStatsResponse,
 )
 from api.schemas.popular_questions import PopularQuestion, PopularQuestionsResponse
+from api.services import popular_questions as popular_questions_service
 from db.postgres.db import get_async_session
 from db.postgres.services.message_log import MessageLogService
 
@@ -245,7 +246,8 @@ async def get_popular_questions(
     - **similarity_threshold**: порог семантической близости формулировок
     """
     try:
-        popular = await log_service.get_popular_questions(
+        popular = await popular_questions_service.get_popular_questions(
+            log_service,
             limit=limit,
             raw_limit=raw_limit,
             similarity_threshold=similarity_threshold,

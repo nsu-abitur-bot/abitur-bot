@@ -1,23 +1,36 @@
 from unittest.mock import AsyncMock
 
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
+from api.routes import message_log as message_log_route
 from api.routes.message_log import get_message_log_service
 
 
-def test_get_popular_questions_returns_semantic_clusters():
+@pytest.fixture
+def clustered(monkeypatch):
+    """Подменяет кластеризацию: роут проверяем без эмбеддингов и без БД."""
+    fake = AsyncMock(
+        return_value=[
+            {
+                "question": "Как поступить в НГУ?",
+                "count": 3,
+                "variants": [
+                    "Как поступить в НГУ?",
+                    "Что нужно для поступления в НГУ?",
+                ],
+            }
+        ]
+    )
+    monkeypatch.setattr(
+        message_log_route.popular_questions_service, "get_popular_questions", fake
+    )
+    return fake
+
+
+def test_get_popular_questions_returns_semantic_clusters(clustered):
     service = AsyncMock()
-    service.get_popular_questions.return_value = [
-        {
-            "question": "Как поступить в НГУ?",
-            "count": 3,
-            "variants": [
-                "Как поступить в НГУ?",
-                "Что нужно для поступления в НГУ?",
-            ],
-        }
-    ]
     app.dependency_overrides[get_message_log_service] = lambda: service
 
     try:
@@ -40,7 +53,9 @@ def test_get_popular_questions_returns_semantic_clusters():
             }
         ]
     }
-    service.get_popular_questions.assert_awaited_once_with(
+    # Сервис БД передаётся первым позиционным аргументом, параметры — по имени.
+    clustered.assert_awaited_once_with(
+        service,
         limit=5,
         raw_limit=50,
         similarity_threshold=0.9,

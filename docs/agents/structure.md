@@ -6,7 +6,8 @@
 api/              HTTP API (FastAPI)
   routes/         Эндпоинты по сущностям (faq, abbrev, faculty, admission_score, rag, ...)
   schemas/        Pydantic-схемы запросов/ответов
-  services/       Бизнес-логика для роутов
+  services/       Бизнес-логика для роутов (в т.ч. popular_questions.py —
+                  кластеризация вопросов по смыслу)
   auth/           JWT-аутентификация (Admin, роли, инвайт-коды)
 abbrev/           Раскрытие аббревиатур перед FAQ/RAG (expander.py)
 bot/              Telegram и MAX боты, стриминг, уведомления
