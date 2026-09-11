@@ -3,6 +3,7 @@ from unittest.mock import AsyncMock
 import pytest
 
 from bot.core import FEEDBACK_FOOTER, BotCore
+from llm.llm_client import LlmAnswer
 
 
 class FakeRedis:
@@ -60,7 +61,7 @@ async def test_feedback_message_creates_report_and_skips_llm(monkeypatch):
     redis.awaiting_feedback = True
     core = BotCore()
     saved_feedback = AsyncMock()
-    ask_llm = AsyncMock(return_value="LLM response")
+    ask_llm = AsyncMock(return_value=LlmAnswer(text="LLM response"))
 
     async def fake_get_redis_client():
         return redis
@@ -166,7 +167,9 @@ async def test_normal_reply_has_feedback_footer(monkeypatch):
         "_check_rate_limit",
         AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
     )
-    monkeypatch.setattr("bot.core.ask_local_llm", AsyncMock(return_value="Ответ бота"))
+    monkeypatch.setattr(
+        "bot.core.ask_local_llm", AsyncMock(return_value=LlmAnswer(text="Ответ бота"))
+    )
 
     reply = await core.handle_message(
         channel="telegram",
@@ -184,7 +187,7 @@ async def test_report_is_not_feedback_command(monkeypatch):
     redis = FakeRedis()
     core = BotCore()
     user_log = type("Log", (), {"id": 10})()
-    ask_llm = AsyncMock(return_value="Ответ на report")
+    ask_llm = AsyncMock(return_value=LlmAnswer(text="Ответ на report"))
 
     async def fake_get_redis_client():
         return redis
@@ -263,7 +266,7 @@ async def test_normal_message_uses_dialog_session_for_logs_and_llm(monkeypatch):
     core = BotCore()
     user_log = type("Log", (), {"id": 10})()
     saved_session_ids: list[str] = []
-    ask_llm = AsyncMock(return_value="Ответ бота")
+    ask_llm = AsyncMock(return_value=LlmAnswer(text="Ответ бота"))
 
     async def fake_get_redis_client():
         return redis
@@ -306,7 +309,7 @@ async def test_rate_limit_skips_llm_and_user_input_log(monkeypatch):
     redis = FakeRedis()
     core = BotCore()
     save_user_message = AsyncMock()
-    ask_llm = AsyncMock(return_value="LLM response")
+    ask_llm = AsyncMock(return_value=LlmAnswer(text="LLM response"))
 
     async def fake_get_redis_client():
         return redis

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Awaitable, Callable, Optional
 
+from bot.formatting import format_for_channel
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
 from db.postgres.services.feedback_report import FeedbackReportService
@@ -368,7 +369,7 @@ class BotCore:
             source=channel,
         )
 
-        response = await ask_local_llm(
+        answer = await ask_local_llm(
             formatted_message,
             session_id=dialog_session_id,
             user_id=internal_user_id,
@@ -377,11 +378,17 @@ class BotCore:
             status_callback=status_callback,
         )
 
-        if not response:
+        if not answer:
+            return BotReply(text="Ответ не найден")
+
+        # Разметку выбираем здесь: пайплайн отдаёт текст и источники без
+        # привязки к каналу, а Telegram и MAX понимают её по-разному.
+        text = format_for_channel(answer.text, answer.sources, channel)
+        if not text:
             return BotReply(text="Ответ не найден")
 
         return BotReply(
-            text=response,
+            text=text,
             parse_mode="HTML" if channel == "telegram" else None,
             fallback_plain_on_format_error=(channel == "telegram"),
             include_feedback_footer=True,

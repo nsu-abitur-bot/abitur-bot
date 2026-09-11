@@ -3,7 +3,8 @@ import json
 import logging
 import re
 from contextlib import contextmanager, suppress
-from html import escape, unescape
+from dataclasses import dataclass, field
+from html import unescape
 from typing import Awaitable, Callable, Optional
 from urllib.parse import urlsplit
 
@@ -11,7 +12,6 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from abbrev.expander import get_abbrev_expander
-from bot.utils import normalize_url_for_messaging
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
@@ -29,6 +29,28 @@ from rag.retriever import query_graph_with_crag, query_graph_with_sources
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class LlmAnswer:
+    """Ответ пайплайна: текст и источники, без разметки конкретного канала.
+
+    Разметку накладывает адаптер канала (`bot/formatting.py`): Telegram и MAX
+    понимают её по-разному, и пайплайн не должен об этом знать.
+    """
+
+    text: str
+    sources: list[dict] = field(default_factory=list)
+
+    def __bool__(self) -> bool:
+        return bool(self.text)
+
+
+def _strip_markup(text: str) -> str:
+    """Текст без тегов — для истории в Redis и PG (её читает модель, не человек)."""
+    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
+    text = re.sub(r"</?p>", "", text, flags=re.IGNORECASE)
+    return unescape(re.sub(r"<[^>]+>", "", text)).strip()
 
 SYSTEM_PROMPT_BASE = """
 Ты — официальный дружелюбный помощник-бот для абитуриентов НГУ
@@ -110,56 +132,6 @@ def _spawn_bg(coro) -> None:
     task = asyncio.create_task(coro)
     _background_tasks.add(task)
     task.add_done_callback(_background_tasks.discard)
-
-
-def _sanitize_telegram_html(text: str) -> str:
-    text = re.sub(r"<br\s*/?>", "\n", text, flags=re.IGNORECASE)
-    text = re.sub(r"</p>\s*<p>", "\n\n", text, flags=re.IGNORECASE)
-    text = re.sub(r"</?p>", "", text, flags=re.IGNORECASE)
-    text = re.sub(
-        r"</?strong>",
-        lambda m: "</b>" if m.group(0).startswith("</") else "<b>",
-        text,
-        flags=re.IGNORECASE,
-    )
-    text = re.sub(
-        r"</?em>",
-        lambda m: "</i>" if m.group(0).startswith("</") else "<i>",
-        text,
-        flags=re.IGNORECASE,
-    )
-
-    allowed_simple = {"b", "i", "u", "s", "code", "pre"}
-
-    def replace_tag(match: re.Match[str]) -> str:
-        raw_tag = match.group(0)
-        tag = raw_tag.strip("<>").strip()
-        is_closing = tag.startswith("/")
-        tag_body = tag[1:].strip() if is_closing else tag
-        tag_name = tag_body.split()[0].lower() if tag_body else ""
-
-        if tag_name in allowed_simple:
-            return f"</{tag_name}>" if is_closing else f"<{tag_name}>"
-
-        if tag_name == "a":
-            if is_closing:
-                return "</a>"
-            href_match = re.search(
-                r"href\s*=\s*[\"\']([^\"\']+)[\"\']",
-                tag_body,
-                flags=re.IGNORECASE,
-            )
-            if href_match:
-                raw_href = href_match.group(1)
-                normalized_href = normalize_url_for_messaging(raw_href)
-                href = escape(normalized_href, quote=True)
-                return f'<a href="{href}">'
-            return ""
-
-        return ""
-
-    text = re.sub(r"<[^>]+>", replace_tag, text)
-    return text.strip()
 
 
 def _clean_source_url(url: str) -> str:
@@ -454,7 +426,7 @@ async def ask_local_llm(
     log_entry_id: Optional[int] = None,
     stream_callback: Optional[StreamCallback] = None,
     status_callback: Optional[StatusCallback] = None,
-) -> str:
+) -> LlmAnswer:
     """
     message - сообщение от пользователя
     session_id - идентификатор переписки,
@@ -534,7 +506,7 @@ async def ask_local_llm(
             )
             if user_id:
                 _spawn_bg(_save_message_to_pg(user_id, session_id, message, faq_answer))
-            return faq_answer
+            return LlmAnswer(text=faq_answer)
 
         # Получаем историю (нужна и для RAG, и для финального промпта) только
         # после того, как FAQ не дал готовый ответ.
@@ -643,6 +615,7 @@ async def ask_local_llm(
             )
 
         # 8. Формируем промпт и зовём основную LLM-генерацию.
+        answer_sources: list[dict] = []
         try:
             logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
             valid_sources = rag_sources
@@ -725,22 +698,15 @@ async def ask_local_llm(
                 flags=re.IGNORECASE,
             )
 
-            # Добавляем свои источники (максимум 3 штуки)
+            # Источники показываем, только если ответ по существу: к отказу
+            # «не нашёл информации» список ссылок приклеивать бессмысленно.
             lower_content = content.lower()
             not_found = (
-                "не нашел информации" in lower_content or "не найдена" in lower_content
+                "не нашел информации" in lower_content
+                or "не нашёл информации" in lower_content
+                or "не найдена" in lower_content
             )
-            if valid_sources and not not_found:
-                links_html = []
-                for s in valid_sources[:3]:
-                    url = str(s.get("url", ""))
-                    if not url:
-                        continue
-                    title = str(s.get("title") or DEFAULT_SOURCE_TITLE)
-                    safe_url = escape(normalize_url_for_messaging(url), quote=True)
-                    links_html.append(f'<a href="{safe_url}">{escape(title)}</a>')
-
-                content += "\n\n<b>Источники:</b>\n" + "\n".join(links_html)
+            answer_sources = [] if not_found else list(valid_sources)
 
             logger.info(f"[{session_id}] Received response from LLM.")
             logger.info(
@@ -763,38 +729,39 @@ async def ask_local_llm(
                 )
             )
 
-            content = re.sub(r"foundland", "", content, flags=re.DOTALL)
-            content = _sanitize_telegram_html(content)
+            content = re.sub(r"foundland", "", content, flags=re.DOTALL).strip()
 
             if not content:
-                logger.warning(
-                    f"[{session_id}] LLM returned empty content after sanitization."
-                )
+                logger.warning(f"[{session_id}] LLM returned empty content.")
                 content = "Ответ не найден"
+                answer_sources = []
             else:
                 logger.info(
-                    f"[{session_id}] Final LLM response after sanitization "
+                    f"[{session_id}] Final LLM response "
                     f"(first 300 chars): {content[:300]}..."
                 )
         except Exception as e:
             logger.warning(f"[{session_id}] Provider generation error: {e}")
             content = "LLM временно недоступна."
+            answer_sources = []
 
         # 9. Сохраняем ответ в Redis + PG в фоне — пользователю отвечаем сразу.
+        # В историю кладём текст без тегов: её читает модель, а не человек.
+        history_text = _strip_markup(content)
         _spawn_bg(
             redis_client.add_message(
-                session_id, {"role": "assistant", "content": content}
+                session_id, {"role": "assistant", "content": history_text}
             )
         )
         if user_id:
-            _spawn_bg(_save_message_to_pg(user_id, session_id, message, content))
+            _spawn_bg(_save_message_to_pg(user_id, session_id, message, history_text))
 
         logger.info(f"[{session_id}] Message processing complete.")
-        return content
+        return LlmAnswer(text=content, sources=answer_sources)
 
     except Exception as e:
         logger.error(f"[{session_id}] LLM error: {e}")
-        return "Что-то пошло не так"
+        return LlmAnswer(text="Что-то пошло не так")
 
 
 async def cleanup_redis():

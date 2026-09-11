@@ -1,4 +1,3 @@
-bot <-> llm
 db <-> llm
 db <-> parser
 faq <-> llm
