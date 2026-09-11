@@ -1,11 +1,21 @@
 import pytest
 
+from abbrev.expander import AbbrevExpander
 from api.services import url_to_rag
 
 
 @pytest.mark.asyncio
 async def test_parse_and_save_url_expands_before_saving(monkeypatch):
     saved_payload = {}
+
+    # Свой расширитель с известной аббревиатурой: abbrev/abbrev_data.yaml в
+    # .gitignore, и тест, опирающийся на него, проходит только там, где файл
+    # случайно оказался — в CI и у нового участника он падал.
+    expander = AbbrevExpander()
+    expander.load_items(
+        [{"short": "НГУ", "full": "Новосибирский государственный университет"}]
+    )
+    monkeypatch.setattr(url_to_rag, "get_abbrev_expander", lambda: expander)
 
     async def fake_process_url(url: str) -> str:
         return "Документы принимает НГУ."
