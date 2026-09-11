@@ -51,6 +51,7 @@ def _strip_markup(text: str) -> str:
     text = re.sub(r"</?p>", "", text, flags=re.IGNORECASE)
     return unescape(re.sub(r"<[^>]+>", "", text)).strip()
 
+
 SYSTEM_PROMPT_BASE = """
 Ты — официальный дружелюбный помощник-бот для абитуриентов НГУ
 (Новосибирский государственный университет).
@@ -348,6 +349,25 @@ def _format_rag_response_log(context: str, trace_lines: list[str]) -> str:
     return _truncate_log_content("\n\n".join(blocks))
 
 
+# Блок «Источники» в прошлых ответах ассистента: в историю он попадал целиком,
+# и модель начинала копировать ссылки из него.
+_SOURCES_BLOCK_RE = re.compile(
+    r"\n?(?:<br>|<b>|###\s*|\*+\s*)*\s*"
+    r"(?:Источники|Источник|References|Ссылки)(?:\s+информации)?:?\s*"
+    r"(?:</b>|\*+)*\s*(?:\n|<a)[\s\S]*",
+    re.IGNORECASE,
+)
+# Ссылка целиком — вырезаем из истории.
+_ANCHOR_RE = re.compile(r"<a\s+href=[^>]+>.*?</a>")
+# Ссылка, от которой оставляем только текст: свои источники приклеивает канал.
+_ANCHOR_TEXT_RE = re.compile(
+    r"<a\s+[^>]*href=[\"\'][^\"\']+[\"\'][^>]*>(.*?)</a>",
+    re.IGNORECASE,
+)
+# Артефакт неизвестного происхождения в ответах модели — см. #309.
+_ARTIFACT_RE = re.compile(r"foundland", re.DOTALL)
+
+
 StreamCallback = Callable[[str], Awaitable[None]]
 StatusCallback = Callable[[str], Awaitable[None]]
 
@@ -355,6 +375,352 @@ STATUS_FAQ_LOOKUP = "🔎 Поиск готового ответа…"
 STATUS_INTENT = "🧭 Анализ вопроса…"
 STATUS_RAG = "📚 Поиск в базе знаний…"
 STATUS_GENERATING = "✍️ Готовлю ответ…"
+
+
+@dataclass
+class _Ctx:
+    """То, что нужно каждому шагу: кому отвечаем и куда писать логи."""
+
+    session_id: str
+    user_id: int
+    log_entry_id: Optional[int] = None
+    status_callback: Optional[StatusCallback] = None
+
+    async def emit_status(self, text: str) -> None:
+        """Промежуточный статус пользователю. Сбой колбэка не ломает ответ."""
+        if self.status_callback is None:
+            return
+        try:
+            await self.status_callback(text)
+        except Exception as exc:
+            logger.warning(f"[{self.session_id}] status_callback error: {exc}")
+
+    def log(self, message_type: str, content: str, **metadata) -> None:
+        """Запись в аналитический лог, fire-and-forget."""
+        tokens_used = metadata.pop("tokens_used", None)
+        _spawn_bg(
+            _save_log_to_db(
+                user_id=self.user_id,
+                session_id=self.session_id,
+                message_type=message_type,
+                content=content,
+                message_metadata=metadata,
+                tokens_used=tokens_used,
+            )
+        )
+
+
+@dataclass
+class _RagResult:
+    """Что база знаний дала для промпта."""
+
+    context: str
+    sources: list[dict] = field(default_factory=list)
+
+
+@dataclass
+class _Postprocessed:
+    """Готовый ответ и то, что от него пишем в лог.
+
+    `log_text` отличается от `text`: в лог идёт ответ до вычистки артефактов,
+    чтобы по логу было видно, что именно вернула модель.
+    """
+
+    text: str
+    sources: list[dict]
+    log_text: str
+
+
+def _expand_abbrevs(message: str, session_id: str) -> str:
+    """Раскрывает аббревиатуры: «ФИТ» → «ФИТ (Факультет информационных...)».
+
+    Нужно и FAQ-матчеру, и поиску: без раскрытия «ФИТ» не находит документы,
+    где написано полное название.
+    """
+    try:
+        return get_abbrev_expander().expand(message)
+    except Exception as exc:
+        logger.warning(f"[{session_id}] abbrev expander error: {exc}")
+        return message
+
+
+async def _await_faq(
+    task: "asyncio.Task[Optional[str]]", session_id: str
+) -> Optional[str]:
+    try:
+        return await task
+    except Exception as e:
+        logger.warning(f"[{session_id}] FAQ matcher error: {e}")
+        return None
+
+
+async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
+    try:
+        return await task
+    except Exception as e:
+        logger.warning(f"[{session_id}] Redis get_history error: {e}")
+        return []
+
+
+async def _retrieve_context(
+    expanded_message: str,
+    history_text: str,
+    ctx: _Ctx,
+) -> _RagResult:
+    """Ищет контекст в базе знаний. При любом сбое возвращает текст-заглушку.
+
+    Заглушка попадает в системный промпт, и модель по ней понимает, что
+    опираться не на что. Поднимать исключение нельзя: без базы знаний бот всё
+    равно должен ответить хотя бы «не знаю».
+    """
+    session_id = ctx.session_id
+    rag_trace_lines: list[str] = []
+    try:
+        logger.info(f"[{session_id}] Querying LightRAG for context.")
+        rag_query = (
+            f"{expanded_message}\n\n{LIGHTRAG_LEVEL_HINT}\n\n{LIGHTRAG_FORMAT_HINT}"
+        )
+        ctx.log(
+            "rag_query",
+            _truncate_log_content(rag_query),
+            title="Запрос к базе знаний",
+            query_length=len(rag_query),
+            history_present=bool(history_text),
+        )
+
+        use_crag = (await load_crag_config()).enabled
+        with _capture_lightrag_logs() as rag_trace:
+            if use_crag:
+                logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
+                raw_context, metadata_sources = await query_graph_with_crag(
+                    rag_query,
+                    conversation_history=history_text or None,
+                )
+            else:
+                raw_context, metadata_sources = await query_graph_with_sources(
+                    rag_query,
+                    conversation_history=history_text or None,
+                )
+        rag_trace_lines = rag_trace.get_lines()
+
+        found = bool(raw_context) and not raw_context.startswith("Error executing query")
+        if found:
+            sources = metadata_sources
+            context = raw_context
+            logger.info(
+                f"[{session_id}] Retrieved context from RAG (sources: {len(sources)})."
+            )
+            logger.info(f"[{session_id}] - Context (first 500 chars): {context[:500]}...")
+            logger.info(f"[{session_id}] - Sources ({len(sources)}): {sources}")
+        else:
+            logger.info(f"[{session_id}] No relevant context found in RAG.")
+            sources = []
+            context = "Релевантный контекст из базы знаний не найден."
+
+        ctx.log(
+            "rag_response",
+            _format_rag_response_log(raw_context or context, rag_trace_lines),
+            title="Ответ базы знаний",
+            sources=sources,
+            context_length=len(raw_context or context),
+            sources_count=len(sources),
+            internal_logs_count=len(rag_trace_lines),
+            found_context=found,
+        )
+        return _RagResult(context=_clean_rag_context(context), sources=sources)
+    except Exception as e:
+        logger.warning(f"[{session_id}] LightRAG query error: {e}")
+        context = "База знаний временно недоступна."
+        ctx.log(
+            "rag_response",
+            context,
+            title="Ответ базы знаний",
+            error=str(e),
+            internal_logs_count=len(rag_trace_lines),
+            found_context=False,
+        )
+        return _RagResult(context=context)
+
+
+def _build_messages(rag_context: str, history_entries: list[dict]) -> list[BaseMessage]:
+    """Собирает промпт: системная часть с контекстом плюс история переписки.
+
+    Из прошлых ответов ассистента вырезаем блок «Источники» и ссылки: раньше
+    они попадали в историю целиком и модель начинала их копировать.
+    """
+    sources_hint = (
+        "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
+        "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать блок 'Источники' или перечислять ссылки. "
+        "Просто ответь на вопрос пользователя, опираясь на контекст!"
+    )
+    system_prompt = SYSTEM_PROMPT_BASE.format(
+        context=rag_context, sources_hint=sources_hint
+    )
+    messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
+
+    for entry in history_entries:
+        role = entry.get("role", "")
+        entry_content = entry.get("content", "")
+
+        if role == "user":
+            messages.append(HumanMessage(content=entry_content))
+        elif role == "assistant":
+            entry_clean = _SOURCES_BLOCK_RE.sub("", entry_content)
+            entry_clean = _ANCHOR_RE.sub("", entry_clean).strip()
+            messages.append(AIMessage(content=entry_clean))
+
+    return messages
+
+
+async def _run_tool_loop(
+    messages: list[BaseMessage],
+    session_id: str,
+    stream_callback: Optional[StreamCallback] = None,
+) -> tuple[str, LLMUsage, str]:
+    """Генерация ответа с доступом к инструментам. Возвращает текст, расход, провайдера.
+
+    Со стримингом отдаём накопленный текст в транспорт по мере генерации; сбой
+    колбэка не должен ломать сам ответ.
+    """
+    provider = get_llm_provider()
+    provider_name = provider.__class__.__name__
+    logger.info(f"[{session_id}] Sending payload to LLM ({provider_name}).")
+
+    if stream_callback is None:
+        result = await provider.generate_with_tools(
+            messages,
+            tools=[ADMISSION_SCORES_TOOL],
+            tool_executor=default_tool_executor,
+            profile=LLMProfiles.CHAT,
+        )
+        return result.text, result.usage, provider_name
+
+    streamed = ""
+
+    async def on_delta(delta: str) -> None:
+        nonlocal streamed
+        if not delta:
+            return
+        streamed += delta
+        try:
+            await stream_callback(streamed)
+        except Exception as cb_exc:
+            logger.warning(f"[{session_id}] stream_callback error: {cb_exc}")
+
+    result = await provider.generate_with_tools(
+        messages,
+        tools=[ADMISSION_SCORES_TOOL],
+        tool_executor=default_tool_executor,
+        profile=LLMProfiles.CHAT,
+        on_delta=on_delta,
+    )
+    return result.text or streamed.strip(), result.usage, provider_name
+
+
+def _postprocess(content: str, rag_sources: list[dict]) -> _Postprocessed:
+    """Готовит ответ к отправке: ссылки, источники, артефакты, пустой ответ."""
+    # Ссылки, которые придумала модель, оставляем текстом без адреса: свои
+    # источники приклеивает канал, из метаданных базы знаний.
+    content = _ANCHOR_TEXT_RE.sub(r"\1", content)
+    log_text = content
+
+    # К отказу «не нашёл информации» список источников приклеивать бессмысленно.
+    lowered = content.lower()
+    not_found = (
+        "не нашел информации" in lowered
+        or "не нашёл информации" in lowered
+        or "не найдена" in lowered
+    )
+    sources = [] if not_found else list(rag_sources)
+
+    content = _ARTIFACT_RE.sub("", content).strip()
+    if not content:
+        logger.warning("LLM returned empty content.")
+        return _Postprocessed(text="Ответ не найден", sources=[], log_text=log_text)
+
+    return _Postprocessed(text=content, sources=sources, log_text=log_text)
+
+
+async def _answer_from_faq(
+    faq_answer: str,
+    message: str,
+    redis_client: RedisClient,
+    ctx: _Ctx,
+) -> LlmAnswer:
+    """Готовый ответ из матчера частых вопросов: модель не зовём вообще."""
+    session_id = ctx.session_id
+    logger.info(f"[{session_id}] FAQ match found, returning predefined answer.")
+
+    ctx.log("faq_match", faq_answer, source="faq")
+    _spawn_bg(
+        redis_client.add_message(
+            session_id, {"role": "assistant", "content": faq_answer}
+        )
+    )
+    if ctx.user_id:
+        _spawn_bg(_save_message_to_pg(ctx.user_id, session_id, message, faq_answer))
+    return LlmAnswer(text=faq_answer)
+
+
+async def _generate_answer(
+    rag: _RagResult,
+    history_entries: list[dict],
+    ctx: _Ctx,
+    stream_callback: Optional[StreamCallback] = None,
+) -> tuple[str, list[dict]]:
+    """Промпт, генерация, постобработка. При сбое модели — текст-заглушка."""
+    session_id = ctx.session_id
+    try:
+        logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
+        messages = _build_messages(rag.context, history_entries)
+
+        await ctx.emit_status(STATUS_GENERATING)
+        content, llm_usage, provider_name = await _run_tool_loop(
+            messages, session_id, stream_callback
+        )
+
+        processed = _postprocess(content, rag.sources)
+        logger.info(f"[{session_id}] Received response from LLM.")
+        logger.info(
+            f"[{session_id}] - Raw response (first 500 chars): "
+            f"{processed.log_text[:500]}..."
+        )
+        ctx.log(
+            "llm_response",
+            processed.log_text[:2000],
+            response_length=len(processed.log_text),
+            provider=provider_name,
+            tokens=llm_usage.to_dict(),
+            tokens_used=llm_usage.total_tokens or None,
+        )
+        logger.info(
+            f"[{session_id}] Final LLM response "
+            f"(first 300 chars): {processed.text[:300]}..."
+        )
+        return processed.text, processed.sources
+    except Exception as e:
+        logger.warning(f"[{session_id}] Provider generation error: {e}")
+        return "LLM временно недоступна.", []
+
+
+def _store_answer(
+    content: str,
+    message: str,
+    redis_client: RedisClient,
+    ctx: _Ctx,
+) -> None:
+    """Сохраняет ответ в историю в фоне — пользователю отвечаем сразу.
+
+    В историю кладём текст без тегов: её читает модель, а не человек.
+    """
+    stored_text = _strip_markup(content)
+    _spawn_bg(
+        redis_client.add_message(
+            ctx.session_id, {"role": "assistant", "content": stored_text}
+        )
+    )
+    if ctx.user_id:
+        _spawn_bg(_save_message_to_pg(ctx.user_id, ctx.session_id, message, stored_text))
 
 
 async def ask_local_llm(
@@ -365,334 +731,58 @@ async def ask_local_llm(
     stream_callback: Optional[StreamCallback] = None,
     status_callback: Optional[StatusCallback] = None,
 ) -> LlmAnswer:
-    """
-    message - сообщение от пользователя
-    session_id - идентификатор переписки,
-    используется для получения и сохранения истории переписки (контекста)
-    между пользователем и ассистентом
-    user_id - внутренний идентификатор пользователя для сохранения в БД
-    stream_callback - опциональная асинхронная функция, вызываемая с накопленным
-    текстом ответа по мере его генерации LLM. Используется для прогрессивного
-    отображения ответа (например, edit_message_text в Telegram). Колбэк
-    вызывается только во время генерации основного LLM-ответа: при FAQ-матче и
-    awaiting-applicant-id веток LLM не вызывается, и колбэк не срабатывает.
+    """Отвечает на сообщение пользователя. Порядок шагов — в теле функции.
+
+    session_id — идентификатор переписки, по нему берётся и сохраняется история.
+    user_id — внутренний идентификатор для записей в PG.
+    stream_callback вызывается с накопленным текстом по мере генерации: на
+    FAQ-матче модель не зовётся, и колбэк не срабатывает.
     """
     logger.info(
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
     )
-
-    async def _emit_status(text: str) -> None:
-        if status_callback is None:
-            return
-        try:
-            await status_callback(text)
-        except Exception as exc:
-            logger.warning(f"[{session_id}] status_callback error: {exc}")
+    ctx = _Ctx(
+        session_id=session_id,
+        user_id=user_id,
+        log_entry_id=log_entry_id,
+        status_callback=status_callback,
+    )
 
     try:
         redis_client = await get_redis_client()
-
-        # 1. Сохраняем сообщение пользователя в Redis-историю.
-        logger.info(f"[{session_id}] Saving user message to Redis history.")
         await redis_client.add_message(session_id, {"role": "user", "content": message})
 
-        # 2. Расширяем аббревиатуры для улучшения FAQ-матчинга и RAG-запросов.
-        try:
-            expanded_message = get_abbrev_expander().expand(message)
-        except Exception:
-            expanded_message = message
+        expanded_message = _expand_abbrevs(message, session_id)
 
-        # 3. Intent-классификация уезжает в фон — она нужна только для
-        # аналитического лога (update_log_topic) и не влияет на ответ.
+        # Классификация темы нужна только аналитическому логу и на ответ не
+        # влияет — уезжает в фон.
         _spawn_bg(_classify_intent_bg(expanded_message, log_entry_id, session_id))
 
-        await _emit_status(STATUS_FAQ_LOOKUP)
+        await ctx.emit_status(STATUS_FAQ_LOOKUP)
 
-        # 4. Параллельно стартуем FAQ-матч и чтение истории.
-        # FAQ обычно отвечает за 0.3-1с, history — за ~10мс.
+        # FAQ и история стартуют параллельно: FAQ отвечает за 0.3-1с, история
+        # за ~10мс. Поиск в базе знаний нельзя запускать до результата FAQ.
         faq_matcher = get_faq_matcher()
         task_faq = asyncio.create_task(faq_matcher.match_async(expanded_message))
         task_history = asyncio.create_task(redis_client.get_history(session_id))
 
-        # 5. Сначала ждём FAQ. LightRAG нельзя запускать до результата FAQ-матчера.
-        try:
-            faq_answer = await task_faq
-        except Exception as e:
-            logger.warning(f"[{session_id}] FAQ matcher error: {e}")
-            faq_answer = None
-
+        faq_answer = await _await_faq(task_faq, session_id)
         if faq_answer:
-            logger.info(f"[{session_id}] FAQ match found, returning predefined answer.")
             task_history.cancel()
             with suppress(asyncio.CancelledError, Exception):
                 await task_history
+            return await _answer_from_faq(faq_answer, message, redis_client, ctx)
 
-            # Запись лога FAQ + истории + PG — fire-and-forget.
-            _spawn_bg(
-                _save_log_to_db(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_type="faq_match",
-                    content=faq_answer,
-                    message_metadata={"source": "faq"},
-                )
-            )
-            _spawn_bg(
-                redis_client.add_message(
-                    session_id, {"role": "assistant", "content": faq_answer}
-                )
-            )
-            if user_id:
-                _spawn_bg(_save_message_to_pg(user_id, session_id, message, faq_answer))
-            return LlmAnswer(text=faq_answer)
-
-        # Получаем историю (нужна и для RAG, и для финального промпта) только
-        # после того, как FAQ не дал готовый ответ.
-        try:
-            history_entries = await task_history
-        except Exception as e:
-            logger.warning(f"[{session_id}] Redis get_history error: {e}")
-            history_entries = []
+        history_entries = await _await_history(task_history, session_id)
         history_text = _build_history_text(history_entries)
 
-        # 7. FAQ промахнулся — запускаем и ждём RAG.
-        rag_sources: list[dict] = []
-        rag_context = ""
-        rag_trace_lines: list[str] = []
-        await _emit_status(STATUS_RAG)
-        try:
-            logger.info(f"[{session_id}] Querying LightRAG for context.")
-            rag_query = (
-                f"{expanded_message}\n\n{LIGHTRAG_LEVEL_HINT}\n\n{LIGHTRAG_FORMAT_HINT}"
-            )
-            _spawn_bg(
-                _save_log_to_db(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_type="rag_query",
-                    content=_truncate_log_content(rag_query),
-                    message_metadata={
-                        "title": "Запрос к базе знаний",
-                        "query_length": len(rag_query),
-                        "history_present": bool(history_text),
-                    },
-                )
-            )
-            use_crag = (await load_crag_config()).enabled
-            with _capture_lightrag_logs() as rag_trace:
-                if use_crag:
-                    logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
-                    rag_context_raw, metadata_sources = await query_graph_with_crag(
-                        rag_query,
-                        conversation_history=history_text or None,
-                    )
-                else:
-                    rag_context_raw, metadata_sources = await query_graph_with_sources(
-                        rag_query,
-                        conversation_history=history_text or None,
-                    )
-            rag_trace_lines = rag_trace.get_lines()
-            if not rag_context_raw or rag_context_raw.startswith("Error executing query"):
-                logger.info(f"[{session_id}] No relevant context found in RAG.")
-                rag_context = "Релевантный контекст из базы знаний не найден."
-                rag_sources = []
-            else:
-                rag_sources = metadata_sources
-                rag_context = rag_context_raw
-                logger.info(
-                    f"[{session_id}] Retrieved context from RAG "
-                    f"(sources: {len(rag_sources)})."
-                )
-                logger.info(
-                    f"[{session_id}] - Context (first 500 chars): "
-                    f"{rag_context_raw[:500]}..."
-                )
-                logger.info(
-                    f"[{session_id}] - Sources ({len(rag_sources)}): {rag_sources}"
-                )
+        await ctx.emit_status(STATUS_RAG)
+        rag = await _retrieve_context(expanded_message, history_text, ctx)
 
-            _spawn_bg(
-                _save_log_to_db(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_type="rag_response",
-                    content=_format_rag_response_log(
-                        rag_context_raw or rag_context,
-                        rag_trace_lines,
-                    ),
-                    message_metadata={
-                        "title": "Ответ базы знаний",
-                        "sources": rag_sources,
-                        "context_length": len(rag_context_raw or rag_context),
-                        "sources_count": len(rag_sources),
-                        "internal_logs_count": len(rag_trace_lines),
-                        "found_context": bool(
-                            rag_context_raw
-                            and not rag_context_raw.startswith("Error executing query")
-                        ),
-                    },
-                )
-            )
-            rag_context = _clean_rag_context(rag_context)
-        except Exception as e:
-            logger.warning(f"[{session_id}] LightRAG query error: {e}")
-            rag_context = "База знаний временно недоступна."
-            _spawn_bg(
-                _save_log_to_db(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_type="rag_response",
-                    content=rag_context,
-                    message_metadata={
-                        "title": "Ответ базы знаний",
-                        "error": str(e),
-                        "internal_logs_count": len(rag_trace_lines),
-                        "found_context": False,
-                    },
-                )
-            )
-
-        # 8. Формируем промпт и зовём основную LLM-генерацию.
-        answer_sources: list[dict] = []
-        try:
-            logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
-            valid_sources = rag_sources
-
-            sources_hint = (
-                "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
-                "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать блок 'Источники' или перечислять ссылки. "
-                "Просто ответь на вопрос пользователя, опираясь на контекст!"
-            )
-
-            system_prompt = SYSTEM_PROMPT_BASE.format(
-                context=rag_context, sources_hint=sources_hint
-            )
-            messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
-
-            # Переиспользуем уже полученную историю (без второго Redis-вызова).
-            for entry in history_entries:
-                role = entry.get("role", "")
-                entry_content = entry.get("content", "")
-
-                if role == "user":
-                    messages.append(HumanMessage(content=entry_content))
-                elif role == "assistant":
-                    # Очищаем старые ответы от блока с источниками,
-                    # чтобы они не сбивали с толку LLM
-                    entry_clean = re.sub(
-                        r"(?i)\n?(?:<br>|<b>|###\s*|\*+\s*)*\s*(?:Источники|Источник|References|Ссылки)(?:\s+информации)?:?\s*(?:</b>|\*+)*\s*(?:\n|<a)[\s\S]*",
-                        "",
-                        entry_content,
-                    )
-                    entry_clean = re.sub(
-                        r"<a\s+href=[^>]+>.*?</a>", "", entry_clean
-                    ).strip()
-                    messages.append(AIMessage(content=entry_clean))
-
-            provider = get_llm_provider()
-            logger.info(
-                f"[{session_id}] Sending payload to LLM ({provider.__class__.__name__})."
-            )
-            await _emit_status(STATUS_GENERATING)
-            llm_usage = LLMUsage()
-            if stream_callback is not None:
-                content = ""
-
-                async def on_stream_delta(delta: str) -> None:
-                    nonlocal content
-                    if not delta:
-                        return
-                    content += delta
-                    try:
-                        await stream_callback(content)
-                    except Exception as cb_exc:
-                        # стриминг в транспорт не должен ломать LLM-ответ
-                        logger.warning(f"[{session_id}] stream_callback error: {cb_exc}")
-
-                llm_result = await provider.generate_with_tools(
-                    messages,
-                    tools=[ADMISSION_SCORES_TOOL],
-                    tool_executor=default_tool_executor,
-                    profile=LLMProfiles.CHAT,
-                    on_delta=on_stream_delta,
-                )
-                content = llm_result.text or content.strip()
-                llm_usage = llm_result.usage
-            else:
-                llm_result = await provider.generate_with_tools(
-                    messages,
-                    tools=[ADMISSION_SCORES_TOOL],
-                    tool_executor=default_tool_executor,
-                    profile=LLMProfiles.CHAT,
-                )
-                content = llm_result.text
-                llm_usage = llm_result.usage
-
-            # Удаляем любые левые ссылки, которые могла придумать LLM
-            content = re.sub(
-                r'<a\s+[^>]*href=["\'][^"\']+["\'][^>]*>(.*?)</a>',
-                r"\1",
-                content,
-                flags=re.IGNORECASE,
-            )
-
-            # Источники показываем, только если ответ по существу: к отказу
-            # «не нашёл информации» список ссылок приклеивать бессмысленно.
-            lower_content = content.lower()
-            not_found = (
-                "не нашел информации" in lower_content
-                or "не нашёл информации" in lower_content
-                or "не найдена" in lower_content
-            )
-            answer_sources = [] if not_found else list(valid_sources)
-
-            logger.info(f"[{session_id}] Received response from LLM.")
-            logger.info(
-                f"[{session_id}] - Raw response (first 500 chars): {content[:500]}..."
-            )
-            logger.info(f"[{session_id}] - Response length: {len(content)} characters")
-
-            _spawn_bg(
-                _save_log_to_db(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_type="llm_response",
-                    content=content[:2000],
-                    message_metadata={
-                        "response_length": len(content),
-                        "provider": provider.__class__.__name__,
-                        "tokens": llm_usage.to_dict(),
-                    },
-                    tokens_used=llm_usage.total_tokens or None,
-                )
-            )
-
-            content = re.sub(r"foundland", "", content, flags=re.DOTALL).strip()
-
-            if not content:
-                logger.warning(f"[{session_id}] LLM returned empty content.")
-                content = "Ответ не найден"
-                answer_sources = []
-            else:
-                logger.info(
-                    f"[{session_id}] Final LLM response "
-                    f"(first 300 chars): {content[:300]}..."
-                )
-        except Exception as e:
-            logger.warning(f"[{session_id}] Provider generation error: {e}")
-            content = "LLM временно недоступна."
-            answer_sources = []
-
-        # 9. Сохраняем ответ в Redis + PG в фоне — пользователю отвечаем сразу.
-        # В историю кладём текст без тегов: её читает модель, а не человек.
-        history_text = _strip_markup(content)
-        _spawn_bg(
-            redis_client.add_message(
-                session_id, {"role": "assistant", "content": history_text}
-            )
+        content, answer_sources = await _generate_answer(
+            rag, history_entries, ctx, stream_callback
         )
-        if user_id:
-            _spawn_bg(_save_message_to_pg(user_id, session_id, message, history_text))
+        _store_answer(content, message, redis_client, ctx)
 
         logger.info(f"[{session_id}] Message processing complete.")
         return LlmAnswer(text=content, sources=answer_sources)
