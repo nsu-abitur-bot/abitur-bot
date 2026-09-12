@@ -196,7 +196,7 @@ class GeminiProvider(BaseLLMProvider):
         **kwargs,
     ) -> LLMResult:
         gemini_messages, config = self._build_request(messages, profile)
-        config.tools = [_tools_to_gemini(tools)]
+        config.tools = [tools_to_gemini(tools)]
 
         contents: list[Any] = list(gemini_messages)
         usage = LLMUsage()
@@ -251,7 +251,7 @@ class GeminiEmbeddings:
         return [list(e.values or []) for e in response.embeddings]
 
 
-def _tools_to_gemini(tools: List[ToolSpec]) -> types.Tool:
+def tools_to_gemini(tools: List[ToolSpec]) -> types.Tool:
     """ToolSpec[] -> types.Tool с function_declarations (raw JSON Schema)."""
     declarations = [
         types.FunctionDeclaration(
