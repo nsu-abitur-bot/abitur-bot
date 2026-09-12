@@ -31,7 +31,6 @@ SUPPORTED_EXTENSIONS = {
     ".pdf",
 }
 
-MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # увеличен лимит до 50MB из-за PDF
 
 
 class _HTMLTextExtractor(HTMLParser):

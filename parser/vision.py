@@ -121,6 +121,11 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
     except Exception as e:
         logger.error(f"Ошибка OpenAI парсинга страниц PDF: {e}")
         return ""
+    finally:
+        # Клиент создаётся на каждую пачку страниц: без закрытия многостраничный
+        # PDF через прокси оставляет по соединению на каждые пять страниц.
+        if http_client is not None:
+            await http_client.aclose()
 
 
 async def _process_batch_gemini(images_b64: List[str]) -> str:
