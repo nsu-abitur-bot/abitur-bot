@@ -6,13 +6,13 @@ import asyncio
 import pytest
 
 from llm.base import BaseLLMProvider, LLMResult, ToolSpec
-from llm.providers.gemini import _tools_to_gemini
-from llm.providers.openai import _tool_spec_to_openai
+from llm.providers.gemini import tools_to_gemini
+from llm.providers.openai import tool_spec_to_openai
 from pipeline.tools import ADMISSION_SCORES_TOOL
 
 
 def test_tool_spec_to_openai_format():
-    result = _tool_spec_to_openai(ADMISSION_SCORES_TOOL)
+    result = tool_spec_to_openai(ADMISSION_SCORES_TOOL)
 
     # Responses API: плоский формат функции (без вложенного "function").
     assert result["type"] == "function"
@@ -24,7 +24,7 @@ def test_tool_spec_to_openai_format():
 
 
 def test_tools_to_gemini_format():
-    tool = _tools_to_gemini([ADMISSION_SCORES_TOOL])
+    tool = tools_to_gemini([ADMISSION_SCORES_TOOL])
 
     assert tool.function_declarations is not None
     assert len(tool.function_declarations) == 1
