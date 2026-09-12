@@ -124,21 +124,7 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
             page_hash = calculate_page_hash(response.text)
             entries = extract_entries(data)
 
-            direction_name = ""
-            if (
-                data
-                and data.get("items")
-                and isinstance(data["items"], list)
-                and len(data["items"]) > 0
-            ):
-                item = data["items"][0]
-                if (
-                    item
-                    and isinstance(item, dict)
-                    and item.get("info")
-                    and item["info"].get("speciality")
-                ):
-                    direction_name = item["info"]["speciality"].get("name", "")
+            direction_name = extract_direction_name(data)
 
             logger.info(f"Получено {len(entries)} записей из {url}")
             return entries, page_hash, direction_name
@@ -174,21 +160,7 @@ def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
         page_hash = calculate_page_hash(response.text)
         entries = extract_entries(data)
 
-        direction_name = ""
-        if (
-            data
-            and data.get("items")
-            and isinstance(data["items"], list)
-            and len(data["items"]) > 0
-        ):
-            item = data["items"][0]
-            if (
-                item
-                and isinstance(item, dict)
-                and item.get("info")
-                and item["info"].get("speciality")
-            ):
-                direction_name = item["info"]["speciality"].get("name", "")
+        direction_name = extract_direction_name(data)
 
         logger.info(f"Получено {len(entries)} записей из мока {url}")
         return entries, page_hash, direction_name
@@ -201,7 +173,7 @@ def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
         return [], "", ""
 
 
-def _extract_direction_name(data: dict) -> str:
+def extract_direction_name(data: dict) -> str:
     """Достаёт название направления из JSON-ответа list-content."""
     items = data.get("items") if isinstance(data, dict) else None
     if not items or not isinstance(items, list):
@@ -245,7 +217,7 @@ def _fetch_list_content(
         data = response.json()
         page_hash = calculate_page_hash(response.text)
         entries = extract_entries(data)
-        return entries, page_hash, _extract_direction_name(data)
+        return entries, page_hash, extract_direction_name(data)
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка при запросе {url_for_log}: {e}")
         return [], "", ""

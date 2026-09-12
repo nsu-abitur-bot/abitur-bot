@@ -48,11 +48,11 @@ class TestPostprocess:
         assert result.text == "Ответ не найден"
         assert result.sources == []
 
-    def test_artifact_removed_from_answer_but_kept_in_log(self):
+    def test_log_text_keeps_answer_before_cleanup(self):
         """В лог пишем ответ до чистки: иначе не видно, что вернула модель."""
-        result = _postprocess("Приём идёт foundland до 25 июля.", [])
-        assert "foundland" not in result.text
-        assert "foundland" in result.log_text
+        result = _postprocess('Читай <a href="https://fake.test">тут</a>.  ', [])
+        assert result.text == "Читай тут."
+        assert result.log_text == "Читай тут.  "
 
 
 class TestBuildMessages:

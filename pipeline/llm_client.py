@@ -364,8 +364,6 @@ _ANCHOR_TEXT_RE = re.compile(
     r"<a\s+[^>]*href=[\"\'][^\"\']+[\"\'][^>]*>(.*?)</a>",
     re.IGNORECASE,
 )
-# Артефакт неизвестного происхождения в ответах модели — см. #309.
-_ARTIFACT_RE = re.compile(r"foundland", re.DOTALL)
 
 
 StreamCallback = Callable[[str], Awaitable[None]]
@@ -633,7 +631,7 @@ def _postprocess(content: str, rag_sources: list[dict]) -> _Postprocessed:
     )
     sources = [] if not_found else list(rag_sources)
 
-    content = _ARTIFACT_RE.sub("", content).strip()
+    content = content.strip()
     if not content:
         logger.warning("LLM returned empty content.")
         return _Postprocessed(text="Ответ не найден", sources=[], log_text=log_text)
