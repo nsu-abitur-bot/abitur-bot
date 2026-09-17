@@ -4,7 +4,7 @@ import os
 
 from fastapi import APIRouter, BackgroundTasks
 
-from db.redis.client import RedisClient
+from db.redis.client import get_redis_client
 from evals.evaluator import PipelineEvaluator
 
 logger = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/evals", tags=["Evaluations"])
 
 async def get_eval_status() -> dict:
     """Получает текущий статус оценки из Redis."""
-    redis = RedisClient()
+    redis = await get_redis_client()
     val = await redis.client.get("eval_status")
     if val:
         return json.loads(val)
@@ -23,7 +23,7 @@ async def get_eval_status() -> dict:
 
 async def set_eval_status(status: dict):
     """Сохраняет текущий статус оценки в Redis (на 1 неделю)."""
-    redis = RedisClient()
+    redis = await get_redis_client()
     await redis.client.set("eval_status", json.dumps(status), ex=7 * 24 * 60 * 60)
 
 

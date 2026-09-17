@@ -269,7 +269,7 @@ class OpenAIProvider(BaseLLMProvider):
         **kwargs,
     ) -> LLMResult:
         input_list: list[Any] = [self._to_openai_message(m) for m in messages]
-        openai_tools = [_tool_spec_to_openai(t) for t in tools]
+        openai_tools = [tool_spec_to_openai(t) for t in tools]
         temperature, max_tokens, timeout = self._resolve_params(profile)
         usage = LLMUsage()
 
@@ -346,7 +346,7 @@ class OpenAIProvider(BaseLLMProvider):
         return {"role": role, "content": content}
 
 
-def _tool_spec_to_openai(tool: ToolSpec) -> dict[str, Any]:
+def tool_spec_to_openai(tool: ToolSpec) -> dict[str, Any]:
     """ToolSpec -> формат функции OpenAI Responses API (плоский, без вложения)."""
     return {
         "type": "function",

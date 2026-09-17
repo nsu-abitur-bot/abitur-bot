@@ -58,7 +58,7 @@ def build_leaderboard_url(
     )
 
 
-def _get_csrf_token(session: requests.Session, headers: dict) -> str | None:
+def get_csrf_token(session: requests.Session, headers: dict) -> str | None:
     """Получает CSRF-токен со страницы."""
     config = get_rating_config()
     base_url = config.get("url", BASE_URL)
@@ -92,13 +92,13 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
     headers = config.get("headers", {})
 
     try:
-        params = _extract_params_from_url(url)
+        params = extract_params_from_url(url)
     except ValueError as e:
         logger.error(f"Некорректные параметры в URL {url}: {e}")
         return [], "", ""
 
     with requests.Session() as session:
-        csrf_token = _get_csrf_token(session, headers)
+        csrf_token = get_csrf_token(session, headers)
         if not csrf_token:
             return [], "", ""
 
@@ -122,23 +122,9 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
 
             data = response.json()
             page_hash = calculate_page_hash(response.text)
-            entries = _extract_entries(data)
+            entries = extract_entries(data)
 
-            direction_name = ""
-            if (
-                data
-                and data.get("items")
-                and isinstance(data["items"], list)
-                and len(data["items"]) > 0
-            ):
-                item = data["items"][0]
-                if (
-                    item
-                    and isinstance(item, dict)
-                    and item.get("info")
-                    and item["info"].get("speciality")
-                ):
-                    direction_name = item["info"]["speciality"].get("name", "")
+            direction_name = extract_direction_name(data)
 
             logger.info(f"Получено {len(entries)} записей из {url}")
             return entries, page_hash, direction_name
@@ -172,23 +158,9 @@ def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
 
         data = response.json()
         page_hash = calculate_page_hash(response.text)
-        entries = _extract_entries(data)
+        entries = extract_entries(data)
 
-        direction_name = ""
-        if (
-            data
-            and data.get("items")
-            and isinstance(data["items"], list)
-            and len(data["items"]) > 0
-        ):
-            item = data["items"][0]
-            if (
-                item
-                and isinstance(item, dict)
-                and item.get("info")
-                and item["info"].get("speciality")
-            ):
-                direction_name = item["info"]["speciality"].get("name", "")
+        direction_name = extract_direction_name(data)
 
         logger.info(f"Получено {len(entries)} записей из мока {url}")
         return entries, page_hash, direction_name
@@ -201,7 +173,7 @@ def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
         return [], "", ""
 
 
-def _extract_direction_name(data: dict) -> str:
+def extract_direction_name(data: dict) -> str:
     """Достаёт название направления из JSON-ответа list-content."""
     items = data.get("items") if isinstance(data, dict) else None
     if not items or not isinstance(items, list):
@@ -244,8 +216,8 @@ def _fetch_list_content(
         response.raise_for_status()
         data = response.json()
         page_hash = calculate_page_hash(response.text)
-        entries = _extract_entries(data)
-        return entries, page_hash, _extract_direction_name(data)
+        entries = extract_entries(data)
+        return entries, page_hash, extract_direction_name(data)
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка при запросе {url_for_log}: {e}")
         return [], "", ""
@@ -259,7 +231,7 @@ def create_rating_session() -> tuple[requests.Session | None, str | None]:
     config = get_rating_config()
     headers = config.get("headers", {})
     session = requests.Session()
-    csrf_token = _get_csrf_token(session, headers)
+    csrf_token = get_csrf_token(session, headers)
     if not csrf_token:
         session.close()
         return None, None
@@ -273,7 +245,7 @@ def parse_rating_url_with_session(
     config = get_rating_config()
     headers = config.get("headers", {})
     try:
-        params = _extract_params_from_url(url)
+        params = extract_params_from_url(url)
     except ValueError as e:
         logger.error(f"Некорректные параметры в URL {url}: {e}")
         return [], "", ""
@@ -357,7 +329,7 @@ def fetch_all_leaderboard_urls(degree: str = "bachelor") -> list[str]:
     return urls
 
 
-def _extract_params_from_url(url: str) -> dict:
+def extract_params_from_url(url: str) -> dict:
     """Извлекает faculty/direction/condition/type из URL."""
     parsed = urlparse(url)
     qs = parse_qs(parsed.query)
@@ -378,7 +350,7 @@ def _extract_params_from_url(url: str) -> dict:
     }
 
 
-def _extract_entries(data: dict) -> list[RatingEntry]:
+def extract_entries(data: dict) -> list[RatingEntry]:
     """Извлекает записи из JSON ответа."""
     entries = []
     items = data.get("items", [])

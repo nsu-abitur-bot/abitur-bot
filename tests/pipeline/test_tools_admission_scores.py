@@ -17,9 +17,9 @@ from sqlalchemy.ext.asyncio import (
 from db.postgres.models import Base
 from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from db.postgres.services.faculty import FacultyService
-from llm.tools import admission_scores as tool_mod
-from llm.tools import default_tool_executor
-from llm.tools.admission_scores import execute_admission_scores
+from pipeline.tools import admission_scores as tool_mod
+from pipeline.tools import default_tool_executor
+from pipeline.tools.admission_scores import execute_admission_scores
 
 TEST_DB_NAME = os.getenv("TEST_DB_NAME", "abitur_test")
 _DB_HOST = os.getenv("DB_HOST", "localhost")

@@ -1,0 +1,63 @@
+name: Задача
+description: Работа, которую нужно сделать
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Заголовок задачи — это действие, а не тема. «Запускать тесты в CI на каждый
+        pull request», а не «Тесты в CI».
+
+  - type: dropdown
+    id: track
+    attributes:
+      label: Трек
+      description: Направление работы. Метку с тем же названием повесь после создания — форма этого не умеет.
+      options:
+        - Инфра — выкладка, тестовый контур, откат, мониторинг
+        - Качество — эталонный набор, ассерты, судья, гардрейлы
+        - Содержимое — наполнение, платформа редактирования, аналитика вопросов
+        - Каналы — веб, виджет, новые предметные области
+        - Не относится ни к одному
+    validations:
+      required: true
+
+  - type: textarea
+    id: why
+    attributes:
+      label: Зачем
+      description: Что сломано или чего не хватает. Без этого задача через месяц непонятна даже автору.
+      placeholder: |
+        Сейчас CI гоняет только линтер и проверку типов. 307 тестов есть, но никто
+        не гарантирует, что они зелёные в PR — то есть регресс не ловится вообще.
+    validations:
+      required: true
+
+  - type: textarea
+    id: what
+    attributes:
+      label: Что сделать
+      description: Необязательно, если из «зачем» и так ясно. Полезно, если есть конкретные файлы или шаги.
+      placeholder: |
+        Добавить шаг `uv run pytest` в `.github/workflows/pr-checks.yml`,
+        поднять сервисы для БД-тестов.
+    validations:
+      required: false
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Готово, когда
+      description: Проверяемый признак, а не «сделано». Если признак не формулируется — задача сформулирована плохо, и её лучше разбить.
+      placeholder: |
+        PR с падающим тестом краснеет.
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Откуда взялась
+      description: Ссылка на разбор, замечание, страницу вики или обращение пользователя — если есть.
+    validations:
+      required: false

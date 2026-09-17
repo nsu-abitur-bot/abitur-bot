@@ -4,11 +4,11 @@ import pytest
 
 from db.postgres.dto import RatingEntry
 from parser.rating import (
-    _extract_entries,
-    _extract_params_from_url,
-    _get_csrf_token,
     build_leaderboard_url,
+    extract_entries,
+    extract_params_from_url,
     find_entry_by_identifier,
+    get_csrf_token,
     parse_rating_page,
 )
 
@@ -32,13 +32,13 @@ class TestBuildLeaderboardUrl:
         assert "type=5" in url
 
 
-# ─── _extract_params_from_url ─────────────────────────────────────────────────
+# ─── extract_params_from_url ─────────────────────────────────────────────────
 
 
 class TestExtractParamsFromUrl:
     def test_extracts_all_params(self):
         url = "https://abiturient.nsu.ru/bachelor?faculty=8&direction=7&condition=10&type=0"
-        params = _extract_params_from_url(url)
+        params = extract_params_from_url(url)
         assert params["faculty"] == 8
         assert params["direction"] == 7
         assert params["condition"] == 10
@@ -46,7 +46,7 @@ class TestExtractParamsFromUrl:
 
     def test_uses_defaults_when_params_missing(self):
         url = "https://abiturient.nsu.ru/bachelor"
-        params = _extract_params_from_url(url)
+        params = extract_params_from_url(url)
         assert params["faculty"] == 8
         assert params["direction"] == 7
         assert params["condition"] == 10
@@ -54,42 +54,42 @@ class TestExtractParamsFromUrl:
 
     def test_returns_int_types(self):
         url = "https://abiturient.nsu.ru/bachelor?faculty=3&direction=5&condition=2&type=1"
-        params = _extract_params_from_url(url)
+        params = extract_params_from_url(url)
         for value in params.values():
             assert isinstance(value, int)
 
 
-# ─── _extract_entries ─────────────────────────────────────────────────────────
+# ─── extract_entries ─────────────────────────────────────────────────────────
 
 
 class TestExtractEntries:
     def test_extracts_correct_count(self, mock_json_response):
-        entries = _extract_entries(mock_json_response)
+        entries = extract_entries(mock_json_response)
         assert len(entries) == 5
 
     def test_extracts_competition_type(self, mock_json_response):
-        entries = _extract_entries(mock_json_response)
+        entries = extract_entries(mock_json_response)
         types = {e.competition_type for e in entries}
         assert "отдельная квота" in types
         assert "общий конкурс" in types
 
     def test_empty_title_becomes_bez_nazvaniya(self, mock_json_response):
-        entries = _extract_entries(mock_json_response)
+        entries = extract_entries(mock_json_response)
         no_name = [e for e in entries if e.competition_type == "без названия"]
         assert len(no_name) == 1
 
     def test_extracts_identifier_and_place(self, mock_json_response):
-        entries = _extract_entries(mock_json_response)
+        entries = extract_entries(mock_json_response)
         first = next(e for e in entries if e.identifier == "4305351")
         assert first.place == 1
         assert first.status == "Зачислен"
 
     def test_empty_response(self):
-        entries = _extract_entries({})
+        entries = extract_entries({})
         assert entries == []
 
     def test_empty_items(self):
-        entries = _extract_entries({"items": []})
+        entries = extract_entries({"items": []})
         assert entries == []
 
     def test_skips_invalid_rows(self):
@@ -104,7 +104,7 @@ class TestExtractEntries:
                 }
             ]
         }
-        entries = _extract_entries(data)
+        entries = extract_entries(data)
         assert len(entries) == 1
         assert entries[0].identifier == "456"
 
@@ -120,7 +120,7 @@ class TestExtractEntries:
                 }
             ]
         }
-        entries = _extract_entries(data)
+        entries = extract_entries(data)
         assert len(entries) == 1
 
 
@@ -166,7 +166,7 @@ class TestFindEntryByIdentifier:
         assert result is None
 
 
-# ─── _get_csrf_token ──────────────────────────────────────────────────────────
+# ─── get_csrf_token ──────────────────────────────────────────────────────────
 
 
 class TestGetCsrfToken:
@@ -177,7 +177,7 @@ class TestGetCsrfToken:
         response.raise_for_status = MagicMock()
         session.get.return_value = response
 
-        token = _get_csrf_token(session, {})
+        token = get_csrf_token(session, {})
         assert token == "test-csrf-token-12345"
 
     def test_returns_none_when_no_meta(self, mock_html_without_csrf):
@@ -187,7 +187,7 @@ class TestGetCsrfToken:
         response.raise_for_status = MagicMock()
         session.get.return_value = response
 
-        token = _get_csrf_token(session, {})
+        token = get_csrf_token(session, {})
         assert token is None
 
     def test_returns_none_on_request_error(self):
@@ -196,7 +196,7 @@ class TestGetCsrfToken:
         session = MagicMock()
         session.get.side_effect = requests.exceptions.ConnectionError()
 
-        token = _get_csrf_token(session, {})
+        token = get_csrf_token(session, {})
         assert token is None
 
 

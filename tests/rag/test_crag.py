@@ -261,7 +261,9 @@ async def test_grader_drops_irrelevant(seeded, monkeypatch):
             return await _fake_generate(messages, profile=profile, **kwargs)
 
     monkeypatch.setattr(crag_module, "get_crag_config", lambda: CragConfig())
-    monkeypatch.setattr("llm.factory.get_llm_provider", lambda: _FakeProvider())
+    # Подменяем имя в rag.crag, а не в llm.factory: импорт там на уровне
+    # модуля, и по исходному пути подмена уже не действует (#310).
+    monkeypatch.setattr(crag_module, "get_llm_provider", lambda: _FakeProvider())
 
     chunks = [
         CragChunk(

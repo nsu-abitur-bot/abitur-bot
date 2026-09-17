@@ -1,0 +1,58 @@
+name: Баг
+description: Что-то работает не так, как должно
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: Что произошло
+      description: Наблюдаемое поведение. Точные формулировки и сообщения об ошибках, а не пересказ.
+      placeholder: |
+        На вопрос «у меня 250 баллов, есть шансы на ПИиКН» бот отвечает, что
+        данных о проходных баллах прошлых лет у него нет.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Что должно было быть
+      placeholder: |
+        В таблице `admission_score` лежит 499 записей — бот должен вернуть баллы
+        прошлых лет по подходящим направлениям.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Как воспроизвести
+      description: Минимальные шаги. Если воспроизводится не всегда — так и напиши, это важная деталь.
+      placeholder: |
+        1. Задать боту вопрос выше.
+        2. Посмотреть `logs/rag_llm_detailed.log` по session_id.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: Где проявляется
+      options:
+        - Прод
+        - Локально
+        - И там, и там
+        - Не знаю
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Логи и окружение
+      description: |
+        Выдержки из `logs/errors.log` или `logs/rag_llm_detailed.log`, версия, провайдер LLM.
+        Секреты и токены не вставляй.
+      render: text
+    validations:
+      required: false

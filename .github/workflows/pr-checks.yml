@@ -17,6 +17,8 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
 
       - name: Sync dependencies
         run: uv sync
@@ -26,3 +28,60 @@ jobs:
 
       - name: Pyrefly check
         run: uv run pyrefly check
+
+      # Кольцевые импорты между пакетами: падает на паре, которой нет в
+      # tools/layers_baseline.txt. См. docs/agents/structure.md.
+      - name: Проверка слоёв
+        run: uv run python tools/check_layers.py
+
+  tests:
+    runs-on: ubuntu-latest
+
+    # БД-тесты работают с реальной тестовой базой, без моков —
+    # см. docs/agents/testing.md.
+    # Образ тот же, что в docker-compose, чтобы поведение совпадало с локальным.
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          # Базу создаёт сам образ при инициализации: conftest создаёт только
+          # таблицы и на отсутствующую базу падает на этапе сбора тестов.
+          POSTGRES_DB: abitur_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d abitur_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_USER: postgres
+      # Единственная переменная без значения по умолчанию: без неё
+      # db/postgres/config.py падает с ValueError на сборе тестов.
+      DB_PASSWORD: postgres
+      TEST_DB_NAME: abitur_test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Pytest
+        run: uv run pytest -q

@@ -6,13 +6,13 @@ import asyncio
 import pytest
 
 from llm.base import BaseLLMProvider, LLMResult, ToolSpec
-from llm.providers.gemini import _tools_to_gemini
-from llm.providers.openai import _tool_spec_to_openai
-from llm.tools import ADMISSION_SCORES_TOOL
+from llm.providers.gemini import tools_to_gemini
+from llm.providers.openai import tool_spec_to_openai
+from pipeline.tools import ADMISSION_SCORES_TOOL
 
 
 def test_tool_spec_to_openai_format():
-    result = _tool_spec_to_openai(ADMISSION_SCORES_TOOL)
+    result = tool_spec_to_openai(ADMISSION_SCORES_TOOL)
 
     # Responses API: плоский формат функции (без вложенного "function").
     assert result["type"] == "function"
@@ -24,7 +24,7 @@ def test_tool_spec_to_openai_format():
 
 
 def test_tools_to_gemini_format():
-    tool = _tools_to_gemini([ADMISSION_SCORES_TOOL])
+    tool = tools_to_gemini([ADMISSION_SCORES_TOOL])
 
     assert tool.function_declarations is not None
     assert len(tool.function_declarations) == 1
@@ -115,7 +115,7 @@ class _FakeFaqMatcher:
 
 @pytest.mark.asyncio
 async def test_ask_local_llm_passes_admission_tool(monkeypatch):
-    from llm import llm_client
+    from pipeline import llm_client
 
     provider = _ToolCallingProvider()
 
@@ -147,7 +147,7 @@ async def test_ask_local_llm_passes_admission_tool(monkeypatch):
     assert provider.tools_seen is not None
     assert provider.tools_seen[0].name == "get_admission_scores"
     assert provider.tool_result == "246 (бюджет, 2024)"
-    assert "246" in response
+    assert "246" in response.text
 
 
 if __name__ == "__main__":

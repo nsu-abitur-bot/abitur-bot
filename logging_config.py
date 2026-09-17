@@ -61,7 +61,7 @@ def setup_logging():
     
     # Добавляем хендлер только для RAG и LLM логгеров
     rag_logger = logging.getLogger("rag.graph_memory")
-    llm_logger = logging.getLogger("llm.llm_client")
+    llm_logger = logging.getLogger("pipeline.llm_client")
     bot_logger = logging.getLogger("bot.main")
     
     rag_logger.addHandler(rag_llm_handler)
@@ -82,7 +82,7 @@ def setup_logging():
     # Устанавливаем уровень для конкретных логгеров
     logging.getLogger("bot.main").setLevel(logging.INFO)
     # Подробные логи для LLM
-    logging.getLogger("llm.llm_client").setLevel(logging.DEBUG)
+    logging.getLogger("pipeline.llm_client").setLevel(logging.DEBUG)
     # Подробные логи для RAG
     logging.getLogger("rag.graph_memory").setLevel(logging.DEBUG)
     

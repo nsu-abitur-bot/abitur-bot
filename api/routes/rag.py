@@ -47,9 +47,9 @@ from db.postgres.services.document import (
     DOCUMENT_STATUS_UPDATED,
     DocumentService,
 )
-from llm.preprocessor import clean_and_structure_text, generate_title_from_text
 from parser.nsu import parse_page
 from parser.url import process_pdf_bytes
+from pipeline.preprocessor import clean_and_structure_text, generate_title_from_text
 from rag.graph_memory import get_graph_memory
 from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
 

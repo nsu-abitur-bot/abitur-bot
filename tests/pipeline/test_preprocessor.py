@@ -1,7 +1,7 @@
 import pytest
 
 from abbrev.expander import AbbrevExpander
-from llm import preprocessor
+from pipeline import preprocessor
 
 
 class _FakeLLM:

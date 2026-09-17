@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from llm.base import LLMResult, LLMUsage
-from llm.llm_client import ask_local_llm
+from pipeline.llm_client import ask_local_llm
 
 
 class _FakeRedis:
@@ -78,25 +78,27 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
     def spawn_bg(coro: Coroutine[Any, Any, None]) -> None:
         background_tasks.append(asyncio.create_task(coro))
 
-    monkeypatch.setattr("llm.llm_client.get_redis_client", fake_get_redis_client)
+    monkeypatch.setattr("pipeline.llm_client.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(
-        "llm.llm_client.get_abbrev_expander", lambda: _FakeAbbrevExpander()
+        "pipeline.llm_client.get_abbrev_expander", lambda: _FakeAbbrevExpander()
     )
-    monkeypatch.setattr("llm.llm_client.get_faq_matcher", lambda: _FakeFaqMatcher())
+    monkeypatch.setattr("pipeline.llm_client.get_faq_matcher", lambda: _FakeFaqMatcher())
     # Мокаем ОБЕ ветки ретрива: какая выполнится, зависит от CRAG_ENABLED,
     # а тест про usage/логи не должен зависеть от этой настройки.
     monkeypatch.setattr(
-        "llm.llm_client.query_graph_with_sources", fake_query_graph_with_sources
+        "pipeline.llm_client.query_graph_with_sources", fake_query_graph_with_sources
     )
     monkeypatch.setattr(
-        "llm.llm_client.query_graph_with_crag", fake_query_graph_with_sources
+        "pipeline.llm_client.query_graph_with_crag", fake_query_graph_with_sources
     )
     monkeypatch.setattr(
-        "llm.llm_client.get_llm_provider", lambda: _FakeStreamingProvider()
+        "pipeline.llm_client.get_llm_provider", lambda: _FakeStreamingProvider()
     )
-    monkeypatch.setattr("llm.llm_client._save_log_to_db", fake_save_log_to_db)
-    monkeypatch.setattr("llm.llm_client._classify_intent_bg", fake_classify_intent_bg)
-    monkeypatch.setattr("llm.llm_client._spawn_bg", spawn_bg)
+    monkeypatch.setattr("pipeline.llm_client._save_log_to_db", fake_save_log_to_db)
+    monkeypatch.setattr(
+        "pipeline.llm_client._classify_intent_bg", fake_classify_intent_bg
+    )
+    monkeypatch.setattr("pipeline.llm_client._spawn_bg", spawn_bg)
 
     response = await ask_local_llm(
         "Когда прием?",
@@ -107,7 +109,7 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
     if background_tasks:
         await asyncio.gather(*background_tasks)
 
-    assert response == "Ответ бота"
+    assert response.text == "Ответ бота"
     assert streamed_updates == ["Ответ", "Ответ бота"]
 
     llm_logs = [log for log in saved_logs if log["message_type"] == "llm_response"]
