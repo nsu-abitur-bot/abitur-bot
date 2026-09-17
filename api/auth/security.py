@@ -3,8 +3,26 @@ from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
+from dotenv import load_dotenv
 
-SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-production-use-a-long-random-string")
+load_dotenv()
+
+# Фиксированный дефолт позволял бы подделать JWT админа и получить доступ к API,
+# поэтому отсутствие/placeholder SECRET_KEY обязаны ломать старт, а не молча работать
+_INSECURE_SECRET_KEYS = frozenset(
+    {
+        "",
+        "change-me-in-production-use-a-long-random-string",
+        "change-me-to-a-long-random-string",
+    }
+)
+
+SECRET_KEY = os.getenv("SECRET_KEY", "")
+if SECRET_KEY in _INSECURE_SECRET_KEYS:
+    raise RuntimeError(
+        "SECRET_KEY не задан или равен placeholder из .env.example. "
+        'Сгенерируйте: python -c "import secrets; print(secrets.token_hex(32))"'
+    )
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_DAYS = 7
 
