@@ -313,3 +313,59 @@ async def test_disabled_crag_keeps_all(seeded, monkeypatch):
     config = CragConfig(use_faculty_table=False)
     kept, _ = await filter_chunks("вопрос без факультета", chunks, config)
     assert len(kept) == 2
+
+
+@pytest.mark.asyncio
+async def test_grading_is_parallel_but_bounded(seeded, monkeypatch):
+    """Грейдинг идёт параллельно, но не шире CRAG_GRADING_CONCURRENCY.
+
+    Семафор — единственное, что удерживает параллельные вызовы в пределах
+    rate-limit провайдера. И порядок чанков после параллельного грейдинга
+    должен остаться исходным.
+    """
+    import asyncio
+
+    import rag.crag as crag_module
+    from rag.crag import CragChunk, CragConfig, filter_chunks
+
+    in_flight = 0
+    max_in_flight = 0
+
+    class _SlowProvider:
+        async def generate(self, messages, profile=None, **kwargs):
+            nonlocal in_flight, max_in_flight
+            in_flight += 1
+            max_in_flight = max(max_in_flight, in_flight)
+            await asyncio.sleep(0.01)
+            in_flight -= 1
+            # Нечётные чанки отсеиваем — чтобы проверить и порядок, и фильтр.
+            user = messages[-1].content
+            keep = any(f"чанк {i}." in user for i in (0, 2, 4))
+            return f'{{"score": {0.9 if keep else 0.1}, "relevant": {str(keep).lower()}}}'
+
+    monkeypatch.setattr(crag_module, "get_crag_config", lambda: CragConfig())
+    monkeypatch.setattr(crag_module, "get_llm_provider", lambda: _SlowProvider())
+
+    chunks = [
+        CragChunk(
+            index=i,
+            content=f"Это чанк {i}.",
+            source_url=f"https://nsu.ru/{i}",
+            file_path=f"https://nsu.ru/{i}",
+        )
+        for i in range(6)
+    ]
+    config = CragConfig(
+        enabled=True,
+        relevance_threshold=0.5,
+        min_chunks=1,
+        allow_refine=False,
+        use_faculty_table=False,
+        max_graded_chunks=12,
+        grading_concurrency=2,
+    )
+
+    kept, _ = await filter_chunks("Любой вопрос", chunks, config)
+
+    assert max_in_flight == 2
+    assert [c.index for c in kept] == [0, 2, 4]
