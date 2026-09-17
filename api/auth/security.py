@@ -17,10 +17,19 @@ _INSECURE_SECRET_KEYS = frozenset(
     }
 )
 
+# HS256 подписывает ключом произвольной длины, поэтому короткий ключ перебирается
+# офлайн по любому выданному токену. 32 байта — минимум для HMAC-SHA256.
+MIN_SECRET_KEY_BYTES = 32
+
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 if SECRET_KEY in _INSECURE_SECRET_KEYS:
     raise RuntimeError(
         "SECRET_KEY не задан или равен placeholder из .env.example. "
+        'Сгенерируйте: python -c "import secrets; print(secrets.token_hex(32))"'
+    )
+if len(SECRET_KEY.encode()) < MIN_SECRET_KEY_BYTES:
+    raise RuntimeError(
+        f"SECRET_KEY короче {MIN_SECRET_KEY_BYTES} байт — такой ключ можно подобрать. "
         'Сгенерируйте: python -c "import secrets; print(secrets.token_hex(32))"'
     )
 ALGORITHM = "HS256"

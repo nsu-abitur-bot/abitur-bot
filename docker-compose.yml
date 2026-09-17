@@ -34,9 +34,14 @@ services:
       - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
       - DB_HOST=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
-    # Только loopback хоста: наружу API отдаёт реверс-прокси (nginx и т.п.)
+      # Без ключа compose не стартует: иначе api молча перезапускался бы по кругу
+      # (restart: always), а проверка в api/auth/security.py видна только в логах.
+      - SECRET_KEY=${SECRET_KEY:?SECRET_KEY is required in .env}
+    # Порт открыт на всех интерфейсах: админка (abitur-web) ходит в API напрямую
+    # по адресу сервера. Закрыть его на 127.0.0.1 можно только вместе с
+    # реверс-прокси и переключением NUXT_PUBLIC_API_BASE_URL на него.
     ports:
-      - "127.0.0.1:8000:8000"
+      - "8000:8000"
     volumes:
       - ./faq:/app/faq
       - ./data:/app/data
@@ -77,11 +82,13 @@ services:
       - --requirepass
       - ${REDIS_PASSWORD:?REDIS_PASSWORD is required in .env}
     environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD:?REDIS_PASSWORD is required in .env}
+      # redis-cli берёт пароль из REDISCLI_AUTH — так он не попадает в аргументы
+      # процесса проверки здоровья.
+      - REDISCLI_AUTH=${REDIS_PASSWORD:?REDIS_PASSWORD is required in .env}
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
       interval: 5s
       timeout: 3s
       retries: 10

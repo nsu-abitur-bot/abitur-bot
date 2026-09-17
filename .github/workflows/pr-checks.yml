@@ -61,11 +61,10 @@ jobs:
       DB_HOST: localhost
       DB_PORT: "5432"
       DB_USER: postgres
-      # Переменные без значений по умолчанию: без них pytest падает на сборе
-      # (db/postgres/config.py — ValueError, api/auth/security.py — RuntimeError).
+      # Единственная переменная без значения по умолчанию: без неё
+      # db/postgres/config.py падает с ValueError на сборе тестов.
+      # SECRET_KEY для тестов задаёт tests/conftest.py.
       DB_PASSWORD: postgres
-      # Только для CI-тестов: в проде SECRET_KEY задаётся своим случайным значением
-      SECRET_KEY: ci-test-secret-key-not-for-production
       TEST_DB_NAME: abitur_test
 
     steps:
