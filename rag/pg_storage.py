@@ -22,6 +22,8 @@ from typing import Any
 
 from sqlalchemy import text
 
+from db.postgres.db import AsyncSessionLocal
+
 logger = logging.getLogger(__name__)
 
 PG_STORAGE_ENV = "LIGHTRAG_STORAGE"
@@ -179,8 +181,6 @@ _TABLES_DDL: dict[str, str] = {
 
 async def ensure_lightrag_tables() -> None:
     """Идемпотентно создаёт таблицы LightRAG (без pgvector)."""
-    from db.postgres.db import AsyncSessionLocal
-
     async with AsyncSessionLocal() as session:
         for ddl in _TABLES_DDL.values():
             await session.execute(text(ddl))
@@ -234,8 +234,6 @@ def doc_status_row_to_dict(row: Any) -> dict:
 
 async def list_docs(workspace: str) -> list[dict]:
     """Список документов из lightrag_doc_status (аналог JSON-версии get_list_docs)."""
-    from db.postgres.db import AsyncSessionLocal
-
     async with AsyncSessionLocal() as session:
         result = await session.execute(
             text(
@@ -252,8 +250,6 @@ async def list_docs(workspace: str) -> list[dict]:
 
 async def get_full_doc(workspace: str, doc_id: str) -> str | None:
     """Полный текст документа из lightrag_doc_full."""
-    from db.postgres.db import AsyncSessionLocal
-
     async with AsyncSessionLocal() as session:
         result = await session.execute(
             text(
@@ -271,8 +267,6 @@ async def get_full_doc(workspace: str, doc_id: str) -> str | None:
 
 async def doc_status_signature(workspace: str) -> tuple[int, Any]:
     """Дешёвая сигнатура doc_status для инвалидации кэшей: count + max(updated_at)."""
-    from db.postgres.db import AsyncSessionLocal
-
     async with AsyncSessionLocal() as session:
         result = await session.execute(
             text(
@@ -289,8 +283,6 @@ async def doc_status_signature(workspace: str) -> tuple[int, Any]:
 
 async def doc_diagnostics(workspace: str, doc_id: str) -> dict:
     """Диагностика документа (аналог JSON-версии get_doc_diagnostics)."""
-    from db.postgres.db import AsyncSessionLocal
-
     async with AsyncSessionLocal() as session:
         status_result = await session.execute(
             text(
@@ -352,8 +344,6 @@ async def dump_kv_stores(workspace: str) -> dict[str, str]:
     Возвращает {имя_файла: json_строка}; формат — {id: {поля}} как у
     исходных kv_store_*.json, чтобы экспорт оставался читаемым.
     """
-    from db.postgres.db import AsyncSessionLocal
-
     tables = {
         "kv_store_doc_status.json": (
             "SELECT id, content_summary, content_length, chunks_count, status,"

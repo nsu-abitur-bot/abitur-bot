@@ -354,10 +354,15 @@ async def main() -> None:
     )
     args = parser.parse_args()
 
+    # Импорт после разбора аргументов: подключение к базе требует DB_PASSWORD,
+    # а `--help` должен работать и без учётных данных.
     from db.postgres.db import AsyncSessionLocal
     from rag.pg_storage import ensure_lightrag_tables
 
-    await ensure_lightrag_tables()
+    # Создание таблиц — тоже запись в базу, а --dry-run обещает «без записи».
+    # Сам dry-run таблицы не читает: только считает строки в JSON-файлах.
+    if not args.dry_run:
+        await ensure_lightrag_tables()
 
     if args.graph_id:
         graph_ids = [args.graph_id]
