@@ -63,6 +63,7 @@ jobs:
       DB_USER: postgres
       # Единственная переменная без значения по умолчанию: без неё
       # db/postgres/config.py падает с ValueError на сборе тестов.
+      # SECRET_KEY для тестов задаёт tests/conftest.py.
       DB_PASSWORD: postgres
       TEST_DB_NAME: abitur_test
 
