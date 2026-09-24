@@ -22,6 +22,7 @@ class QuestionGroup(TypedDict):
     count: int
     variants: list[str]
 
+
 DEFAULT_QUESTION_RAW_LIMIT = 500
 _FROM_PREFIX_RE = re.compile(r"^\[from\s+[^\]]*\]\s*", re.IGNORECASE)
 
@@ -104,9 +105,13 @@ class MessageLogService:
         user_id: Optional[int] = None,
     ) -> int:
         """Считает пользовательские запросы с указанного времени."""
-        stmt = select(func.count()).select_from(MessageLog).where(
-            MessageLog.message_type == "user_input",
-            MessageLog.created_at >= start,
+        stmt = (
+            select(func.count())
+            .select_from(MessageLog)
+            .where(
+                MessageLog.message_type == "user_input",
+                MessageLog.created_at >= start,
+            )
         )
         if user_id is not None:
             stmt = stmt.where(MessageLog.user_id == user_id)
@@ -256,6 +261,70 @@ class MessageLogService:
 
         return {"total": total, "buckets": buckets}
 
+    async def get_faq_hit_stats(
+        self,
+        start: Optional[datetime],
+        end: Optional[datetime],
+        group_by: str,
+    ) -> dict:
+        """Как часто FAQ-слой отвечает без обращения к модели.
+
+        Числитель — записи `faq_match`, знаменатель — `user_input`.
+        Отдаётся по периодам, чтобы было видно динамику после смены порога.
+        """
+        if start is not None:
+            start = start.replace(tzinfo=None)
+        if end is not None:
+            end = end.replace(tzinfo=None)
+
+        period_expr = func.date_trunc(group_by, MessageLog.created_at).label("period")
+        questions_expr = (
+            func.count()
+            .filter(MessageLog.message_type == "user_input")
+            .label("questions")
+        )
+        hits_expr = (
+            func.count().filter(MessageLog.message_type == "faq_match").label("hits")
+        )
+        stmt = (
+            select(period_expr, questions_expr, hits_expr)
+            .where(MessageLog.message_type.in_(["user_input", "faq_match"]))
+            .group_by(period_expr)
+            .order_by(period_expr)
+        )
+        if start is not None:
+            stmt = stmt.where(MessageLog.created_at >= start)
+        if end is not None:
+            stmt = stmt.where(MessageLog.created_at <= end)
+
+        rows = (await self.session.execute(stmt)).all()
+
+        buckets = []
+        total_questions = 0
+        total_hits = 0
+        for row in rows:
+            if row.period is None:
+                continue
+            questions = int(row._mapping["questions"])
+            hits = int(row._mapping["hits"])
+            total_questions += questions
+            total_hits += hits
+            buckets.append(
+                {
+                    "period": row.period,
+                    "questions": questions,
+                    "hits": hits,
+                    "hit_rate": hits / questions if questions else None,
+                }
+            )
+
+        return {
+            "total_questions": total_questions,
+            "total_hits": total_hits,
+            "hit_rate": total_hits / total_questions if total_questions else None,
+            "buckets": buckets,
+        }
+
     async def get_token_usage_stats(
         self,
         start: Optional[datetime],
@@ -272,9 +341,9 @@ class MessageLogService:
         if end is not None:
             end = end.replace(tzinfo=None)
 
-        base_stmt = select(
-            func.coalesce(func.sum(MessageLog.tokens_used), 0)
-        ).where(MessageLog.tokens_used.is_not(None))
+        base_stmt = select(func.coalesce(func.sum(MessageLog.tokens_used), 0)).where(
+            MessageLog.tokens_used.is_not(None)
+        )
 
         if start is not None:
             base_stmt = base_stmt.where(MessageLog.created_at >= start)
@@ -313,9 +382,7 @@ class MessageLogService:
             for row in valid_rows:
                 if row.period in all_buckets:
                     all_buckets[row.period] = int(row._mapping["tokens"] or 0)
-            buckets = [
-                {"period": k, "tokens": v} for k, v in sorted(all_buckets.items())
-            ]
+            buckets = [{"period": k, "tokens": v} for k, v in sorted(all_buckets.items())]
         else:
             buckets = []
 

@@ -17,7 +17,7 @@ from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
-from faq.matcher import get_faq_matcher
+from faq.matcher import FAQMatcher, get_faq_matcher, load_faq_threshold
 from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
@@ -393,6 +393,18 @@ async def _await_faq(
         return None
 
 
+async def _match_faq(matcher: FAQMatcher, message: str) -> Optional[str]:
+    """FAQ-матч с актуальным порогом.
+
+    Порог читается перед каждым вопросом (значение из админки поверх
+    env-дефолта, как у CRAG), чтобы смена настройки действовала без
+    рестарта бота. load_faq_threshold не бросает исключений: при сбое БД
+    остаётся env/дефолт, и дешёвый слой продолжает работать.
+    """
+    matcher.threshold = await load_faq_threshold()
+    return await matcher.match_async(message)
+
+
 async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
     try:
         return await task
@@ -695,7 +707,7 @@ async def ask_local_llm(
         # FAQ и история стартуют параллельно: FAQ отвечает за 0.3-1с, история
         # за ~10мс. Поиск в базе знаний нельзя запускать до результата FAQ.
         faq_matcher = get_faq_matcher()
-        task_faq = asyncio.create_task(faq_matcher.match_async(expanded_message))
+        task_faq = asyncio.create_task(_match_faq(faq_matcher, expanded_message))
         task_history = asyncio.create_task(redis_client.get_history(session_id))
 
         faq_answer = await _await_faq(task_faq, session_id)

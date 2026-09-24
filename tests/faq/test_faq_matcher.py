@@ -105,8 +105,7 @@ class TestCleanUserInput:
 
     def test_strips_from_prefix(self):
         assert (
-            clean_user_input("[from Максим] когда появился НГУ?")
-            == "когда появился НГУ?"
+            clean_user_input("[from Максим] когда появился НГУ?") == "когда появился НГУ?"
         )
 
     def test_strips_greeting(self):
@@ -144,9 +143,7 @@ class TestFAQMatcherLoading:
         assert m.size == 0
 
     def test_missing_file(self, tmp_path: Path):
-        m = FAQMatcher(
-            faq_path=tmp_path / "nonexistent.yaml", embedder=FakeEmbeddings()
-        )
+        m = FAQMatcher(faq_path=tmp_path / "nonexistent.yaml", embedder=FakeEmbeddings())
         assert m.size == 0
         assert m.match("любой вопрос") is None
 
@@ -231,6 +228,27 @@ class TestFAQMatcherWithNoisyInput:
 class TestFAQMatcherThreshold:
     """Тесты порога сходства."""
 
+    def test_default_threshold_is_strict(self, faq_yaml: Path, monkeypatch):
+        """Дефолт 0.95: ниже FAQ отвечает на соседние вопросы чужим ответом."""
+        monkeypatch.delenv("FAQ_SIMILARITY_THRESHOLD", raising=False)
+        m = FAQMatcher(faq_path=faq_yaml, embedder=FakeEmbeddings())
+        assert m.threshold == 0.95
+
+    def test_env_overrides_default(self, faq_yaml: Path, monkeypatch):
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.9")
+        m = FAQMatcher(faq_path=faq_yaml, embedder=FakeEmbeddings())
+        assert m.threshold == 0.9
+
+    def test_env_invalid_falls_back_to_default(self, faq_yaml: Path, monkeypatch):
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "не-число")
+        m = FAQMatcher(faq_path=faq_yaml, embedder=FakeEmbeddings())
+        assert m.threshold == 0.95
+
+    def test_explicit_threshold_wins_over_env(self, faq_yaml: Path, monkeypatch):
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.9")
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.50, embedder=FakeEmbeddings())
+        assert m.threshold == 0.50
+
     def test_high_threshold_rejects(self, faq_yaml: Path):
         m = FAQMatcher(faq_path=faq_yaml, threshold=0.99, embedder=FakeEmbeddings())
         # Даже перефразированный вопрос не пройдёт при пороге 0.99
@@ -246,6 +264,92 @@ class TestFAQMatcherThreshold:
         assert matcher.threshold == 0.80
         matcher.threshold = 0.90
         assert matcher.threshold == 0.90
+
+
+class TestMatchAsync:
+    """match и match_async делят одну реализацию — результаты совпадают."""
+
+    async def test_match_and_match_async_agree(self, matcher: FAQMatcher):
+        questions = [
+            "Какие факультеты есть в НГУ?",
+            "привет, когда появился НГУ?",
+            "How to cook pasta carbonara recipe?",
+        ]
+        for question in questions:
+            assert await matcher.match_async(question) == matcher.match(question)
+
+    async def test_match_async_respects_threshold(self, faq_yaml: Path):
+        m = FAQMatcher(faq_path=faq_yaml, threshold=0.99, embedder=FakeEmbeddings())
+        assert await m.match_async("В НГУ какие факультеты бывают?") is None
+
+    async def test_match_async_hit(self, matcher: FAQMatcher):
+        result = await matcher.match_async("привет, когда появился НГУ?")
+        assert result is not None
+        assert "1958" in result
+
+
+class TestLoadFaqThreshold:
+    """Эффективный порог: значение из админки поверх env-дефолта."""
+
+    async def test_db_value_overrides_env(self, monkeypatch):
+        import faq.matcher as matcher_module
+
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.70")
+        _patch_db(monkeypatch, matcher_module, db_value="0.85")
+        assert await matcher_module.load_faq_threshold() == 0.85
+
+    async def test_missing_db_value_falls_back_to_env(self, monkeypatch):
+        import faq.matcher as matcher_module
+
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.70")
+        _patch_db(monkeypatch, matcher_module, db_value=None)
+        assert await matcher_module.load_faq_threshold() == 0.70
+
+    async def test_no_env_uses_default(self, monkeypatch):
+        import faq.matcher as matcher_module
+
+        monkeypatch.delenv("FAQ_SIMILARITY_THRESHOLD", raising=False)
+        _patch_db(monkeypatch, matcher_module, db_value=None)
+        assert await matcher_module.load_faq_threshold() == 0.95
+
+    async def test_invalid_db_value_falls_back(self, monkeypatch):
+        import faq.matcher as matcher_module
+
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.70")
+        _patch_db(monkeypatch, matcher_module, db_value="не-число")
+        assert await matcher_module.load_faq_threshold() == 0.70
+
+    async def test_db_failure_falls_back_to_env(self, monkeypatch):
+        import faq.matcher as matcher_module
+
+        monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.70")
+
+        def _broken_session_local():
+            raise ConnectionError("db down")
+
+        monkeypatch.setattr(matcher_module, "AsyncSessionLocal", _broken_session_local)
+        assert await matcher_module.load_faq_threshold() == 0.70
+
+
+def _patch_db(monkeypatch, matcher_module, db_value: str | None) -> None:
+    """Подменяет SettingsService/AsyncSessionLocal: get_value → db_value."""
+
+    class _FakeService:
+        def __init__(self, session):
+            self.session = session
+
+        async def get_value(self, key: str):
+            return db_value
+
+    class _FakeSession:
+        async def __aenter__(self):
+            return object()
+
+        async def __aexit__(self, *exc_info):
+            return False
+
+    monkeypatch.setattr(matcher_module, "SettingsService", _FakeService)
+    monkeypatch.setattr(matcher_module, "AsyncSessionLocal", lambda: _FakeSession())
 
 
 class TestFAQMatcherReload:
