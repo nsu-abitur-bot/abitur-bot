@@ -138,3 +138,47 @@ class TestCragSettings:
         )
 
         assert response.status_code == 422
+
+
+class TestFaqSettings:
+    def setup_method(self):
+        self.client = TestClient(app)
+
+    def teardown_method(self):
+        app.dependency_overrides.pop(get_settings_service, None)
+
+    def test_get_faq_settings(self):
+        with patch("api.routes.settings.load_faq_threshold", AsyncMock(return_value=0.8)):
+            response = self.client.get("/api/v1/settings/faq")
+
+        assert response.status_code == 200
+        assert response.json() == {"similarity_threshold": 0.8}
+
+    def test_update_faq_settings(self):
+        service = AsyncMock()
+        app.dependency_overrides[get_settings_service] = lambda: service
+        with (
+            patch(
+                "api.routes.settings.load_faq_threshold",
+                AsyncMock(return_value=0.75),
+            ),
+            patch("api.routes.settings.get_faq_matcher") as get_matcher,
+        ):
+            response = self.client.put(
+                "/api/v1/settings/faq",
+                json={"similarity_threshold": 0.75},
+            )
+
+        assert response.status_code == 200
+        assert response.json() == {"similarity_threshold": 0.75}
+        service.update_faq_settings.assert_awaited_once_with(similarity_threshold=0.75)
+        # Порог применяется к матчеру этого процесса сразу.
+        assert get_matcher.return_value.threshold == 0.75
+
+    def test_update_faq_settings_invalid_threshold(self):
+        response = self.client.put(
+            "/api/v1/settings/faq",
+            json={"similarity_threshold": 2},
+        )
+
+        assert response.status_code == 422

@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 class MessageLogResponse(BaseModel):
     """Модель ответа для лога сообщения."""
+
     id: int
     user_id: int
     session_id: str
@@ -21,6 +22,7 @@ class MessageLogResponse(BaseModel):
 
 class MessageLogListResponse(BaseModel):
     """Модель ответа для списка логов."""
+
     logs: List[MessageLogResponse]
     total: int
     limit: int
@@ -29,6 +31,7 @@ class MessageLogListResponse(BaseModel):
 
 class MessageLogQueryParams(BaseModel):
     """Параметры запроса для получения логов."""
+
     user_id: Optional[int] = Field(None, description="ID пользователя")
     session_id: Optional[str] = Field(None, description="ID сессии")
     limit: int = Field(50, ge=1, le=1000, description="Лимит записей")
@@ -37,12 +40,14 @@ class MessageLogQueryParams(BaseModel):
 
 class RequestCountBucket(BaseModel):
     """Элемент статистики по количеству запросов."""
+
     period: datetime
     count: int
 
 
 class RequestCountStatsResponse(BaseModel):
     """Статистика количества запросов за период времени."""
+
     total: int
     group_by: str
     start: Optional[datetime] = None
@@ -52,14 +57,37 @@ class RequestCountStatsResponse(BaseModel):
 
 class TokenUsageBucket(BaseModel):
     """Элемент статистики по количеству потраченных токенов."""
+
     period: datetime
     tokens: int
 
 
 class TokenUsageStatsResponse(BaseModel):
     """Статистика потребления токенов LLM за период времени."""
+
     total: int
     group_by: str
     start: Optional[datetime] = None
     end: Optional[datetime] = None
     buckets: List[TokenUsageBucket]
+
+
+class FaqHitBucket(BaseModel):
+    """Элемент статистики срабатываний FAQ-слоя."""
+
+    period: datetime
+    questions: int
+    hits: int
+    hit_rate: Optional[float] = None
+
+
+class FaqHitStatsResponse(BaseModel):
+    """Как часто вопросы закрываются готовыми ответами FAQ без модели."""
+
+    total_questions: int
+    total_hits: int
+    hit_rate: Optional[float] = None
+    group_by: str
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    buckets: List[FaqHitBucket]

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -99,3 +101,69 @@ async def test_get_question_groups_merges_exact_matches(session: AsyncSession):
     assert first["canonical"] == "как поступить в нгу"
     assert first["variants"] == ["Как поступить в НГУ?", "как поступить в нгу"]
     assert groups[1]["question"] == "Сколько стоит общежитие?"
+
+
+@pytest.mark.asyncio
+async def test_get_faq_hit_stats_counts_and_rate(session: AsyncSession):
+    """Доля срабатываний FAQ: faq_match / user_input, прочие типы не считаются."""
+    service = MessageLogService(session)
+
+    for index in range(3):
+        await service.create_log(
+            user_id=1,
+            session_id="session-1",
+            message_type="user_input",
+            content=f"Вопрос {index}",
+        )
+    await service.create_log(
+        user_id=1,
+        session_id="session-1",
+        message_type="faq_match",
+        content="Готовый ответ",
+    )
+    await service.create_log(
+        user_id=1,
+        session_id="session-1",
+        message_type="llm_response",
+        content="Ответ модели",
+    )
+
+    stats = await service.get_faq_hit_stats(start=None, end=None, group_by="day")
+
+    assert stats["total_questions"] == 3
+    assert stats["total_hits"] == 1
+    assert stats["hit_rate"] == pytest.approx(1 / 3)
+    assert len(stats["buckets"]) == 1
+    bucket = stats["buckets"][0]
+    assert bucket["questions"] == 3
+    assert bucket["hits"] == 1
+    assert bucket["hit_rate"] == pytest.approx(1 / 3)
+
+
+@pytest.mark.asyncio
+async def test_get_faq_hit_stats_empty_period(session: AsyncSession):
+    service = MessageLogService(session)
+
+    stats = await service.get_faq_hit_stats(start=None, end=None, group_by="day")
+
+    assert stats["total_questions"] == 0
+    assert stats["total_hits"] == 0
+    assert stats["hit_rate"] is None
+    assert stats["buckets"] == []
+
+
+@pytest.mark.asyncio
+async def test_get_faq_hit_stats_respects_period(session: AsyncSession):
+    service = MessageLogService(session)
+    await service.create_log(
+        user_id=1,
+        session_id="session-1",
+        message_type="user_input",
+        content="Вопрос",
+    )
+
+    future = datetime(2100, 1, 1)
+    stats = await service.get_faq_hit_stats(start=future, end=None, group_by="day")
+
+    assert stats["total_questions"] == 0
+    assert stats["hit_rate"] is None

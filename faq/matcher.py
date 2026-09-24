@@ -11,6 +11,7 @@ FAQ Matcher — модуль для поиска готовых ответов �
 
 import asyncio
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Optional, Protocol
@@ -18,14 +19,67 @@ from typing import Optional, Protocol
 import numpy as np
 import yaml
 
+from db.postgres.db import AsyncSessionLocal
+from db.postgres.services.settings import SettingsService
 from llm.factory import get_llm_provider
 
 logger = logging.getLogger(__name__)
 
 # Порог косинусного сходства для срабатывания FAQ.
 # 0.80 — баланс между ложными срабатываниями на размытых вопросах
-# и пропуском перефразированных конкретных вопросов.
-SIMILARITY_THRESHOLD = 0.95
+# и пропуском перефразированных конкретных вопросов: на эмбеддингах 0.95
+# означает почти дословное совпадение, и слой практически не срабатывает.
+# Дефолт переопределяется env (FAQ_SIMILARITY_THRESHOLD), поверх него —
+# значением из админки (см. load_faq_threshold).
+SIMILARITY_THRESHOLD = 0.80
+
+# Ключ порога FAQ в таблице settings (веб-админка).
+FAQ_SIMILARITY_THRESHOLD_SETTING_KEY = "faq_similarity_threshold"
+
+
+def _env_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, str(default)))
+    except (TypeError, ValueError):
+        return default
+
+
+def default_similarity_threshold() -> float:
+    """Порог из env с дефолтом SIMILARITY_THRESHOLD."""
+    return _env_float("FAQ_SIMILARITY_THRESHOLD", SIMILARITY_THRESHOLD)
+
+
+async def load_faq_threshold() -> float:
+    """Эффективный порог FAQ: значение из админки (таблица settings)
+    поверх env-дефолта — как load_crag_config у CRAG.
+
+    При недоступной БД или некорректном значении возвращаем env/дефолт,
+    чтобы дешёвый слой не зависел от БД.
+    """
+    default = default_similarity_threshold()
+    try:
+        async with AsyncSessionLocal() as session:
+            raw = await SettingsService(session).get_value(
+                FAQ_SIMILARITY_THRESHOLD_SETTING_KEY
+            )
+    except Exception as exc:
+        logger.warning(
+            "FAQ: порог из БД не прочитан, использую env/дефолт %.2f: %s",
+            default,
+            exc,
+        )
+        return default
+
+    if raw is None:
+        return default
+    try:
+        return float(raw)
+    except ValueError:
+        logger.warning(
+            "FAQ: некорректный порог в settings (%r), использую %.2f", raw, default
+        )
+        return default
+
 
 # Слова-паразиты / приветствия, которые не несут смысловой нагрузки
 # и мешают семантическому сопоставлению с FAQ.
@@ -115,10 +169,14 @@ class FAQMatcher:
     def __init__(
         self,
         faq_path: Optional[Path] = None,
-        threshold: float = SIMILARITY_THRESHOLD,
+        threshold: Optional[float] = None,
         embedder: Optional["EmbeddingClient"] = None,
     ):
-        self._threshold = threshold
+        # None → env-дефолт; явное значение передают тесты и вызовы,
+        # которым нужен детерминированный порог.
+        self._threshold = (
+            default_similarity_threshold() if threshold is None else threshold
+        )
         self._faq_path = faq_path or FAQ_DATA_PATH
 
         self._embedder = embedder or self._create_embedder()
@@ -248,20 +306,8 @@ class FAQMatcher:
         """Загружает FAQ из списка словарей (из БД)."""
         self._process_items(items)
 
-    def match(self, user_question: str) -> Optional[str]:
-        """
-        Проверяет, подходит ли пользовательский вопрос под один из FAQ.
-
-        Перед сопоставлением очищает текст от приветствий, префикса
-        [from username] и слов-паразитов.
-
-        Args:
-            user_question: Текст вопроса пользователя (может содержать
-                           префикс [from ...], приветствия и т.д.).
-
-        Returns:
-            Готовый ответ, если сходство >= порога, иначе None.
-        """
+    def _match(self, user_question: str) -> Optional[str]:
+        """Единая реализация сопоставления (см. match / match_async)."""
         if self._embeddings is None or len(self._questions) == 0:
             return None
 
@@ -299,45 +345,29 @@ class FAQMatcher:
 
         return None
 
+    def match(self, user_question: str) -> Optional[str]:
+        """
+        Проверяет, подходит ли пользовательский вопрос под один из FAQ.
+
+        Синхронная обёртка над общей реализацией `_match` — нужна только
+        evals/evaluator.py и тестам; в боте ходит match_async.
+
+        Перед сопоставлением очищает текст от приветствий, префикса
+        [from username] и слов-паразитов.
+
+        Args:
+            user_question: Текст вопроса пользователя (может содержать
+                           префикс [from ...], приветствия и т.д.).
+
+        Returns:
+            Готовый ответ, если сходство >= порога, иначе None.
+        """
+        return self._match(user_question)
+
     async def match_async(self, user_question: str) -> Optional[str]:
-        """Async-вариант match: выносит синхронный embed_documents в отдельный поток,
-        чтобы не блокировать event loop."""
-        if self._embeddings is None or len(self._questions) == 0:
-            return None
-
-        cleaned = clean_user_input(user_question)
-        if not cleaned:
-            return None
-
-        logger.info(f"[FAQ] Input cleaned: '{user_question}' → '{cleaned}'")
-
-        if self._embedder is None:
-            return None
-
-        embed_result = await asyncio.to_thread(
-            self._embedder.embed_documents, [cleaned]
-        )
-        query_vec = np.array(embed_result[0], dtype=float)
-        query_embedding = query_vec / max(float(np.linalg.norm(query_vec)), 1e-10)
-
-        similarities = _cosine_similarity(query_embedding, self._embeddings)
-
-        best_idx = int(np.argmax(similarities))
-        best_score = float(similarities[best_idx])
-
-        logger.info(
-            f"[FAQ] Match result: best='{self._questions[best_idx]}' "
-            f"score={best_score:.4f} threshold={self._threshold}"
-        )
-
-        if best_score >= self._threshold:
-            logger.info(
-                f"[FAQ] HIT: '{cleaned}' → '{self._questions[best_idx]}' "
-                f"(score={best_score:.4f})"
-            )
-            return self._answers[best_idx]
-
-        return None
+        """Async-обёртка над `_match`: вся работа, включая вызов эмбеддинга,
+        уезжает в отдельный поток, чтобы не блокировать event loop."""
+        return await asyncio.to_thread(self._match, user_question)
 
     def reload(self) -> None:
         """Перезагружает FAQ из файла (для тестов с faq_path)."""

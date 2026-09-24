@@ -2,9 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas.crag import CragSettings, CragSettingsUpdate
+from api.schemas.faq import FaqSettings, FaqSettingsUpdate
 from api.schemas.rate_limit import RateLimitSettings, RateLimitSettingsUpdate
 from db.postgres.db import get_async_session
 from db.postgres.services.settings import SettingsService
+from faq.matcher import get_faq_matcher, load_faq_threshold
 from rag.crag import load_crag_config
 
 router = APIRouter(prefix="/settings", tags=["settings"])
@@ -102,3 +104,37 @@ async def update_crag_settings(
     except Exception:
         raise HTTPException(status_code=503, detail="Database unavailable")
     return _crag_config_to_schema(cfg)
+
+
+@router.get(
+    "/faq",
+    response_model=FaqSettings,
+    summary="Получить настройки FAQ-матчера",
+)
+async def get_faq_settings() -> FaqSettings:
+    try:
+        threshold = await load_faq_threshold()
+    except Exception:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    return FaqSettings(similarity_threshold=threshold)
+
+
+@router.put(
+    "/faq",
+    response_model=FaqSettings,
+    summary="Обновить настройки FAQ-матчера",
+)
+async def update_faq_settings(
+    data: FaqSettingsUpdate,
+    service: SettingsService = Depends(get_settings_service),
+) -> FaqSettings:
+    """Меняет порог FAQ. Бот подхватывает значение на следующем вопросе —
+    без рестарта, как у CRAG."""
+    try:
+        await service.update_faq_settings(similarity_threshold=data.similarity_threshold)
+        threshold = await load_faq_threshold()
+    except Exception:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+    # В процессе API свой экземпляр матчера — обновляем и его.
+    get_faq_matcher().threshold = threshold
+    return FaqSettings(similarity_threshold=threshold)

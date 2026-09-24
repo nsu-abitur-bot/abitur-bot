@@ -3,6 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from api.schemas.message_log import (
+    FaqHitStatsResponse,
     MessageLogListResponse,
     MessageLogQueryParams,
     MessageLogResponse,
@@ -68,6 +69,57 @@ async def get_request_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Ошибка получения статистики: {str(e)}",
+        )
+
+
+@router.get(
+    "/faq-stats",
+    response_model=FaqHitStatsResponse,
+    summary="Как часто FAQ-слой отвечает без обращения к модели",
+)
+async def get_faq_hit_stats(
+    start: datetime | None = Query(None, description="Начало периода (ISO 8601)"),
+    end: datetime | None = Query(None, description="Конец периода (ISO 8601)"),
+    group_by: str = Query(
+        "day",
+        description="Группировка: hour, day, week, month",
+    ),
+    log_service: MessageLogService = Depends(get_message_log_service),
+):
+    """Доля вопросов, закрытых готовыми ответами FAQ (трек качества).
+    Порог матчера настраивается через PUT /settings/faq."""
+    allowed_groups = {"hour", "day", "week", "month"}
+    if group_by not in allowed_groups:
+        raise HTTPException(
+            status_code=400,
+            detail=f"group_by должен быть одним из {sorted(allowed_groups)}",
+        )
+
+    if start is not None and end is not None and start > end:
+        raise HTTPException(
+            status_code=400,
+            detail="start не может быть позже end",
+        )
+
+    try:
+        stats = await log_service.get_faq_hit_stats(
+            start=start,
+            end=end,
+            group_by=group_by,
+        )
+        return FaqHitStatsResponse(
+            total_questions=stats["total_questions"],
+            total_hits=stats["total_hits"],
+            hit_rate=stats["hit_rate"],
+            group_by=group_by,
+            start=start,
+            end=end,
+            buckets=stats["buckets"],
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения статистики FAQ: {str(e)}",
         )
 
 

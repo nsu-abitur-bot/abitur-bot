@@ -109,6 +109,14 @@ class SettingsService:
         )
         await self.session.commit()
 
+    async def update_faq_settings(self, *, similarity_threshold: float) -> None:
+        await self._upsert(
+            "faq_similarity_threshold",
+            str(similarity_threshold),
+            "FAQ: порог косинусного сходства для срабатывания матчера (0..1)",
+        )
+        await self.session.commit()
+
     async def get_value(self, key: str) -> str | None:
         """Значение произвольной настройки по ключу (или None, если её нет)."""
         result = await self.session.execute(select(Settings).where(Settings.key == key))
