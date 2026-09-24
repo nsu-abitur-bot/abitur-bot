@@ -31,6 +31,7 @@ llm/              Только провайдеры моделей, без ло�
   profiles.py     Профили параметров (CHAT, GRAPH, PARSER, VISION, INTENT, TITLE, EMBEDDING)
 pipeline/         Сборка ответа: слой выше rag/faq/abbrev/db и провайдеров llm
   llm_client.py   ask_local_llm: abbrev → FAQ → RAG → модель(+tools)
+  prompts.py      Промпты пайплайна с версиями: правила ответа, хинты RAG, интент
   tools/          Function-calling инструменты (admission_scores.py, registry.py)
   preprocessor.py Очистка/структурирование текста перед загрузкой в RAG
 parser/           Парсеры сайта НГУ и таблиц
