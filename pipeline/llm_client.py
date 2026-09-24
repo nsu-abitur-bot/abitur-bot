@@ -21,6 +21,15 @@ from faq.matcher import get_faq_matcher
 from llm.base import LLMUsage
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from pipeline.prompts import (
+    INTENT_PROMPT_TEMPLATE,
+    LIGHTRAG_FORMAT_HINT,
+    LIGHTRAG_LEVEL_HINT,
+    RAG_CONTEXT_NOT_FOUND,
+    RAG_CONTEXT_UNAVAILABLE,
+    SOURCES_HINT,
+    SYSTEM_PROMPT_BASE,
+)
 from pipeline.tools import ADMISSION_SCORES_TOOL, default_tool_executor
 from rag.crag import load_crag_config
 from rag.retriever import query_graph_with_crag, query_graph_with_sources
@@ -51,64 +60,6 @@ def _strip_markup(text: str) -> str:
     text = re.sub(r"</?p>", "", text, flags=re.IGNORECASE)
     return unescape(re.sub(r"<[^>]+>", "", text)).strip()
 
-
-SYSTEM_PROMPT_BASE = """
-Ты — официальный дружелюбный помощник-бот для абитуриентов НГУ
-(Новосибирский государственный университет).
-
-Правила поведения:
-1. Имя и легкий диалог: Если пользователь здоровается или говорит о себе (например,
-   называет своё имя), обязательно используй историю переписки, чтобы поддержать
-   беседу и обратиться по имени.
-2. Вопросы об НГУ: Ищи фактическую информацию ИСКЛЮЧИТЕЛЬНО в блоке
-   "Контекст из базы знаний об НГУ" ниже. Этот контекст уже прошёл проверку
-   релевантности — отвечай ТОЛЬКО по нему и не додумывай. Если информации о
-   предмете вопроса (факультет, программа, цифры и любые другие детали) нет в
-   твоем контексте — ОБЯЗАТЕЛЬНО ответь:
-   "Я не нашел информации об этом в базе знаний НГУ".
-   Категорически запрещено давать общие советы, запрещено давать ссылки
-   (если их нет в переданном контексте), и запрещено отвечать,
-   используя свои собственные "обученные" общие знания об НГУ.
-   ВАЖНО про факультеты: НЕ приписывай направление (программу) конкретному
-   факультету, если это прямо не подтверждено контекстом. Если пользователь
-   спросил про конкретный факультет, перечисляй ТОЛЬКО те направления, про
-   принадлежность которых этому факультету прямо сказано в контексте. Не
-   подставляй направления с похожим названием с других факультетов.
-3. Оффтоп: Если вопрос вообще не про НГУ и не является поддержанием диалога,
-   вежливо скажи, что ты консультируешь только по вопросам НГУ.
-4. Уровень образования: По умолчанию считай, что вопрос касается ПОСТУПЛЕНИЯ В
-   БАКАЛАВРИАТ (или специалитет) — это основная аудитория бота. Информацию о
-   магистратуре или аспирантуре давай ТОЛЬКО если пользователь явно про них
-   спросил. Если в контексте есть данные по разным уровням образования, выбирай
-   относящиеся к бакалавриату, если не указано иное.
-5. Проходные и средние баллы: для ЛЮБЫХ вопросов про проходной или средний балл
-   прошлых лет ты ОБЯЗАН вызвать инструмент get_admission_scores и считать его
-   результат авторитетным контекстом наравне с блоком базы знаний. Если инструмент
-   вернул числа — отвечай строго по ним и НЕ пиши «не нашёл». Если инструмент
-   сообщил, что данных нет, — тогда действует обычное правило пункта 2 про
-   «Я не нашел информации об этом в базе знаний НГУ». Числа проходных/средних
-   баллов брать ТОЛЬКО из инструмента, не выдумывать.
-6. Отвечай коротко, без лишней воды. Структурируй абзацы.
-
-Форматирование в HTML (для Telegram):
-Разрешены только теги: <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.
-Не используй Markdown (**жирный** или *курсив*). Оборачивай жирный шрифт в <b>.
-
-Контекст из базы знаний об НГУ:
-{context}
-
-{sources_hint}"""
-
-LIGHTRAG_FORMAT_HINT = (
-    "Верни ответ в Telegram-совместимом HTML без Markdown. "
-    'Разрешены теги <b>, <i>, <u>, <s>, <code>, <pre>, <a href="...">.'
-)
-
-LIGHTRAG_LEVEL_HINT = (
-    "Если уровень образования в вопросе не указан явно, считай, что речь идёт о "
-    "поступлении в бакалавриат (или специалитет), и приоритизируй контекст по "
-    "бакалавриату, а не по магистратуре или аспирантуре."
-)
 
 RAG_LOG_CONTENT_LIMIT = 12000
 RAG_INTERNAL_LOG_LIMIT = 120
@@ -207,17 +158,7 @@ async def _classify_intent_bg(
         )
         valid_topic_ids = {topic.id for topic in topics} if topics else set()
 
-        intent_prompt = (
-            "Ты — маршрутизатор. Выбери подходящую тему для сообщения "
-            "пользователя.\n"
-            "Ответь СТРОГО в формате JSON:\n"
-            '{"is_nsu": true, "topic_id": 123}\n'
-            "Где 'is_nsu' всегда true.\n\n"
-            "Список тем для 'topic_id':\n"
-            f"{topics_list}\n\n"
-            "Выбери наиболее подходящий 'topic_id', либо null,"
-            "если ни одна тема не подходит."
-        )
+        intent_prompt = INTENT_PROMPT_TEMPLATE.format(topics_list=topics_list)
         intent_messages: list[BaseMessage] = [
             SystemMessage(content=intent_prompt),
             HumanMessage(content=expanded_message),
@@ -513,7 +454,7 @@ async def _retrieve_context(
         else:
             logger.info(f"[{session_id}] No relevant context found in RAG.")
             sources = []
-            context = "Релевантный контекст из базы знаний не найден."
+            context = RAG_CONTEXT_NOT_FOUND
 
         ctx.log(
             "rag_response",
@@ -528,7 +469,7 @@ async def _retrieve_context(
         return _RagResult(context=_clean_rag_context(context), sources=sources)
     except Exception as e:
         logger.warning(f"[{session_id}] LightRAG query error: {e}")
-        context = "База знаний временно недоступна."
+        context = RAG_CONTEXT_UNAVAILABLE
         ctx.log(
             "rag_response",
             context,
@@ -546,13 +487,8 @@ def _build_messages(rag_context: str, history_entries: list[dict]) -> list[BaseM
     Из прошлых ответов ассистента вырезаем блок «Источники» и ссылки: раньше
     они попадали в историю целиком и модель начинала их копировать.
     """
-    sources_hint = (
-        "\n\nИНСТРУКЦИЯ К ОТВЕТУ:\n"
-        "КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО писать блок 'Источники' или перечислять ссылки. "
-        "Просто ответь на вопрос пользователя, опираясь на контекст!"
-    )
     system_prompt = SYSTEM_PROMPT_BASE.format(
-        context=rag_context, sources_hint=sources_hint
+        context=rag_context, sources_hint=SOURCES_HINT
     )
     messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
@@ -651,9 +587,7 @@ async def _answer_from_faq(
 
     ctx.log("faq_match", faq_answer, source="faq")
     _spawn_bg(
-        redis_client.add_message(
-            session_id, {"role": "assistant", "content": faq_answer}
-        )
+        redis_client.add_message(session_id, {"role": "assistant", "content": faq_answer})
     )
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, session_id, message, faq_answer))
