@@ -35,9 +35,7 @@ class DocumentUpdateService:
         self.check_concurrency = check_concurrency
         self.documents = DocumentService(session)
 
-    async def check_documents(
-        self, document_ids: list[str] | None = None
-    ) -> list[dict]:
+    async def check_documents(self, document_ids: list[str] | None = None) -> list[dict]:
         docs = await self.documents.list_checkable(self.graph_id, document_ids)
         semaphore = asyncio.Semaphore(self.check_concurrency)
         results = await asyncio.gather(

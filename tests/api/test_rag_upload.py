@@ -71,10 +71,7 @@ class TestRagPreprocessEndpoint:
     def test_preprocess_document_success(self, monkeypatch):
         async def fake_clean_and_structure_text(text: str) -> str:
             assert text == "Документы принимает НГУ."
-            return (
-                "Документы принимает НГУ "
-                "(Новосибирский государственный университет)."
-            )
+            return "Документы принимает НГУ (Новосибирский государственный университет)."
 
         monkeypatch.setattr(
             rag, "clean_and_structure_text", fake_clean_and_structure_text
@@ -88,8 +85,7 @@ class TestRagPreprocessEndpoint:
         assert response.status_code == 200
         data = response.json()
         assert data["text"] == (
-            "Документы принимает НГУ "
-            "(Новосибирский государственный университет)."
+            "Документы принимает НГУ (Новосибирский государственный университет)."
         )
         assert data["chars"] == len(data["text"])
 

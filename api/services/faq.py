@@ -20,8 +20,10 @@ class FaqService:
         entry = await self._db.create(item.question, item.aliases, item.answer)
         await self._reload_matcher()
         return FaqItem(
-            id=entry.id, question=entry.question,
-            aliases=entry.aliases, answer=entry.answer
+            id=entry.id,
+            question=entry.question,
+            aliases=entry.aliases,
+            answer=entry.answer,
         )
 
     async def create_many(self, items: list[FaqItem]) -> list[FaqItem]:
@@ -42,8 +44,10 @@ class FaqService:
             raise KeyError(item_id)
         await self._reload_matcher()
         return FaqItem(
-            id=entry.id, question=entry.question,
-            aliases=entry.aliases, answer=entry.answer
+            id=entry.id,
+            question=entry.question,
+            aliases=entry.aliases,
+            answer=entry.answer,
         )
 
     async def delete(self, item_id: str) -> None:

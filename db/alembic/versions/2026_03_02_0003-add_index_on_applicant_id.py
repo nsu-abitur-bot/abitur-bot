@@ -19,9 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema: create index on applicant_id."""
-    op.create_index(
-        "idx_user_applicant_id", "user", ["applicant_id"], unique=False
-    )
+    op.create_index("idx_user_applicant_id", "user", ["applicant_id"], unique=False)
 
 
 def downgrade() -> None:

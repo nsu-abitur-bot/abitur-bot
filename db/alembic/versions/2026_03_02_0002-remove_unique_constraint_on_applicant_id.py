@@ -21,9 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema: remove unique constraint on applicant_id if exists."""
     # Используем PostgreSQL-специфичный синтаксис IF EXISTS
-    op.execute(
-        text('ALTER TABLE "user" DROP CONSTRAINT IF EXISTS uq_user_applicant_id')
-    )
+    op.execute(text('ALTER TABLE "user" DROP CONSTRAINT IF EXISTS uq_user_applicant_id'))
 
 
 def downgrade() -> None:

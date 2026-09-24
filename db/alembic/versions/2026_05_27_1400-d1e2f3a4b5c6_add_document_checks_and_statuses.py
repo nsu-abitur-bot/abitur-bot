@@ -18,13 +18,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     op.execute("UPDATE document SET status = 'indexed' WHERE status = 'active'")
-    op.execute(
-        "UPDATE document SET status = 'indexing_failed' WHERE status = 'error'"
-    )
+    op.execute("UPDATE document SET status = 'indexing_failed' WHERE status = 'error'")
 
 
 def downgrade() -> None:
     op.execute("UPDATE document SET status = 'active' WHERE status = 'indexed'")
-    op.execute(
-        "UPDATE document SET status = 'error' WHERE status = 'indexing_failed'"
-    )
+    op.execute("UPDATE document SET status = 'error' WHERE status = 'indexing_failed'")

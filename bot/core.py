@@ -44,17 +44,12 @@ WELCOME_TEXT = (
     "Напишите свой вопрос или используйте команду /track, чтобы начать! 🚀"
 )
 
-FEEDBACK_FOOTER = (
-    "Я ответил неправильно?\n"
-    "Поделитесь обратной связью командой /feedback"
-)
+FEEDBACK_FOOTER = "Я ответил неправильно?\nПоделитесь обратной связью командой /feedback"
 
 SYSTEM_RATE_LIMIT_MESSAGE = (
     "Сегодняшний общий лимит запросов к боту исчерпан. Попробуйте завтра."
 )
-USER_RATE_LIMIT_MESSAGE = (
-    "Вы исчерпали дневной лимит запросов к боту. Попробуйте завтра."
-)
+USER_RATE_LIMIT_MESSAGE = "Вы исчерпали дневной лимит запросов к боту. Попробуйте завтра."
 
 
 @dataclass(frozen=True)
@@ -85,9 +80,7 @@ class BotReply:
 class BotCore:
     """Общая бизнес-логика бота, независимая от транспорта."""
 
-    async def resolve_internal_user_id(
-        self, channel: str, external_user_id: str
-    ) -> int:
+    async def resolve_internal_user_id(self, channel: str, external_user_id: str) -> int:
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             if channel == "telegram":
@@ -171,9 +164,7 @@ class BotCore:
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str
     ) -> BotReply:
-        internal_user_id = await self.resolve_internal_user_id(
-            channel, external_user_id
-        )
+        internal_user_id = await self.resolve_internal_user_id(channel, external_user_id)
         redis_client = await get_redis_client()
         await redis_client.set_awaiting_applicant_id(session_id, False)
         await redis_client.set_awaiting_feedback(session_id, False)
@@ -198,9 +189,7 @@ class BotCore:
     async def cmd_untrack(
         self, channel: str, external_user_id: str, session_id: str
     ) -> BotReply:
-        internal_user_id = await self.resolve_internal_user_id(
-            channel, external_user_id
-        )
+        internal_user_id = await self.resolve_internal_user_id(channel, external_user_id)
         async with AsyncSessionLocal() as session:
             user_service = UserService(session)
             updated = await user_service.update_applicant_id(internal_user_id, None)
@@ -275,9 +264,7 @@ class BotCore:
         stream_callback: Optional[StreamCallback] = None,
         status_callback: Optional[StatusCallback] = None,
     ) -> BotReply:
-        internal_user_id = await self.resolve_internal_user_id(
-            channel, external_user_id
-        )
+        internal_user_id = await self.resolve_internal_user_id(channel, external_user_id)
         redis_client = await get_redis_client()
         dialog_session_id = await redis_client.get_dialog_session_id(session_id)
 

@@ -25,8 +25,19 @@ import sys
 # Пакеты первого уровня, между которыми следим за зависимостями. Всё прочее
 # (сторонние библиотеки, tools, alembic) не наше дело.
 PACKAGES = {
-    "abbrev", "api", "bootstrap", "bot", "config", "db", "evals",
-    "faq", "llm", "parser", "pipeline", "rag", "scheduler",
+    "abbrev",
+    "api",
+    "bootstrap",
+    "bot",
+    "config",
+    "db",
+    "evals",
+    "faq",
+    "llm",
+    "parser",
+    "pipeline",
+    "rag",
+    "scheduler",
 }
 
 # Каталоги, в которые не ходим. tests исключены сознательно: тесты имеют право

@@ -69,11 +69,7 @@ class FeedbackReportService:
             stmt = stmt.where(*filters)
             count_stmt = count_stmt.where(*filters)
 
-        stmt = (
-            stmt.order_by(FeedbackReport.created_at.desc())
-            .limit(limit)
-            .offset(offset)
-        )
+        stmt = stmt.order_by(FeedbackReport.created_at.desc()).limit(limit).offset(offset)
         rows = (await self.session.execute(stmt)).scalars().all()
         total = (await self.session.execute(count_stmt)).scalar_one()
         return list(rows), int(total)

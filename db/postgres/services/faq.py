@@ -23,9 +23,7 @@ class FaqDbService:
             logger.error(f"Ошибка получения всех FAQ: {e}")
             return []
 
-    async def create(
-        self, question: str, aliases: list[str], answer: str
-    ) -> FaqEntry:
+    async def create(self, question: str, aliases: list[str], answer: str) -> FaqEntry:
         entry = FaqEntry(question=question, aliases=aliases, answer=answer)
         self.session.add(entry)
         try:
@@ -37,9 +35,7 @@ class FaqDbService:
             logger.error(f"Ошибка создания FAQ: {e}")
             raise
 
-    async def create_many(
-        self, items: list[dict]
-    ) -> list[FaqEntry]:
+    async def create_many(self, items: list[dict]) -> list[FaqEntry]:
         entries = [
             FaqEntry(
                 question=item["question"],

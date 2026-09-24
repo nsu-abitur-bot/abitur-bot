@@ -41,9 +41,7 @@ async def add_texts_async(
                 continue
 
             source_id = source_ids[i] if source_ids and i < len(source_ids) else None
-            file_path = (
-                file_paths[i] if file_paths and i < len(file_paths) else source_id
-            )
+            file_path = file_paths[i] if file_paths and i < len(file_paths) else source_id
 
             # Формируем строку без запятых, чтобы избежать проблем со split(",")
             # в query_with_sources

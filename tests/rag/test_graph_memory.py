@@ -79,9 +79,7 @@ async def test_query_with_sources_uses_document_title(monkeypatch):
     monkeypatch.setattr(memory, "_use_graph", fake_use_graph)
     monkeypatch.setattr(memory, "get_list_docs", fake_get_list_docs)
     monkeypatch.setattr(memory, "_get_source_titles", fake_get_source_titles)
-    monkeypatch.setattr(
-        memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm
-    )
+    monkeypatch.setattr(memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm)
 
     answer, sources = await memory.query_with_sources("test_graph", "Вопрос")
 
@@ -125,9 +123,7 @@ async def test_query_with_sources_logs_rag_query_and_response(monkeypatch, caplo
 
     monkeypatch.setattr(memory, "_use_graph", fake_use_graph)
     monkeypatch.setattr(memory, "_get_source_titles", fake_get_source_titles)
-    monkeypatch.setattr(
-        memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm
-    )
+    monkeypatch.setattr(memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm)
 
     with caplog.at_level(logging.DEBUG, logger="rag.graph_memory"):
         answer, sources = await memory.query_with_sources(

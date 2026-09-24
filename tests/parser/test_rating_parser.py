@@ -37,7 +37,9 @@ class TestBuildLeaderboardUrl:
 
 class TestExtractParamsFromUrl:
     def test_extracts_all_params(self):
-        url = "https://abiturient.nsu.ru/bachelor?faculty=8&direction=7&condition=10&type=0"
+        url = (
+            "https://abiturient.nsu.ru/bachelor?faculty=8&direction=7&condition=10&type=0"
+        )
         params = extract_params_from_url(url)
         assert params["faculty"] == 8
         assert params["direction"] == 7
@@ -53,7 +55,9 @@ class TestExtractParamsFromUrl:
         assert params["type"] == 0
 
     def test_returns_int_types(self):
-        url = "https://abiturient.nsu.ru/bachelor?faculty=3&direction=5&condition=2&type=1"
+        url = (
+            "https://abiturient.nsu.ru/bachelor?faculty=3&direction=5&condition=2&type=1"
+        )
         params = extract_params_from_url(url)
         for value in params.values():
             assert isinstance(value, int)

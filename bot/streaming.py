@@ -147,9 +147,7 @@ class MaxStreamer:
 
         if self._message_id is None:
             try:
-                sent = await self._client.send_message(
-                    chat_id=self._chat_id, text=plain
-                )
+                sent = await self._client.send_message(chat_id=self._chat_id, text=plain)
             except Exception as exc:
                 logger.warning("MaxStreamer: failed to send status message: %s", exc)
                 return
@@ -163,9 +161,7 @@ class MaxStreamer:
             return
 
         try:
-            await self._client.edit_message(
-                message_id=self._message_id, text=plain
-            )
+            await self._client.edit_message(message_id=self._message_id, text=plain)
             self._last_sent_text = plain
         except Exception as exc:
             logger.debug("MaxStreamer: status edit failed (%s)", exc)
@@ -195,9 +191,7 @@ class MaxStreamer:
                     "MaxStreamer: HTML parse failed on send, sending plain text"
                 )
                 plain = normalize_links_for_messaging(re.sub(r"<[^>]+>", "", final_text))
-                sent = await self._client.send_message(
-                    chat_id=self._chat_id, text=plain
-                )
+                sent = await self._client.send_message(chat_id=self._chat_id, text=plain)
             if (
                 sent is not None
                 and sent.message is not None
@@ -222,8 +216,6 @@ class MaxStreamer:
             )
             plain = normalize_links_for_messaging(re.sub(r"<[^>]+>", "", final_text))
             try:
-                await self._client.edit_message(
-                    message_id=self._message_id, text=plain
-                )
+                await self._client.edit_message(message_id=self._message_id, text=plain)
             except Exception as exc2:
                 logger.debug("MaxStreamer: plain fallback edit failed (%s)", exc2)

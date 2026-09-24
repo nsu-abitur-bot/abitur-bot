@@ -26,7 +26,7 @@ def _make_message(
     msg.user_text = user_text
     msg.bot_response = bot_response
     msg.created_at = created_at or datetime(2026, 3, 8, 12, 0, 0)
-    
+
     mock_user = AsyncMock()
     mock_user.telegram_id = 12345
     mock_user.max_id = None

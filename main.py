@@ -22,8 +22,10 @@ async def _load_faq_and_abbrev() -> None:
         try:
             faq_entries = await FaqDbService(session).get_all()
             get_faq_matcher().load_items(
-                [{"question": e.question, "aliases": e.aliases, "answer": e.answer}
-                 for e in faq_entries]
+                [
+                    {"question": e.question, "aliases": e.aliases, "answer": e.answer}
+                    for e in faq_entries
+                ]
             )
             logger.info("FAQ загружен из БД: %d записей", len(faq_entries))
 

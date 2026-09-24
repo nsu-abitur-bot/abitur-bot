@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 
 class RedisClient:
     def __init__(self):
-        self.client: redis_client.Redis = redis.from_url(
-            REDIS_URL, decode_responses=True
-        )
+        self.client: redis_client.Redis = redis.from_url(REDIS_URL, decode_responses=True)
 
     async def add_message(
         self, session_id: str, message: Dict[str, str]
@@ -126,9 +124,7 @@ class RedisClient:
                 await self.client.set(key, "1", ex=TTL_SECONDS)
             else:
                 await self.client.delete(key)
-            logger.debug(
-                "Установлен awaiting_applicant_id=%s для %s", value, session_id
-            )
+            logger.debug("Установлен awaiting_applicant_id=%s для %s", value, session_id)
         except redis.RedisError as e:
             logger.error("Ошибка установки awaiting_applicant_id: %s", e)
             raise

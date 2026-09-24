@@ -215,9 +215,7 @@ async def run_telegram_bot() -> bool | None:
             return
 
         user_text = (message.text or "").strip()
-        user_name = (
-            message.from_user.username or message.from_user.first_name or "Аноним"
-        )
+        user_name = message.from_user.username or message.from_user.first_name or "Аноним"
         chat_id = str(message.chat.id)
         session_id = get_session_id(message)
 

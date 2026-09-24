@@ -32,7 +32,6 @@ SUPPORTED_EXTENSIONS = {
 }
 
 
-
 class _HTMLTextExtractor(HTMLParser):
     def __init__(self) -> None:
         super().__init__()

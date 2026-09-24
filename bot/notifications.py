@@ -109,9 +109,7 @@ async def notify_users(
                         user.max_id,
                     )
 
-            if (not bot or not user.telegram_id) and (
-                not max_client or not user.max_id
-            ):
+            if (not bot or not user.telegram_id) and (not max_client or not user.max_id):
                 logger.warning(
                     "У пользователя %s нет доступных каналов для уведомления",
                     user_id,

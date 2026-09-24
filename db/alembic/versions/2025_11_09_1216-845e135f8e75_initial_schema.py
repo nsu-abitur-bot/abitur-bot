@@ -32,9 +32,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("url"),
     )
-    op.create_index(
-        "idx_leaderboards_active", "leaderboard", ["is_active"], unique=False
-    )  # noqa: E501
+    op.create_index("idx_leaderboards_active", "leaderboard", ["is_active"], unique=False)  # noqa: E501
     op.create_index(
         "idx_leaderboards_hash", "leaderboard", ["content_hash"], unique=False
     )  # noqa: E501

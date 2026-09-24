@@ -179,6 +179,7 @@ _TABLES_DDL: dict[str, str] = {
         )""",
 }
 
+
 async def ensure_lightrag_tables() -> None:
     """Идемпотентно создаёт таблицы LightRAG (без pgvector)."""
     async with AsyncSessionLocal() as session:

@@ -73,4 +73,3 @@ def run_migrations():
     except Exception as e:
         logger.error(f"Ошибка при применении миграций: {e}")
         sys.exit(1)
-

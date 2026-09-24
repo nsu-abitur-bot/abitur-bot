@@ -14,9 +14,7 @@ async def get_topics(db: AsyncSession = Depends(get_db)):
     topic_service = TopicService(db)
     topics = await topic_service.get_all_active_topics()
     return TopicListResponse(
-        topics=[
-            TopicResponse.model_validate(topic) for topic in topics
-        ],
+        topics=[TopicResponse.model_validate(topic) for topic in topics],
         total=len(topics),
     )
 
@@ -33,13 +31,13 @@ async def create_topic(
 ):
     """
     Создает новую тему.
-    
+
     - **label**: уникальное название темы
     - **description**: опциональное описание
     - **is_active**: активна ли тема при создании (по умолчанию True)
     """
     topic_service = TopicService(db)
-    
+
     # Проверяем, не существует ли уже тема с таким названием
     existing_topic = await topic_service.get_topic_by_label(topic_data.label)
     if existing_topic:
@@ -47,7 +45,7 @@ async def create_topic(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Тема с названием '{topic_data.label}' уже существует",
         )
-    
+
     topic = await topic_service.create_topic(
         label=topic_data.label,
         description=topic_data.description,
@@ -68,13 +66,13 @@ async def get_topic(
     """Получает тему по её ID."""
     topic_service = TopicService(db)
     topic = await topic_service.get_topic_by_id(topic_id)
-    
+
     if not topic:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Тема с ID {topic_id} не найдена",
         )
-    
+
     return TopicResponse.model_validate(topic)
 
 
@@ -90,13 +88,13 @@ async def update_topic(
 ):
     """
     Обновляет тему по ID.
-    
+
     - **label**: новое название (опционально)
     - **description**: новое описание (опционально)
     - **is_active**: изменить статус активности (опционально)
     """
     topic_service = TopicService(db)
-    
+
     # Проверяем, существует ли тема
     topic = await topic_service.get_topic_by_id(topic_id)
     if not topic:
@@ -104,7 +102,7 @@ async def update_topic(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Тема с ID {topic_id} не найдена",
         )
-    
+
     # Проверяем, не существует ли уже тема с новым названием (если оно меняется)
     if topic_data.label and topic_data.label != topic.label:
         existing_topic = await topic_service.get_topic_by_label(topic_data.label)
@@ -113,14 +111,14 @@ async def update_topic(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Тема с названием '{topic_data.label}' уже существует",
             )
-    
+
     updated_topic = await topic_service.update_topic(
         topic_id=topic_id,
         label=topic_data.label,
         description=topic_data.description,
         is_active=topic_data.is_active,
     )
-    
+
     return TopicResponse.model_validate(updated_topic)
 
 
@@ -135,12 +133,12 @@ async def delete_topic(
 ):
     """
     Удаляет (деактивирует) тему по ID.
-    
+
     Примечание: тема не удаляется из БД, а деактивируется (is_active = False)
     для сохранения целостности исторических данных.
     """
     topic_service = TopicService(db)
-    
+
     # Проверяем, существует ли тема
     topic = await topic_service.get_topic_by_id(topic_id)
     if not topic:
@@ -148,7 +146,7 @@ async def delete_topic(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Тема с ID {topic_id} не найдена",
         )
-    
+
     success = await topic_service.delete_topic(topic_id)
     if not success:
         raise HTTPException(

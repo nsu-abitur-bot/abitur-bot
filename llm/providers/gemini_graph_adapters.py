@@ -17,9 +17,7 @@ GEMINI_EMBEDDING_DIMS: dict[str, int] = {
 class GeminiLLM:
     """LLM-адаптер для LightRAG на базе Google Gemini."""
 
-    def __init__(
-        self, api_key: str, model: str = "gemini-2.5-flash-lite"
-    ) -> None:
+    def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite") -> None:
         self.model = model
         self.client = genai.Client(api_key=api_key)
         self.profile = LLMProfiles.GRAPH
@@ -31,7 +29,7 @@ class GeminiLLM:
             system_prompt = kwargs.get("system_prompt")
             config = types.GenerateContentConfig(
                 temperature=kwargs.get("temperature", self.profile.temperature),
-                max_output_tokens=kwargs.get("max_tokens", self.profile.max_tokens)
+                max_output_tokens=kwargs.get("max_tokens", self.profile.max_tokens),
             )
 
             if system_prompt:
