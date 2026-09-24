@@ -154,6 +154,14 @@ class TestFaqSettings:
         assert response.status_code == 200
         assert response.json() == {"similarity_threshold": 0.8}
 
+    def test_update_faq_settings_rejects_low_threshold(self):
+        """Порог ниже 0.5 превратил бы FAQ в ответ на любой вопрос."""
+        response = self.client.put(
+            "/api/v1/settings/faq",
+            json={"similarity_threshold": 0.3},
+        )
+        assert response.status_code == 422
+
     def test_update_faq_settings(self):
         service = AsyncMock()
         app.dependency_overrides[get_settings_service] = lambda: service

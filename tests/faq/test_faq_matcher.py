@@ -228,11 +228,11 @@ class TestFAQMatcherWithNoisyInput:
 class TestFAQMatcherThreshold:
     """Тесты порога сходства."""
 
-    def test_default_threshold_is_documented_balance(self, faq_yaml: Path, monkeypatch):
-        """Дефолт — 0.80 из комментария у константы, а не 0.95."""
+    def test_default_threshold_is_strict(self, faq_yaml: Path, monkeypatch):
+        """Дефолт 0.95: ниже FAQ отвечает на соседние вопросы чужим ответом."""
         monkeypatch.delenv("FAQ_SIMILARITY_THRESHOLD", raising=False)
         m = FAQMatcher(faq_path=faq_yaml, embedder=FakeEmbeddings())
-        assert m.threshold == 0.80
+        assert m.threshold == 0.95
 
     def test_env_overrides_default(self, faq_yaml: Path, monkeypatch):
         monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.9")
@@ -242,7 +242,7 @@ class TestFAQMatcherThreshold:
     def test_env_invalid_falls_back_to_default(self, faq_yaml: Path, monkeypatch):
         monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "не-число")
         m = FAQMatcher(faq_path=faq_yaml, embedder=FakeEmbeddings())
-        assert m.threshold == 0.80
+        assert m.threshold == 0.95
 
     def test_explicit_threshold_wins_over_env(self, faq_yaml: Path, monkeypatch):
         monkeypatch.setenv("FAQ_SIMILARITY_THRESHOLD", "0.9")
@@ -310,7 +310,7 @@ class TestLoadFaqThreshold:
 
         monkeypatch.delenv("FAQ_SIMILARITY_THRESHOLD", raising=False)
         _patch_db(monkeypatch, matcher_module, db_value=None)
-        assert await matcher_module.load_faq_threshold() == 0.80
+        assert await matcher_module.load_faq_threshold() == 0.95
 
     async def test_invalid_db_value_falls_back(self, monkeypatch):
         import faq.matcher as matcher_module

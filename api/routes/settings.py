@@ -112,11 +112,8 @@ async def update_crag_settings(
     summary="Получить настройки FAQ-матчера",
 )
 async def get_faq_settings() -> FaqSettings:
-    try:
-        threshold = await load_faq_threshold()
-    except Exception:
-        raise HTTPException(status_code=503, detail="Database unavailable")
-    return FaqSettings(similarity_threshold=threshold)
+    # load_faq_threshold не бросает: при недоступной БД отдаёт env/дефолт.
+    return FaqSettings(similarity_threshold=await load_faq_threshold())
 
 
 @router.put(

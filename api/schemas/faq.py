@@ -21,8 +21,8 @@ class FaqSettings(BaseModel):
     """Настройки FAQ-матчера."""
 
     similarity_threshold: float = Field(
-        0.80,
-        ge=0,
+        0.95,
+        ge=0.5,
         le=1,
         description="Порог косинусного сходства для срабатывания FAQ (0..1)",
     )
@@ -31,4 +31,5 @@ class FaqSettings(BaseModel):
 class FaqSettingsUpdate(BaseModel):
     """Обновление настроек FAQ-матчера."""
 
-    similarity_threshold: float = Field(ge=0, le=1)
+    # Ниже 0.5 FAQ отвечал бы готовым текстом почти на любой вопрос.
+    similarity_threshold: float = Field(ge=0.5, le=1)
