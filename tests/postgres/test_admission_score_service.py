@@ -91,6 +91,25 @@ async def test_upsert_creates_then_updates_idempotently(session: AsyncSession):
 
 
 @pytest.mark.asyncio
+async def test_upsert_does_not_overwrite_scores_with_empty(session: AsyncSession):
+    """Строки без баллов (сломался парсер) не обнуляют уже сохранённые."""
+    await _seed_fit(session)
+    service = AdmissionScoreService(session)
+    await service.upsert_from_rows(_fit_rows())
+
+    empty = _fit_rows()
+    for row in empty:
+        row.passing_score = None
+        row.average_score = None
+    await service.upsert_from_rows(empty)
+
+    scores = {s["program_name"]: s for s in await service.query_scores(faculty="ФИТ")}
+    pi = scores["Программная инженерия и компьютерные науки"]
+    assert pi["passing_score"] == 246
+    assert pi["average_score"] == 84.2
+
+
+@pytest.mark.asyncio
 async def test_upsert_skips_unknown_faculty_and_program(session: AsyncSession):
     await _seed_fit(session)
     service = AdmissionScoreService(session)

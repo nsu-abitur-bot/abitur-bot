@@ -22,6 +22,12 @@ logger = logging.getLogger(__name__)
 # импорта определить нельзя.
 LAST_SCORES_IMPORT_KEY = "admission_scores_last_import"
 
+# Минимальная доля строк с проходным баллом, при которой импорт считается
+# правдоподобным. На живой странице итогов приёма заполнены все строки
+# (521 из 521 на 01.10.2026); резкое падение доли означает, что парсер
+# разучился читать вёрстку, а не что баллы исчезли.
+MIN_FILLED_SCORES_SHARE = 0.9
+
 
 def _env_flag(name: str, default: bool) -> bool:
     raw = os.getenv(name)
@@ -101,6 +107,19 @@ async def seed_admission_scores() -> None:
         if not rows:
             logger.warning(
                 "Страница итогов приёма не дала строк — проходные баллы не обновлены"
+            )
+            return
+
+        filled = sum(row.passing_score is not None for row in rows)
+        if filled / len(rows) < MIN_FILLED_SCORES_SHARE:
+            # Отметку о заливке не ставим: на следующем старте попробуем снова.
+            logger.error(
+                "Импорт проходных баллов отменён: балл есть только в %d из %d строк "
+                "(нужно не меньше %.0f%%). Похоже, изменилась вёрстка страницы %s",
+                filled,
+                len(rows),
+                MIN_FILLED_SCORES_SHARE * 100,
+                url,
             )
             return
 

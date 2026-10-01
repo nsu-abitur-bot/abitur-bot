@@ -15,6 +15,23 @@ from datetime import UTC, datetime, timedelta
 import pytest
 
 from bootstrap import seed
+from db.postgres.services.admission_score import ScoreRow
+
+
+def _row(passing_score: int | None = 250) -> ScoreRow:
+    return ScoreRow(
+        faculty_name="ФИТ",
+        program_name="Программная инженерия и компьютерные науки",
+        code="09.03.04",
+        year=2025,
+        form="budget",
+        passing_score=passing_score,
+        average_score=None,
+    )
+
+
+ROW = _row()
+ROW_2 = _row(260)
 
 
 class _DummySession:
@@ -93,7 +110,7 @@ def _iso_ago(**kwargs) -> str:
 
 @pytest.mark.asyncio
 async def test_disabled_by_env_skips_everything(monkeypatch):
-    calls = _patch(monkeypatch, parse_result=["row"])
+    calls = _patch(monkeypatch, parse_result=[ROW])
     monkeypatch.setenv("SEED_ADMISSION_SCORES", "0")
 
     await seed.seed_admission_scores()
@@ -105,7 +122,7 @@ async def test_disabled_by_env_skips_everything(monkeypatch):
 @pytest.mark.asyncio
 async def test_recent_import_skips_fetch(monkeypatch):
     """Недавно заливали — сайт НГУ не дёргаем (защита от рестарт-цикла)."""
-    calls = _patch(monkeypatch, parse_result=["row"])
+    calls = _patch(monkeypatch, parse_result=[ROW])
     _FakeSettings.stored = _iso_ago(hours=1)
 
     await seed.seed_admission_scores()
@@ -116,49 +133,49 @@ async def test_recent_import_skips_fetch(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_stale_import_triggers_refresh(monkeypatch):
-    calls = _patch(monkeypatch, parse_result=["row-1", "row-2"])
+    calls = _patch(monkeypatch, parse_result=[ROW, ROW_2])
     _FakeSettings.stored = _iso_ago(hours=48)
 
     await seed.seed_admission_scores()
 
     assert len(calls) == 1
-    assert _FakeScoreService.upserted == ["row-1", "row-2"]
+    assert _FakeScoreService.upserted == [ROW, ROW_2]
     assert _FakeSettings.written is not None  # отметка обновлена
 
 
 @pytest.mark.asyncio
 async def test_first_run_imports_and_records_marker(monkeypatch):
-    calls = _patch(monkeypatch, parse_result=["row"])
+    calls = _patch(monkeypatch, parse_result=[ROW])
     _FakeSettings.stored = None  # отметки ещё нет
 
     await seed.seed_admission_scores()
 
     assert len(calls) == 1
-    assert _FakeScoreService.upserted == ["row"]
+    assert _FakeScoreService.upserted == [ROW]
     assert _FakeSettings.written is not None
 
 
 @pytest.mark.asyncio
 async def test_force_ignores_freshness(monkeypatch):
-    calls = _patch(monkeypatch, parse_result=["row"])
+    calls = _patch(monkeypatch, parse_result=[ROW])
     _FakeSettings.stored = _iso_ago(minutes=1)
     monkeypatch.setenv("SEED_ADMISSION_SCORES_FORCE", "1")
 
     await seed.seed_admission_scores()
 
     assert len(calls) == 1
-    assert _FakeScoreService.upserted == ["row"]
+    assert _FakeScoreService.upserted == [ROW]
 
 
 @pytest.mark.asyncio
 async def test_corrupted_marker_is_treated_as_stale(monkeypatch):
-    calls = _patch(monkeypatch, parse_result=["row"])
+    calls = _patch(monkeypatch, parse_result=[ROW])
     _FakeSettings.stored = "не-дата"
 
     await seed.seed_admission_scores()
 
     assert len(calls) == 1
-    assert _FakeScoreService.upserted == ["row"]
+    assert _FakeScoreService.upserted == [ROW]
 
 
 @pytest.mark.asyncio
@@ -186,9 +203,35 @@ async def test_parser_exception_is_not_fatal(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_custom_url_from_env(monkeypatch):
-    calls = _patch(monkeypatch, parse_result=["row"])
+    calls = _patch(monkeypatch, parse_result=[ROW])
     monkeypatch.setenv("ADMISSION_SCORES_URL", "https://example.test/scores")
 
     await seed.seed_admission_scores()
 
     assert calls == ["https://example.test/scores"]
+
+
+@pytest.mark.asyncio
+async def test_mostly_empty_scores_cancel_import(monkeypatch, caplog):
+    """Сменилась вёрстка: строки есть, а баллов в них нет — импорт отменяется
+    целиком, в лог идёт ERROR, отметка не ставится, чтобы попробовать снова."""
+    calls = _patch(monkeypatch, parse_result=[ROW] + [_row(None)] * 9)
+
+    with caplog.at_level("ERROR", logger="bootstrap.seed"):
+        await seed.seed_admission_scores()
+
+    assert len(calls) == 1
+    assert _FakeScoreService.upserted is None
+    assert _FakeSettings.written is None
+    assert "Импорт проходных баллов отменён" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_few_gaps_do_not_block_import(monkeypatch):
+    """Единичные пустые строки — нормальная жизнь, импорт идёт."""
+    rows = [ROW] * 19 + [_row(None)]
+    _patch(monkeypatch, parse_result=rows)
+
+    await seed.seed_admission_scores()
+
+    assert _FakeScoreService.upserted == rows
