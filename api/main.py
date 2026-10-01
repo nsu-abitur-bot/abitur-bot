@@ -32,6 +32,7 @@ from db.postgres.services.faq import FaqDbService
 from db.postgres.services.message import MessageService
 from db.postgres.services.user import UserService
 from faq.matcher import get_faq_matcher
+from logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -57,6 +58,8 @@ class MessageResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # В lifespan, а не на импорте: тесты импортируют app и не должны писать в logs/.
+    setup_logging()
     async with AsyncSessionLocal() as session:
         try:
             faq_entries = await FaqDbService(session).get_all()
