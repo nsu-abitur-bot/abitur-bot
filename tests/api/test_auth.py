@@ -412,6 +412,5 @@ class TestTopicsAuth:
             role=AdminRole.viewer
         )
         app.dependency_overrides.pop(require_admin, None)
-        kwargs = {"json": body} if body is not None else {}
-        response = self.client.request(method.upper(), path, **kwargs)
+        response = self.client.request(method.upper(), path, json=body)
         assert response.status_code == 403
