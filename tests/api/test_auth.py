@@ -6,6 +6,7 @@
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from api.auth import security
@@ -373,4 +374,43 @@ class TestChangeRoleEndpoint:
             "/api/v1/auth/admins/other-id/role",
             json={"role": "viewer"},
         )
+        assert response.status_code == 403
+
+
+class TestTopicsAuth:
+    """Темы — справочник для разметки логов: без токена их не читают и не меняют."""
+
+    def setup_method(self):
+        self.client = TestClient(app)
+
+    @pytest.mark.parametrize(
+        "method, path",
+        [
+            ("get", "/api/v1/topics/"),
+            ("post", "/api/v1/topics/"),
+            ("get", "/api/v1/topics/1"),
+            ("put", "/api/v1/topics/1"),
+            ("delete", "/api/v1/topics/1"),
+        ],
+    )
+    def test_without_token_returns_401(self, method, path):
+        app.dependency_overrides.pop(get_current_admin, None)
+        app.dependency_overrides.pop(require_admin, None)
+        response = getattr(self.client, method)(path)
+        assert response.status_code == 401
+
+    @pytest.mark.parametrize(
+        "method, path, body",
+        [
+            ("post", "/api/v1/topics/", {"label": "x"}),
+            ("put", "/api/v1/topics/1", {"label": "x"}),
+            ("delete", "/api/v1/topics/1", None),
+        ],
+    )
+    def test_viewer_cannot_change_topics(self, method, path, body):
+        app.dependency_overrides[get_current_admin] = lambda: FakeAdmin(
+            role=AdminRole.viewer
+        )
+        app.dependency_overrides.pop(require_admin, None)
+        response = self.client.request(method.upper(), path, json=body)
         assert response.status_code == 403

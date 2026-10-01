@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.dependencies import require_admin
 from api.schemas.topic import TopicCreate, TopicListResponse, TopicResponse, TopicUpdate
 from db.postgres.db import get_db
 from db.postgres.services.topic import TopicService
@@ -24,6 +25,7 @@ async def get_topics(db: AsyncSession = Depends(get_db)):
     response_model=TopicResponse,
     status_code=status.HTTP_201_CREATED,
     summary="Создать новую тему",
+    dependencies=[Depends(require_admin)],
 )
 async def create_topic(
     topic_data: TopicCreate,
@@ -80,6 +82,7 @@ async def get_topic(
     "/{topic_id}",
     response_model=TopicResponse,
     summary="Обновить тему",
+    dependencies=[Depends(require_admin)],
 )
 async def update_topic(
     topic_id: int,
@@ -126,6 +129,7 @@ async def update_topic(
     "/{topic_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Удалить тему",
+    dependencies=[Depends(require_admin)],
 )
 async def delete_topic(
     topic_id: int,

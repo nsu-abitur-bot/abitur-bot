@@ -99,9 +99,6 @@ app.add_middleware(
 # Auth роутер — публичные эндпоинты /login и /register, остальное защищено внутри
 app.include_router(auth_router, prefix="/api/v1")
 
-# Публичные роуты
-app.include_router(topic_router, prefix="/api/v1")
-
 # Все остальные роутеры требуют аутентификации
 # Мутации (abbrev, faq, rag, evals) требуют роль admin или superadmin
 # Аналитика (message_log, stats) доступна любому авторизованному, включая viewer
@@ -127,6 +124,13 @@ app.include_router(
 )
 app.include_router(
     message_log_router,
+    prefix="/api/v1",
+    dependencies=[Depends(get_current_admin)],
+)
+# Список тем нужен просмотру логов, поэтому читать может и viewer;
+# создание, правка и удаление — только admin (см. api/routes/topic.py).
+app.include_router(
+    topic_router,
     prefix="/api/v1",
     dependencies=[Depends(get_current_admin)],
 )
