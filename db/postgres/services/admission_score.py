@@ -175,6 +175,10 @@ class AdmissionScoreService:
         нормализованному имени). Если факультет или направление не находятся —
         строка молча пропускается (logger.info). Возвращает счётчики
         ``{"created": int, "updated": int, "skipped": int}``.
+
+        Пустой балл в строке не затирает уже сохранённый: если НГУ поменяет
+        вёрстку страницы итогов, парсер начнёт отдавать строки без чисел, и
+        без этой проверки импорт молча обнулил бы баллы по всему университету.
         """
         stats = {"created": 0, "updated": 0, "skipped": 0}
 
@@ -228,8 +232,10 @@ class AdmissionScoreService:
                 )
                 stats["created"] += 1
             else:
-                existing.passing_score = row.passing_score
-                existing.average_score = row.average_score
+                if row.passing_score is not None:
+                    existing.passing_score = row.passing_score
+                if row.average_score is not None:
+                    existing.average_score = row.average_score
                 stats["updated"] += 1
 
         await self.session.commit()
