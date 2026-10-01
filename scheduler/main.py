@@ -9,6 +9,7 @@ from bot.notifications import notify_users
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.dto import RatingEntry
 from db.postgres.services.rating import RatingService
+from logging_config import setup_logging
 from parser.rating import (
     create_rating_session,
     fetch_all_leaderboard_urls,
@@ -194,6 +195,8 @@ async def main():
 
 
 if __name__ == "__main__":
+    # Здесь, а не на импорте: тесты импортируют модуль и не должны писать в logs/.
+    setup_logging()
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
