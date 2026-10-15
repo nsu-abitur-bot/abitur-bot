@@ -11,6 +11,7 @@
 | `User` | `user` | Пользователи бота |
 | `Message` / `MessageLog` | `message` / `message_logs` | История переписки / детальные логи обработки |
 | `Leaderboard` / `UserRating` | `leaderboard` / `user_rating` | Конкурсные списки и позиции пользователей |
+| `NotificationOutbox` | `notification_outbox` | Очередь уведомлений об изменении позиции: пишется в одном коммите с местами, рассылается планировщиком |
 | `FaqEntry` / `Abbreviation` | `faq_entry` / `abbreviation` | FAQ и аббревиатуры (грузятся в память при старте) |
 | `Topic` | `topic` | Темы для аналитической intent-классификации |
 | `Document` | `document` | Метаданные документов в RAG |

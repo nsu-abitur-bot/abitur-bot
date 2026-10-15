@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..dto import RatingChange, RatingEntry
 from ..models import Leaderboard, User, UserRating
+from .notification_outbox import NotificationOutboxService
 
 logger = logging.getLogger(__name__)
 
@@ -140,6 +141,9 @@ class RatingService:
         self,
         leaderboard_id: str,
         entries: List[RatingEntry],
+        *,
+        content_hash: Optional[str] = None,
+        enqueue_notifications: bool = False,
     ) -> Dict[str, Any]:
         """Обновить позиции абитуриентов в БД по результатам парсера.
 
@@ -151,6 +155,12 @@ class RatingService:
         Args:
             leaderboard_id: ID рейтинговой таблицы.
             entries: Список записей от парсера.
+            content_hash: Если задан — новый хэш списка пишется в том же коммите,
+                что и места. Иначе сбой между двумя коммитами оставил бы новые
+                места со старым хэшем или наоборот.
+            enqueue_notifications: Положить уведомления в notification_outbox
+                в том же коммите. Тогда они переживают падение процесса
+                до рассылки (#285).
 
         Returns:
             {"created": int, "updated": int, "skipped": int,
@@ -163,9 +173,6 @@ class RatingService:
             "notifications": [],
         }
 
-        if not entries:
-            return stats
-
         # Получаем данные о рейтинговой таблице
         leaderboard_result = await self.session.execute(
             select(Leaderboard).where(Leaderboard.id == leaderboard_id)
@@ -177,8 +184,12 @@ class RatingService:
         identifiers = [e.identifier for e in entries if e.identifier]
 
         if not identifiers:
-            logger.warning("Нет валидных идентификаторов в списке entries")
-            stats["skipped"] = len(entries)
+            if entries:
+                logger.warning("Нет валидных идентификаторов в списке entries")
+                stats["skipped"] = len(entries)
+            if content_hash and leaderboard:
+                leaderboard.content_hash = content_hash
+                await self._commit()
             return stats
 
         # Батч 1: загрузить всех пользователей по списку идентификаторов
@@ -301,18 +312,26 @@ class RatingService:
                         f"status='{entry.status}'"
                     )
 
-        try:
-            await self.session.commit()
-        except Exception as e:
-            await self.session.rollback()
-            logger.error(f"Ошибка при сохранении обновлений рейтинга: {e}")
-            raise
+        if content_hash and leaderboard:
+            leaderboard.content_hash = content_hash
+        if enqueue_notifications and stats["notifications"]:
+            NotificationOutboxService(self.session).enqueue(stats["notifications"])
+
+        await self._commit()
 
         logger.info(
             f"update_ratings_from_entries: создано={stats['created']}, "
             f"обновлено={stats['updated']}, пропущено={stats['skipped']}"
         )
         return stats
+
+    async def _commit(self) -> None:
+        try:
+            await self.session.commit()
+        except Exception as e:
+            await self.session.rollback()
+            logger.error(f"Ошибка при сохранении обновлений рейтинга: {e}")
+            raise
 
     async def get_user_ratings(self, user_id: int) -> List[UserRating]:
         """Получить все рейтинги пользователя."""
