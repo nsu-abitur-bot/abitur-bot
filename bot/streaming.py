@@ -9,6 +9,7 @@ from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 
+from bot.splitting import split_message
 from bot.utils import normalize_links_for_messaging
 
 if TYPE_CHECKING:
@@ -92,28 +93,30 @@ class TelegramStreamer:
         parse_mode: Optional[str] = None,
         fallback_plain: bool = False,
     ) -> None:
-        """Отправляет финальный сохраненный ответ с нужным parse_mode."""
-        final_text = normalize_links_for_messaging(text)
-        aiogram_parse_mode = ParseMode.HTML if parse_mode == "HTML" else None
+        """Отправляет финальный ответ с нужным parse_mode, длинный — частями.
 
-        try:
-            await self._bot.send_message(
-                self._chat_id,
-                final_text,
-                parse_mode=aiogram_parse_mode,
-            )
-            self._last_sent_text = final_text
-        except TelegramBadRequest:
-            if not fallback_plain:
-                raise
-            logger.warning(
-                "TelegramStreamer: HTML parse failed on send, sending plain text"
-            )
-            plain = re.sub(r"<[^>]+>", "", final_text)
-            await self._bot.send_message(
-                self._chat_id,
-                normalize_links_for_messaging(plain),
-            )
+        Draft эфемерный, редактировать нечего: каждая часть уходит отдельным
+        send_message.
+        """
+        final_text = normalize_links_for_messaging(text)
+        is_html = parse_mode == "HTML"
+        aiogram_parse_mode = ParseMode.HTML if is_html else None
+
+        for chunk in split_message(final_text, html=is_html):
+            try:
+                await self._bot.send_message(
+                    self._chat_id,
+                    chunk,
+                    parse_mode=aiogram_parse_mode,
+                )
+            except TelegramBadRequest:
+                if not fallback_plain:
+                    raise
+                logger.warning(
+                    "TelegramStreamer: HTML parse failed on send, sending plain text"
+                )
+                await self._bot.send_message(self._chat_id, _strip_tags(chunk))
+            self._last_sent_text = chunk
 
 
 class MaxStreamer:
@@ -178,44 +181,63 @@ class MaxStreamer:
     ) -> None:
         final_text = normalize_links_for_messaging(text)
         max_parse_mode = self._resolve_parse_mode(parse_mode)
-
-        if self._message_id is None:
-            try:
-                sent = await self._client.send_message(
-                    chat_id=self._chat_id, text=final_text, parse_mode=max_parse_mode
-                )
-            except Exception:
-                if not fallback_plain:
-                    raise
-                logger.warning(
-                    "MaxStreamer: HTML parse failed on send, sending plain text"
-                )
-                plain = normalize_links_for_messaging(re.sub(r"<[^>]+>", "", final_text))
-                sent = await self._client.send_message(chat_id=self._chat_id, text=plain)
-            if (
-                sent is not None
-                and sent.message is not None
-                and sent.message.body is not None
-            ):
-                self._message_id = sent.message.body.mid
-                self._last_sent_text = final_text
+        chunks = split_message(final_text, html=parse_mode == "HTML")
+        if not chunks:
             return
 
+        # Первая часть заменяет статус-сообщение, остальные идут следом.
+        first, *others = chunks
+        if self._message_id is None:
+            await self._send(first, max_parse_mode, fallback_plain)
+        else:
+            await self._edit(self._message_id, first, max_parse_mode, fallback_plain)
+        for chunk in others:
+            await self._send(chunk, max_parse_mode, fallback_plain)
+
+    async def _send(self, text: str, parse_mode, fallback_plain: bool) -> None:
+        try:
+            sent = await self._client.send_message(
+                chat_id=self._chat_id, text=text, parse_mode=parse_mode
+            )
+        except Exception:
+            if not fallback_plain:
+                raise
+            logger.warning("MaxStreamer: HTML parse failed on send, sending plain text")
+            sent = await self._client.send_message(
+                chat_id=self._chat_id, text=_strip_tags(text)
+            )
+        if (
+            sent is not None
+            and sent.message is not None
+            and sent.message.body is not None
+        ):
+            self._message_id = sent.message.body.mid
+            self._last_sent_text = text
+
+    async def _edit(
+        self, message_id: str, text: str, parse_mode, fallback_plain: bool
+    ) -> None:
         try:
             await self._client.edit_message(
-                message_id=self._message_id,
-                text=final_text,
-                parse_mode=max_parse_mode,
+                message_id=message_id,
+                text=text,
+                parse_mode=parse_mode,
             )
-            self._last_sent_text = final_text
+            self._last_sent_text = text
         except Exception:
             if not fallback_plain:
                 raise
             logger.warning(
                 "MaxStreamer: HTML parse failed on edit, falling back to plain"
             )
-            plain = normalize_links_for_messaging(re.sub(r"<[^>]+>", "", final_text))
             try:
-                await self._client.edit_message(message_id=self._message_id, text=plain)
+                await self._client.edit_message(
+                    message_id=message_id, text=_strip_tags(text)
+                )
             except Exception as exc2:
                 logger.debug("MaxStreamer: plain fallback edit failed (%s)", exc2)
+
+
+def _strip_tags(text: str) -> str:
+    """Текст без разметки — запасной вариант, когда мессенджер не разобрал HTML."""
+    return normalize_links_for_messaging(re.sub(r"<[^>]+>", "", text))

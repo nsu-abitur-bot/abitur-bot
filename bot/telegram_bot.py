@@ -13,7 +13,7 @@ from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
 
-from bot.core import BotCore
+from bot.core import ERROR_REPLY_TEXT, BotCore
 from bot.streaming import TelegramStreamer
 from bot.utils import normalize_links_for_messaging
 
@@ -79,6 +79,53 @@ def get_session_id(message: Message) -> str:
         if message.chat.type in ["group", "supergroup"]
         else chat_id
     )
+
+
+async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
+    """Отвечает на обычное сообщение. Человек получает ответ при любой ошибке.
+
+    Падение здесь (БД, Redis, провайдер, отказ Telegram принять ответ) раньше
+    уходило в лог aiogram, а человек видел «печатает…» и тишину.
+    asyncio.CancelledError — не Exception и проходит насквозь: остановку бота
+    глотать нельзя.
+    """
+    if not message.from_user:
+        return
+
+    user_text = (message.text or "").strip()
+    user_name = message.from_user.username or message.from_user.first_name or "Аноним"
+    chat_id = str(message.chat.id)
+
+    try:
+        session_id = get_session_id(message)
+        await bot.send_chat_action(chat_id, "typing")
+        streamer = TelegramStreamer(bot, chat_id)
+        reply = await core.handle_message(
+            channel="telegram",
+            external_user_id=str(message.from_user.id),
+            session_id=session_id,
+            user_name=user_name,
+            user_text=user_text,
+            stream_callback=streamer.update,
+            status_callback=streamer.set_status,
+        )
+
+        await streamer.finalize(
+            text=reply.text,
+            parse_mode=reply.parse_mode,
+            fallback_plain=reply.fallback_plain_on_format_error,
+        )
+    except Exception:
+        logger.exception(
+            "Не удалось ответить на сообщение в Telegram: chat_id=%s", chat_id
+        )
+        try:
+            await bot.send_message(chat_id, ERROR_REPLY_TEXT)
+        except Exception:
+            logger.exception(
+                "Не удалось отправить сообщение об ошибке в Telegram: chat_id=%s",
+                chat_id,
+            )
 
 
 async def run_telegram_bot() -> bool | None:
@@ -211,31 +258,7 @@ async def run_telegram_bot() -> bool | None:
 
     @dp.message()
     async def handle_message(message: Message):
-        if not message.from_user:
-            return
-
-        user_text = (message.text or "").strip()
-        user_name = message.from_user.username or message.from_user.first_name or "Аноним"
-        chat_id = str(message.chat.id)
-        session_id = get_session_id(message)
-
-        await bot.send_chat_action(chat_id, "typing")
-        streamer = TelegramStreamer(bot, chat_id)
-        reply = await core.handle_message(
-            channel="telegram",
-            external_user_id=str(message.from_user.id),
-            session_id=session_id,
-            user_name=user_name,
-            user_text=user_text,
-            stream_callback=streamer.update,
-            status_callback=streamer.set_status,
-        )
-
-        await streamer.finalize(
-            text=reply.text,
-            parse_mode=reply.parse_mode,
-            fallback_plain=reply.fallback_plain_on_format_error,
-        )
+        await answer_message(bot, core, message)
 
     logger.info("Telegram bot started")
     try:

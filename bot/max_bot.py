@@ -6,13 +6,80 @@ from dotenv import load_dotenv
 from maxapi import Bot, Dispatcher
 from maxapi.enums.parse_mode import ParseMode
 from maxapi.enums.sender_action import SenderAction
+from maxapi.types.message import Message
 from maxapi.types.updates.message_created import MessageCreated
 
-from bot.core import BotCore
+from bot.core import ERROR_REPLY_TEXT, BotCore
+from bot.splitting import split_message
 from bot.streaming import MaxStreamer
 from bot.utils import normalize_links_for_messaging
 
 logger = logging.getLogger(__name__)
+
+
+async def answer_max_message(
+    client: Bot,
+    core: BotCore,
+    message: Message,
+    *,
+    chat_id: int | None,
+    session_id: str,
+    external_user_id: str,
+    user_name: str,
+    user_text: str,
+) -> None:
+    """Отвечает на обычное сообщение в MAX. Человек получает ответ при любой ошибке.
+
+    Падение здесь (БД, Redis, провайдер, отказ MAX принять ответ) раньше
+    оставляло человека без ответа. asyncio.CancelledError — не Exception и
+    проходит насквозь: остановку бота глотать нельзя.
+    """
+    streamer: MaxStreamer | None = (
+        MaxStreamer(client, chat_id) if chat_id is not None else None
+    )
+    try:
+        try:
+            # chat_id бывает None у некоторых типов апдейтов
+            if chat_id is not None:
+                await client.send_action(chat_id=chat_id, action=SenderAction.TYPING_ON)
+        except Exception:
+            # «печатает…» не критично: продолжаем без него
+            logger.debug("Failed to send typing action for session %s", session_id)
+
+        reply = await core.handle_message(
+            channel="max",
+            external_user_id=external_user_id,
+            session_id=session_id,
+            user_name=user_name,
+            user_text=user_text,
+            stream_callback=streamer.update if streamer else None,
+            status_callback=streamer.set_status if streamer else None,
+        )
+        if streamer is not None:
+            await streamer.finalize(
+                text=reply.text,
+                parse_mode=reply.parse_mode,
+                fallback_plain=reply.fallback_plain_on_format_error,
+            )
+        else:
+            for chunk in split_message(normalize_links_for_messaging(reply.text)):
+                await message.answer(text=chunk)
+    except Exception:
+        logger.exception(
+            "Не удалось ответить на сообщение в MAX: session_id=%s", session_id
+        )
+        try:
+            # Через стример: если уже висит статус «Ищу…», он заменится
+            # сообщением об ошибке, а не останется навсегда.
+            if streamer is not None:
+                await streamer.finalize(text=ERROR_REPLY_TEXT)
+            else:
+                await message.answer(text=ERROR_REPLY_TEXT)
+        except Exception:
+            logger.exception(
+                "Не удалось отправить сообщение об ошибке в MAX: session_id=%s",
+                session_id,
+            )
 
 
 async def run_max_bot() -> bool | None:
@@ -86,35 +153,16 @@ async def run_max_bot() -> bool | None:
             await message.answer(text=reply.text)
             return
 
-        # show typing action similar to Telegram
-        try:
-            # chat_id may be None for some update types, guard against that
-            if chat_id is not None:
-                await client.send_action(chat_id=chat_id, action=SenderAction.TYPING_ON)
-        except Exception:
-            # non-fatal: continue even if action can't be sent
-            logger.debug("Failed to send typing action for session %s", session_id)
-
-        streamer: MaxStreamer | None = (
-            MaxStreamer(client, chat_id) if chat_id is not None else None
-        )
-        reply = await core.handle_message(
-            channel="max",
-            external_user_id=external_user_id,
+        await answer_max_message(
+            client,
+            core,
+            message,
+            chat_id=chat_id,
             session_id=session_id,
+            external_user_id=external_user_id,
             user_name=user_name,
             user_text=user_text,
-            stream_callback=streamer.update if streamer else None,
-            status_callback=streamer.set_status if streamer else None,
         )
-        if streamer is not None:
-            await streamer.finalize(
-                text=reply.text,
-                parse_mode=reply.parse_mode,
-                fallback_plain=reply.fallback_plain_on_format_error,
-            )
-        else:
-            await message.answer(text=normalize_links_for_messaging(reply.text))
 
         # Уступка API лимитам до внедрения адаптивного backoff.
         await asyncio.sleep(0)
