@@ -7,8 +7,9 @@
 """
 
 import logging
+import re
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,6 +35,151 @@ def _field_part(name: str) -> str:
 def _profile_part(name: str) -> str:
     """Часть названия ПОСЛЕ последнего «. » (профиль), нормализованная."""
     return normalize_name(name.rsplit(_FIELD_PROFILE_SEP, 1)[-1])
+
+
+# --- Поиск направления по формулировке из вопроса ---------------------------
+#
+# Импорт баллов матчит строго (см. _resolve_program_detailed): там ошибка
+# пишет чужой балл в базу. Поиск по вопросу — другое дело: модель передаёт
+# направление так, как его назвал абитуриент («ПИиКН», «программная
+# инженерия», «ПИиКН (Программная инженерия и компьютерные науки)» после
+# расширения аббревиатур), а в справочнике лежит «Информатика и
+# вычислительная техника. Программная инженерия и компьютерные науки».
+# Строгое сравнение такие запросы не находит, и бот отвечает, что баллов нет.
+# Поэтому при поиске после строгих уровней идут мягкие: аббревиатура, код
+# ФГОС, совпадение слов. Ответ всё равно подписан полным названием и
+# факультетом, так что лишняя строка в выдаче видна модели, а не подменяет
+# собой нужную.
+
+_CODE_RE = re.compile(r"\d{2}\.\d{2}\.\d{2}")
+_WORD_RE = re.compile(r"[a-zа-я0-9]+")
+# Слова, которые описывают запрос, а не называют направление.
+_NOISE_WORDS = frozenset(
+    {
+        "направление",
+        "направления",
+        "направлении",
+        "программа",
+        "программы",
+        "профиль",
+        "профиля",
+        "специальность",
+        "специальности",
+        "бакалавриат",
+        "бакалавриата",
+        "специалитет",
+        "специалитета",
+        "нгу",
+        "на",
+        "по",
+        "в",
+    }
+)
+_CONJUNCTION = "и"
+
+
+def _fold(value: str) -> str:
+    """normalize_name + «ё» как «е»: в вопросах «ё» пишут через раз."""
+    return normalize_name(value).replace("ё", "е")
+
+
+def _words(value: str) -> list[str]:
+    return _WORD_RE.findall(_fold(_CODE_RE.sub(" ", value)))
+
+
+def _stem(word: str) -> str:
+    """Грубая основа: отрезаем окончание, чтобы «прикладная» ~ «прикладной»."""
+    return word[: max(4, len(word) - 2)]
+
+
+def _acronyms(name: str) -> set[str]:
+    """Аббревиатуры названия: «ПИиКН» и «ПИКН» для «Программная инженерия и
+    компьютерные науки». Считаются для полного названия и для каждой его
+    части «Поле. Профиль» — абитуриенты сокращают именно профиль."""
+    result: set[str] = set()
+    for part in {name, *name.split(_FIELD_PROFILE_SEP)}:
+        words = _WORD_RE.findall(_fold(part))
+        if len(words) < 2:
+            continue
+        with_conj = "".join(w if w == _CONJUNCTION else w[0] for w in words)
+        without_conj = "".join(w[0] for w in words if w != _CONJUNCTION)
+        result.update(a for a in (with_conj, without_conj) if len(a) >= 2)
+    return result
+
+
+def query_variants(value: str, inner: bool = True) -> list[str]:
+    """Варианты строки запроса, от самого точного к более общим.
+
+    Расширитель аббревиатур превращает «ПИиКН» в «ПИиКН (Программная инженерия
+    и компьютерные науки)», и модель часто передаёт в инструмент именно эту
+    форму. Пробуем её целиком, затем часть в скобках и часть до скобок.
+    ``inner=False`` — без части в скобках.
+    """
+    variants = [value]
+    match = re.match(r"^(.*?)\(([^()]*)\)\s*$", value.strip())
+    if match:
+        if inner:
+            variants.append(match.group(2))
+        variants.append(match.group(1))
+    seen: set[str] = set()
+    result: list[str] = []
+    for variant in variants:
+        if _fold(variant) and _fold(variant) not in seen:
+            seen.add(_fold(variant))
+            result.append(variant)
+    return result
+
+
+def match_programs(programs: Sequence[Program], query: str) -> list[Program]:
+    """Направления, подходящие под формулировку из вопроса.
+
+    Уровни по порядку, срабатывает первый непустой:
+    1) точное имя, профиль, поле — как при импорте;
+    2) аббревиатура названия или профиля («ПИиКН», «ПМИ», «КНиС»);
+    3) код ФГОС («09.03.01»);
+    4) значимые слова запроса есть в названии — подряд, вразброс, затем по
+       основам («прикладная математика», «программная инженерия»).
+    """
+    target = _fold(query)
+    if not target:
+        return []
+
+    tiers = (
+        lambda p: _fold(p.name) == target,
+        lambda p: _has_field_profile(p.name) and _fold(_profile_part(p.name)) == target,
+        lambda p: _has_field_profile(p.name) and _fold(_field_part(p.name)) == target,
+    )
+    for tier in tiers:
+        found = [p for p in programs if tier(p)]
+        if found:
+            return found
+
+    compact = re.sub(r"[^a-zа-я0-9]", "", target)
+    if " " not in target and len(compact) >= 3:
+        found = [p for p in programs if compact in _acronyms(p.name)]
+        if found:
+            return found
+
+    codes = set(_CODE_RE.findall(query))
+    words = [w for w in _words(query) if w not in _NOISE_WORDS and w != _CONJUNCTION]
+    if codes and not words:
+        return [p for p in programs if p.code in codes]
+    if not words:
+        return []
+
+    candidates = [p for p in programs if not codes or p.code in codes] or list(programs)
+    phrase = f" {' '.join(words)} "
+    for matches in (
+        # Слова идут подряд: «прикладная математика» — это ПМИ, а не «Прикладные
+        # математика и физика. Прикладная физика…», где те же слова вразброс.
+        lambda p: phrase in f" {' '.join(_words(p.name))} ",
+        lambda p: set(words) <= set(_words(p.name)),
+    ):
+        found = [p for p in candidates if matches(p)]
+        if found:
+            return found
+    stems = {_stem(w) for w in words}
+    return [p for p in candidates if stems <= {_stem(w) for w in _words(p.name)}]
 
 
 @dataclass
@@ -138,35 +284,64 @@ class AdmissionScoreService:
         program = await self._resolve_program(faculty_name, program_name, level)
         return program.id if program is not None else None
 
-    async def _match_program_ids_global(
-        self, program_name: str, level: Optional[str]
-    ) -> list[str]:
-        """program_id всех направлений, подходящих под имя, БЕЗ факультета.
+    async def _find_faculty_loose(
+        self, query: str, inner: bool = True
+    ) -> Optional[Faculty]:
+        """Факультет по формулировке из вопроса: «ФИТ», «ФИТ НГУ»,
+        «ФИТ (Факультет информационных технологий)»."""
+        for variant in query_variants(query, inner=inner):
+            for candidate in (variant, re.sub(r"\bнгу\b", " ", _fold(variant))):
+                faculty = await self.faculty_service.find_faculty_by_alias(candidate)
+                if faculty is not None:
+                    return faculty
+        return None
 
-        Та же строгая логика (точное имя → профиль-суффикс → филд-префикс), но
-        по всему справочнику. Возвращает ВСЕ id первого сработавшего уровня.
+    async def _match_program_ids_loose(
+        self, query: str, faculty: Optional[Faculty], level: Optional[str]
+    ) -> list[str]:
+        """program_id направлений под формулировку из вопроса.
+
+        Сначала ищем среди направлений указанного факультета, затем по всему
+        справочнику: модель нередко угадывает факультет неверно (ПИиКН на
+        ММФ), и тогда честнее показать баллы с подписью настоящего факультета,
+        чем ответить, что данных нет. Название факультета в поле направления
+        («ФИТ») означает все его направления — иначе «ФИТ» совпал бы с
+        аббревиатурой «Физика и информационные технологии» физфака.
         """
-        target = normalize_name(program_name)
-        if not target:
-            return []
-        programs = await self.faculty_service.get_all_programs(
-            level=normalize_level(level)
+        # Только направления, по которым есть баллы: иначе «Прикладные
+        # математика и физика» могли бы совпасть с профилем без баллов вместо
+        # строки поля, куда их записал импорт, и ответ снова был бы пустым.
+        scored = set(
+            (await self.session.execute(select(AdmissionScore.program_id).distinct()))
+            .scalars()
+            .all()
         )
-        exact = [p.id for p in programs if normalize_name(p.name) == target]
-        if exact:
-            return exact
-        by_profile = [
-            p.id
-            for p in programs
-            if _has_field_profile(p.name) and _profile_part(p.name) == target
+        programs = [
+            p
+            for p in await self.faculty_service.get_all_programs(
+                level=normalize_level(level)
+            )
+            if p.id in scored
         ]
-        if by_profile:
-            return by_profile
-        return [
-            p.id
-            for p in programs
-            if _has_field_profile(p.name) and _field_part(p.name) == target
-        ]
+        # Скобки не смотрим: в «Прикладная математика ФИТ (Факультет
+        # информационных технологий)» факультет — уточнение, а не запрос.
+        as_faculty = await self._find_faculty_loose(query, inner=False)
+        if as_faculty is not None:
+            return [p.id for p in programs if p.faculty_id == as_faculty.id]
+
+        variants = query_variants(query)
+        scopes: list[Sequence[Program]] = []
+        if faculty is not None:
+            scopes.append([p for p in programs if p.faculty_id == faculty.id])
+        scopes.append(programs)
+
+        for scope in scopes:
+            for variant in variants:
+                found = match_programs(scope, variant)
+                if found:
+                    return [p.id for p in found]
+
+        return []
 
     async def upsert_from_rows(self, rows: Iterable[ScoreRow]) -> dict[str, int]:
         """Идемпотентный upsert по ключу (program_id, year, form).
@@ -252,8 +427,9 @@ class AdmissionScoreService:
     ) -> list[dict]:
         """Выборка проходных баллов с разрешением строковых фильтров.
 
-        Факультет разрешается по алиасу, направление — по строгому матчу имени
-        (точное → профиль-суффикс → филд-префикс). ``level=None`` (по умолчанию)
+        Факультет разрешается по алиасу, направление — по формулировке из
+        вопроса (:func:`match_programs`: точное имя → профиль → поле →
+        аббревиатура → код → слова). ``level=None`` (по умолчанию)
         означает любой уровень — так находятся и специалитетные программы
         (медицина), а не только бакалавриат. Возвращает список плоских словарей,
         отсортированный по (program_name, year, form). Пустой список, если
@@ -269,26 +445,21 @@ class AdmissionScoreService:
         if canonical_level is not None:
             stmt = stmt.where(Program.level == canonical_level)
 
+        resolved_faculty = None
         if faculty is not None:
-            resolved_faculty = await self.faculty_service.find_faculty_by_alias(faculty)
-            if resolved_faculty is None:
+            resolved_faculty = await self._find_faculty_loose(faculty)
+            # Без направления фильтровать не по чему; с направлением —
+            # нераспознанный факультет не повод терять ответ.
+            if resolved_faculty is None and program is None:
                 return []
-            stmt = stmt.where(Program.faculty_id == resolved_faculty.id)
 
         if program is not None:
-            if faculty is not None:
-                # Факультет уже разрешён — ищем направление среди его программ.
-                target_program = await self._resolve_program(faculty, program, level)
-                if target_program is None:
-                    return []
-                stmt = stmt.where(AdmissionScore.program_id == target_program.id)
-            else:
-                # Без факультета — матчим по справочнику глобально (точное имя →
-                # профиль-суффикс → филд-префикс), затем фильтруем по id.
-                ids = await self._match_program_ids_global(program, level)
-                if not ids:
-                    return []
-                stmt = stmt.where(AdmissionScore.program_id.in_(ids))
+            ids = await self._match_program_ids_loose(program, resolved_faculty, level)
+            if not ids:
+                return []
+            stmt = stmt.where(AdmissionScore.program_id.in_(ids))
+        elif resolved_faculty is not None:
+            stmt = stmt.where(Program.faculty_id == resolved_faculty.id)
 
         if year is not None:
             stmt = stmt.where(AdmissionScore.year == year)
