@@ -130,12 +130,16 @@ class OpenAIEmbedding:
         )
 
     async def __call__(self, texts: List[str]) -> List[List[float]]:
+        # Ошибку не глотаем и нулевой вектор не подставляем: в nano_vectordb
+        # нулевой запрос даёт NaN-скоры и случайные top-k чанки, а нулевой
+        # чанк — NaN-строку, которая до переиндексации попадает в топ-1 (#283).
+        # Повторы при сбое делает сам LightRAG.
         try:
             response = await self.client.embeddings.create(
                 model=self.model,
                 input=texts,
             )
-            return [item.embedding for item in response.data]
         except Exception as e:
             logger.error(f"Error in OpenAIEmbedding: {e}")
-            return [[0.0] * self.embedding_dim for _ in texts]
+            raise
+        return [item.embedding for item in response.data]

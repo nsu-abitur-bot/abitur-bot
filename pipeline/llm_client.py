@@ -26,13 +26,17 @@ from pipeline.prompts import (
     LIGHTRAG_FORMAT_HINT,
     LIGHTRAG_LEVEL_HINT,
     RAG_CONTEXT_NOT_FOUND,
-    RAG_CONTEXT_UNAVAILABLE,
+    RAG_UNAVAILABLE_ANSWER,
     SOURCES_HINT,
     SYSTEM_PROMPT_BASE,
 )
 from pipeline.tools import ADMISSION_SCORES_TOOL, default_tool_executor
 from rag.crag import load_crag_config
-from rag.retriever import query_graph_with_crag, query_graph_with_sources
+from rag.retriever import (
+    RetrievalError,
+    query_graph_with_crag,
+    query_graph_with_sources,
+)
 
 load_dotenv()
 
@@ -351,10 +355,15 @@ class _Ctx:
 
 @dataclass
 class _RagResult:
-    """Что база знаний дала для промпта."""
+    """Что база знаний дала для промпта.
+
+    `failed` отличает сбой поиска от пустого результата: при пустом модель
+    отвечает «не нашёл», при сбое пользователь получает «сервис недоступен».
+    """
 
     context: str
     sources: list[dict] = field(default_factory=list)
+    failed: bool = False
 
 
 @dataclass
@@ -453,11 +462,12 @@ async def _retrieve_context(
     history_text: str,
     ctx: _Ctx,
 ) -> _RagResult:
-    """Ищет контекст в базе знаний. При любом сбое возвращает текст-заглушку.
+    """Ищет контекст в базе знаний.
 
-    Заглушка попадает в системный промпт, и модель по ней понимает, что
-    опираться не на что. Поднимать исключение нельзя: без базы знаний бот всё
-    равно должен ответить хотя бы «не знаю».
+    Пустой результат — заглушка RAG_CONTEXT_NOT_FOUND в системный промпт, и
+    модель по ней понимает, что опираться не на что. Сбой поиска — результат с
+    `failed=True`: исключение наружу не поднимаем, ответ пользователю собирает
+    `_generate_answer`, но сбой не маскируется под «ничего не нашлось» (#282).
     """
     session_id = ctx.session_id
     rag_trace_lines: list[str] = []
@@ -489,7 +499,7 @@ async def _retrieve_context(
                 )
         rag_trace_lines = rag_trace.get_lines()
 
-        found = bool(raw_context) and not raw_context.startswith("Error executing query")
+        found = bool(raw_context and raw_context.strip())
         if found:
             sources = metadata_sources
             context = raw_context
@@ -515,17 +525,20 @@ async def _retrieve_context(
         )
         return _RagResult(context=_clean_rag_context(context), sources=sources)
     except Exception as e:
-        logger.warning(f"[{session_id}] LightRAG query error: {e}")
-        context = RAG_CONTEXT_UNAVAILABLE
+        # RetrievalError — штатный сигнал сбоя из rag/, остальное — неожиданная
+        # ошибка уже здесь; для пользователя обе значат одно: поиск не прошёл.
+        kind = "failed" if isinstance(e, RetrievalError) else "crashed"
+        logger.error(f"[{session_id}] RAG retrieval {kind}: {e}")
         ctx.log(
             "rag_response",
-            context,
+            f"Поиск по базе знаний не выполнился: {e}",
             title="Ответ базы знаний",
             error=str(e),
             internal_logs_count=len(rag_trace_lines),
             found_context=False,
+            retrieval_failed=True,
         )
-        return _RagResult(context=context)
+        return _RagResult(context="", failed=True)
 
 
 def _build_messages(
@@ -657,8 +670,15 @@ async def _generate_answer(
     ctx: _Ctx,
     stream_callback: Optional[StreamCallback] = None,
 ) -> tuple[str, list[dict]]:
-    """Промпт, генерация, постобработка. При сбое модели — текст-заглушка."""
+    """Промпт, генерация, постобработка. При сбое модели — текст-заглушка.
+
+    Если упал поиск по базе знаний, модель не зовём и сразу отвечаем, что
+    сервис временно недоступен.
+    """
     session_id = ctx.session_id
+    if rag.failed:
+        logger.info(f"[{session_id}] Skipping generation: knowledge base unavailable.")
+        return RAG_UNAVAILABLE_ANSWER, []
     try:
         logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
         messages = _build_messages(rag.context, history_entries, question)
