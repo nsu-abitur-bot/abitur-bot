@@ -2,7 +2,12 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from bot.core import FEEDBACK_FOOTER, BotCore
+from bot.core import (
+    FEEDBACK_FOOTER,
+    MAX_USER_MESSAGE_LENGTH,
+    TOO_LONG_MESSAGE_TEXT,
+    BotCore,
+)
 from pipeline.llm_client import LlmAnswer
 
 
@@ -345,3 +350,37 @@ async def test_rate_limit_skips_llm_and_user_input_log(monkeypatch):
     assert FEEDBACK_FOOTER not in reply.text
     save_user_message.assert_not_awaited()
     ask_llm.assert_not_awaited()
+
+
+@pytest.mark.asyncio
+async def test_too_long_message_is_rejected_before_llm_and_rate_limit(monkeypatch):
+    redis = FakeRedis()
+    core = BotCore()
+    ask_llm = AsyncMock(return_value=LlmAnswer(text="LLM response"))
+    rate_limit = AsyncMock()
+    save_message = AsyncMock()
+
+    async def fake_get_redis_client():
+        return redis
+
+    async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
+        return 42
+
+    monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
+    monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
+    monkeypatch.setattr(core, "_check_rate_limit", rate_limit)
+    monkeypatch.setattr(core, "_save_user_message_to_db", save_message)
+    monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
+
+    reply = await core.handle_message(
+        channel="telegram",
+        external_user_id="123",
+        session_id="session-1",
+        user_name="user",
+        user_text="а" * (MAX_USER_MESSAGE_LENGTH + 1),
+    )
+
+    assert reply.text == TOO_LONG_MESSAGE_TEXT
+    ask_llm.assert_not_awaited()
+    rate_limit.assert_not_awaited()
+    save_message.assert_not_awaited()
