@@ -18,7 +18,7 @@ from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import FAQMatcher, get_faq_matcher, load_faq_threshold
-from llm.base import LLMUsage
+from llm.base import LLMUsage, ToolExecutor
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from pipeline.prompts import (
@@ -26,6 +26,7 @@ from pipeline.prompts import (
     LIGHTRAG_FORMAT_HINT,
     LIGHTRAG_LEVEL_HINT,
     RAG_CONTEXT_NOT_FOUND,
+    RAG_CONTEXT_UNAVAILABLE,
     RAG_UNAVAILABLE_ANSWER,
     SOURCES_HINT,
     SYSTEM_PROMPT_BASE,
@@ -577,12 +578,14 @@ async def _run_tool_loop(
     messages: list[BaseMessage],
     session_id: str,
     stream_callback: Optional[StreamCallback] = None,
+    tool_executor: Optional[ToolExecutor] = None,
 ) -> tuple[str, LLMUsage, str]:
     """Генерация ответа с доступом к инструментам. Возвращает текст, расход, провайдера.
 
     Со стримингом отдаём накопленный текст в транспорт по мере генерации; сбой
     колбэка не должен ломать сам ответ.
     """
+    tool_executor = tool_executor or default_tool_executor
     provider = get_llm_provider()
     provider_name = provider.__class__.__name__
     logger.info(f"[{session_id}] Sending payload to LLM ({provider_name}).")
@@ -591,7 +594,7 @@ async def _run_tool_loop(
         result = await provider.generate_with_tools(
             messages,
             tools=[ADMISSION_SCORES_TOOL],
-            tool_executor=default_tool_executor,
+            tool_executor=tool_executor,
             profile=LLMProfiles.CHAT,
         )
         return result.text, result.usage, provider_name
@@ -611,7 +614,7 @@ async def _run_tool_loop(
     result = await provider.generate_with_tools(
         messages,
         tools=[ADMISSION_SCORES_TOOL],
-        tool_executor=default_tool_executor,
+        tool_executor=tool_executor,
         profile=LLMProfiles.CHAT,
         on_delta=on_delta,
     )
@@ -663,6 +666,57 @@ async def _answer_from_faq(
     return LlmAnswer(text=faq_answer)
 
 
+async def _answer_without_kb(
+    history_entries: list[dict], question: str, ctx: _Ctx
+) -> tuple[str, list[dict]]:
+    """Ответ, когда поиск по базе знаний упал (#282).
+
+    Модель всё равно зовём: проходные баллы она берёт из инструмента, а не из
+    базы знаний, и этот путь от сбоя поиска не зависит. Но ответ модели
+    отдаём, только если она опиралась на инструмент. Иначе с пустым
+    контекстом она сказала бы «этого нет в базе НГУ», и сбой сервиса
+    выглядел бы как отсутствие информации — поэтому отвечаем, что сервис
+    временно недоступен. Без стриминга: решение принимается после генерации,
+    а показанный по ходу текст уже не забрать.
+    """
+    session_id = ctx.session_id
+    used_tool = False
+
+    async def tracking_executor(name: str, args: dict) -> str:
+        nonlocal used_tool
+        used_tool = True
+        return await default_tool_executor(name, args)
+
+    try:
+        messages = _build_messages(RAG_CONTEXT_UNAVAILABLE, history_entries, question)
+        await ctx.emit_status(STATUS_GENERATING)
+        content, llm_usage, provider_name = await _run_tool_loop(
+            messages, session_id, tool_executor=tracking_executor
+        )
+    except Exception as e:
+        logger.warning(f"[{session_id}] Provider generation error: {e}")
+        return RAG_UNAVAILABLE_ANSWER, []
+
+    if not used_tool:
+        logger.info(
+            f"[{session_id}] Knowledge base unavailable and no tool used: "
+            "answering that the service is unavailable."
+        )
+        return RAG_UNAVAILABLE_ANSWER, []
+
+    processed = _postprocess(content, [])
+    ctx.log(
+        "llm_response",
+        processed.log_text[:2000],
+        response_length=len(processed.log_text),
+        provider=provider_name,
+        tokens=llm_usage.to_dict(),
+        tokens_used=llm_usage.total_tokens or None,
+        retrieval_failed=True,
+    )
+    return processed.text, processed.sources
+
+
 async def _generate_answer(
     rag: _RagResult,
     history_entries: list[dict],
@@ -670,15 +724,10 @@ async def _generate_answer(
     ctx: _Ctx,
     stream_callback: Optional[StreamCallback] = None,
 ) -> tuple[str, list[dict]]:
-    """Промпт, генерация, постобработка. При сбое модели — текст-заглушка.
-
-    Если упал поиск по базе знаний, модель не зовём и сразу отвечаем, что
-    сервис временно недоступен.
-    """
-    session_id = ctx.session_id
+    """Промпт, генерация, постобработка. При сбое модели — текст-заглушка."""
     if rag.failed:
-        logger.info(f"[{session_id}] Skipping generation: knowledge base unavailable.")
-        return RAG_UNAVAILABLE_ANSWER, []
+        return await _answer_without_kb(history_entries, question, ctx)
+    session_id = ctx.session_id
     try:
         logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
         messages = _build_messages(rag.context, history_entries, question)

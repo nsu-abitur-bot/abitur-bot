@@ -2,7 +2,8 @@
 
 Пустой результат и упавший поиск — разные состояния: на пустом модель честно
 отвечает «не нашёл», на упавшем пользователь должен узнать, что сервис
-временно недоступен, а в логах должна остаться ошибка.
+временно недоступен, а в логах должна остаться ошибка. Проходные баллы идут
+через инструмент, а не через базу знаний, и при упавшем поиске работают.
 """
 
 import logging
@@ -12,7 +13,11 @@ import pytest
 
 from llm.base import LLMResult
 from pipeline import llm_client
-from pipeline.prompts import RAG_CONTEXT_NOT_FOUND, RAG_UNAVAILABLE_ANSWER
+from pipeline.prompts import (
+    RAG_CONTEXT_NOT_FOUND,
+    RAG_CONTEXT_UNAVAILABLE,
+    RAG_UNAVAILABLE_ANSWER,
+)
 from rag.retriever import RetrievalError
 
 
@@ -23,11 +28,15 @@ def _close_background_coro(coro) -> None:
 class _RecordingProvider:
     def __init__(self) -> None:
         self.system_prompts: list[str] = []
+        self.call_tool = False
 
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None
     ) -> LLMResult:
         self.system_prompts.append(str(messages[0].content))
+        if self.call_tool:
+            scores = await tool_executor("get_admission_scores", {"faculty": "ФИТ"})
+            return LLMResult(text=f"Проходной балл: {scores}")
         return LLMResult(text="Ответ модели")
 
 
@@ -36,8 +45,12 @@ def pipeline_without_io(monkeypatch):
     async def crag_disabled():
         return SimpleNamespace(enabled=False)
 
+    async def fake_tool_executor(name: str, args: dict) -> str:
+        return "246"
+
     provider = _RecordingProvider()
     monkeypatch.setattr(llm_client, "load_crag_config", crag_disabled)
+    monkeypatch.setattr(llm_client, "default_tool_executor", fake_tool_executor)
     monkeypatch.setattr(llm_client, "_spawn_bg", _close_background_coro)
     monkeypatch.setattr(llm_client, "get_llm_provider", lambda: provider)
     return provider
@@ -65,9 +78,11 @@ async def test_retrieval_error_tells_user_service_is_unavailable(
     with caplog.at_level(logging.ERROR, logger="pipeline.llm_client"):
         text = await _answer_with_retrieval(monkeypatch, failing_retrieval)
 
+    # Модель без инструмента сказала бы «не нашёл в базе» — её ответ не отдаём.
     assert text == RAG_UNAVAILABLE_ANSWER
-    # Модель не зовём: с пустым контекстом она сказала бы «не нашёл в базе».
-    assert pipeline_without_io.system_prompts == []
+    [system_prompt] = pipeline_without_io.system_prompts
+    assert RAG_CONTEXT_UNAVAILABLE in system_prompt
+    assert RAG_CONTEXT_NOT_FOUND not in system_prompt
     errors = [r for r in caplog.records if r.levelno == logging.ERROR]
     assert any("429" in r.getMessage() for r in errors)
 
@@ -81,7 +96,33 @@ async def test_unexpected_retrieval_crash_is_also_unavailable(
     text = await _answer_with_retrieval(monkeypatch, crashing_retrieval)
 
     assert text == RAG_UNAVAILABLE_ANSWER
-    assert pipeline_without_io.system_prompts == []
+
+
+async def test_scores_tool_still_answers_when_retrieval_fails(
+    monkeypatch, pipeline_without_io
+):
+    async def failing_retrieval(query, conversation_history=None):
+        raise RetrievalError("RateLimitError 429")
+
+    pipeline_without_io.call_tool = True
+    text = await _answer_with_retrieval(monkeypatch, failing_retrieval)
+
+    assert text == "Проходной балл: 246"
+
+
+async def test_generation_error_when_retrieval_fails_is_unavailable(
+    monkeypatch, pipeline_without_io
+):
+    async def failing_retrieval(query, conversation_history=None):
+        raise RetrievalError("RateLimitError 429")
+
+    async def broken_generate(*args, **kwargs):
+        raise RuntimeError("provider down")
+
+    monkeypatch.setattr(pipeline_without_io, "generate_with_tools", broken_generate)
+    text = await _answer_with_retrieval(monkeypatch, failing_retrieval)
+
+    assert text == RAG_UNAVAILABLE_ANSWER
 
 
 async def test_empty_retrieval_still_means_not_found(monkeypatch, pipeline_without_io):
