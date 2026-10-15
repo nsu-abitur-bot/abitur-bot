@@ -2,6 +2,7 @@
 
 import logging
 import os
+from dataclasses import dataclass, field
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -22,6 +23,46 @@ SITE_ORIGIN = "https://abiturient.nsu.ru"
 # рейтинговый список, 50 — высший приоритет) не отслеживаем. Переопределяется
 # через env RATING_TYPES (список через запятую).
 DEFAULT_LIST_TYPES = "30"
+
+
+@dataclass(frozen=True)
+class ListFetchResult:
+    """Результат загрузки одного конкурсного списка.
+
+    Ошибка — отдельный признак, а не пустой список: иначе упавший запрос
+    неотличим от списка, в котором действительно никого нет (#286).
+    """
+
+    entries: list[RatingEntry] = field(default_factory=list)
+    page_hash: str = ""
+    direction_name: str = ""
+    error: str | None = None
+    # Повтор с новой сессией может помочь (сеть, 5xx, протухший CSRF), а
+    # битые параметры в URL — нет.
+    retryable: bool = True
+
+    @property
+    def ok(self) -> bool:
+        return self.error is None
+
+    @classmethod
+    def failure(cls, error: str, retryable: bool = True) -> "ListFetchResult":
+        return cls(error=error, retryable=retryable)
+
+
+def _parse_list_response(text: str, data: object) -> ListFetchResult:
+    """Разбирает JSON list-content; неожиданный формат считается ошибкой.
+
+    Ответ без ключа items — это не пустой список, а сменившийся протокол
+    или страница-заглушка вместо данных.
+    """
+    if not isinstance(data, dict) or "items" not in data:
+        return ListFetchResult.failure("неожиданный формат ответа: нет ключа items")
+    return ListFetchResult(
+        entries=extract_entries(data),
+        page_hash=calculate_page_hash(text),
+        direction_name=extract_direction_name(data),
+    )
 
 
 def _resolve_type_ids() -> list[int]:
@@ -137,16 +178,8 @@ def parse_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
             return [], "", ""
 
 
-def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
-    """
-    Получает данные рейтингового списка с мок-сайта (напрямую GET-запросом).
-
-    Args:
-        url: Ссылка на эндпоинт мок-сервера.
-
-    Returns:
-        (список записей рейтинга, хэш ответа, название направления)
-    """
+def parse_mock_rating_page(url: str) -> ListFetchResult:
+    """Получает данные рейтингового списка с мок-сайта (напрямую GET-запросом)."""
     config = get_rating_config()
     headers = config.get("headers", {})
 
@@ -155,22 +188,19 @@ def parse_mock_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
             url, headers={**headers, "Accept": "application/json"}, timeout=10
         )
         response.raise_for_status()
-
-        data = response.json()
-        page_hash = calculate_page_hash(response.text)
-        entries = extract_entries(data)
-
-        direction_name = extract_direction_name(data)
-
-        logger.info(f"Получено {len(entries)} записей из мока {url}")
-        return entries, page_hash, direction_name
-
+        result = _parse_list_response(response.text, response.json())
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка при GET запросе к моку {url}: {e}")
-        return [], "", ""
+        return ListFetchResult.failure(f"запрос: {e}")
     except Exception as e:
         logger.error(f"Ошибка при парсинге мока {url}: {e}")
-        return [], "", ""
+        return ListFetchResult.failure(f"разбор ответа: {e}")
+
+    if result.ok:
+        logger.info(f"Получено {len(result.entries)} записей из мока {url}")
+    else:
+        logger.error(f"Ошибка при разборе мока {url}: {result.error}")
+    return result
 
 
 def extract_direction_name(data: dict) -> str:
@@ -192,7 +222,7 @@ def _fetch_list_content(
     params: dict,
     headers: dict,
     url_for_log: str = "",
-) -> tuple[list[RatingEntry], str, str]:
+) -> ListFetchResult:
     """POST-запрос к list-content с готовой сессией и CSRF-токеном.
 
     Вынесено отдельно, чтобы обходить много списков, переиспользуя одну сессию
@@ -214,16 +244,16 @@ def _fetch_list_content(
             timeout=10,
         )
         response.raise_for_status()
-        data = response.json()
-        page_hash = calculate_page_hash(response.text)
-        entries = extract_entries(data)
-        return entries, page_hash, extract_direction_name(data)
+        result = _parse_list_response(response.text, response.json())
     except requests.exceptions.RequestException as e:
         logger.error(f"Ошибка при запросе {url_for_log}: {e}")
-        return [], "", ""
+        return ListFetchResult.failure(f"запрос: {e}")
     except Exception as e:
         logger.error(f"Ошибка при парсинге {url_for_log}: {e}")
-        return [], "", ""
+        return ListFetchResult.failure(f"разбор ответа: {e}")
+    if not result.ok:
+        logger.error(f"Ошибка при разборе {url_for_log}: {result.error}")
+    return result
 
 
 def create_rating_session() -> tuple[requests.Session | None, str | None]:
@@ -240,7 +270,7 @@ def create_rating_session() -> tuple[requests.Session | None, str | None]:
 
 def parse_rating_url_with_session(
     session: requests.Session, csrf_token: str, url: str
-) -> tuple[list[RatingEntry], str, str]:
+) -> ListFetchResult:
     """Парсит один список, переиспользуя переданные сессию и CSRF-токен."""
     config = get_rating_config()
     headers = config.get("headers", {})
@@ -248,8 +278,56 @@ def parse_rating_url_with_session(
         params = extract_params_from_url(url)
     except ValueError as e:
         logger.error(f"Некорректные параметры в URL {url}: {e}")
-        return [], "", ""
+        return ListFetchResult.failure(f"некорректный URL: {e}", retryable=False)
     return _fetch_list_content(session, csrf_token, params, headers, url_for_log=url)
+
+
+class RatingListFetcher:
+    """Обход многих списков в одной HTTP-сессии с одним CSRF-токеном.
+
+    Обход идёт минутами, и токен или кука могут протухнуть на середине. Тогда
+    при ошибке сессия и токен запрашиваются заново, а список — ещё раз.
+    Число таких перезапусков за обход ограничено: если сайт лежит, долбить
+    его новой сессией на каждый список бессмысленно.
+    """
+
+    def __init__(self, max_refreshes: int = 3) -> None:
+        self._session: requests.Session | None = None
+        self._csrf_token: str | None = None
+        self.refreshes_left = max_refreshes
+
+    def open(self) -> bool:
+        self._session, self._csrf_token = create_rating_session()
+        return self._session is not None and self._csrf_token is not None
+
+    def close(self) -> None:
+        if self._session is not None:
+            self._session.close()
+        self._session = None
+        self._csrf_token = None
+
+    def _fetch_once(self, url: str) -> ListFetchResult:
+        if self._session is None or self._csrf_token is None:
+            return ListFetchResult.failure("нет HTTP-сессии с CSRF-токеном")
+        return parse_rating_url_with_session(self._session, self._csrf_token, url)
+
+    def fetch(self, url: str) -> ListFetchResult:
+        result = self._fetch_once(url)
+        if result.ok or not result.retryable or self.refreshes_left <= 0:
+            return result
+
+        self.refreshes_left -= 1
+        logger.warning(
+            "Ошибка списка %s (%s): перезапрашиваю сессию и CSRF-токен и повторяю",
+            url,
+            result.error,
+        )
+        self.close()
+        if not self.open():
+            # Токен не получить — сайт, скорее всего, лежит: дальше не перезапускаем.
+            self.refreshes_left = 0
+            return result
+        return self._fetch_once(url)
 
 
 def _to_int(value: object) -> int | None:

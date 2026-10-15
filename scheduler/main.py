@@ -1,20 +1,21 @@
 import asyncio
 import logging
 import os
+from dataclasses import dataclass
 
 from aiogram import Bot as TelegramBot
 from maxapi import Bot as MaxBot
 
-from bot.notifications import notify_users
+from bot.notifications import send_pending_notifications
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.dto import RatingEntry
 from db.postgres.services.rating import RatingService
 from logging_config import setup_logging
 from parser.rating import (
-    create_rating_session,
+    ListFetchResult,
+    RatingListFetcher,
     fetch_all_leaderboard_urls,
     parse_mock_rating_page,
-    parse_rating_url_with_session,
 )
 
 logger = logging.getLogger(__name__)
@@ -26,10 +27,27 @@ POLL_START_SECONDS = int(os.getenv("RATING_POLL_START_SECONDS", "1800"))
 # Пауза между запросами к сайту (вежливость к abiturient.nsu.ru).
 REQUEST_DELAY_SECONDS = float(os.getenv("RATING_REQUEST_DELAY", "0.3"))
 RATING_DEGREE = os.getenv("RATING_DEGREE", "bachelor")
+# Доля списков с ошибкой, выше которой цикл считается неудачным: ERROR в логе
+# и интервал опроса не растёт. Единичные сбои — WARNING.
+FAILED_LISTS_THRESHOLD = float(os.getenv("RATING_FAILED_LISTS_THRESHOLD", "0.2"))
+# Сколько раз за обход можно перезапросить сессию и CSRF-токен после ошибки.
+MAX_SESSION_REFRESHES = int(os.getenv("RATING_MAX_SESSION_REFRESHES", "3"))
 
 
 def _use_mock() -> bool:
     return os.getenv("RATING_USE_MOCK", "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+@dataclass
+class SyncResult:
+    """Итог одного цикла синхронизации."""
+
+    changed: bool = False
+    # Цикл не справился: упал, не получил список URL или токен, либо доля
+    # списков с ошибкой выше порога. Такой цикл не повод опрашивать реже.
+    failed: bool = False
+    total_lists: int = 0
+    failed_lists: int = 0
 
 
 def compute_next_interval(
@@ -37,13 +55,20 @@ def compute_next_interval(
     changed: bool,
     min_s: int = POLL_MIN_SECONDS,
     max_s: int = POLL_MAX_SECONDS,
+    failed: bool = False,
 ) -> int:
     """Адаптивный интервал опроса.
 
     Были изменения → опрашиваем чаще (текущий ÷2); не было → реже (×2).
-    Результат ограничен диапазоном [min_s, max_s].
+    Неудачный цикл ничего не говорит о том, менялись ли списки, поэтому
+    интервал после него не растёт. Результат ограничен диапазоном [min_s, max_s].
     """
-    nxt = current // 2 if changed else current * 2
+    if changed:
+        nxt = current // 2
+    elif failed:
+        nxt = current
+    else:
+        nxt = current * 2
     return max(min_s, min(max_s, nxt))
 
 
@@ -53,10 +78,11 @@ async def _process_leaderboard(
     entries: list[RatingEntry],
     page_hash: str,
     direction_name: str,
-) -> tuple[bool, list]:
+) -> bool:
     """Обновляет один конкурсный список в БД.
 
-    Возвращает (были ли изменения, список уведомлений).
+    Места, новый хэш и уведомления в notification_outbox пишутся одним
+    коммитом: либо всё, либо ничего. Возвращает, были ли изменения.
     """
     leaderboard = await rating_service.get_or_create_leaderboard(
         url, direction_name=direction_name
@@ -64,7 +90,7 @@ async def _process_leaderboard(
 
     # Хэш совпал — данные не менялись, пропускаем.
     if leaderboard.content_hash == page_hash:
-        return False, []
+        return False
 
     # Дедуп по applicant_id: один человек может быть в нескольких номинациях —
     # оставляем лучшее (наименьшее) место.
@@ -77,24 +103,66 @@ async def _process_leaderboard(
             unique[ident] = entry
 
     stats = await rating_service.update_ratings_from_entries(
-        leaderboard_id=leaderboard.id, entries=list(unique.values())
+        leaderboard_id=leaderboard.id,
+        entries=list(unique.values()),
+        content_hash=page_hash or None,
+        enqueue_notifications=True,
     )
-    if page_hash:
-        await rating_service.update_leaderboard_hash(leaderboard.id, page_hash)
+    logger.info(
+        "Список %s обновлён: уведомлений в очереди %d",
+        url,
+        len(stats.get("notifications", [])),
+    )
+    return True
 
-    return True, stats.get("notifications", [])
+
+async def _deliver_pending(bot: TelegramBot | None, max_client: MaxBot | None) -> None:
+    """Рассылка из очереди; её сбой не должен ронять обход списков."""
+    try:
+        await send_pending_notifications(bot, max_client=max_client)
+    except Exception as e:
+        logger.error("Ошибка рассылки уведомлений из очереди: %s", e, exc_info=True)
 
 
-async def run_sync_job(bot: TelegramBot | None, max_client: MaxBot | None = None) -> bool:
+def _report_failures(result: SyncResult) -> None:
+    if not result.failed_lists:
+        return
+    share = result.failed_lists / result.total_lists
+    if share > FAILED_LISTS_THRESHOLD:
+        result.failed = True
+        logger.error(
+            "Не загрузились %d из %d конкурсных списков (%.0f%%, порог %.0f%%): "
+            "данные этого цикла неполные, хэши упавших списков не обновлены.",
+            result.failed_lists,
+            result.total_lists,
+            share * 100,
+            FAILED_LISTS_THRESHOLD * 100,
+        )
+    else:
+        logger.warning(
+            "Не загрузились %d из %d конкурсных списков; хэши этих списков "
+            "не обновлены, повторим в следующем цикле.",
+            result.failed_lists,
+            result.total_lists,
+        )
+
+
+async def run_sync_job(
+    bot: TelegramBot | None, max_client: MaxBot | None = None
+) -> SyncResult:
     """Один прогон: обход всех конкурсных списков → обновление БД → уведомления.
 
-    Возвращает True, если хотя бы в одном списке были изменения (для адаптивного
-    интервала).
+    Уведомления не копятся в памяти до конца обхода, а лежат в
+    notification_outbox: рассылается то, что осталось с прошлых циклов, и
+    новое — сразу после каждого изменившегося списка.
     """
     logger.info("Начало цикла синхронизации рейтингов...")
-    changed_any = False
-    all_notifications: list = []
+    result = SyncResult()
 
+    # Хвост прошлого цикла, если он упал между записью в базу и рассылкой.
+    await _deliver_pending(bot, max_client)
+
+    fetcher: RatingListFetcher | None = None
     try:
         if _use_mock():
             urls = [
@@ -106,57 +174,64 @@ async def run_sync_job(bot: TelegramBot | None, max_client: MaxBot | None = None
             urls = fetch_all_leaderboard_urls(RATING_DEGREE)
 
         if not urls:
-            logger.warning("Список URL конкурсных списков пуст — пропускаем итерацию.")
-            return False
+            logger.error("Список URL конкурсных списков пуст — пропускаем итерацию.")
+            result.failed = True
+            return result
 
         logger.info("К обходу %d конкурсных списков", len(urls))
+        result.total_lists = len(urls)
 
-        session = None
-        csrf_token = None
         if not _use_mock():
-            session, csrf_token = create_rating_session()
-            if not session or not csrf_token:
-                logger.warning("Не удалось получить CSRF-токен — пропускаем итерацию.")
-                return False
+            fetcher = RatingListFetcher(max_refreshes=MAX_SESSION_REFRESHES)
+            if not fetcher.open():
+                logger.error("Не удалось получить CSRF-токен — пропускаем итерацию.")
+                result.failed = True
+                return result
 
-        try:
-            async with AsyncSessionLocal() as db_session:
-                rating_service = RatingService(db_session)
-                for url in urls:
-                    if _use_mock():
-                        entries, page_hash, direction_name = parse_mock_rating_page(url)
-                    else:
-                        assert session is not None and csrf_token is not None
-                        entries, page_hash, direction_name = (
-                            parse_rating_url_with_session(session, csrf_token, url)
-                        )
-                        if REQUEST_DELAY_SECONDS > 0:
-                            await asyncio.sleep(REQUEST_DELAY_SECONDS)
+        async with AsyncSessionLocal() as db_session:
+            rating_service = RatingService(db_session)
+            for url in urls:
+                fetched: ListFetchResult
+                if fetcher is None:
+                    fetched = parse_mock_rating_page(url)
+                else:
+                    fetched = fetcher.fetch(url)
+                    if REQUEST_DELAY_SECONDS > 0:
+                        await asyncio.sleep(REQUEST_DELAY_SECONDS)
 
-                    if not entries:
-                        continue
+                if not fetched.ok:
+                    # Хэш не трогаем: следующий цикл должен увидеть список заново.
+                    result.failed_lists += 1
+                    continue
+                if not fetched.entries:
+                    continue
 
-                    changed, notifications = await _process_leaderboard(
-                        rating_service, url, entries, page_hash, direction_name
-                    )
-                    if changed:
-                        changed_any = True
-                        all_notifications.extend(notifications)
-        finally:
-            if session is not None:
-                session.close()
+                changed = await _process_leaderboard(
+                    rating_service,
+                    url,
+                    fetched.entries,
+                    fetched.page_hash,
+                    fetched.direction_name,
+                )
+                if changed:
+                    result.changed = True
+                    await _deliver_pending(bot, max_client)
 
-        if all_notifications:
-            logger.info("Рассылка %d уведомлений...", len(all_notifications))
-            await notify_users(bot, all_notifications, max_client=max_client)
-        else:
-            logger.info("Изменений нет, уведомления не требуются.")
-
-        logger.info("Цикл синхронизации завершён. Изменения: %s", changed_any)
+        _report_failures(result)
+        logger.info(
+            "Цикл синхронизации завершён. Изменения: %s, ошибок списков: %d из %d",
+            result.changed,
+            result.failed_lists,
+            result.total_lists,
+        )
     except Exception as e:
+        result.failed = True
         logger.error(f"Ошибка во время цикла синхронизации: {e}", exc_info=True)
+    finally:
+        if fetcher is not None:
+            fetcher.close()
 
-    return changed_any
+    return result
 
 
 async def main():
@@ -182,14 +257,15 @@ async def main():
     logger.info("Запуск планировщика. Стартовый интервал: %d сек.", interval)
 
     while True:
-        changed = False
+        result = SyncResult()
         if bot is not None or max_client is not None:
-            changed = await run_sync_job(bot, max_client=max_client)
-        interval = compute_next_interval(interval, changed)
+            result = await run_sync_job(bot, max_client=max_client)
+        interval = compute_next_interval(interval, result.changed, failed=result.failed)
         logger.info(
-            "Ожидание %d сек до следующего опроса (были изменения: %s)...",
+            "Ожидание %d сек до следующего опроса (были изменения: %s, сбой: %s)...",
             interval,
-            changed,
+            result.changed,
+            result.failed,
         )
         await asyncio.sleep(interval)
 

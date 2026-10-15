@@ -27,3 +27,13 @@ def test_change_floored_at_min():
 
 def test_no_change_from_min_goes_up():
     assert compute_next_interval(300, False, MIN_S, MAX_S) == 600
+
+
+def test_failed_cycle_does_not_back_off():
+    # Сбой не значит «изменений нет»: интервал не растёт (#286).
+    assert compute_next_interval(600, False, MIN_S, MAX_S, failed=True) == 600
+    assert compute_next_interval(300, False, MIN_S, MAX_S, failed=True) == 300
+
+
+def test_failed_cycle_with_changes_still_speeds_up():
+    assert compute_next_interval(1800, True, MIN_S, MAX_S, failed=True) == 900

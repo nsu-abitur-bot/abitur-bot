@@ -160,6 +160,51 @@ class UserRating(Base):
         )
 
 
+class NotificationStatus(str, enum.Enum):
+    """Статус уведомления в очереди на отправку."""
+
+    pending = "pending"
+    sent = "sent"
+    # Доставить не получилось и пробовать больше не будем: нет канала связи,
+    # пользователь пропал или исчерпаны попытки.
+    failed = "failed"
+
+
+class NotificationOutbox(Base):
+    """Очередь уведомлений об изменении позиции в конкурсном списке.
+
+    Строка пишется в той же транзакции, что и новые места, поэтому
+    уведомление не теряется, если процесс упал между записью в базу и рассылкой:
+    неотправленное уйдёт следующим проходом планировщика.
+    """
+
+    __tablename__ = "notification_outbox"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False
+    )
+    # Поля RatingChange: текст собирается при отправке, а не при записи.
+    payload: Mapped[dict] = mapped_column(JSON, nullable=False)
+    status: Mapped[str] = mapped_column(
+        String(16), default=NotificationStatus.pending.value, nullable=False
+    )
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    user: Mapped["User"] = relationship("User")
+
+    __table_args__ = (Index("ix_notification_outbox_status_id", "status", "id"),)
+
+    def __repr__(self) -> str:
+        return (
+            f"<NotificationOutbox(id={self.id}, user_id={self.user_id}, "
+            f"status='{self.status}', attempts={self.attempts})>"
+        )
+
+
 class Message(Base):
     """Сообщения пользователей и ответы бота."""
 
