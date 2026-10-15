@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
+from abbrev.expander import AbbrevExpander
 from db.postgres.models import Base
 from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from db.postgres.services.faculty import FacultyService
@@ -134,6 +135,49 @@ async def test_execute_empty_returns_marker(sessionmaker_bound):
 
     text = await execute_admission_scores({"faculty": "Несуществующий"})
     assert text == "По этому запросу данных о проходных баллах нет."
+
+
+@pytest.fixture
+def expander(monkeypatch) -> AbbrevExpander:
+    """Свой словарь аббревиатур — как будто его завели в админке."""
+    exp = AbbrevExpander()
+    exp.load_items([])
+    monkeypatch.setattr(tool_mod, "get_abbrev_expander", lambda: exp)
+    return exp
+
+
+@pytest.mark.asyncio
+async def test_execute_finds_program_by_user_phrasing(sessionmaker_bound, expander):
+    """«у меня 250 баллов, есть шансы на ПИиКН» — баллы находятся (#235)."""
+    await _seed_fit(sessionmaker_bound)
+
+    for program in ("ПИиКН", "программная инженерия", "ПИиКН (Программная инженерия)"):
+        text = await execute_admission_scores({"program": program})
+        assert "246" in text, program
+        assert "260" not in text, program
+
+
+@pytest.mark.asyncio
+async def test_execute_uses_admin_abbreviations(sessionmaker_bound, expander):
+    """Сокращение, которое не выводится из названия, берётся из словаря админки."""
+    await _seed_fit(sessionmaker_bound)
+    expander.load_items(
+        [{"short": "Прогинж", "full": "Программная инженерия и компьютерные науки"}]
+    )
+
+    text = await execute_admission_scores({"faculty": "ФИТ", "program": "Прогинж"})
+    assert "246" in text
+    assert "260" not in text
+
+
+@pytest.mark.asyncio
+async def test_execute_falls_back_to_published_years(sessionmaker_bound, expander):
+    """За текущий год итогов ещё нет — показываем прошлые, а не «данных нет»."""
+    await _seed_fit(sessionmaker_bound)
+
+    text = await execute_admission_scores({"program": "ПИиКН", "year": 2026})
+    assert "За 2026 год данных нет" in text
+    assert "246" in text
 
 
 @pytest.mark.asyncio

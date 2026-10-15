@@ -8,6 +8,7 @@
 import logging
 from typing import Optional
 
+from abbrev.expander import get_abbrev_expander
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.admission_score import AdmissionScoreService
 from llm.base import ToolSpec
@@ -36,9 +37,10 @@ ADMISSION_SCORES_TOOL = ToolSpec(
             "program": {
                 "type": "string",
                 "description": (
-                    "Название направления подготовки "
-                    "(например, «Компьютерные науки и системотехника»). "
-                    "Необязательно."
+                    "Направление подготовки так, как его назвал пользователь: "
+                    "полное название, его часть или сокращение (например, "
+                    "«Компьютерные науки и системотехника», «ПИиКН», "
+                    "«прикладная математика»). Необязательно."
                 ),
             },
             "year": {
@@ -125,6 +127,27 @@ def _format_scores(rows: list[dict], metric: str) -> str:
     return "\n".join(lines).strip()
 
 
+def _str_or_none(value: object) -> Optional[str]:
+    return str(value) if value else None
+
+
+def _expand(value: object) -> Optional[str]:
+    """Расшифровывает аббревиатуры из справочника админки.
+
+    «ПИиКН» превращается в «ПИиКН (Программная инженерия и компьютерные
+    науки)» — сервис пробует обе части. Так сокращения, которые завели в
+    админке, работают и в поиске баллов, а не только в тексте вопроса.
+    """
+    text = _str_or_none(value)
+    if text is None:
+        return None
+    try:
+        return get_abbrev_expander().expand(text)
+    except Exception:
+        logger.warning("Не удалось расшифровать аббревиатуры в %r", text)
+        return text
+
+
 async def execute_admission_scores(arguments: dict) -> str:
     """Выполняет запрос проходных/средних баллов и форматирует результат.
 
@@ -135,19 +158,26 @@ async def execute_admission_scores(arguments: dict) -> str:
     if metric not in ("passing", "average", "both"):
         metric = "passing"
 
-    faculty = arguments.get("faculty")
-    program = arguments.get("program")
+    faculty = _expand(arguments.get("faculty"))
+    program = _expand(arguments.get("program"))
     form = arguments.get("form")
     year = _coerce_year(arguments.get("year"))
 
     try:
         async with AsyncSessionLocal() as session:
-            rows = await AdmissionScoreService(session).query_scores(
-                faculty=str(faculty) if faculty else None,
-                program=str(program) if program else None,
-                year=year,
-                form=str(form) if form else None,
+            service = AdmissionScoreService(session)
+            rows = await service.query_scores(
+                faculty=faculty, program=program, year=year, form=_str_or_none(form)
             )
+            note = ""
+            if not rows and year is not None:
+                # Модель подставляет текущий год, а итоги приёма за него ещё не
+                # опубликованы: лучше показать прошлые годы, чем «данных нет».
+                rows = await service.query_scores(
+                    faculty=faculty, program=program, form=_str_or_none(form)
+                )
+                if rows:
+                    note = f"За {year} год данных нет, показаны доступные годы."
     except Exception:
         logger.exception("Ошибка выполнения инструмента get_admission_scores")
         return "Не удалось получить данные о проходных баллах."
@@ -155,4 +185,5 @@ async def execute_admission_scores(arguments: dict) -> str:
     if not rows:
         return "По этому запросу данных о проходных баллах нет."
 
-    return _format_scores(rows, metric)
+    text = _format_scores(rows, metric)
+    return f"{note}\n\n{text}" if note else text
