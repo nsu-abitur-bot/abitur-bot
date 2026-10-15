@@ -57,9 +57,14 @@ class TestPostprocess:
 
 class TestBuildMessages:
     def test_context_goes_into_system_prompt(self):
-        messages = _build_messages("Приём до 25 июля.", [])
-        assert len(messages) == 1
+        messages = _build_messages("Приём до 25 июля.", [], "Когда приём?")
         assert "Приём до 25 июля." in messages[0].content
+
+    def test_question_is_last_even_without_history(self):
+        """Пустая история (сбой Redis, TTL) не должна оставлять модель без вопроса."""
+        messages = _build_messages("контекст", [], "Когда приём?")
+        assert [m.type for m in messages] == ["system", "human"]
+        assert messages[-1].content == "Когда приём?"
 
     def test_history_roles_are_mapped(self):
         messages = _build_messages(
@@ -69,8 +74,9 @@ class TestBuildMessages:
                 {"role": "assistant", "content": "До 25 июля."},
                 {"role": "system", "content": "это игнорируется"},
             ],
+            "А на магистратуру?",
         )
-        assert [m.type for m in messages] == ["system", "human", "ai"]
+        assert [m.type for m in messages] == ["system", "human", "ai", "human"]
         assert messages[1].content == "Когда подавать?"
         assert messages[2].content == "До 25 июля."
 
@@ -87,6 +93,7 @@ class TestBuildMessages:
                     ),
                 }
             ],
+            "Вопрос",
         )
         assert messages[1].content == "До 25 июля."
 
@@ -94,6 +101,7 @@ class TestBuildMessages:
         messages = _build_messages(
             "контекст",
             [{"role": "assistant", "content": 'Смотри <a href="https://n.ru">тут</a>'}],
+            "Вопрос",
         )
         assert "<a" not in messages[1].content
 
