@@ -2,6 +2,7 @@
 проброс инструмента в ask_local_llm (без обращения к сети и реальным LLM)."""
 
 import asyncio
+from types import SimpleNamespace
 
 import pytest
 
@@ -125,6 +126,10 @@ async def test_ask_local_llm_passes_admission_tool(monkeypatch):
     async def fake_query_graph_with_sources(*args, **kwargs):
         return "Контекст из RAG", []
 
+    async def crag_disabled():
+        # Иначе поиск пойдёт в настоящий CRAG и упадёт без ключа Gemini.
+        return SimpleNamespace(enabled=False)
+
     async def fake_executor(name: str, args: dict) -> str:
         # Заменяем реальный исполнитель (с БД) на канонический ответ.
         assert name == "get_admission_scores"
@@ -133,6 +138,7 @@ async def test_ask_local_llm_passes_admission_tool(monkeypatch):
     monkeypatch.setattr(llm_client, "get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
     monkeypatch.setattr(llm_client, "get_faq_matcher", lambda: _FakeFaqMatcher())
+    monkeypatch.setattr(llm_client, "load_crag_config", crag_disabled)
     monkeypatch.setattr(
         llm_client, "query_graph_with_sources", fake_query_graph_with_sources
     )

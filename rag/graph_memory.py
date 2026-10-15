@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
-from lightrag.utils import wrap_embedding_func_with_attrs
+from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
 
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
@@ -123,6 +123,32 @@ def _fallback_title_from_source(source: str | None) -> str:
 
     clean_source = _clean_source_title(source)
     return clean_source or DEFAULT_SOURCE_TITLE
+
+
+class RetrievalError(RuntimeError):
+    """Поиск по базе знаний не выполнился: сеть, лимиты, сломанный стор.
+
+    Отдельный тип, чтобы вызывающий код не путал сбой с честным «ничего не
+    нашлось»: пустой результат возвращается пустым, а сбой — этим исключением
+    (#282).
+    """
+
+
+def _ensure_query_succeeded(result: Any) -> bool:
+    """Проверяет ответ `aquery_llm`. True — поиск прошёл, но ничего не нашёл.
+
+    LightRAG ловит исключения запроса сам и возвращает `status="failure"`.
+    «Нет результатов» — тоже failure, но с `failure_reason="no_results"`: это
+    честная пустота, а не сбой. Всё остальное с failure — сбой.
+    """
+    if not isinstance(result, dict):
+        raise RetrievalError(f"LightRAG вернул неожиданный ответ: {type(result)!r}")
+    if result.get("status") != "failure":
+        return False
+    metadata = result.get("metadata") or {}
+    if metadata.get("failure_reason") == "no_results":
+        return True
+    raise RetrievalError(str(result.get("message") or "LightRAG query failed"))
 
 
 class _GraphWrapper:
@@ -529,11 +555,28 @@ class GraphMemory:
     ) -> bool:
         try:
             async with self._use_graph(graph_id) as rag:
-                await rag.ainsert(
+                track_id = await rag.ainsert(
                     text,
                     ids=source_id,
                     file_paths=file_paths_str or source_id,
                 )
+                failed = await self._failed_docs(rag, track_id)
+                for doc_id in failed:
+                    await self._restore_chunks_list(rag, doc_id)
+            if failed:
+                # LightRAG при сбое (например, эмбеддинга) не бросает
+                # исключение, а помечает документ FAILED — и уже записанные
+                # чанки остаются в сторе. Документ, проиндексированный
+                # наполовину, хуже отсутствующего: удаляем его целиком (#283).
+                for doc_id, error in failed.items():
+                    logger.error(
+                        "Документ %s не проиндексирован в графе %s: %s",
+                        doc_id,
+                        graph_id,
+                        error,
+                    )
+                    await self.delete_doc(graph_id, doc_id)
+                return False
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
                 self._graph_signatures[graph_id] = await asyncio.to_thread(
@@ -544,6 +587,67 @@ class GraphMemory:
         except Exception as e:
             logger.error(f"Error inserting text into graph {graph_id}: {e}")
             return False
+
+    @staticmethod
+    async def _failed_docs(rag: Any, track_id: Any) -> dict[str, str]:
+        """Документы этой вставки, которые LightRAG пометил FAILED.
+
+        Только FAILED, а не «всё, что не PROCESSED»: если конвейер LightRAG уже
+        занят другой вставкой, наш документ остаётся PENDING и будет обработан
+        тем конвейером — удалять его нельзя.
+        """
+        if not isinstance(track_id, str):
+            return {}
+        docs = await rag.aget_docs_by_track_id(track_id)
+        failed: dict[str, str] = {}
+        for doc_id, status_doc in (docs or {}).items():
+            status = getattr(status_doc, "status", None)
+            if getattr(status, "value", status) == "failed":
+                error = getattr(status_doc, "error_msg", None) or "status=failed"
+                failed[doc_id] = str(error)
+        return failed
+
+    @staticmethod
+    async def _restore_chunks_list(rag: Any, doc_id: str) -> None:
+        """Возвращает в doc_status список чанков упавшего документа.
+
+        Записывая FAILED, LightRAG затирает `chunks_list`, а `adelete_by_doc_id`
+        удаляет чанки именно по нему. Без списка документ удалится, а его
+        чанки — с векторами, если сбой случился уже на графе, — останутся в
+        поиске. Список пересчитываем тем же чанкером, что и при вставке.
+        """
+        try:
+            status_record = await rag.doc_status.get_by_id(doc_id)
+            if not status_record or status_record.get("chunks_list"):
+                return
+            full_doc = await rag.full_docs.get_by_id(doc_id)
+            content = (full_doc or {}).get("content")
+            if not content:
+                return
+            chunk_ids = [
+                compute_mdhash_id(dp["content"], prefix="chunk-")
+                for dp in rag.chunking_func(
+                    rag.tokenizer,
+                    content,
+                    None,
+                    False,
+                    rag.chunk_overlap_token_size,
+                    rag.chunk_token_size,
+                )
+            ]
+            await rag.doc_status.upsert(
+                {
+                    doc_id: {
+                        **status_record,
+                        "chunks_list": chunk_ids,
+                        "chunks_count": len(chunk_ids),
+                    }
+                }
+            )
+        except Exception as exc:
+            logger.warning(
+                "Не удалось восстановить список чанков документа %s: %s", doc_id, exc
+            )
 
     async def query(
         self,
@@ -559,7 +663,10 @@ class GraphMemory:
                     mode,
                     _clip_for_log(question),
                 )
-                result = await rag.aquery(question, param=QueryParam(mode=mode))
+                response = await rag.aquery_llm(question, param=QueryParam(mode=mode))
+                if _ensure_query_succeeded(response):
+                    return ""
+                result = (response.get("llm_response") or {}).get("content") or ""
                 logger.info(
                     "RAG query response: graph_id=%s mode=%s length=%d content=%s",
                     graph_id,
@@ -570,7 +677,9 @@ class GraphMemory:
                 return str(result)
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
-            return f"Error executing query: {str(e)}"
+            if isinstance(e, RetrievalError):
+                raise
+            raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
     async def _retrieve_raw_chunks(
         self,
@@ -593,6 +702,8 @@ class GraphMemory:
                 setattr(query_param, attr_name, attr_value)
 
         result = await rag.aquery_llm(question, param=query_param)
+        if _ensure_query_succeeded(result):
+            return []
         data = result.get("data", {}) if isinstance(result, dict) else {}
         chunks = data.get("chunks", [])
         if not isinstance(chunks, list):
@@ -681,7 +792,7 @@ class GraphMemory:
                 )
 
                 if not kept:
-                    return "Релевантный контекст из базы знаний не найден.", []
+                    return "", []
 
                 url_to_title = await self._get_source_titles(graph_id)
 
@@ -716,7 +827,9 @@ class GraphMemory:
                 return context, sources
         except Exception as e:
             logger.error(f"Error in CRAG query for graph {graph_id}: {e}")
-            return f"Error executing query: {str(e)}", []
+            if isinstance(e, RetrievalError):
+                raise
+            raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
     async def query_with_sources(
         self,
@@ -762,6 +875,11 @@ class GraphMemory:
                     )
 
                 result = await rag.aquery_llm(question, param=query_param)
+                if _ensure_query_succeeded(result):
+                    logger.info(
+                        "RAG retrieval response: graph_id=%s no results", graph_id
+                    )
+                    return "", []
                 answer = result.get("llm_response", {}).get("content", "") or ""
                 data = result.get("data", {})
                 chunks = data.get("chunks", [])
@@ -858,7 +976,9 @@ class GraphMemory:
                 return str(answer), reranked_sources
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
-            return f"Error executing query: {str(e)}", []
+            if isinstance(e, RetrievalError):
+                raise
+            raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
     @staticmethod
     def _docs_files_signature(workspace_path: str) -> tuple[float, float]:

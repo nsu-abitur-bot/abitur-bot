@@ -57,6 +57,10 @@ class GeminiEmbedding:
         self.profile = LLMProfiles.EMBEDDING
 
     async def __call__(self, texts: List[str]) -> List[List[float]]:
+        # Ошибку не глотаем и нулевой вектор не подставляем: в nano_vectordb
+        # нулевой запрос даёт NaN-скоры и случайные top-k чанки, а нулевой
+        # чанк — NaN-строку, которая до переиндексации попадает в топ-1 (#283).
+        # Повторы при сбое делает сам LightRAG.
         try:
             result = await self.client.aio.models.embed_content(
                 model=self.model,
@@ -66,21 +70,14 @@ class GeminiEmbedding:
                     output_dimensionality=self.embedding_dim,
                 ),
             )
-            embeddings: List[List[float]] = []
-            if result.embeddings:
-                for emb in result.embeddings:
-                    # В некоторых случаях values может быть None,
-                    # дадим подсказку анализатору
-                    val = (
-                        emb.values
-                        if emb.values is not None
-                        else [0.0] * self.embedding_dim
-                    )
-                    embeddings.append(val)
-            else:
-                # Fallback if somehow empty
-                embeddings = [[0.0] * self.embedding_dim for _ in texts]
-            return embeddings
         except Exception as e:
             logger.error(f"Error in GeminiEmbedding: {e}")
-            return [[0.0] * self.embedding_dim for _ in texts]
+            raise
+
+        embeddings = [emb.values for emb in result.embeddings or []]
+        if len(embeddings) != len(texts) or any(not values for values in embeddings):
+            raise RuntimeError(
+                "GeminiEmbedding: модель вернула не все эмбеддинги "
+                f"({len(embeddings)} на {len(texts)} текстов)"
+            )
+        return [list(values) for values in embeddings if values]

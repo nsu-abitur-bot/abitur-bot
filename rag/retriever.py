@@ -1,6 +1,14 @@
 from typing import Literal
 
-from rag.graph_memory import get_graph_memory
+from rag.graph_memory import RetrievalError, get_graph_memory
+
+__all__ = [
+    "DEFAULT_GRAPH_ID",
+    "RetrievalError",
+    "query_graph",
+    "query_graph_with_crag",
+    "query_graph_with_sources",
+]
 
 DEFAULT_GRAPH_ID = "abitur_kb"
 
