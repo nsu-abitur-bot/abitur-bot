@@ -413,6 +413,41 @@ async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
         return []
 
 
+async def _remember_message(
+    redis_client: RedisClient, session_id: str, entry: dict[str, str]
+) -> None:
+    """Пишет реплику в историю. Сбой Redis не должен ронять ответ.
+
+    История — вспомогательный контекст: без неё бот всё равно может ответить
+    на текущий вопрос, поэтому ошибку записи только логируем.
+    """
+    try:
+        await redis_client.add_message(session_id, entry)
+    except Exception as e:
+        logger.warning(
+            f"[{session_id}] Redis add_message error, continuing without history: {e}"
+        )
+
+
+def _history_before_question(history_entries: list[dict], question: str) -> list[dict]:
+    """История без текущего вопроса: он уже записан в Redis до чтения истории.
+
+    Вопрос в промпт добавляется отдельно и всегда последним, поэтому из
+    истории его убираем, иначе модель увидит его дважды. Ищем только среди
+    реплик после последнего ответа ассистента: более ранний такой же вопрос —
+    часть переписки, а не текущий.
+    """
+    last_answer = max(
+        (i for i, e in enumerate(history_entries) if e.get("role") == "assistant"),
+        default=-1,
+    )
+    for i in range(len(history_entries) - 1, last_answer, -1):
+        entry = history_entries[i]
+        if entry.get("role") == "user" and entry.get("content") == question:
+            return history_entries[:i] + history_entries[i + 1 :]
+    return list(history_entries)
+
+
 async def _retrieve_context(
     expanded_message: str,
     history_text: str,
@@ -493,8 +528,14 @@ async def _retrieve_context(
         return _RagResult(context=context)
 
 
-def _build_messages(rag_context: str, history_entries: list[dict]) -> list[BaseMessage]:
-    """Собирает промпт: системная часть с контекстом плюс история переписки.
+def _build_messages(
+    rag_context: str, history_entries: list[dict], question: str
+) -> list[BaseMessage]:
+    """Собирает промпт: системная часть с контекстом, история, текущий вопрос.
+
+    Вопрос добавляется всегда и последним, а история — только контекст: она
+    живёт в Redis и может оказаться пустой (сбой, истёкший TTL, рестарт), и
+    тогда модель получала один системный промпт без вопроса.
 
     Из прошлых ответов ассистента вырезаем блок «Источники» и ссылки: раньше
     они попадали в историю целиком и модель начинала их копировать.
@@ -515,6 +556,7 @@ def _build_messages(rag_context: str, history_entries: list[dict]) -> list[BaseM
             entry_clean = _ANCHOR_RE.sub("", entry_clean).strip()
             messages.append(AIMessage(content=entry_clean))
 
+    messages.append(HumanMessage(content=question))
     return messages
 
 
@@ -599,7 +641,9 @@ async def _answer_from_faq(
 
     ctx.log("faq_match", faq_answer, source="faq")
     _spawn_bg(
-        redis_client.add_message(session_id, {"role": "assistant", "content": faq_answer})
+        _remember_message(
+            redis_client, session_id, {"role": "assistant", "content": faq_answer}
+        )
     )
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, session_id, message, faq_answer))
@@ -609,6 +653,7 @@ async def _answer_from_faq(
 async def _generate_answer(
     rag: _RagResult,
     history_entries: list[dict],
+    question: str,
     ctx: _Ctx,
     stream_callback: Optional[StreamCallback] = None,
 ) -> tuple[str, list[dict]]:
@@ -616,7 +661,7 @@ async def _generate_answer(
     session_id = ctx.session_id
     try:
         logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
-        messages = _build_messages(rag.context, history_entries)
+        messages = _build_messages(rag.context, history_entries, question)
 
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
@@ -659,8 +704,8 @@ def _store_answer(
     """
     stored_text = _strip_markup(content)
     _spawn_bg(
-        redis_client.add_message(
-            ctx.session_id, {"role": "assistant", "content": stored_text}
+        _remember_message(
+            redis_client, ctx.session_id, {"role": "assistant", "content": stored_text}
         )
     )
     if ctx.user_id:
@@ -694,7 +739,9 @@ async def ask_local_llm(
 
     try:
         redis_client = await get_redis_client()
-        await redis_client.add_message(session_id, {"role": "user", "content": message})
+        await _remember_message(
+            redis_client, session_id, {"role": "user", "content": message}
+        )
 
         expanded_message = _expand_abbrevs(message, session_id)
 
@@ -724,7 +771,11 @@ async def ask_local_llm(
         rag = await _retrieve_context(expanded_message, history_text, ctx)
 
         content, answer_sources = await _generate_answer(
-            rag, history_entries, ctx, stream_callback
+            rag,
+            _history_before_question(history_entries, message),
+            expanded_message,
+            ctx,
+            stream_callback,
         )
         _store_answer(content, message, redis_client, ctx)
 
