@@ -22,7 +22,7 @@ db/
     client.py     Клиент Redis (история чатов, сессии)
   seed/           Сид-данные (faculties.json) и их загрузка; когда заливать —
                   решает bootstrap/
-evals/            Оценка качества RAG (evaluator + judge)
+evals/            Оценка продуктового ask_local_llm; static YAML, assertions, judge, baseline
 faq/              Семантический матчер FAQ (matcher.py, эмбеддинги)
 llm/              Только провайдеры моделей, без логики ответа
   providers/      openai.py / gemini.py (+ *_graph_adapters.py для LightRAG)

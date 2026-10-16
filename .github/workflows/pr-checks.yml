@@ -4,6 +4,29 @@ on:
   pull_request:
 
 jobs:
+  evals-offline:
+    runs-on: ubuntu-latest
+    env:
+      PYTHON_DOTENV_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+      - run: uv sync
+      - name: Deterministic product pipeline gate (no LLM keys)
+        run: uv run python -m evals.evaluator --offline --report eval-report.json
+      - name: Upload evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval-report.json
+          if-no-files-found: ignore
+
   lint-and-types:
     runs-on: ubuntu-latest
     steps:

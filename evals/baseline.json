@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "faq_1": {"passed": true},
+    "faq_2": {"passed": true},
+    "faq_negative_1": {"passed": true},
+    "abbrev_1": {"passed": true},
+    "tool_1": {"passed": true},
+    "rag_1": {"passed": true}
+  }
+}

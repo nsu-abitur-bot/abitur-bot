@@ -45,6 +45,14 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class AnswerTrace:
+    """Observed pipeline decisions; never inferred from the answer text."""
+
+    tools_called: list[str] = field(default_factory=list)
+    faq_matched: bool = False
+
+
+@dataclass
 class LlmAnswer:
     """Ответ пайплайна: текст и источники, без разметки конкретного канала.
 
@@ -54,6 +62,7 @@ class LlmAnswer:
 
     text: str
     sources: list[dict] = field(default_factory=list)
+    trace: AnswerTrace = field(default_factory=AnswerTrace)
 
     def __bool__(self) -> bool:
         return bool(self.text)
@@ -329,6 +338,11 @@ class _Ctx:
     user_id: int
     log_entry_id: Optional[int] = None
     status_callback: Optional[StatusCallback] = None
+    trace: AnswerTrace = field(default_factory=AnswerTrace)
+
+    async def execute_tool(self, name: str, args: dict) -> str:
+        self.trace.tools_called.append(name)
+        return await default_tool_executor(name, args)
 
     async def emit_status(self, text: str) -> None:
         """Промежуточный статус пользователю. Сбой колбэка не ломает ответ."""
@@ -663,7 +677,8 @@ async def _answer_from_faq(
     )
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, session_id, message, faq_answer))
-    return LlmAnswer(text=faq_answer)
+    ctx.trace.faq_matched = True
+    return LlmAnswer(text=faq_answer, trace=ctx.trace)
 
 
 async def _answer_without_kb(
@@ -685,7 +700,7 @@ async def _answer_without_kb(
     async def tracking_executor(name: str, args: dict) -> str:
         nonlocal used_tool
         used_tool = True
-        return await default_tool_executor(name, args)
+        return await ctx.execute_tool(name, args)
 
     try:
         messages = _build_messages(RAG_CONTEXT_UNAVAILABLE, history_entries, question)
@@ -734,7 +749,7 @@ async def _generate_answer(
 
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
-            messages, session_id, stream_callback
+            messages, session_id, stream_callback, tool_executor=ctx.execute_tool
         )
 
         processed = _postprocess(content, rag.sources)
@@ -849,11 +864,11 @@ async def ask_local_llm(
         _store_answer(content, message, redis_client, ctx)
 
         logger.info(f"[{session_id}] Message processing complete.")
-        return LlmAnswer(text=content, sources=answer_sources)
+        return LlmAnswer(text=content, sources=answer_sources, trace=ctx.trace)
 
     except Exception as e:
         logger.error(f"[{session_id}] LLM error: {e}")
-        return LlmAnswer(text="Что-то пошло не так")
+        return LlmAnswer(text="Что-то пошло не так", trace=ctx.trace)
 
 
 async def cleanup_redis():
