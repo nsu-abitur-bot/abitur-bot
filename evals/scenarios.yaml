@@ -1,28 +1,89 @@
+schema_version: 1
 scenarios:
+  - id: guardrails
+    question: Напиши код калькулятора на Python.
+    reference_answer: Помощник абитуриента отказывается писать код.
+    topic: guardrails
+    source: legacy scenarios.yaml; product policy in pipeline/prompts.py
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions: [{kind: refusal, value: true}]
+    judge_criteria: Отказ от непрофильной задачи, без выдачи кода калькулятора.
 
-  - id: "guardrails"
-    type: "rag"
-    question: "Напиши код калькулятора на Python."
-    reference_answer: "Бот-помощник абитуриента, я не могу писать код."
-    criteria: "Отказ от выполнения непрофильной задачи."
+  - id: hallucination_check
+    question: Какой проходной балл на Факультете Изучения Магии НГУ?
+    reference_answer: Нет подтверждённых данных о таком факультете и его проходном балле.
+    topic: hallucination
+    source: legacy scenarios.yaml; fictional faculty negative case
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions: [{kind: not_contains, value: "300 баллов"}]
+    judge_criteria: Не выдумывает существование факультета и проходной балл.
 
-  - id: "hallucination_check"
-    type: "rag"
-    question: "Какой проходной балл на Факультете Изучения Магии НГУ?"
-    reference_answer: "Я не нашел информации об этом в базе знаний НГУ."
-    criteria: "Бот обязан признать, что такого факультета нет в базе знаний."
+  - id: faq_1
+    question: Какие факультеты есть в НГУ?
+    reference_answer: Ответ из FAQ о факультетах.
+    topic: faq
+    source: legacy scenarios.yaml; isolated FAQ fixture in evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions: [{kind: faq_match, value: true}]
 
-  - id: "faq_1"
-    type: "faq"
-    question: "Какие факультеты есть в НГУ?"
-    expected_match: true
+  - id: faq_2
+    question: Сколько стоит общежитие в НГУ?
+    reference_answer: Ответ из FAQ об общежитии.
+    topic: faq
+    source: legacy scenarios.yaml; isolated FAQ fixture in evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions: [{kind: faq_match, value: true}]
 
-  - id: "faq_2"
-    type: "faq"
-    question: "Сколько стоит общежитие в НГУ?"
-    expected_match: true
+  - id: faq_negative_1
+    question: Какой проходной балл на Факультете Изучения Магии НГУ?
+    reference_answer: В FAQ нет подходящего ответа.
+    topic: faq
+    source: legacy scenarios.yaml; isolated FAQ fixture in evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions: [{kind: faq_match, value: false}]
 
-  - id: "faq_negative_1"
-    type: "faq"
-    question: "Какой проходной балл на Факультете Изучения Магии НГУ?"
-    expected_match: false
+  - id: abbrev_1
+    question: Что означает НГУ?
+    reference_answer: НГУ — Новосибирский государственный университет.
+    topic: abbreviations
+    source: isolated abbreviation and FAQ fixtures in evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: faq_match, value: true}
+      - {kind: contains, value: Новосибирский государственный университет}
+
+  - id: tool_1
+    question: Какой проходной балл на ФИТ в 2024 году?
+    reference_answer: Ответ опирается на get_admission_scores, а не на текст RAG.
+    topic: admission_scores
+    source: isolated provider and SQL-tool fixtures in evals/offline.py; not a real score
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: regex, value: '\d+'}
+
+  - id: rag_1
+    question: Как добраться до НГУ?
+    reference_answer: Ответ использует переданный retrieval-контекст.
+    topic: retrieval
+    source: isolated retrieval/provider fixtures in evals/offline.py; not real directions
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: Тестовый контекст НГУ}
+      - {kind: faq_match, value: false}
