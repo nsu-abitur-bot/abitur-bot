@@ -1,0 +1,5 @@
+Temporary GitHub workflow smoke test, 2026-10-16.
+
+Purpose: verify a local commit, authenticated HTTPS push, and draft pull request.
+This file has no application behavior and must not be merged into main.
+The test pull request will be closed and its remote branch deleted after verification.
