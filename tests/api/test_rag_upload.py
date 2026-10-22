@@ -149,3 +149,59 @@ class TestRagUploadService:
                 assert len(results) == 1
                 assert results[0].status == "skipped"
                 assert "PDF exceeds maximum allowed pages" in results[0].message
+
+    @pytest.mark.asyncio
+    async def test_ingest_files_preserves_old_doc_when_indexing_fails(
+        self, rag_service: RagUploadService, monkeypatch
+    ):
+        deleted_calls = []
+
+        class FakeDocument:
+            id = "doc-123"
+            rag_doc_id = "rag-v1"
+            title = "test.txt"
+            source_url = None
+
+        class FakeDocumentService:
+            def __init__(self, session):  # noqa: ANN001
+                pass
+
+            async def create_or_update_for_source(self, **kwargs):  # noqa: ANN001
+                return FakeDocument()
+
+            async def mark_error(self, doc_id):  # noqa: ANN001
+                pass
+
+        class FakeSessionContext:
+            async def __aenter__(self):  # noqa: ANN001
+                return object()
+
+            async def __aexit__(self, exc_type, exc, traceback):  # noqa: ANN001
+                return None
+
+        async def failing_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
+            raise RuntimeError("LightRAG failure")
+
+        class FakeMemory:
+            async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
+                deleted_calls.append((graph_id, doc_id))
+                return True
+
+        from api.services import document_indexer, rag_upload
+
+        monkeypatch.setattr(rag_upload, "AsyncSessionLocal", lambda: FakeSessionContext())
+        monkeypatch.setattr(rag_upload, "DocumentService", FakeDocumentService)
+        monkeypatch.setattr(document_indexer, "add_texts_async", failing_add_texts_async)
+        monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+
+        mock_file = MagicMock(spec=UploadFile)
+        mock_file.filename = "test.txt"
+        mock_file.read = AsyncMock(return_value=b"plain text content")
+
+        with patch.object(rag_service, "_get_settings", AsyncMock(return_value={})):
+            results = await rag_service.ingest_files([mock_file], graph_id="test_graph")
+
+        assert len(results) == 1
+        assert results[0].status == "skipped"
+        # Старая версия в LightRAG не удалена!
+        assert ("test_graph", "rag-v1") not in deleted_calls

@@ -34,6 +34,7 @@ from api.schemas.rag import (
     RagDocumentUpdateRequest,
     RagUploadResponse,
 )
+from api.services.document_indexer import index_document
 from api.services.document_update import (
     DocumentUpdateService,
     calculate_content_hash,
@@ -51,7 +52,7 @@ from parser.nsu import parse_page
 from parser.url import process_pdf_bytes
 from pipeline.preprocessor import clean_and_structure_text, generate_title_from_text
 from rag.graph_memory import get_graph_memory
-from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
+from rag.loader import DEFAULT_GRAPH_ID
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/rag", tags=["RAG Management"])
@@ -257,28 +258,18 @@ async def confirm_rag_upload(
                 graph_id=DEFAULT_GRAPH_ID,
                 title=request.title,
                 source_url=request.url,
-                content_hash=content_hash,
-                content_length=len(prepared_text),
             )
-            old_rag_doc_id = document.rag_doc_id
-
-            memory = get_graph_memory()
-            await memory.delete_doc(DEFAULT_GRAPH_ID, old_rag_doc_id)
-            saved_count = await add_texts_async(
-                texts=[prepared_text],
+            indexed_doc = await index_document(
+                document=document,
+                text=prepared_text,
+                content_hash=content_hash,
+                file_path=request.url,
                 graph_id=DEFAULT_GRAPH_ID,
-                source_ids=[document.id],
-                file_paths=[request.url],
+                session=session,
+                document_service=document_service,
             )
-            if saved_count == 0:
-                await document_service.mark_error(document.id)
+            if not indexed_doc:
                 raise HTTPException(status_code=500, detail="Failed to upload")
-            await document_service.mark_indexed(
-                document.id,
-                content_hash=content_hash,
-                content_length=len(prepared_text),
-                rag_doc_id=document.id,
-            )
 
         # 2. Вложенные документы больше не загружаем (по запросу)
         # if request.documents:

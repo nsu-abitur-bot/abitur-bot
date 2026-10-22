@@ -122,11 +122,12 @@ class DocumentService:
                 document.rag_doc_id = document.id
         else:
             document.title = title
-            document.source_url = source_url
-            document.content_hash = content_hash
-            document.content_length = content_length
-            document.status = DOCUMENT_STATUS_INDEXED
-            document.last_indexed_at = timestamp()
+            if source_url is not None:
+                document.source_url = source_url
+            if content_hash is not None:
+                document.content_hash = content_hash
+            if content_length is not None:
+                document.content_length = content_length
             if not document.rag_doc_id:
                 document.rag_doc_id = document.id
 

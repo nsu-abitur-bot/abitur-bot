@@ -9,6 +9,7 @@ from sqlalchemy import select
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import UploadedDocumentResult
+from api.services.document_indexer import index_document
 from api.services.document_update import calculate_content_hash, first_http_url
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
@@ -17,8 +18,6 @@ from parser.pdf import pdf_to_base64_images
 from parser.utils import extract_sources
 from parser.vision import parse_images_with_llm
 from pipeline.preprocessor import generate_title_from_text
-from rag.graph_memory import get_graph_memory
-from rag.loader import add_texts_async
 
 SUPPORTED_EXTENSIONS = {
     ".txt",
@@ -149,25 +148,18 @@ class RagUploadService:
                     graph_id=graph_id,
                     title=source_id,
                     source_url=source_url,
-                    content_hash=content_hash,
-                    content_length=len(prepared),
                 )
-                old_rag_doc_id = document.rag_doc_id
+                indexed_doc = await index_document(
+                    document=document,
+                    text=prepared,
+                    content_hash=content_hash,
+                    file_path=file_paths_str,
+                    graph_id=graph_id,
+                    session=session,
+                    document_service=document_service,
+                )
 
-            memory = get_graph_memory()
-            await memory.delete_doc(graph_id, old_rag_doc_id)
-
-            # Передаем подготовленный текст и извлеченные ID/источники в RAG
-            saved_count = await add_texts_async(
-                [prepared],
-                graph_id=graph_id,
-                source_ids=[document.id],
-                file_paths=[file_paths_str],
-            )
-
-            if saved_count == 0:
-                async with AsyncSessionLocal() as session:
-                    await DocumentService(session).mark_error(document.id)
+            if not indexed_doc:
                 results.append(
                     UploadedDocumentResult(
                         filename=filename,
@@ -176,14 +168,6 @@ class RagUploadService:
                     )
                 )
                 continue
-
-            async with AsyncSessionLocal() as session:
-                await DocumentService(session).mark_indexed(
-                    document.id,
-                    content_hash=content_hash,
-                    content_length=len(prepared),
-                    rag_doc_id=document.id,
-                )
 
             results.append(
                 UploadedDocumentResult(

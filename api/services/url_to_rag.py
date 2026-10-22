@@ -3,12 +3,12 @@
 import logging
 
 from abbrev.expander import get_abbrev_expander
+from api.services.document_indexer import index_document
 from api.services.document_update import calculate_content_hash, fetch_url_bytes
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.document import DocumentService
 from parser.url import process_url
-from rag.graph_memory import get_graph_memory
-from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
+from rag.loader import DEFAULT_GRAPH_ID
 
 logger = logging.getLogger(__name__)
 
@@ -43,24 +43,18 @@ async def parse_and_save_url(url: str, title: str) -> bool:
                 graph_id=DEFAULT_GRAPH_ID,
                 title=source_id,
                 source_url=url,
-                content_hash=content_hash,
-                content_length=len(prepared_text),
             )
-            old_rag_doc_id = document.rag_doc_id
+            indexed_doc = await index_document(
+                document=document,
+                text=prepared_text,
+                content_hash=content_hash,
+                file_path=url,
+                graph_id=DEFAULT_GRAPH_ID,
+                session=session,
+                document_service=document_service,
+            )
 
-        memory = get_graph_memory()
-        await memory.delete_doc(DEFAULT_GRAPH_ID, old_rag_doc_id)
-        saved_count = await add_texts_async(
-            texts=[prepared_text], source_ids=[document.id], file_paths=[url]
-        )
-        if saved_count > 0:
-            async with AsyncSessionLocal() as session:
-                await DocumentService(session).mark_indexed(
-                    document.id,
-                    content_hash=content_hash,
-                    content_length=len(prepared_text),
-                    rag_doc_id=document.id,
-                )
+        if indexed_doc:
             logger.info(f"Успешно сохранён документ {url} в RAG")
             return True
         else:

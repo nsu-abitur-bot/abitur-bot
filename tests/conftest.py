@@ -7,3 +7,4 @@ import os
 # pytest прерывался бы на сборе целиком у любого, в чьём .env ключа нет.
 # setdefault: если ключ задан в окружении, тесты берут его.
 os.environ.setdefault("SECRET_KEY", "test-secret-key-not-for-production-0123456789abcdef")
+os.environ.setdefault("DB_PASSWORD", "postgres")
