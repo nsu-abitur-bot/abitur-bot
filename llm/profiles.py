@@ -24,3 +24,11 @@ class LLMProfiles:
     TITLE = LLMProfile(max_tokens=100, timeout=20, temperature=0.2)
     # 7. Эмбеддинги (только timeout, так как max_tokens не применяется)
     EMBEDDING = LLMProfile(timeout=60)
+
+    # Дефолты моделей для профилей, работающих с несколькими провайдерами.
+    # Единственное место дефолтов: env-переменная без значения берёт отсюда,
+    # а .env.example и документация ссылаются на эти же модели (#326).
+    VISION_MODEL_DEFAULTS = {
+        "openai": "gpt-5.4-mini",
+        "gemini": "gemini-2.5-flash",
+    }

@@ -23,9 +23,11 @@ class TestBuildLeaderboardUrl:
         assert "condition=10" in url
         assert "type=0" in url
 
-    def test_default_type_is_zero(self):
-        url = build_leaderboard_url(faculty=8, direction=7, condition=10)
-        assert "type=0" in url
+    def test_type_is_required(self):
+        # Дефолтного типа нет: какой список отслеживать, решает вызывающая
+        # сторона (RATING_TYPES), поэтому type_ обязателен (#326).
+        with pytest.raises(TypeError):
+            build_leaderboard_url(faculty=8, direction=7, condition=10)  # type: ignore[call-arg]
 
     def test_custom_type(self):
         url = build_leaderboard_url(faculty=1, direction=2, condition=3, type_=5)

@@ -75,7 +75,7 @@ def build_leaderboard_url(
     faculty: int,
     direction: int,
     condition: int,
-    type_: int = 0,
+    type_: int,
 ) -> str:
     """
     Строит URL рейтингового списка с заданными параметрами.
@@ -83,7 +83,7 @@ def build_leaderboard_url(
         faculty: Идентификатор факультета.
         direction: Идентификатор направления подготовки.
         condition: Идентификатор условия поступления (основание конкурса).
-        type_: Тип списка (например, общий, целевой и т.п.); по умолчанию 0.
+        type_: Тип списка (например, общий, целевой и т.п.).
     Returns:
         Полный URL страницы рейтингового списка с подставленными параметрами.
     """
@@ -408,23 +408,30 @@ def fetch_all_leaderboard_urls(degree: str = "bachelor") -> list[str]:
 
 
 def extract_params_from_url(url: str) -> dict:
-    """Извлекает faculty/direction/condition/type из URL."""
+    """Извлекает faculty/direction/condition/type из URL.
+
+    Дефолты для отсутствующих в URL параметров берёт из parser/config/config.yaml
+    (rating.defaults) — это единственное место, где живут эти числа (#326).
+    """
     parsed = urlparse(url)
     qs = parse_qs(parsed.query)
 
     config = get_rating_config()
     defaults = config.get("defaults", {}) if isinstance(config, dict) else {}
 
-    faculty_default = int(defaults.get("faculty", 8))
-    direction_default = int(defaults.get("direction", 7))
-    condition_default = int(defaults.get("condition", 10))
-    type_default = int(defaults.get("type", 0))
+    def _default(name: str) -> int:
+        value = defaults.get(name)
+        if value is None:
+            raise RuntimeError(
+                f"В parser/config/config.yaml не задан rating.defaults.{name}"
+            )
+        return int(value)
 
     return {
-        "faculty": int(qs.get("faculty", [faculty_default])[0]),
-        "direction": int(qs.get("direction", [direction_default])[0]),
-        "condition": int(qs.get("condition", [condition_default])[0]),
-        "type": int(qs.get("type", [type_default])[0]),
+        "faculty": int(qs.get("faculty", [_default("faculty")])[0]),
+        "direction": int(qs.get("direction", [_default("direction")])[0]),
+        "condition": int(qs.get("condition", [_default("condition")])[0]),
+        "type": int(qs.get("type", [_default("type")])[0]),
     }
 
 
