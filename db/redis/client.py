@@ -17,6 +17,13 @@ logger = logging.getLogger(__name__)
 
 class RedisClient:
     def __init__(self):
+        # Без явной проверки redis.from_url(None) падает TypeError'ом из
+        # недр redis-py — непонятно, что именно не задано (#326).
+        if not REDIS_URL:
+            raise RuntimeError(
+                "REDIS_URL не задана: добавь её в .env "
+                "(формат — в .env.example), без неё Redis-клиент не создать"
+            )
         self.client: redis_client.Redis = redis.from_url(REDIS_URL, decode_responses=True)
 
     async def add_message(

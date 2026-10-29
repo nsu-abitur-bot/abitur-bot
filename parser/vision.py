@@ -46,7 +46,7 @@ async def parse_images_with_llm(
     по умолчанию "gemini".
     """
     if not provider:
-        provider = os.getenv("PDF_PARSER_PROVIDER", "openai").lower()
+        provider = os.getenv("PDF_PARSER_PROVIDER", "gemini").lower()
 
     if not images_base64:
         return ""
@@ -90,7 +90,7 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
 
     client = AsyncOpenAI(api_key=api_key, http_client=http_client)
 
-    model = os.getenv("OPENAI_MODEL_VISION", "gpt-5.4-mini")
+    model = os.getenv("OPENAI_MODEL_VISION", LLMProfiles.VISION_MODEL_DEFAULTS["openai"])
 
     content: List[Any] = [
         {
@@ -136,7 +136,7 @@ async def _process_batch_gemini(images_b64: List[str]) -> str:
         return ""
 
     client = genai.Client(api_key=api_key)
-    model = os.getenv("GEMINI_MODEL_VISION", "gemini-2.5-flash")
+    model = os.getenv("GEMINI_MODEL_VISION", LLMProfiles.VISION_MODEL_DEFAULTS["gemini"])
 
     contents: List[Any] = [PARSE_PROMPT]
     for img in images_b64:
