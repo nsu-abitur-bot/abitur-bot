@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Макеты веб-чата абитуриента НГУ — план перехода на веб (#306)</title>
+<style>
+  :root {
+    --nsu-blue: #17408b;
+    --nsu-blue-dark: #0f2d63;
+    --nsu-blue-light: #eef2fa;
+    --ink: #1c2333;
+    --muted: #6b7280;
+    --line: #e3e7ef;
+    --bubble-user: #17408b;
+    --ok: #0e7a4a;
+    --warn: #b04a1e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #f5f6f9; color: var(--ink); padding: 32px 24px 64px;
+  }
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+  .boards { display: flex; flex-wrap: wrap; gap: 36px; align-items: flex-start; }
+  .board { width: 380px; }
+  .board-caption { font-size: 13px; font-weight: 600; color: var(--nsu-blue); margin-bottom: 10px; }
+  .board-note { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+  .frame {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; box-shadow: 0 10px 28px rgba(23, 64, 139, .08);
+  }
+  .chrome { display: flex; gap: 6px; padding: 9px 12px; background: #f0f2f7; border-bottom: 1px solid var(--line); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: #c7cdd9; }
+  .chrome .url {
+    flex: 1; margin-left: 8px; background: #fff; border-radius: 6px; font-size: 10px;
+    color: var(--muted); padding: 2px 8px; border: 1px solid var(--line);
+    white-space: nowrap; overflow: hidden;
+  }
+  .chat { display: flex; flex-direction: column; height: 520px; }
+  .chat-head {
+    display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+    background: var(--nsu-blue); color: #fff;
+  }
+  .chat-head .logo {
+    width: 30px; height: 30px; border-radius: 8px; background: rgba(255,255,255,.16);
+    display: grid; place-items: center; font-weight: 700; font-size: 12px; letter-spacing: .5px;
+  }
+  .chat-head .name { font-size: 14px; font-weight: 600; }
+  .chat-head .status { font-size: 11px; opacity: .75; }
+  .chat-head .new-chat {
+    margin-left: auto; font-size: 11px; padding: 5px 10px; border: 1px solid rgba(255,255,255,.45);
+    border-radius: 999px; background: transparent; color: #fff; cursor: pointer;
+  }
+  .body { flex: 1; overflow: hidden; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: #fbfcfe; }
+  .msg { max-width: 82%; padding: 10px 12px; border-radius: 14px; font-size: 13px; line-height: 1.5; }
+  .bot { background: var(--nsu-blue-light); border: 1px solid var(--line); border-bottom-left-radius: 4px; align-self: flex-start; }
+  .user { background: var(--bubble-user); color: #fff; border-bottom-right-radius: 4px; align-self: flex-end; }
+  .msg b { font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 4px; }
+  .chip {
+    font-size: 12px; color: var(--nsu-blue); background: #fff; border: 1px solid var(--nsu-blue);
+    padding: 6px 12px; border-radius: 999px; cursor: pointer; white-space: nowrap;
+  }
+  .sources { margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 8px; }
+  .sources .cap { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; margin-bottom: 4px; }
+  .sources a { display: block; font-size: 12px; color: var(--nsu-blue); text-decoration: none; margin: 3px 0; }
+  .sources a::before { content: "📄 "; }
+  .rating { display: flex; gap: 10px; margin-top: 8px; }
+  .rating button {
+    border: 1px solid var(--line); background: #fff; border-radius: 8px;
+    padding: 3px 9px; cursor: pointer; font-size: 13px;
+  }
+  .rating button.active { border-color: var(--nsu-blue); background: var(--nsu-blue-light); }
+  .composer { display: flex; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); background: #fff; }
+  .composer input {
+    flex: 1; border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px;
+    font-size: 13px; color: var(--ink); outline: none;
+  }
+  .composer input:focus { border-color: var(--nsu-blue); }
+  .composer button {
+    width: 38px; height: 38px; border-radius: 50%; border: none; background: var(--nsu-blue);
+    color: #fff; font-size: 15px; cursor: pointer;
+  }
+  .typing { display: flex; gap: 4px; align-items: center; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: #9db1d8; animation: blink 1.2s infinite; }
+  .typing i:nth-child(2) { animation-delay: .2s; } .typing i:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 70%, 100% { opacity: .35; } 35% { opacity: 1; } }
+  .cursor { display: inline-block; width: 8px; height: 15px; background: var(--nsu-blue);
+    vertical-align: text-bottom; animation: blink 1s infinite; }
+  .badge { display: inline-block; font-size: 11px; padding: 2px 9px; border-radius: 999px; margin-bottom: 6px; }
+  .badge.ok { background: #e6f4ec; color: var(--ok); }
+  .badge.warn { background: #fbeee4; color: var(--warn); }
+
+  .contacts { margin-top: 8px; display: grid; gap: 6px; }
+  .contacts a { font-size: 12px; color: var(--nsu-blue); text-decoration: none; font-weight: 500; }
+  .contacts span { font-size: 12px; color: var(--ink); }
+
+  /* Мобильная версия */
+  .phone-shell { background: #0f2d63; border-radius: 26px; padding: 12px 10px 16px; width: 260px; }
+  .phone-notch { width: 90px; height: 5px; border-radius: 999px; background: rgba(255,255,255,.35); margin: 0 auto 10px; }
+  .phone { width: 238px; height: 500px; background: #fbfcfe; border-radius: 12px; overflow: hidden;
+    display: flex; flex-direction: column; border: 1px solid rgba(255,255,255,.25); }
+  .phone .chat-head { padding: 9px 10px; }
+  .phone .chat-head .new-chat { display: none; }
+  .phone .body { padding: 10px; }
+  .phone .msg { font-size: 12px; max-width: 88%; }
+  .phone .chips-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin; }
+  .phone .composer { padding: 8px; }
+  .phone .composer input { padding: 8px 12px; font-size: 12px; }
+</style>
+</head>
+<body>
+<h1>Веб-чат абитуриента НГУ — макеты ключевых экранов</h1>
+<p class="sub">К плану перехода на веб (<code>docs/web-transition.md</code>), задача #306. Статические макеты: открыть в браузере, без сборки.</p>
+
+<div class="boards">
+
+  <!-- 1. Окно чата -->
+  <div class="board">
+    <div class="board-caption">1 · Окно чата — приветствие и подсказки</div>
+    <div class="frame">
+      <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">abitur.nsu.ru/chat</span></div>
+      <div class="chat">
+        <div class="chat-head">
+          <div class="logo">НГУ</div>
+          <div>
+            <div class="name">Бот абитуриента НГУ</div>
+            <div class="status">отвечает по документам приёмной комиссии</div>
+          </div>
+          <button class="new-chat">Новый диалог</button>
+        </div>
+        <div class="body">
+          <div class="msg bot">
+            Привет! Я помогу с вопросами о поступлении в НГУ: проходные баллы,
+            документы, общежития, сроки. Спрашивай — отвечу со ссылками на источники.
+          </div>
+          <div class="chips">
+            <span class="chip">Проходные баллы</span>
+            <span class="chip">Какие документы нужны</span>
+            <span class="chip">Общежития</span>
+            <span class="chip">Сроки подачи</span>
+          </div>
+        </div>
+        <div class="composer">
+          <input placeholder="Спроси о поступлении…" autofocus>
+          <button title="Отправить">➤</button>
+        </div>
+      </div>
+    </div>
+    <div class="board-note">«Новый диалог» — аналог /reset в мессенджерах: очищает историю сессии в Redis. Чипсы — топ-вопросы из аналитики message_logs.</div>
+  </div>
+
+  <!-- 2. Ответ с источниками -->
+  <div class="board">
+    <div class="board-caption">2 · Ответ с источниками и оценкой</div>
+    <div class="frame">
+      <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">abitur.nsu.ru/chat</span></div>
+      <div class="chat">
+        <div class="chat-head">
+          <div class="logo">НГУ</div>
+          <div>
+            <div class="name">Бот абитуриента НГУ</div>
+            <div class="status">online</div>
+          </div>
+          <button class="new-chat">Новый диалог</button>
+        </div>
+        <div class="body">
+          <div class="msg user">Какой проходной балл был на «Фундаментальную информатику и ИТ» в 2026?</div>
+          <div class="msg bot">
+            <span class="badge ok">по данным НГУ</span><br>
+            В 2026 году проходной балл на направление «Фундаментальная информатика
+            и информационные технологии» (ММФ, очная форма, бюджет) составил
+            <b>272 балла</b>. Конкурс — около 9 человек на место.
+            <div class="sources">
+              <div class="cap">Источники</div>
+              <a href="#">Итоги приёма 2026 · nsu.ru</a>
+              <a href="#">Направление «Фундаментальная информатика и ИТ»</a>
+            </div>
+            <div class="rating">
+              <button title="Полезно">👍</button>
+              <button title="Неполезно">👎</button>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <input placeholder="Спроси о поступлении…">
+          <button title="Отправить">➤</button>
+        </div>
+      </div>
+    </div>
+    <div class="board-note">До 3 источников — как в мессенджерах (bot/formatting.py). Балл приходит из SQL-инструмента get_admission_scores, бейдж подтверждает, что это данные, а не генерация.</div>
+  </div>
+
+  <!-- 3. Отказ -->
+  <div class="board">
+    <div class="board-caption">3 · Отказ: «не знаю — вот к кому обратиться»</div>
+    <div class="frame">
+      <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">abitur.nsu.ru/chat</span></div>
+      <div class="chat">
+        <div class="chat-head">
+          <div class="logo">НГУ</div>
+          <div>
+            <div class="name">Бот абитуриента НГУ</div>
+            <div class="status">online</div>
+          </div>
+          <button class="new-chat">Новый диалог</button>
+        </div>
+        <div class="body">
+          <div class="msg user">Помоги восстановиться после отчисления с третьего курса</div>
+          <div class="msg bot">
+            <span class="badge warn">нет в базе знаний</span><br>
+            По этому вопросу у меня нет подтверждённой информации — не хочу
+            гадать. Точно ответит приёмная комиссия:
+            <div class="contacts">
+              <span>📞 Приёмная комиссия НГУ: <b>+7 (383) 000-00-00</b></span>
+              <a href="#">✉️ priem@nsu.ru</a>
+              <a href="#">Абитуриенту НГУ · контакты</a>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip">Когда начинается приём документов?</span>
+            <span class="chip">Какие документы нужны</span>
+          </div>
+        </div>
+        <div class="composer">
+          <input placeholder="Спроси о поступлении…">
+          <button title="Отправить">➤</button>
+        </div>
+      </div>
+    </div>
+    <div class="board-note">Детект отказа уже есть в pipeline/llm_client.py (_postprocess: «не нашёл информации») — веб лишь оформляет его отдельным состоянием с контактами. Вопрос при этом падает в аналитику для пополнения базы знаний.</div>
+  </div>
+
+  <!-- 4. Стриминг -->
+  <div class="board">
+    <div class="board-caption">4 · Загрузка и стриминг ответа</div>
+    <div class="frame">
+      <div class="chrome"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="url">abitur.nsu.ru/chat</span></div>
+      <div class="chat">
+        <div class="chat-head">
+          <div class="logo">НГУ</div>
+          <div>
+            <div class="name">Бот абитуриента НГУ</div>
+            <div class="status">печатает…</div>
+          </div>
+          <button class="new-chat">Новый диалог</button>
+        </div>
+        <div class="body">
+          <div class="msg user">Нужна ли математика на «Журналистику»?</div>
+          <div class="msg bot">
+            <div class="typing"><i></i><i></i><i></i>&nbsp; ищу в документах НГУ…</div>
+          </div>
+          <div class="msg bot" style="opacity:.85">
+            Для поступления на «Журналистику» (ФИЖТ, очная форма) нужны ЕГЭ по
+            русскому языку, литературе и…<span class="cursor"></span>
+          </div>
+        </div>
+        <div class="composer">
+          <input placeholder="Спроси о поступлении…">
+          <button title="Отправить">➤</button>
+        </div>
+      </div>
+    </div>
+    <div class="board-note">SSE-стриминг из публичного API (#263). Стадия «ищу в документах» прикрывает ожидание ретрива, текст приходит по частям, как сейчас в Telegram/MAX.</div>
+  </div>
+
+  <!-- 5. Мобильная версия -->
+  <div class="board">
+    <div class="board-caption">5 · Мобильная версия</div>
+    <div class="phone-shell">
+      <div class="phone-notch"></div>
+      <div class="phone">
+        <div class="chat-head">
+          <div class="logo">НГУ</div>
+          <div>
+            <div class="name" style="font-size:12px">Бот абитуриента НГУ</div>
+            <div class="status" style="font-size:10px">online</div>
+          </div>
+          <button class="new-chat" style="display:none"></button>
+        </div>
+        <div class="body">
+          <div class="msg bot">Привет! Спрашивай о поступлении в НГУ — отвечу со ссылками на источники.</div>
+          <div class="chips-row">
+            <span class="chip">Проходные баллы</span>
+            <span class="chip">Общежития</span>
+            <span class="chip">Документы</span>
+          </div>
+          <div class="msg user">Есть ли общежитие первокурсникам?</div>
+          <div class="msg bot">
+            Да, всем иногородним первокурсникам, поступившим на бюджет,
+            предоставляется общежитие…
+            <div class="sources">
+              <div class="cap">Источники</div>
+              <a href="#">Положение об общежитиях НГУ</a>
+            </div>
+          </div>
+        </div>
+        <div class="composer">
+          <input placeholder="Спроси…">
+          <button title="Отправить" style="width:32px;height:32px;font-size:13px">➤</button>
+        </div>
+      </div>
+    </div>
+    <div class="board-note">Тот же интерфейс в узком экране: чипсы прокручиваются горизонтально, история лениво подгружается вверх. «Новый диалог» уходит в меню ⋮.</div>
+  </div>
+
+</div>
+</body>
+</html>
