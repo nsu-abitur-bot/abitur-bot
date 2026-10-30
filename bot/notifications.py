@@ -1,12 +1,12 @@
 import asyncio
 import enum
 import logging
-import os
 from dataclasses import dataclass
 from typing import Any, List
 
 from aiogram import Bot
 
+from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.dto import RatingChange
 from db.postgres.models import User
@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 # Пауза между отправками: очередь после долгого простоя может накопить сотни
 # сообщений, а Telegram режет примерно на 30 в секунду. Полноценный троттлинг
 # с обработкой flood wait — #292; здесь только чтобы не уйти в 429 залпом.
-SEND_DELAY_SECONDS = float(os.getenv("NOTIFY_SEND_DELAY", "0.035"))
+SEND_DELAY_SECONDS = float(get_setting("NOTIFY_SEND_DELAY", "0.035"))
 OUTBOX_BATCH_SIZE = 100
 
 
@@ -155,7 +155,11 @@ async def send_pending_notifications(
 
     Возвращает число доставленных уведомлений.
     """
-    delay = SEND_DELAY_SECONDS if delay_seconds is None else delay_seconds
+    delay = (
+        float(get_setting("NOTIFY_SEND_DELAY", "0.035"))
+        if delay_seconds is None
+        else delay_seconds
+    )
     delivered = 0
     last_id = 0
 

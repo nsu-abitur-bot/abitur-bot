@@ -1,11 +1,11 @@
 import logging
-import os
 from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 
 from google import genai
 from google.genai import types
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
+from config.instance import get_setting
 from llm.base import BaseLLMProvider, LLMResult, LLMUsage, ToolExecutor, ToolSpec
 from llm.profiles import LLMProfile
 
@@ -17,14 +17,20 @@ _MAX_TOOL_ITERATIONS = 3
 
 class GeminiProvider(BaseLLMProvider):
     def __init__(self) -> None:
-        api_key = os.getenv("GEMINI_API_KEY")
+        api_key = get_setting("GEMINI_API_KEY")
         if not api_key:
             raise RuntimeError("Переменная окружения GEMINI_API_KEY не установлена.")
 
-        self.model_name = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
-        self.temperature = float(os.getenv("GEMINI_TEMPERATURE", "0.2"))
+        self.model_name = get_setting("GEMINI_MODEL", "gemini-3.1-flash-lite-preview")
+        self.temperature = float(get_setting("GEMINI_TEMPERATURE", "0.2"))
 
-        self.client = genai.Client(api_key=api_key)
+        self.client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(
+                base_url=get_setting("GEMINI_BASE_URL"),
+                timeout=int(float(get_setting("GEMINI_TIMEOUT_SECONDS", "60")) * 1000),
+            ),
+        )
 
         logger.info(
             "Gemini провайдер инициализирован (модель: %s)",
@@ -65,6 +71,16 @@ class GeminiProvider(BaseLLMProvider):
         config = types.GenerateContentConfig(
             temperature=temperature,
             max_output_tokens=max_tokens,
+            http_options=types.HttpOptions(
+                timeout=int(
+                    float(
+                        profile.timeout
+                        if profile and profile.timeout
+                        else get_setting("GEMINI_TIMEOUT_SECONDS", "60")
+                    )
+                    * 1000
+                )
+            ),
         )
         if system_instruction:
             config.system_instruction = system_instruction
@@ -237,7 +253,7 @@ class GeminiEmbeddings:
 
     def __init__(self, client: genai.Client):
         self.client = client
-        self.model = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2-preview")
+        self.model = get_setting("GEMINI_EMBEDDING_MODEL", "gemini-embedding-2-preview")
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         # google-genai SDK поддерживает пакетную обработку

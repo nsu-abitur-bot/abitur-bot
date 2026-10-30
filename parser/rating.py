@@ -1,13 +1,13 @@
 """Парсер рейтинговых списков абитуриентов НГУ."""
 
 import logging
-import os
 from dataclasses import dataclass, field
 from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
+from config.instance import get_setting
 from db.postgres.dto import RatingEntry
 from parser.config.load_config import get_rating_config
 from parser.utils import calculate_page_hash
@@ -66,7 +66,7 @@ def _parse_list_response(text: str, data: object) -> ListFetchResult:
 
 
 def _resolve_type_ids() -> list[int]:
-    raw = os.getenv("RATING_TYPES", DEFAULT_LIST_TYPES)
+    raw = get_setting("RATING_TYPES", DEFAULT_LIST_TYPES)
     ids = [v for part in raw.split(",") if (v := _to_int(part.strip())) is not None]
     return ids or [30]
 
