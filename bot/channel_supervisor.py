@@ -51,6 +51,7 @@ async def supervise_channel(
                 acquired = await connection.scalar(
                     text("SELECT pg_try_advisory_lock(:key)"), {"key": lock_id}
                 )
+                await connection.commit()
                 if not acquired:
                     await asyncio.sleep(2)
                     continue
@@ -60,13 +61,20 @@ async def supervise_channel(
                         await asyncio.sleep(2)
                         # Loss of the fencing connection must stop this poller.
                         await connection.execute(text("SELECT 1"))
+                        await connection.commit()
                 finally:
                     if task is not None:
                         task.cancel()
                         await asyncio.gather(task, return_exceptions=True)
-                    await connection.execute(
-                        text("SELECT pg_advisory_unlock(:key)"), {"key": lock_id}
-                    )
+                    try:
+                        await connection.rollback()
+                        await connection.execute(
+                            text("SELECT pg_advisory_unlock(:key)"), {"key": lock_id}
+                        )
+                        await connection.commit()
+                    except Exception:
+                        # Never return a possibly locked session to the pool.
+                        await connection.invalidate()
         except asyncio.CancelledError:
             raise
         except Exception:

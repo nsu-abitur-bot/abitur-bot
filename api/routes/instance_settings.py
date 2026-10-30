@@ -92,6 +92,7 @@ async def update_instance_settings(
         # No database locks while awaiting remote services.
         for target in sorted(required_checks(data.changes, values)):
             await check_connection(target, values)
+        await guard_embeddings(session, snapshot, values, lock=True)
         updated = await service.write(values, data.revision)
         install(updated.values, updated.revision)
         return await describe(session)

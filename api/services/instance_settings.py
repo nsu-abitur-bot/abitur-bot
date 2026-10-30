@@ -9,7 +9,7 @@ from google import genai
 from google.genai import types
 from maxapi import Bot as MaxBot
 from openai import AsyncOpenAI
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from config.instance import SPECS, SettingSpec, remember_secrets
@@ -88,7 +88,11 @@ def validate_value(spec: SettingSpec, value: str) -> None:
 
 
 async def guard_embeddings(
-    session: AsyncSession, current: InstanceSnapshot, values: dict[str, str]
+    session: AsyncSession,
+    current: InstanceSnapshot,
+    values: dict[str, str],
+    *,
+    lock: bool = False,
 ) -> None:
     embedding_keys = {
         "FAQ_EMBEDDING_PROVIDER",
@@ -105,6 +109,10 @@ async def guard_embeddings(
         values[k] != current.values.get(k, SPECS[k].default) for k in embedding_keys
     ):
         return
+    if lock:
+        # Fence new document/FAQ inserts until the new embedding configuration
+        # commits. Remote checks happen before taking these short-lived locks.
+        await session.execute(text("LOCK TABLE document, faq_entry IN SHARE MODE"))
     # Also protect legacy on-disk indexes which are not registered in Document.
     import os
     from pathlib import Path
