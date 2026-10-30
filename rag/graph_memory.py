@@ -1129,11 +1129,18 @@ class GraphMemory:
             bool(history_block),
         )
 
-        provider = get_llm_provider()
-        raw = await provider.generate(
-            [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
-            profile=LLMProfiles.CHAT,
-        )
+        try:
+            provider = get_llm_provider()
+            raw = await provider.generate(
+                [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
+                profile=LLMProfiles.CHAT,
+            )
+        except Exception as exc:
+            # Ranking is optional: keep successful retrieval usable on provider failure.
+            logger.warning(
+                "LLM rerank fallback: provider failed (%s)", type(exc).__name__
+            )
+            return [{"url": s["url"], "title": s["title"]} for s in sources[:max_sources]]
 
         logger.debug("LLM rerank raw response: %s", raw)
 
