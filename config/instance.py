@@ -31,6 +31,20 @@ def define(
     SPECS[name] = SettingSpec(label, group, default, secret, kind, choices)
 
 
+define("UNIVERSITY_PROFILE", "Профиль вуза", "Вуз", "nsu", choices=("nsu", "custom"))
+for key, label, kind in (
+    ("UNIVERSITY_SHORT_NAME", "Краткое название", "text"),
+    ("UNIVERSITY_FULL_NAME", "Полное название", "text"),
+    ("ASSISTANT_NAME", "Имя помощника", "text"),
+    ("UNIVERSITY_WEBSITE", "Сайт", "url"),
+    ("ADMISSIONS_EMAIL", "Почта приёмной комиссии", "text"),
+    ("ADMISSIONS_PHONE", "Телефон приёмной комиссии", "text"),
+    ("ADMISSIONS_ADDRESS", "Адрес приёмной комиссии", "text"),
+    ("UNIVERSITY_LOGO_URL", "Логотип", "url"),
+):
+    define(key, label, "Вуз", kind=kind)
+
+
 for provider in ("OPENAI", "GEMINI"):
     group = "OpenAI" if provider == "OPENAI" else "Gemini"
     define(f"{provider}_API_KEY", "API-ключ", group, secret=True)
@@ -286,14 +300,21 @@ define(
 
 _values: dict[str, str] | None = None
 _revision = 0
+_loaded = False
 _secret_history: set[str] = set()
 
 
-def install(values: dict[str, str], revision: int) -> None:
-    global _values, _revision
+def install(values: dict[str, str], revision: int, *, loaded: bool = True) -> None:
+    global _values, _revision, _loaded
     remember_secrets(values)
     _values = dict(values)
     _revision = revision
+    _loaded = loaded
+
+
+def is_loaded() -> bool:
+    """Whether a usable settings snapshot has been installed successfully."""
+    return _loaded
 
 
 def revision() -> int:

@@ -19,4 +19,5 @@ def isolate_runtime_configuration(monkeypatch):
     # Lifespan snapshots belong to one app/test, not the next test's environment.
     monkeypatch.setattr(instance, "_values", None)
     monkeypatch.setattr(instance, "_revision", 0)
+    monkeypatch.setattr(instance, "_loaded", False)
     monkeypatch.setattr(instance, "_secret_history", set())

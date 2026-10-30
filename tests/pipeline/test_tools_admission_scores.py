@@ -110,6 +110,7 @@ async def test_execute_returns_distinct_passing_scores(sessionmaker_bound):
     # Оба направления присутствуют с РАЗНЫМИ проходными баллами.
     assert "246" in text
     assert "260" in text
+    assert text.startswith("Проходные баллы прошлых лет (НГУ):")
     assert "Программная инженерия и компьютерные науки" in text
     assert "Компьютерные науки и системотехника" in text
     # По умолчанию — только проходной, без среднего.
@@ -194,3 +195,38 @@ async def test_default_tool_executor_dispatches(sessionmaker_bound):
 async def test_default_tool_executor_unknown_tool():
     text = await default_tool_executor("does_not_exist", {})
     assert "does_not_exist" in text
+
+
+@pytest.mark.asyncio
+async def test_custom_scores_use_own_university(sessionmaker_bound, expander):
+    from config.instance import install
+
+    install({"UNIVERSITY_PROFILE": "custom", "UNIVERSITY_SHORT_NAME": "Север"}, 1)
+    async with sessionmaker_bound() as session:
+        await FacultyService(session).upsert_from_seed(
+            [
+                {
+                    "name": "Факультет Севера",
+                    "programs": [{"name": "Северная инженерия", "level": "bachelor"}],
+                }
+            ]
+        )
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    faculty_name="Факультет Севера",
+                    program_name="Северная инженерия",
+                    code=None,
+                    year=2025,
+                    form="budget",
+                    passing_score=210,
+                    average_score=None,
+                )
+            ]
+        )
+    text = await default_tool_executor(
+        "get_admission_scores", {"program": "Северная инженерия"}
+    )
+    assert "НГУ" not in text
+    assert "Северная инженерия — Факультет Севера" in text
+    assert "2025, бюджет: проходной 210" in text

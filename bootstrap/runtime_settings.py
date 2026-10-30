@@ -33,7 +33,7 @@ async def watch_settings() -> None:
 async def runtime_settings() -> AsyncIterator[None]:
     # A missing database/key must not enable legacy env tokens while the API
     # is recovering. Start with disabled channels and retry in the watcher.
-    install({}, 0)
+    install({}, 0, loaded=False)
     try:
         await refresh_settings()
     except Exception:

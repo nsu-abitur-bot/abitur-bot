@@ -8,6 +8,7 @@ from maxapi import Bot as MaxBot
 from bootstrap.runtime_settings import runtime_settings
 from bot.notifications import send_pending_notifications
 from config.instance import enabled, get_setting, revision
+from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.dto import RatingEntry
 from db.postgres.services.rating import RatingService
@@ -162,6 +163,8 @@ async def run_sync_job(
     notification_outbox: рассылается то, что осталось с прошлых циклов, и
     новое — сразу после каждого изменившегося списка.
     """
+    if not is_nsu():
+        return SyncResult()
     logger.info("Начало цикла синхронизации рейтингов...")
     result = SyncResult()
 
@@ -270,7 +273,7 @@ async def main() -> None:
             try:
                 result = (
                     await run_sync_job(bot, max_client=max_client)
-                    if enabled("SCHEDULER_ENABLED") and (bot or max_client)
+                    if is_nsu() and enabled("SCHEDULER_ENABLED") and (bot or max_client)
                     else SyncResult()
                 )
                 interval = compute_next_interval(

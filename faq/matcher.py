@@ -19,6 +19,7 @@ from typing import Callable, Optional, Protocol
 import numpy as np
 import yaml
 
+from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.settings import SettingsService
 from llm.factory import get_faq_provider as get_llm_provider
@@ -221,7 +222,7 @@ class FAQMatcher:
             logger.warning("FAQ embedder не инициализирован, FAQ matching отключен")
             return
 
-        if not self._faq_path.exists():
+        if not is_nsu() or not self._faq_path.exists():
             logger.warning(f"FAQ file not found: {self._faq_path}")
             return
 

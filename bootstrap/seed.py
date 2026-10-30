@@ -8,6 +8,7 @@ import logging
 from datetime import UTC, datetime, timedelta
 
 from config.instance import get_setting
+from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.admission_score import AdmissionScoreService
 from db.postgres.services.settings import SettingsService
@@ -52,7 +53,7 @@ async def seed_reference_data() -> None:
     записи сида при каждом деплое. SEED_FACULTIES_FORCE=1 — жёстко перезалить.
     """
     try:
-        if not _env_flag("SEED_FACULTIES", True):
+        if not is_nsu() or not _env_flag("SEED_FACULTIES", True):
             return
         if _env_flag("SEED_FACULTIES_FORCE", False):
             stats = await seed_faculties(soft=False)
@@ -91,7 +92,7 @@ async def seed_admission_scores() -> None:
     безопасны. Отключить целиком: SEED_ADMISSION_SCORES=0. Игнорировать
     свежесть: SEED_ADMISSION_SCORES_FORCE=1.
     """
-    if not _env_flag("SEED_ADMISSION_SCORES", True):
+    if not is_nsu() or not _env_flag("SEED_ADMISSION_SCORES", True):
         logger.info("Автозаливка проходных баллов отключена (SEED_ADMISSION_SCORES=0)")
         return
 

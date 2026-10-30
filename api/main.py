@@ -238,3 +238,13 @@ async def get_messages(
             )
         )
     return result
+
+
+@app.get("/api/v1/university", dependencies=[Depends(get_current_admin)])
+async def get_university() -> dict[str, str]:
+    from config.instance import is_loaded
+    from config.university import identity, is_nsu
+
+    if not is_loaded():
+        raise HTTPException(status_code=503, detail="University settings unavailable")
+    return {**identity(), "profile": "nsu" if is_nsu() else "custom"}
