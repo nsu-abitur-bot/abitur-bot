@@ -8,3 +8,17 @@ import os
 # setdefault: если ключ задан в окружении, тесты берут его.
 os.environ.setdefault("SECRET_KEY", "test-secret-key-not-for-production-0123456789abcdef")
 os.environ.setdefault("DB_PASSWORD", "postgres")
+
+
+import pytest
+
+from config import instance
+
+
+@pytest.fixture(autouse=True)
+def isolate_runtime_configuration(monkeypatch):
+    # Lifespan snapshots belong to one app/test, not the next test's environment.
+    monkeypatch.setattr(instance, "_values", None)
+    monkeypatch.setattr(instance, "_revision", 0)
+    monkeypatch.setattr(instance, "_loaded", False)
+    monkeypatch.setattr(instance, "_secret_history", set())

@@ -14,6 +14,7 @@ from lightrag import LightRAG, QueryParam
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
 
+from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
@@ -37,8 +38,8 @@ UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
     re.IGNORECASE,
 )
-LOG_TEXT_PREVIEW_LIMIT = int(os.getenv("RAG_LOG_TEXT_PREVIEW_LIMIT", "2000"))
-LOG_CHUNKS_LIMIT = int(os.getenv("RAG_LOG_CHUNKS_LIMIT", "10"))
+LOG_TEXT_PREVIEW_LIMIT = int(get_setting("RAG_LOG_TEXT_PREVIEW_LIMIT", "2000"))
+LOG_CHUNKS_LIMIT = int(get_setting("RAG_LOG_CHUNKS_LIMIT", "10"))
 
 
 def _clip_for_log(value: Any, limit: int = LOG_TEXT_PREVIEW_LIMIT) -> str:
@@ -151,6 +152,19 @@ def _ensure_query_succeeded(result: Any) -> bool:
     raise RetrievalError(str(result.get("message") or "LightRAG query failed"))
 
 
+def graph_configuration() -> tuple:
+    return tuple(
+        get_setting(k)
+        for k in (
+            "LIGHTRAG_EMBEDDING_PROVIDER",
+            "OPENAI_GRAPH_EMBEDDING_MODEL",
+            "GEMINI_GRAPH_EMBEDDING_MODEL",
+            "LIGHTRAG_EMBEDDING_WORKERS",
+            "LIGHTRAG_LLM_WORKERS",
+        )
+    )
+
+
 class _GraphWrapper:
     """Wrapper to track usage count of LightRAG instances for safe finalization."""
 
@@ -158,6 +172,7 @@ class _GraphWrapper:
         self.rag = rag
         self.usage_count = 0
         self.marked_for_deletion = False
+        self.configuration = graph_configuration()
 
 
 class GraphMemory:
@@ -175,7 +190,7 @@ class GraphMemory:
         self._clearing_events: Dict[str, asyncio.Event] = {}
         self._last_cache_clear_marker: Dict[str, float] = {}
         self._cache_clear_timeout: float = float(
-            os.getenv("LIGHTRAG_CACHE_CLEAR_TIMEOUT", "10")
+            get_setting("LIGHTRAG_CACHE_CLEAR_TIMEOUT", "10")
         )
         self._check_interval: float = 2.0  # limit disk scanning (os.scandir) frequency
         # Кэш «URL → заголовок» для блока «Источники»: строится из KV-файлов и
@@ -184,7 +199,7 @@ class GraphMemory:
             str, tuple[tuple[tuple[float, float], tuple[int, Any]], dict[str, str]]
         ] = {}
 
-        self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
+        self.workspace_path = get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
 
         # LIGHTRAG_STORAGE=postgres: KV-стораджи и doc_status — в PostgreSQL
@@ -362,6 +377,15 @@ class GraphMemory:
         await self._await_cache_clear_if_needed(graph_id)
 
         async with self._get_lock(graph_id):
+            current = self._graphs.get(graph_id)
+            if current is not None and current.configuration != graph_configuration():
+                if current.usage_count:
+                    current.usage_count += 1
+                    return current
+                # Rebuild only when there are no users; never share mutable stores
+                # with an old worker configuration during the transition.
+                await current.rag.finalize_storages()
+                self._graphs.pop(graph_id)
             now = time.monotonic()
             check_disk = False
 
@@ -407,42 +431,35 @@ class GraphMemory:
             workspace_path = self._get_workspace_path(graph_id)
 
             try:
-                graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gemini").lower()
+                graph_llm_provider = get_setting(
+                    "LIGHTRAG_EMBEDDING_PROVIDER",
+                    get_setting("LIGHTRAG_LLM_PROVIDER", "gemini"),
+                ).lower()
 
                 if graph_llm_provider == "openai":
-                    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+                    openai_api_key = get_setting("OPENAI_API_KEY", "")
                     if not openai_api_key:
                         raise RuntimeError(
                             "LIGHTRAG_LLM_PROVIDER=openai,"
                             + " но OPENAI_API_KEY не установлен."
                         )
-                    llm_adapter: Any = OpenAILLM(
-                        api_key=openai_api_key,
-                        model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
-                    )
                     embedding_adapter: Any = OpenAIEmbedding(
                         api_key=openai_api_key,
-                        model=os.getenv(
+                        model=get_setting(
                             "OPENAI_GRAPH_EMBEDDING_MODEL",
                             "text-embedding-3-small",
                         ),
                     )
                 elif graph_llm_provider == "gemini":
-                    gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+                    gemini_api_key = get_setting("GEMINI_API_KEY", "")
                     if not gemini_api_key:
                         raise RuntimeError(
                             "LIGHTRAG_LLM_PROVIDER=gemini,"
                             + " но GEMINI_API_KEY не установлен."
                         )
-                    llm_adapter: Any = GeminiLLM(
-                        api_key=gemini_api_key,
-                        model=os.getenv(
-                            "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
-                        ),
-                    )
                     embedding_adapter: Any = GeminiEmbedding(
                         api_key=gemini_api_key,
-                        model=os.getenv(
+                        model=get_setting(
                             "GEMINI_GRAPH_EMBEDDING_MODEL",
                             "gemini-embedding-2-preview",
                         ),
@@ -453,17 +470,59 @@ class GraphMemory:
                         "Допустимые значения: openai, gemini"
                     )
 
+                await embedding_adapter.aclose()
+
+                embedding_provider = graph_llm_provider
+                embedding_model = get_setting(
+                    "OPENAI_GRAPH_EMBEDDING_MODEL"
+                    if embedding_provider == "openai"
+                    else "GEMINI_GRAPH_EMBEDDING_MODEL",
+                    "text-embedding-3-small"
+                    if embedding_provider == "openai"
+                    else "gemini-embedding-2-preview",
+                )
+
                 @wrap_embedding_func_with_attrs(
                     embedding_dim=embedding_adapter.embedding_dim
                 )
                 async def embedding_func(texts: List[str]) -> List[List[float]]:
-                    return await embedding_adapter(texts)
+                    provider = embedding_provider
+                    if provider == "openai":
+                        adapter = OpenAIEmbedding(
+                            api_key=get_setting("OPENAI_API_KEY", ""),
+                            model=embedding_model,
+                        )
+                    else:
+                        adapter = GeminiEmbedding(
+                            api_key=get_setting("GEMINI_API_KEY", ""),
+                            model=embedding_model,
+                        )
+                    try:
+                        return await adapter(texts)
+                    finally:
+                        await adapter.aclose()
 
                 async def llm_model_func(prompt: str, **kwargs) -> str:
-                    return await llm_adapter(prompt, **kwargs)
+                    provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
+                    if provider == "openai":
+                        adapter = OpenAILLM(
+                            api_key=get_setting("OPENAI_API_KEY", ""),
+                            model=get_setting("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
+                        )
+                    else:
+                        adapter = GeminiLLM(
+                            api_key=get_setting("GEMINI_API_KEY", ""),
+                            model=get_setting(
+                                "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
+                            ),
+                        )
+                    try:
+                        return await adapter(prompt, **kwargs)
+                    finally:
+                        await adapter.aclose()
 
-                embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
-                llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
+                embedding_workers = int(get_setting("LIGHTRAG_EMBEDDING_WORKERS", "2"))
+                llm_workers = int(get_setting("LIGHTRAG_LLM_WORKERS", "1"))
 
                 # PG-режим: KV и doc_status — в PostgreSQL (workspace=graph_id
                 # разделяет базы знаний), векторный стор и граф — файловые.

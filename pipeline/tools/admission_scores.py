@@ -9,6 +9,7 @@ import logging
 from typing import Optional
 
 from abbrev.expander import get_abbrev_expander
+from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.admission_score import AdmissionScoreService
 from llm.base import ToolSpec
@@ -103,7 +104,11 @@ def _format_score_value(row: dict, metric: str) -> str:
 
 def _format_scores(rows: list[dict], metric: str) -> str:
     """Компактный RU-текст, сгруппированный по направлению, затем по году/форме."""
-    header = "Проходные баллы прошлых лет (НГУ):"
+    header = (
+        "Проходные баллы прошлых лет (НГУ):"
+        if is_nsu()
+        else "Проходные баллы прошлых лет:"
+    )
     lines: list[str] = [header]
 
     current_key: Optional[tuple[str, Optional[str]]] = None

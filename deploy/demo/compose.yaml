@@ -1,0 +1,100 @@
+name: ${INSTANCE_NAME:?Set INSTANCE_NAME}
+
+x-backend: &backend
+  build:
+    context: ../..
+  environment: &environment
+    PYTHON_DOTENV_DISABLED: "1"
+    DB_HOST: postgres
+    DB_PORT: "5432"
+    DB_NAME: abitur
+    DB_USER: abitur
+    DB_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+    REDIS_URL: redis://:${REDIS_PASSWORD:?Set REDIS_PASSWORD}@redis:6379/0
+    SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY}
+    SETTINGS_ENCRYPTION_KEY: ${SETTINGS_ENCRYPTION_KEY:?Set SETTINGS_ENCRYPTION_KEY}
+    CORS_ALLOW_ORIGINS: ${WEB_ORIGIN:?Set WEB_ORIGIN}
+    LIGHTRAG_WORKSPACE_BASE: /app/data/lightrag
+    LIGHTRAG_STORAGE: json
+    LOG_DIR: /app/logs
+  volumes:
+    - files:/app/data
+    - logs:/app/logs
+
+services:
+  permissions:
+    <<: *backend
+    user: root
+    command: [sh, -eu, -c, "chown 1000:1000 /app/data /app/logs"]
+
+  migrate:
+    <<: *backend
+    command: [python, -c, "from db.postgres.init_db import run_migrations; run_migrations()"]
+    depends_on:
+      permissions:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *backend
+    restart: unless-stopped
+    command: [uvicorn, api.main:app, --host, 0.0.0.0, --port, "8000"]
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${API_PORT:?Set API_PORT}:8000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ${WEB_SOURCE:-../../../abitur-web}
+    restart: unless-stopped
+    environment:
+      NUXT_PUBLIC_API_BASE_URL: ${API_ORIGIN:?Set API_ORIGIN}
+      NUXT_PUBLIC_BASE_URL: ${WEB_ORIGIN:?Set WEB_ORIGIN}
+      NUXT_SESSION_PASSWORD: ${WEB_SESSION_PASSWORD:?Set WEB_SESSION_PASSWORD}
+      NUXT_SESSION_NAME: ${INSTANCE_NAME}-session
+      NUXT_DATABASE_URL: postgres://abitur:${DB_PASSWORD}@postgres:5432/abitur
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:?Set WEB_PORT}:3000"
+    depends_on:
+      api:
+        condition: service_started
+
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: abitur
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: abitur
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U abitur -d abitur"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    command: [redis-server, --requirepass, "${REDIS_PASSWORD}", --appendonly, "yes"]
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    volumes:
+      - redis:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  postgres:
+  redis:
+  files:
+  logs:

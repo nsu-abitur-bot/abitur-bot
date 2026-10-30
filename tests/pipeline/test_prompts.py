@@ -38,8 +38,8 @@ VERSIONED_PROMPTS = [
 # подними версию в pipeline/prompts.py и обнови обе колонки здесь.
 PINNED = {
     "system": (
-        "1.0",
-        "37647de6fea71ba62ae592794b14a668bbe51c310465b0b3b150d4386b23ad02",
+        "2.0",
+        "58c78976f31c575bfd3f6476477aa235bfac431b1d90e1f21dc4d3a1e693d7cf",
     ),
     "sources_hint": (
         "1.0",
@@ -92,7 +92,11 @@ class TestVersions:
 class TestSystemPrompt:
     def test_placeholders_are_substituted(self):
         prompt = SYSTEM_PROMPT_BASE.format(
-            context="Приём до 25 июля.", sources_hint=SOURCES_HINT
+            context="Приём до 25 июля.",
+            sources_hint=SOURCES_HINT,
+            assistant_name="официальный дружелюбный помощник-бот",
+            university_short_name="НГУ",
+            university_full_name="Новосибирский государственный университет",
         )
         assert "Приём до 25 июля." in prompt
         assert "ИНСТРУКЦИЯ К ОТВЕТУ" in prompt
@@ -103,12 +107,27 @@ class TestSystemPrompt:
     def test_refusal_formula_is_word_for_word(self):
         """_postprocess ищет эту фразу и по ней отключает источники:
         изменить её в промпте можно только вместе с постобработкой."""
-        assert "Я не нашел информации об этом в базе знаний НГУ" in SYSTEM_PROMPT_BASE
+        assert (
+            "Я не нашел информации об этом в базе знаний НГУ"
+            in SYSTEM_PROMPT_BASE.format(
+                context="",
+                sources_hint="",
+                assistant_name="помощник",
+                university_short_name="НГУ",
+                university_full_name="НГУ",
+            )
+        )
 
     def test_admission_scores_tool_is_named(self):
         """Правило про проходные баллы опирается на инструмент, который
         _run_tool_loop предлагает модели всегда."""
-        assert "get_admission_scores" in SYSTEM_PROMPT_BASE
+        assert "get_admission_scores" in SYSTEM_PROMPT_BASE.format(
+            context="",
+            sources_hint="",
+            assistant_name="помощник",
+            university_short_name="НГУ",
+            university_full_name="НГУ",
+        )
 
 
 class TestIntentPrompt:

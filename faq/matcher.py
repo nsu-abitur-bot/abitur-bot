@@ -14,14 +14,15 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Optional, Protocol
+from typing import Callable, Optional, Protocol
 
 import numpy as np
 import yaml
 
+from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.settings import SettingsService
-from llm.factory import get_llm_provider
+from llm.factory import get_faq_provider as get_llm_provider
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +184,7 @@ class FAQMatcher:
         )
         self._faq_path = faq_path or FAQ_DATA_PATH
 
-        self._embedder = embedder or self._create_embedder()
+        self._embedder = embedder or _LiveEmbeddingClient(self._create_embedder)
 
         # Загружаем FAQ
         self._questions: list[str] = []  # все формулировки (question + aliases)
@@ -221,7 +222,7 @@ class FAQMatcher:
             logger.warning("FAQ embedder не инициализирован, FAQ matching отключен")
             return
 
-        if not self._faq_path.exists():
+        if not is_nsu() or not self._faq_path.exists():
             logger.warning(f"FAQ file not found: {self._faq_path}")
             return
 
@@ -389,6 +390,17 @@ class FAQMatcher:
     def size(self) -> int:
         """Количество FAQ-фраз (question + aliases)."""
         return len(self._questions)
+
+
+class _LiveEmbeddingClient:
+    def __init__(self, factory: Callable[[], Optional["EmbeddingClient"]]) -> None:
+        self.factory = factory
+
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        embedder = self.factory()
+        if embedder is None:
+            raise RuntimeError("Подключение эмбеддингов не настроено")
+        return embedder.embed_documents(texts)
 
 
 class EmbeddingClient(Protocol):

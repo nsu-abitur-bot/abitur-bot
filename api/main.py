@@ -19,12 +19,14 @@ from api.routes.evals import router as evals_router
 from api.routes.faculty import router as faculty_router
 from api.routes.faq import router as faq_router
 from api.routes.feedback_report import router as feedback_report_router
+from api.routes.instance_settings import router as instance_settings_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
 from api.routes.settings import router as settings_router
 from api.routes.stats import router as stats_router
 from api.routes.system_logs import router as system_logs_router
 from api.routes.topic import router as topic_router
+from bootstrap.runtime_settings import runtime_settings
 from db.postgres.db import AsyncSessionLocal, get_async_session
 from db.postgres.models import Admin
 from db.postgres.services.abbrev import AbbrevDbService
@@ -60,25 +62,28 @@ class MessageResponse(BaseModel):
 async def lifespan(app: FastAPI):
     # В lifespan, а не на импорте: тесты импортируют app и не должны писать в logs/.
     setup_logging()
-    async with AsyncSessionLocal() as session:
-        try:
-            faq_entries = await FaqDbService(session).get_all()
-            get_faq_matcher().load_items(
-                [
-                    {"question": e.question, "aliases": e.aliases, "answer": e.answer}
-                    for e in faq_entries
-                ]
-            )
-            logger.info("FAQ загружен из БД: %d записей", len(faq_entries))
+    async with runtime_settings():
+        async with AsyncSessionLocal() as session:
+            try:
+                faq_entries = await FaqDbService(session).get_all()
+                get_faq_matcher().load_items(
+                    [
+                        {"question": e.question, "aliases": e.aliases, "answer": e.answer}
+                        for e in faq_entries
+                    ]
+                )
+                logger.info("FAQ загружен из БД: %d записей", len(faq_entries))
 
-            abbrev_entries = await AbbrevDbService(session).get_all()
-            get_abbrev_expander().load_items(
-                [{"short": e.short, "full": e.full} for e in abbrev_entries]
-            )
-            logger.info("Аббревиатуры загружены из БД: %d записей", len(abbrev_entries))
-        except Exception:
-            logger.exception("Ошибка загрузки FAQ/аббревиатур из БД при старте")
-    yield
+                abbrev_entries = await AbbrevDbService(session).get_all()
+                get_abbrev_expander().load_items(
+                    [{"short": e.short, "full": e.full} for e in abbrev_entries]
+                )
+                logger.info(
+                    "Аббревиатуры загружены из БД: %d записей", len(abbrev_entries)
+                )
+            except Exception:
+                logger.exception("Ошибка загрузки FAQ/аббревиатур из БД при старте")
+        yield
 
 
 app = FastAPI(title="Abitur API", lifespan=lifespan)
@@ -98,6 +103,7 @@ app.add_middleware(
 
 # Auth роутер — публичные эндпоинты /login и /register, остальное защищено внутри
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(instance_settings_router, prefix="/api/v1")
 
 # Все остальные роутеры требуют аутентификации
 # Мутации (abbrev, faq, rag, evals) требуют роль admin или superadmin
@@ -232,3 +238,13 @@ async def get_messages(
             )
         )
     return result
+
+
+@app.get("/api/v1/university", dependencies=[Depends(get_current_admin)])
+async def get_university() -> dict[str, str]:
+    from config.instance import is_loaded
+    from config.university import identity, is_nsu
+
+    if not is_loaded():
+        raise HTTPException(status_code=503, detail="University settings unavailable")
+    return {**identity(), "profile": "nsu" if is_nsu() else "custom"}

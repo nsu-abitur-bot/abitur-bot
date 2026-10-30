@@ -1,11 +1,11 @@
 import logging
-import os
 from typing import Any, List
 from urllib.parse import urlsplit
 
 import httpx
 from openai import AsyncOpenAI
 
+from config.instance import get_setting
 from llm.profiles import LLMProfiles
 
 logger = logging.getLogger(__name__)
@@ -45,10 +45,11 @@ class OpenAILLM:
         self.model = model
         self.profile = LLMProfiles.GRAPH
         self._async_http_client: httpx.AsyncClient | None = None
-        effective_proxy = proxy_url or os.getenv("OPENAI_SOCKS5_PROXY")
+        effective_proxy = proxy_url or get_setting("OPENAI_SOCKS5_PROXY")
 
         client_kwargs: dict[str, Any] = {
             "api_key": api_key,
+            "base_url": get_setting("OPENAI_BASE_URL"),
             "timeout": float(self.profile.timeout or 120),
         }
         if effective_proxy:
@@ -68,6 +69,9 @@ class OpenAILLM:
             self.model,
             _mask_proxy_url(effective_proxy),
         )
+
+    async def aclose(self) -> None:
+        await self.client.close()
 
     async def __call__(self, prompt: str, **kwargs) -> str:
         try:
@@ -105,10 +109,11 @@ class OpenAIEmbedding:
         self.model = model
         self.profile = LLMProfiles.EMBEDDING
         self._async_http_client: httpx.AsyncClient | None = None
-        effective_proxy = proxy_url or os.getenv("OPENAI_SOCKS5_PROXY")
+        effective_proxy = proxy_url or get_setting("OPENAI_SOCKS5_PROXY")
 
         client_kwargs: dict[str, Any] = {
             "api_key": api_key,
+            "base_url": get_setting("OPENAI_BASE_URL"),
             "timeout": float(self.profile.timeout or 60),
         }
         if effective_proxy:
@@ -128,6 +133,9 @@ class OpenAIEmbedding:
             self.model,
             _mask_proxy_url(effective_proxy),
         )
+
+    async def aclose(self) -> None:
+        await self.client.close()
 
     async def __call__(self, texts: List[str]) -> List[List[float]]:
         # Ошибку не глотаем и нулевой вектор не подставляем: в nano_vectordb
