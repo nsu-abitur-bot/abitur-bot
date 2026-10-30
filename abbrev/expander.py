@@ -4,6 +4,8 @@ from pathlib import Path
 
 import yaml
 
+from config.university import is_nsu
+
 logger = __import__("logging").getLogger(__name__)
 
 ABBREV_DATA_PATH = Path(__file__).parent / "abbrev_data.yaml"
@@ -22,7 +24,7 @@ class AbbrevExpander:
         self._load()
 
     def _load(self) -> None:
-        if not ABBREV_DATA_PATH.exists():
+        if not is_nsu() or not ABBREV_DATA_PATH.exists():
             self._abbrev = {}
             self._pattern = None
             return

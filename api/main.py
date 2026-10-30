@@ -238,3 +238,10 @@ async def get_messages(
             )
         )
     return result
+
+
+@app.get("/api/v1/university", dependencies=[Depends(get_current_admin)])
+async def get_university() -> dict[str, str]:
+    from config.university import identity, is_nsu
+
+    return {**identity(), "profile": "nsu" if is_nsu() else "custom"}

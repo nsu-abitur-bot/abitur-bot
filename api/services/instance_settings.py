@@ -48,8 +48,10 @@ def merge_changes(
 def validate_value(spec: SettingSpec, value: str) -> None:
     if len(value) > 4000 or "\n" in value or "\r" in value:
         raise ConfigurationError("Недопустимое значение настройки")
+    if spec.group == "Вуз" and (len(value) > 300 or any(c in value for c in "{}<>")):
+        raise ConfigurationError("Реквизиты должны быть обычным текстом до 300 символов")
     if spec.choices and value not in spec.choices:
-        raise ConfigurationError("Выберите поддерживаемого провайдера")
+        raise ConfigurationError("Выберите допустимое значение")
     if spec.kind == "boolean" and value not in {"true", "false"}:
         raise ConfigurationError("Ожидается true или false")
     if spec.kind == "number":
