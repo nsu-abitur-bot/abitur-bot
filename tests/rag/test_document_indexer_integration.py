@@ -21,6 +21,9 @@ class FakeOpenAIEmbedding:
             for t in texts
         ]
 
+    async def aclose(self) -> None:
+        pass
+
 
 class FakeOpenAILLM:
     def __init__(self, should_fail: bool = False):
@@ -30,6 +33,9 @@ class FakeOpenAILLM:
         if self.should_fail:
             raise RuntimeError("LLM extraction failed internally in LightRAG!")
         return "empty response<|COMPLETE|>"
+
+    async def aclose(self) -> None:
+        pass
 
 
 class InMemoryDocument:
