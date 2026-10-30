@@ -92,7 +92,7 @@ scenarios:
     question: Как добраться до главного корпуса НГУ?
     reference_answer: Тестовый контекст НГУ сохраняется при таймауте ранжировщика.
     topic: retrieval
-    source: synthetic test fixture in evals/offline.py; issue #291; not real directions
+    source: "synthetic test fixture in evals/offline.py; issue #291; not real directions"
     approved_by: null
     approved_at: null
     requires_llm: false
