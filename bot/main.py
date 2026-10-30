@@ -1,8 +1,9 @@
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
-from os import getenv
 
+from bootstrap.runtime_settings import runtime_settings
+from bot.channel_supervisor import supervise_channel
 from bot.max_bot import run_max_bot
 from bot.telegram_bot import run_telegram_bot
 from pipeline.llm_client import cleanup_redis
@@ -42,43 +43,19 @@ async def _run_with_restart(
 
 
 async def main() -> None:
-    """Запускает Telegram и MAX адаптеры параллельно."""
-    logger.info("Запуск bot-core адаптеров: Telegram + MAX")
-
-    restart_delay_seconds = float(getenv("BOT_RESTART_DELAY_SECONDS", "5"))
-
-    telegram_task = asyncio.create_task(
-        _run_with_restart(
-            name="Telegram",
-            runner=run_telegram_bot,
-            restart_delay_seconds=restart_delay_seconds,
-        )
-    )
-    max_task = asyncio.create_task(
-        _run_with_restart(
-            name="MAX",
-            runner=run_max_bot,
-            restart_delay_seconds=restart_delay_seconds,
-        )
-    )
-
-    tasks = (telegram_task, max_task)
-    try:
-        await asyncio.gather(*tasks)
-    except asyncio.CancelledError:
-        logger.info("Остановка bot-core адаптеров...")
-        raise
-    finally:
-        for task in tasks:
-            if not task.done():
+    async with runtime_settings():
+        tasks = [
+            asyncio.create_task(supervise_channel("telegram", run_telegram_bot)),
+            asyncio.create_task(supervise_channel("max", run_max_bot)),
+        ]
+        try:
+            await asyncio.gather(*tasks)
+        finally:
+            for task in tasks:
                 task.cancel()
-        await asyncio.gather(*tasks, return_exceptions=True)
-        logger.info("Закрытие соединений...")
-        await cleanup_redis()
+            await asyncio.gather(*tasks, return_exceptions=True)
+            await cleanup_redis()
 
 
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-        logger.info("Боты остановлены")
+    asyncio.run(main())

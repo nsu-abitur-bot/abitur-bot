@@ -10,6 +10,7 @@ from sqlalchemy import select
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import UploadedDocumentResult
 from api.services.document_update import calculate_content_hash, first_http_url
+from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
 from db.postgres.services.document import DocumentService
@@ -64,12 +65,21 @@ class RagUploadService:
     ) -> list[UploadedDocumentResult]:
         settings = await self._get_settings()
         try:
-            max_file_size = int(settings.get("max_document_size", 50 * 1024 * 1024))
+            max_file_size = int(
+                get_setting(
+                    "MAX_DOCUMENT_SIZE",
+                    settings.get("max_document_size", str(50 * 1024 * 1024)),
+                )
+            )
         except ValueError:
             max_file_size = 50 * 1024 * 1024
 
         try:
-            max_pages = int(settings.get("max_document_pages", 50))
+            max_pages = int(
+                get_setting(
+                    "MAX_DOCUMENT_PAGES", settings.get("max_document_pages", "50")
+                )
+            )
         except ValueError:
             max_pages = 50
 
