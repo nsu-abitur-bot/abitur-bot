@@ -64,7 +64,11 @@ def validate_value(spec: SettingSpec, value: str) -> None:
             and "доля" not in spec.label.lower()
             and ("Пауза" not in spec.label and "Период" not in spec.label)
         ):
-            if number < 1 or not number.is_integer():
+            try:
+                integer = int(value)
+            except ValueError:
+                raise ConfigurationError("Ожидается положительное целое число") from None
+            if integer < 1:
                 raise ConfigurationError("Ожидается положительное целое число")
         if "Температура" in spec.label and number > 2:
             raise ConfigurationError("Температура должна быть от 0 до 2")

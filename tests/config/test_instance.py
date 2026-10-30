@@ -57,3 +57,9 @@ def test_formatter_redacts_current_retired_and_urlencoded_secrets():
     formatted = SecretSafeFormatter().format(record)
     assert "secret" not in formatted and "current" not in formatted
     assert formatted.count("[REDACTED]") == 3
+
+
+@pytest.mark.parametrize("value", ["1.0", "1e3"])
+def test_integer_settings_reject_float_notation_used_by_integer_consumers(value):
+    with pytest.raises(ConfigurationError):
+        merge_changes(InstanceSnapshot(0, {}), {"RATING_MAX_SESSION_REFRESHES": value})
