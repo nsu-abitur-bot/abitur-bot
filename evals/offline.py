@@ -37,6 +37,7 @@ def _fixture_pipeline() -> Iterator[Runner]:
     from faq.matcher import FAQMatcher
     from llm.base import LLMResult
     from pipeline import llm_client
+    from rag.graph_memory import GraphMemory
 
     class MemoryHistory:
         async def add_message(self, session_id: str, message: dict) -> None:
@@ -87,7 +88,30 @@ def _fixture_pipeline() -> Iterator[Runner]:
     async def history() -> MemoryHistory:
         return MemoryHistory()
 
-    async def retrieve(*args, **kwargs):
+    class FailingRerankProvider:
+        async def generate(self, messages, profile):
+            # No suspension while the process-local provider patch is active.
+            raise TimeoutError("Synthetic reranker timeout (#291)")
+
+    async def retrieve(question, **kwargs):
+        if "до главного корпуса" in question.casefold():
+            candidates = [
+                {
+                    "url": f"https://example.test/rerank/{index}",
+                    "title": f"Synthetic source {index}",
+                    "snippet": "Тестовый контекст НГУ.",
+                }
+                for index in range(3)
+            ]
+            with patch("rag.graph_memory.get_llm_provider", FailingRerankProvider):
+                sources = await GraphMemory._rerank_sources_with_llm(
+                    object.__new__(GraphMemory),
+                    question,
+                    kwargs.get("conversation_history"),
+                    candidates,
+                    max_sources=2,
+                )
+            return "Тестовый контекст НГУ.", sources
         return "Тестовый контекст НГУ.", []
 
     async def config():
