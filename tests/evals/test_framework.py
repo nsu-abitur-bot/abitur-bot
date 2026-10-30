@@ -320,8 +320,16 @@ async def test_offline_reranker_failure_uses_real_helper(monkeypatch):
     scenario = next(
         s for s in load_scenarios("evals/scenarios.yaml") if s.id == "rag_rerank_failure"
     )
+    from unittest.mock import patch
+
+    from pipeline import llm_client
+
+    async def forbidden_crag(*args, **kwargs):
+        raise AssertionError("Reranker regression must use the CRAG-disabled branch")
+
     with offline_pipeline() as runner:
-        observation = await runner(scenario, "eval:regression:rag_rerank_failure")
+        with patch.object(llm_client, "query_graph_with_crag", forbidden_crag):
+            observation = await runner(scenario, "eval:regression:rag_rerank_failure")
     assert observation.text == "Тестовый контекст НГУ."
     assert not observation.faq_matched
     assert len(calls) == 1

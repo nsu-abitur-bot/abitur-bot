@@ -3,12 +3,15 @@
 import os
 from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from evals.checks import Observation
 from evals.evaluator import Runner
+from evals.schema import Scenario
 
 
 @contextmanager
@@ -94,7 +97,7 @@ def _fixture_pipeline() -> Iterator[Runner]:
             raise TimeoutError("Synthetic reranker timeout (#291)")
 
     async def retrieve(question, **kwargs):
-        if "до главного корпуса" in question.casefold():
+        if reranker_case.get():
             candidates = [
                 {
                     "url": f"https://example.test/rerank/{index}",
@@ -114,8 +117,18 @@ def _fixture_pipeline() -> Iterator[Runner]:
             return "Тестовый контекст НГУ.", sources
         return "Тестовый контекст НГУ.", []
 
+    reranker_case = ContextVar("offline_reranker_case", default=False)
+
     async def config():
-        return SimpleNamespace(enabled=True)
+        return SimpleNamespace(enabled=not reranker_case.get())
+
+    async def run_case(scenario: Scenario, session_id: str) -> Observation:
+        # Per-task state: concurrent scenarios must keep their normal CRAG path.
+        token = reranker_case.set(scenario.id == "rag_rerank_failure")
+        try:
+            return await run_product(scenario, session_id)
+        finally:
+            reranker_case.reset(token)
 
     async def threshold() -> float:
         return 0.99
@@ -157,4 +170,4 @@ def _fixture_pipeline() -> Iterator[Runner]:
         }
         for name, value in replacements.items():
             stack.enter_context(patch.object(llm_client, name, value))
-        yield run_product
+        yield run_case
