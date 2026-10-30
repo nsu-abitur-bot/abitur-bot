@@ -300,14 +300,21 @@ define(
 
 _values: dict[str, str] | None = None
 _revision = 0
+_loaded = False
 _secret_history: set[str] = set()
 
 
-def install(values: dict[str, str], revision: int) -> None:
-    global _values, _revision
+def install(values: dict[str, str], revision: int, *, loaded: bool = True) -> None:
+    global _values, _revision, _loaded
     remember_secrets(values)
     _values = dict(values)
     _revision = revision
+    _loaded = loaded
+
+
+def is_loaded() -> bool:
+    """Whether a usable settings snapshot has been installed successfully."""
+    return _loaded
 
 
 def revision() -> int:

@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 from cryptography.fernet import Fernet
@@ -53,6 +54,89 @@ async def test_wrong_master_key_fails_closed(session, monkeypatch):
     monkeypatch.setenv("SETTINGS_ENCRYPTION_KEY", Fernet.generate_key().decode())
     with pytest.raises(ValueError, match="расшифровать"):
         await service.read()
+
+
+async def test_university_initial_failure_recovery_and_last_good(
+    session, test_engine, monkeypatch
+):
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+
+    from api.auth.security import create_access_token
+    from bootstrap import runtime_settings
+
+    maker = async_sessionmaker(test_engine, expire_on_commit=False)
+    monkeypatch.setattr(runtime_settings, "AsyncSessionLocal", maker)
+    monkeypatch.setattr(runtime_settings, "engine", test_engine)
+
+    async def db_override():
+        async with maker() as connection:
+            yield connection
+
+    admin = Admin(username="viewer", password_hash="unused", role=AdminRole.viewer)
+    session.add(admin)
+    await session.flush()
+    token = create_access_token(admin.id)
+    key = os.environ["SETTINGS_ENCRYPTION_KEY"]
+    await InstanceSettingsService(session).write(
+        {
+            "UNIVERSITY_PROFILE": "custom",
+            "UNIVERSITY_SHORT_NAME": "Север",
+            "OPENAI_API_KEY": "private-fixture",
+        },
+        0,
+    )
+    monkeypatch.setenv("SETTINGS_ENCRYPTION_KEY", Fernet.generate_key().decode())
+    app.dependency_overrides[get_async_session] = db_override
+    try:
+        async with runtime_settings.runtime_settings():
+            async with AsyncClient(
+                transport=ASGITransport(app), base_url="http://test"
+            ) as client:
+                assert (await client.get("/api/v1/university")).status_code == 401
+                headers = {"Authorization": f"Bearer {token}"}
+                response = await client.get("/api/v1/university", headers=headers)
+                assert response.status_code == 503
+                monkeypatch.setenv("SETTINGS_ENCRYPTION_KEY", key)
+                await runtime_settings.refresh_settings()
+                response = await client.get("/api/v1/university", headers=headers)
+                assert response.status_code == 200
+                assert response.json()["profile"] == "custom"
+                assert response.json()["short_name"] == "Север"
+                assert "private-fixture" not in response.text
+                monkeypatch.setenv(
+                    "SETTINGS_ENCRYPTION_KEY", Fernet.generate_key().decode()
+                )
+                with pytest.raises(ValueError):
+                    await runtime_settings.refresh_settings()
+                assert (
+                    await client.get("/api/v1/university", headers=headers)
+                ).json() == response.json()
+                monkeypatch.setenv("SETTINGS_ENCRYPTION_KEY", key)
+                async with maker() as connection:
+                    await InstanceSettingsService(connection).write(
+                        {"UNIVERSITY_PROFILE": "nsu"}, 1
+                    )
+                await runtime_settings.refresh_settings()
+                response = await client.get("/api/v1/university", headers=headers)
+                assert response.status_code == 200
+                assert response.json()["profile"] == "nsu"
+    finally:
+        app.dependency_overrides.pop(get_async_session, None)
+
+
+async def test_successful_empty_snapshot_is_loaded(test_engine, monkeypatch):
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+
+    from bootstrap import runtime_settings
+
+    monkeypatch.setattr(
+        runtime_settings, "AsyncSessionLocal", async_sessionmaker(test_engine)
+    )
+    monkeypatch.setattr(runtime_settings, "engine", test_engine)
+    async with runtime_settings.runtime_settings():
+        assert instance.is_loaded()
+        assert instance.revision() == 0
+        assert instance.get_setting("UNIVERSITY_PROFILE") == "nsu"
 
 
 async def test_reject_embedding_change_for_existing_index(session, tmp_path):
