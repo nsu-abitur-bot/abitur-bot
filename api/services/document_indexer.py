@@ -1,4 +1,7 @@
+import asyncio
 import logging
+import os
+import time
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +15,62 @@ from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
 
 logger = logging.getLogger(__name__)
 
+# Статусы, при которых новая версия считается успешно проиндексированной.
+_READY_STATUSES: frozenset[str] = frozenset({"processed", "preprocessed"})
+# Статус окончательного сбоя — переключение запрещено.
+_FAILED_STATUS = "failed"
+
+
+async def _wait_for_doc_ready(
+    graph_id: str,
+    new_rag_doc_id: str,
+    timeout: float = 30.0,
+    poll_interval: float = 0.05,
+) -> bool:
+    """Ожидает перехода нового документа в статус PROCESSED/PREPROCESSED.
+
+    Причины ожидания и строгой проверки:
+    - saved_count > 0 не гарантирует успешности: GraphMemory.save() возвращает True,
+      если rag.ainsert() завершился, но LightRAG перехватывает сбои extraction/merge
+      и сохраняет DocStatus.FAILED без выбрасывания исключения.
+    - При занятом pipeline обработка лишь ставится в очередь (DocStatus.PENDING),
+      а ainsert() уже возвращается.
+    В обоих случаях переключение Postgres и удаление старой версии недопустимы,
+    пока не подтверждён успешный PROCESSED именно для new_rag_doc_id.
+    """
+    memory = get_graph_memory()
+    if not hasattr(memory, "get_doc_status"):
+        return True
+
+    start_time = time.monotonic()
+    while True:
+        status = await memory.get_doc_status(graph_id, new_rag_doc_id)
+        if status in _READY_STATUSES:
+            return True
+
+        if status == _FAILED_STATUS:
+            logger.error(
+                "Новая версия документа %s в графе %s помечена как FAILED в LightRAG;"
+                " переключение отменено, старая версия сохранена",
+                new_rag_doc_id,
+                graph_id,
+            )
+            return False
+
+        elapsed = time.monotonic() - start_time
+        if elapsed >= timeout:
+            logger.warning(
+                "Новая версия документа %s в графе %s не достигла PROCESSED за %.2fс"
+                " (status=%r); переключение отменено, старая версия сохранена",
+                new_rag_doc_id,
+                graph_id,
+                elapsed,
+                status,
+            )
+            return False
+
+        await asyncio.sleep(min(poll_interval, max(0.001, timeout - elapsed)))
+
 
 async def index_document(
     *,
@@ -24,16 +83,21 @@ async def index_document(
     graph_id: str = DEFAULT_GRAPH_ID,
     session: Optional[AsyncSession] = None,
     document_service: Optional[DocumentService] = None,
+    wait_timeout: Optional[float] = None,
 ) -> Optional[Document]:
-    """Индексирует документ в RAG с безопасной заменой версии (add -> switch -> delete).
+    """Индексирует документ в RAG с безопасной заменой версии (add → switch → delete).
 
     Порядок:
     1. ADD: индексируем новую версию под новым rag_doc_id.
-    2. SWITCH: при успехе атомарно переключаем Document.rag_doc_id на новый ID в Postgres.
-    3. DELETE: удаляем старую версию (old_rag_doc_id) из LightRAG.
+    2. VERIFY: ожидаем статус PROCESSED именно для new_rag_doc_id.
+       При FAILED или незавершённой обработке (PENDING/таймаут очереди)
+       старая версия сохраняется, переключение в Postgres не выполняется.
+    3. SWITCH: при подтверждённом PROCESSED атомарно переключаем
+       Document.rag_doc_id в Postgres.
+    4. DELETE: удаляем старую версию из LightRAG через delete_doc_safe,
+       сохраняя чанки, общие с новой версией (chunk_id = hash(text)).
 
-    При сбое индексации старая версия документа остаётся нетронутой в RAG
-    и доступной боту.
+    При любом сбое на шагах 1–2 старая версия документа остаётся нетронутой.
     """
     if document_service is None:
         if session is not None:
@@ -49,6 +113,7 @@ async def index_document(
                     file_path=file_path,
                     graph_id=graph_id,
                     session=auto_session,
+                    wait_timeout=wait_timeout,
                 )
 
     resolved_title = (
@@ -103,7 +168,23 @@ async def index_document(
             await document_service.mark_error(document.id)
         return None
 
-    # 2. SWITCH: атомарно переключаем Document.rag_doc_id и фиксируем в БД
+    # 2. VERIFY: дожидаемся подтверждённого статуса PROCESSED для new_rag_doc_id
+    resolved_wait_timeout = (
+        wait_timeout
+        if wait_timeout is not None
+        else float(os.getenv("RAG_INDEX_WAIT_TIMEOUT", "30.0"))
+    )
+    new_doc_ready = await _wait_for_doc_ready(
+        graph_id,
+        new_rag_doc_id,
+        timeout=resolved_wait_timeout,
+    )
+    if not new_doc_ready:
+        if hasattr(document_service, "mark_error"):
+            await document_service.mark_error(document.id)
+        return None
+
+    # 3. SWITCH: атомарно переключаем Document.rag_doc_id и фиксируем в БД
     updated_doc = await document_service.mark_indexed(
         document.id,
         content_hash=content_hash,
@@ -113,11 +194,23 @@ async def index_document(
         rag_doc_id=new_rag_doc_id,
     )
 
-    # 3. DELETE: удаляем старую версию документа из RAG
+    # 4. DELETE: удаляем старую версию документа из RAG, сохраняя общие чанки
     if old_rag_doc_id and old_rag_doc_id != new_rag_doc_id:
         try:
             memory = get_graph_memory()
-            await memory.delete_doc(graph_id, old_rag_doc_id)
+            if hasattr(memory, "delete_doc_safe"):
+                new_chunks = (
+                    await memory.get_chunks_list(graph_id, new_rag_doc_id)
+                    if hasattr(memory, "get_chunks_list")
+                    else []
+                )
+                await memory.delete_doc_safe(
+                    graph_id,
+                    old_rag_doc_id,
+                    preserve_chunk_ids=set(new_chunks),
+                )
+            else:
+                await memory.delete_doc(graph_id, old_rag_doc_id)
         except Exception as exc:
             logger.warning(
                 "Не удалось удалить старую версию документа %s (rag_doc_id=%s): %s",

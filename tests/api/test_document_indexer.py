@@ -41,6 +41,33 @@ class FakeDocumentService:
         return True
 
 
+class BaseFakeMemory:
+    def __init__(self, status: str = "processed", chunks: list[str] | None = None):
+        self.status = status
+        self.chunks = chunks if chunks is not None else ["chunk-1"]
+        self.delete_doc_calls: list[tuple[str, str]] = []
+        self.delete_doc_safe_calls: list[tuple[str, str, set[str] | None]] = []
+
+    async def get_doc_status(self, graph_id: str, doc_id: str) -> str | None:
+        return self.status
+
+    async def get_chunks_list(self, graph_id: str, doc_id: str) -> list[str]:
+        return list(self.chunks)
+
+    async def delete_doc(self, graph_id: str, doc_id: str) -> bool:
+        self.delete_doc_calls.append((graph_id, doc_id))
+        return True
+
+    async def delete_doc_safe(
+        self,
+        graph_id: str,
+        old_doc_id: str,
+        preserve_chunk_ids: set[str] | None = None,
+    ) -> bool:
+        self.delete_doc_safe_calls.append((graph_id, old_doc_id, preserve_chunk_ids))
+        return True
+
+
 @pytest.mark.asyncio
 async def test_index_document_preserves_old_version_when_indexing_fails(monkeypatch):
     """При сбое индексации старый документ не удаляется, а rag_doc_id не меняется."""
@@ -52,13 +79,10 @@ async def test_index_document_preserves_old_version_when_indexing_fails(monkeypa
         events.append("add_failed")
         raise RuntimeError("LLM embedding timeout / API key expired")
 
-    class FakeMemory:
-        async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
-            events.append(("delete_doc", graph_id, doc_id))
-            return True
+    fake_memory = BaseFakeMemory()
 
     monkeypatch.setattr(document_indexer, "add_texts_async", failing_add_texts_async)
-    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: fake_memory)
 
     result = await document_indexer.index_document(
         document=cast(Document, doc),
@@ -68,13 +92,9 @@ async def test_index_document_preserves_old_version_when_indexing_fails(monkeypa
     )
 
     assert result is None
-    # Главное требование: старый документ НЕ должен быть удален!
-    deleted_doc_ids = [
-        evt[2]
-        for evt in events
-        if isinstance(evt, tuple) and len(evt) > 2 and evt[0] == "delete_doc"
-    ]
-    assert "old-rag-doc-v1" not in deleted_doc_ids
+    # Старый документ НЕ должен быть удален
+    assert len(fake_memory.delete_doc_calls) == 0
+    assert len(fake_memory.delete_doc_safe_calls) == 0
 
     # Document.rag_doc_id в БД по-прежнему указывает на старую версию
     assert doc.rag_doc_id == "old-rag-doc-v1"
@@ -89,18 +109,13 @@ async def test_index_document_preserves_old_version_when_saved_count_zero(monkey
     """
     doc = FakeDocument(doc_id="doc-123", rag_doc_id="old-rag-doc-v1")
     service = FakeDocumentService(document=doc)
-    deleted_calls = []
+    fake_memory = BaseFakeMemory()
 
     async def zero_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
         return 0
 
-    class FakeMemory:
-        async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
-            deleted_calls.append((graph_id, doc_id))
-            return True
-
     monkeypatch.setattr(document_indexer, "add_texts_async", zero_add_texts_async)
-    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: fake_memory)
 
     result = await document_indexer.index_document(
         document=cast(Document, doc),
@@ -110,7 +125,75 @@ async def test_index_document_preserves_old_version_when_saved_count_zero(monkey
     )
 
     assert result is None
-    assert ("abitur_kb", "old-rag-doc-v1") not in deleted_calls
+    assert len(fake_memory.delete_doc_calls) == 0
+    assert len(fake_memory.delete_doc_safe_calls) == 0
+    assert doc.rag_doc_id == "old-rag-doc-v1"
+    assert doc.status == "ошибка индексации"
+
+
+@pytest.mark.asyncio
+async def test_index_document_preserves_old_on_internal_failed_status(
+    monkeypatch,
+):
+    """[P1] LightRAG перехватил ошибку extraction/merge и сохранил DocStatus.FAILED без
+    исключения из ainsert(). saved_count > 0, но переключение в Postgres и удаление
+    старой версии должны быть заблокированы.
+    """
+    doc = FakeDocument(doc_id="doc-fail", rag_doc_id="old-rag-doc-v1")
+    service = FakeDocumentService(document=doc)
+    # add_texts_async вернул 1, но статус документа в LightRAG — failed
+    fake_memory = BaseFakeMemory(status="failed")
+
+    async def fake_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
+        return 1
+
+    monkeypatch.setattr(document_indexer, "add_texts_async", fake_add_texts_async)
+    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: fake_memory)
+
+    result = await document_indexer.index_document(
+        document=cast(Document, doc),
+        text="Текст с упавшей обработкой",
+        content_hash="hash-failed",
+        document_service=cast(DocumentService, service),
+    )
+
+    assert result is None
+    # Старый документ НЕ должен быть удален!
+    assert len(fake_memory.delete_doc_safe_calls) == 0
+    assert len(fake_memory.delete_doc_calls) == 0
+
+    # Document.rag_doc_id остался неизменным
+    assert doc.rag_doc_id == "old-rag-doc-v1"
+    assert doc.status == "ошибка индексации"
+
+
+@pytest.mark.asyncio
+async def test_index_document_preserves_old_version_on_busy_queue(monkeypatch):
+    """[P1] При занятом pipeline ainsert() ставит задачу в очередь (PENDING) и
+    возвращается немедленно. Документ не успевает стать PROCESSED за время таймаута;
+    старая версия должна быть сохранена.
+    """
+    doc = FakeDocument(doc_id="doc-busy", rag_doc_id="old-rag-doc-v1")
+    service = FakeDocumentService(document=doc)
+    # Статус остаётся pending
+    fake_memory = BaseFakeMemory(status="pending")
+
+    async def fake_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
+        return 1
+
+    monkeypatch.setattr(document_indexer, "add_texts_async", fake_add_texts_async)
+    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: fake_memory)
+
+    result = await document_indexer.index_document(
+        document=cast(Document, doc),
+        text="Текст в очередь",
+        content_hash="hash-busy",
+        document_service=cast(DocumentService, service),
+        wait_timeout=0.02,
+    )
+
+    assert result is None
+    assert len(fake_memory.delete_doc_safe_calls) == 0
     assert doc.rag_doc_id == "old-rag-doc-v1"
     assert doc.status == "ошибка индексации"
 
@@ -136,13 +219,20 @@ async def test_index_document_order_add_switch_delete(monkeypatch):
 
     service.mark_indexed = tracked_mark_indexed
 
-    class FakeMemory:
-        async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
-            operation_log.append(("delete", doc_id))
+    class TrackedFakeMemory(BaseFakeMemory):
+        async def delete_doc_safe(
+            self,
+            graph_id: str,
+            old_doc_id: str,
+            preserve_chunk_ids: set[str] | None = None,
+        ) -> bool:
+            operation_log.append(("delete", old_doc_id, preserve_chunk_ids))
             return True
 
+    fake_memory = TrackedFakeMemory(status="processed", chunks=["chunk-x1", "chunk-x2"])
+
     monkeypatch.setattr(document_indexer, "add_texts_async", fake_add_texts_async)
-    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: fake_memory)
 
     result = await document_indexer.index_document(
         document=cast(Document, doc),
@@ -156,7 +246,7 @@ async def test_index_document_order_add_switch_delete(monkeypatch):
 
     add_op, new_id = operation_log[0]
     switch_op, switch_id = operation_log[1]
-    delete_op, delete_id = operation_log[2]
+    delete_op, delete_id, preserved = operation_log[2]
 
     assert add_op == "add"
     assert switch_op == "switch"
@@ -166,8 +256,9 @@ async def test_index_document_order_add_switch_delete(monkeypatch):
     assert new_id != "old-rag-doc-v1"
     # Переключение переключило ровно на новый rag_doc_id
     assert switch_id == new_id
-    # Удаление удалило именно старый rag_doc_id
+    # Удаление удалило именно старый rag_doc_id с защитой чанков новой версии
     assert delete_id == "old-rag-doc-v1"
+    assert preserved == {"chunk-x1", "chunk-x2"}
 
     # В объекте документа теперь новый rag_doc_id
     assert result.rag_doc_id == new_id
@@ -182,12 +273,19 @@ async def test_index_document_cleans_up_if_delete_fails(monkeypatch):
     async def fake_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
         return 1
 
-    class FakeMemory:
-        async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
+    class FailingDeleteMemory(BaseFakeMemory):
+        async def delete_doc_safe(
+            self,
+            graph_id: str,
+            old_doc_id: str,
+            preserve_chunk_ids: set[str] | None = None,
+        ) -> bool:
             raise RuntimeError("Delete error from LightRAG")
 
     monkeypatch.setattr(document_indexer, "add_texts_async", fake_add_texts_async)
-    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+    monkeypatch.setattr(
+        document_indexer, "get_graph_memory", lambda: FailingDeleteMemory()
+    )
 
     result = await document_indexer.index_document(
         document=cast(Document, doc),
