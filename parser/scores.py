@@ -16,10 +16,11 @@
 import logging
 import re
 
-import requests
+import httpx
 from bs4 import BeautifulSoup, Tag
 
 from db.postgres.services.admission_score import ScoreRow
+from parser.safe_fetch import UnsafeURLError, fetch_url_async
 
 logger = logging.getLogger(__name__)
 
@@ -231,9 +232,9 @@ async def parse_scores(url: str = DEFAULT_SCORES_URL) -> list[ScoreRow]:
     пропускаются.
     """
     try:
-        response = requests.get(url, headers=_HEADERS, timeout=30)
+        response = await fetch_url_async(url, headers=_HEADERS)
         response.raise_for_status()
-    except requests.exceptions.RequestException as exc:
+    except (httpx.HTTPError, UnsafeURLError) as exc:
         logger.error("Ошибка загрузки страницы итогов приёма %s: %s", url, exc)
         return []
 
