@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.postgres.db import get_async_session
@@ -50,51 +51,39 @@ async def register(
 ) -> AdminResponse:
     service = AdminService(session)
 
-    total = await service.count()
-    is_first = total == 0
+    if not body.invite_code:
+        raise HTTPException(status_code=400, detail="Invite code required")
 
-    invite = None
-    role = AdminRole.superadmin if is_first else AdminRole.admin
-
-    if not is_first:
-        if not body.invite_code:
+    try:
+        invite = await service.consume_invite_code(body.invite_code)
+        if invite is None:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invite code required",
+                status_code=400, detail="Invalid, expired or already used invite code"
             )
-        invite = await service.get_invite_code(body.invite_code)
-        if invite is None or invite.used_at is not None:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid or already used invite code",
-            )
-        if invite.expires_at and invite.expires_at < datetime.now(UTC).replace(
-            tzinfo=None
+        admin = await service.create(
+            username=body.username,
+            password_hash=hash_password(body.password),
+            role=AdminRole(invite.role),
+            created_by_id=invite.created_by_id,
+        )
+        invite.used_by_id = admin.id
+        await session.commit()
+    except IntegrityError as exc:
+        await session.rollback()
+        # asyncpg exposes the server constraint on the wrapped driver exception.
+        cause = getattr(exc.orig, "__cause__", None)
+        if (
+            getattr(cause, "sqlstate", None) == "23505"
+            and getattr(cause, "constraint_name", None) == "admins_username_key"
         ):
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invite code has expired",
-            )
-        role = AdminRole(invite.role)
+                status_code=409, detail="Username already taken"
+            ) from None
+        raise
+    except Exception:
+        await session.rollback()
+        raise
 
-    if await service.get_by_username(body.username) is not None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Username already taken",
-        )
-
-    created_by_id = invite.created_by_id if invite else None
-    admin = await service.create(
-        username=body.username,
-        password_hash=hash_password(body.password),
-        role=role,
-        created_by_id=created_by_id,
-    )
-
-    if invite is not None and body.invite_code:
-        await service.use_invite_code(body.invite_code, admin.id)
-
-    await session.commit()
     return AdminResponse.model_validate(admin)
 
 
