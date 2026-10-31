@@ -39,11 +39,16 @@ def _fixture_pipeline() -> Iterator[Runner]:
     from pipeline import llm_client
 
     class MemoryHistory:
-        async def add_message(self, session_id: str, message: dict) -> None:
-            pass
+        def __init__(self) -> None:
+            self._storage: dict[str, list[dict]] = {}
 
-        async def get_history(self, session_id: str) -> list:
-            return []
+        async def add_message(self, session_id: str, message: dict) -> None:
+            self._storage.setdefault(session_id, []).append(message)
+
+        async def get_history(self, session_id: str) -> list[dict]:
+            return list(self._storage.get(session_id, []))
+
+    mem_history = MemoryHistory()
 
     faq_items = [
         {"question": "Какие факультеты есть в НГУ?", "answer": "ФИТ, ФЕН, ГГФ."},
@@ -82,13 +87,19 @@ def _fixture_pipeline() -> Iterator[Runner]:
                 "Тестовый контекст НГУ." in str(message.content) for message in messages
             ):
                 return LLMResult(text="Тестовый контекст НГУ.")
+            if "ммф" in question.casefold() or any(
+                "Тестовый контекст ММФ." in str(message.content) for message in messages
+            ):
+                return LLMResult(text="Тестовый контекст ММФ.")
             return LLMResult(text="Информация не найдена.")
 
     async def history() -> MemoryHistory:
-        return MemoryHistory()
+        return mem_history
 
-    async def retrieve(*args, **kwargs):
-        return "Тестовый контекст НГУ.", []
+    async def retrieve(query: str, conversation_history: str | None = None, **kwargs):
+        if "ммф" in query.casefold():
+            return "Тестовый контекст ММФ.", [{"url": "https://mmf.nsu.ru/admission"}]
+        return "Тестовый контекст НГУ.", [{"url": "https://nsu.ru/info"}]
 
     async def config():
         return SimpleNamespace(enabled=True)

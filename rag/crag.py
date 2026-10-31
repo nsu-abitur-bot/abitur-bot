@@ -23,7 +23,7 @@ import os
 import re
 import time
 from dataclasses import dataclass, field
-from typing import Awaitable, Callable, Optional
+from typing import Awaitable, Callable, Optional, Sequence
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
@@ -175,43 +175,76 @@ def detect_level(question: str) -> Optional[str]:
     return None
 
 
-async def detect_faculty_hint(question: str) -> FacultyHint:
+def _match_faculty(
+    faculties: Sequence[Faculty],
+    text: str,
+) -> Optional[Faculty]:
+    normalized_text = normalize_name(text)
+    if not normalized_text:
+        return None
+
+    tokens = set(re.findall(r"[\wа-яё]+", normalized_text))
+    best: Optional[Faculty] = None
+    best_len = 0
+    for faculty in faculties:
+        candidates = [faculty.name, *(faculty.aliases or [])]
+        for candidate in candidates:
+            norm = normalize_name(candidate)
+            if not norm:
+                continue
+            matched = False
+            if " " in norm:
+                matched = norm in normalized_text
+            else:
+                matched = norm in tokens
+            if matched and len(norm) > best_len:
+                best = faculty
+                best_len = len(norm)
+    return best
+
+
+async def detect_faculty_hint(
+    question: str,
+    conversation_history: Optional[str] = None,
+) -> FacultyHint:
     """Ищет в вопросе упоминание факультета (по названию/алиасу) и уровня.
 
     Сопоставление идёт по справочнику Faculty: проверяем, встречается ли имя
     факультета или любой из его алиасов как отдельное слово/подстрока вопроса.
+    Приоритет отдаётся текущему вопросу: если в нём явно назван факультет,
+    он выбирается независимо от наличия других факультетов в истории диалога.
+    Если в текущем вопросе факультет не найден, поиск продолжается в истории.
     """
     level = detect_level(question)
-    normalized_q = normalize_name(question)
-    if not normalized_q:
-        return FacultyHint(faculty=None, level=level)
-
-    # Готовим набор «слов» вопроса для матчинга коротких аббревиатур (ФИТ, ЭФ),
-    # чтобы случайно не словить аббревиатуру внутри другого слова.
-    question_tokens = set(re.findall(r"[\wа-яё]+", normalized_q))
+    if level is None and conversation_history:
+        for line in reversed(conversation_history.splitlines()):
+            if not line.strip():
+                continue
+            lvl = detect_level(line)
+            if lvl is not None:
+                level = lvl
+                break
+        if level is None:
+            level = detect_level(conversation_history)
 
     try:
         async with AsyncSessionLocal() as session:
             faculties = await FacultyService(session).get_all_faculties(only_active=True)
-            best: Optional[Faculty] = None
-            best_len = 0
-            for faculty in faculties:
-                candidates = [faculty.name, *(faculty.aliases or [])]
-                for candidate in candidates:
-                    norm = normalize_name(candidate)
-                    if not norm:
+            # 1. Приоритет: ищем факультет в текущем вопросе
+            best = _match_faculty(faculties, question)
+
+            # 2. Если в вопросе факультет не упомянут — ищем в истории диалога
+            if best is None and conversation_history:
+                for line in reversed(conversation_history.splitlines()):
+                    if not line.strip():
                         continue
-                    matched = False
-                    if " " in norm:
-                        # Многословное название — ищем как подстроку.
-                        matched = norm in normalized_q
-                    else:
-                        # Одно слово/аббревиатура — точное совпадение токена.
-                        matched = norm in question_tokens
-                    # Берём самое длинное совпадение (наиболее специфичное).
-                    if matched and len(norm) > best_len:
-                        best = faculty
-                        best_len = len(norm)
+                    found = _match_faculty(faculties, line)
+                    if found is not None:
+                        best = found
+                        break
+                if best is None:
+                    best = _match_faculty(faculties, conversation_history)
+
             return FacultyHint(faculty=best, level=level)
     except Exception as exc:
         logger.warning("CRAG: не удалось определить факультет из вопроса: %s", exc)
@@ -360,7 +393,10 @@ def _scrub_chunk(
 
 
 def _build_grading_prompt(
-    question: str, hint: FacultyHint, chunk: CragChunk
+    question: str,
+    hint: FacultyHint,
+    chunk: CragChunk,
+    conversation_history: Optional[str] = None,
 ) -> tuple[str, str]:
     faculty_clause = ""
     if hint.faculty is not None:
@@ -391,7 +427,12 @@ def _build_grading_prompt(
         "score=0 — фрагмент не относится к вопросу."
         f"{faculty_clause}{level_clause}"
     )
-    user_prompt = f"Вопрос: {question}\n\nФрагмент:\n{chunk.content}"
+    history_prefix = (
+        f"Контекст предыдущего диалога:\n{conversation_history}\n\n"
+        if conversation_history
+        else ""
+    )
+    user_prompt = f"{history_prefix}Вопрос: {question}\n\nФрагмент:\n{chunk.content}"
     return system_prompt, user_prompt
 
 
@@ -415,10 +456,16 @@ def _parse_grade(raw: str) -> tuple[float, Optional[bool]]:
 
 
 async def grade_chunk(
-    question: str, hint: FacultyHint, chunk: CragChunk, config: CragConfig
+    question: str,
+    hint: FacultyHint,
+    chunk: CragChunk,
+    config: CragConfig,
+    conversation_history: Optional[str] = None,
 ) -> bool:
     """LLM-грейдинг одного чанка. True — оставить, False — отсеять."""
-    system_prompt, user_prompt = _build_grading_prompt(question, hint, chunk)
+    system_prompt, user_prompt = _build_grading_prompt(
+        question, hint, chunk, conversation_history=conversation_history
+    )
     provider = get_llm_provider()
     try:
         raw = await provider.generate(
@@ -451,6 +498,7 @@ async def filter_chunks(
     question: str,
     chunks: list[CragChunk],
     config: Optional[CragConfig] = None,
+    conversation_history: Optional[str] = None,
 ) -> tuple[list[CragChunk], FacultyHint]:
     """Применяет CRAG-фильтр к списку чанков.
 
@@ -459,7 +507,7 @@ async def filter_chunks(
     max_graded_chunks для контроля латентности).
     """
     config = config or get_crag_config()
-    hint = await detect_faculty_hint(question)
+    hint = await detect_faculty_hint(question, conversation_history=conversation_history)
 
     if not chunks:
         return [], hint
@@ -490,7 +538,16 @@ async def filter_chunks(
 
     async def _grade_with_limit(chunk: CragChunk) -> bool:
         async with semaphore:
-            return await grade_chunk(question, hint, chunk, config)
+            try:
+                return await grade_chunk(
+                    question,
+                    hint,
+                    chunk,
+                    config,
+                    conversation_history=conversation_history,
+                )
+            except TypeError:
+                return await grade_chunk(question, hint, chunk, config)
 
     # gather сохраняет порядок to_grade, поэтому итоговый список не переупорядочивается.
     grading_start = time.monotonic()
@@ -516,18 +573,30 @@ async def filter_chunks(
     return kept, hint
 
 
-async def refine_query(question: str, hint: FacultyHint) -> str:
+async def refine_query(
+    question: str,
+    hint: FacultyHint,
+    conversation_history: Optional[str] = None,
+) -> str:
     """Одна попытка переформулировать запрос для повторного ретрива."""
     faculty_clause = (
         f" Сохрани упоминание факультета «{hint.faculty.name}»."
         if hint.faculty is not None
         else ""
     )
+    history_clause = (
+        f" Учитывай контекст предыдущего диалога:\n{conversation_history}\n"
+        if conversation_history
+        else ""
+    )
     system_prompt = (
         "Ты помогаешь улучшить поисковый запрос к базе знаний. "
         "Переформулируй вопрос так, чтобы он точнее находил релевантные документы: "
-        "добавь ключевые синонимы, раскрой аббревиатуры." + faculty_clause + " "
-        "Верни ТОЛЬКО переформулированный запрос одной строкой, без пояснений."
+        "добавь ключевые синонимы, раскрой аббревиатуры."
+        + faculty_clause
+        + " "
+        + history_clause
+        + "Верни ТОЛЬКО переформулированный запрос одной строкой, без пояснений."
     )
     provider = get_llm_provider()
     try:
@@ -554,6 +623,7 @@ async def run_crag(
     chunks: list[CragChunk],
     retrieve_fn: Optional[CragRetrieveFn] = None,
     config: Optional[CragConfig] = None,
+    conversation_history: Optional[str] = None,
 ) -> tuple[list[CragChunk], FacultyHint]:
     """Полный CRAG-цикл: фильтр → (при нехватке) одна доретрив-итерация.
 
@@ -561,7 +631,9 @@ async def run_crag(
     Если она не передана или доретрив выключен, ограничиваемся одним проходом.
     """
     config = config or get_crag_config()
-    kept, hint = await filter_chunks(question, chunks, config)
+    kept, hint = await filter_chunks(
+        question, chunks, config, conversation_history=conversation_history
+    )
 
     if len(kept) >= config.min_chunks or not config.allow_refine or retrieve_fn is None:
         return kept, hint
@@ -571,7 +643,9 @@ async def run_crag(
         len(kept),
         config.min_chunks,
     )
-    refined = await refine_query(question, hint)
+    refined = await refine_query(
+        question, hint, conversation_history=conversation_history
+    )
     if normalize_name(refined) == normalize_name(question):
         return kept, hint
 
@@ -589,7 +663,9 @@ async def run_crag(
             merged.append(c)
             seen.add(c.content)
 
-    refined_kept, _ = await filter_chunks(question, merged, config)
+    refined_kept, _ = await filter_chunks(
+        question, merged, config, conversation_history=conversation_history
+    )
     logger.info(
         "CRAG: после доретрива kept=%d (было %d)",
         len(refined_kept),

@@ -28,9 +28,20 @@ async def prepare_product() -> None:
 
 
 async def run_product(scenario: Scenario, session_id: str) -> Observation:
+    if scenario.history:
+        from pipeline.llm_client import get_redis_client
+
+        redis_client = await get_redis_client()
+        for entry in scenario.history:
+            await redis_client.add_message(session_id, entry)
+
     answer = await ask_local_llm(scenario.question, session_id=session_id, user_id=0)
+    sources = [
+        s.get("url") if isinstance(s, dict) else str(s) for s in (answer.sources or [])
+    ]
     return Observation(
         text=answer.text,
         tools_called=answer.trace.tools_called,
         faq_matched=answer.trace.faq_matched,
+        sources=[s for s in sources if s],
     )
