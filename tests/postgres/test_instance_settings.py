@@ -93,6 +93,8 @@ async def test_university_initial_failure_recovery_and_last_good(
                 transport=ASGITransport(app), base_url="http://test"
             ) as client:
                 assert (await client.get("/api/v1/university")).status_code == 401
+                public = await client.get("/api/v1/university/profile")
+                assert public.status_code == 503
                 headers = {"Authorization": f"Bearer {token}"}
                 response = await client.get("/api/v1/university", headers=headers)
                 assert response.status_code == 503
@@ -101,6 +103,9 @@ async def test_university_initial_failure_recovery_and_last_good(
                 response = await client.get("/api/v1/university", headers=headers)
                 assert response.status_code == 200
                 assert response.json()["profile"] == "custom"
+                public = await client.get("/api/v1/university/profile")
+                assert public.status_code == 200
+                assert public.json() == {"profile": "custom"}
                 assert response.json()["short_name"] == "Север"
                 assert "private-fixture" not in response.text
                 monkeypatch.setenv(
@@ -111,6 +116,9 @@ async def test_university_initial_failure_recovery_and_last_good(
                 assert (
                     await client.get("/api/v1/university", headers=headers)
                 ).json() == response.json()
+                public = await client.get("/api/v1/university/profile")
+                assert public.status_code == 200
+                assert public.json() == {"profile": "custom"}
                 monkeypatch.setenv("SETTINGS_ENCRYPTION_KEY", key)
                 async with maker() as connection:
                     await InstanceSettingsService(connection).write(
@@ -120,6 +128,9 @@ async def test_university_initial_failure_recovery_and_last_good(
                 response = await client.get("/api/v1/university", headers=headers)
                 assert response.status_code == 200
                 assert response.json()["profile"] == "nsu"
+                public = await client.get("/api/v1/university/profile")
+                assert public.status_code == 200
+                assert public.json() == {"profile": "nsu"}
     finally:
         app.dependency_overrides.pop(get_async_session, None)
 
@@ -135,6 +146,12 @@ async def test_successful_empty_snapshot_is_loaded(test_engine, monkeypatch):
     monkeypatch.setattr(runtime_settings, "engine", test_engine)
     async with runtime_settings.runtime_settings():
         assert instance.is_loaded()
+        async with AsyncClient(
+            transport=ASGITransport(app), base_url="http://test"
+        ) as client:
+            response = await client.get("/api/v1/university/profile")
+            assert response.status_code == 200
+            assert response.json() == {"profile": "nsu"}
         assert instance.revision() == 0
         assert instance.get_setting("UNIVERSITY_PROFILE") == "nsu"
 

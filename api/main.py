@@ -248,3 +248,14 @@ async def get_university() -> dict[str, str]:
     if not is_loaded():
         raise HTTPException(status_code=503, detail="University settings unavailable")
     return {**identity(), "profile": "nsu" if is_nsu() else "custom"}
+
+
+@app.get("/api/v1/university/profile")
+async def get_university_profile() -> dict[str, str]:
+    """Public capability gate for the university-specific rating page."""
+    from config.instance import is_loaded
+    from config.university import is_nsu
+
+    if not is_loaded():
+        raise HTTPException(status_code=503, detail="University settings unavailable")
+    return {"profile": "nsu" if is_nsu() else "custom"}
