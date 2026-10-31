@@ -97,7 +97,7 @@ localhost разделяют localStorage, но cookie не изолируютс
 git pull --ff-only
 git -C ../abitur-web pull --ff-only
 docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml pull api migrate permissions
-docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml up -d --force-recreate
+docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml up -d --build --force-recreate
 docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml logs --tail 100 api migrate web
 ```
 
@@ -108,7 +108,8 @@ GitHub Actions публикует backend в `ghcr.io/nsu-abitur-bot/abitur-bot`
 каждого push в `main`: обновляемый тег `main` и неизменяемый
 `sha-<полный SHA коммита>`. Для приватного пакета серверу нужен `docker login ghcr.io`
 с токеном, имеющим `read:packages`. Backend на сервере только скачивается;
-UI по-прежнему собирается из соседнего checkout `abitur-web`.
+UI по-прежнему собирается из соседнего checkout `abitur-web` (флаг `--build`
+пересобирает образ `web`, тогда как `pull` выбирает только backend-сервисы).
 Новые healthcheck приложения относятся к #241; используются существующие проверки
 готовности PostgreSQL/Redis и порядок запуска, а не обещание готовности API/UI.
 

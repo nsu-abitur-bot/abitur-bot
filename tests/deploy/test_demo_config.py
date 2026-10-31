@@ -70,3 +70,26 @@ def test_two_demo_configs_have_distinct_storage_and_secrets(tmp_path: Path) -> N
             for service in services.values()
             for volume in service.get("volumes", [])
         )
+
+
+def test_publish_image_workflow_concurrency_and_tags() -> None:
+    import yaml
+
+    workflow_path = ROOT / ".github/workflows/publish-image.yml"
+    assert workflow_path.exists()
+    data = yaml.safe_load(workflow_path.read_text())
+    assert "concurrency" in data
+    assert data["concurrency"]["cancel-in-progress"] is True
+    assert "github.ref" in str(data["concurrency"]["group"])
+    tags = data["jobs"]["publish"]["steps"][-1]["with"]["tags"]
+    assert "ghcr.io/${{ github.repository }}:main" in tags
+    assert "ghcr.io/${{ github.repository }}:sha-${{ github.sha }}" in tags
+
+
+def test_demo_instances_doc_rebuilds_web_on_update() -> None:
+    doc_path = ROOT / "docs/demo-instances.md"
+    content = doc_path.read_text()
+    assert (
+        "docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml "
+        "up -d --build --force-recreate"
+    ) in content
