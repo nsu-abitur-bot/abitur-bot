@@ -6,6 +6,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abbrev.expander import get_abbrev_expander
+from api.services.document_indexer import index_document
 from db.postgres.models import Document
 from db.postgres.services.document import (
     DOCUMENT_STATUS_CHANGED,
@@ -17,8 +18,7 @@ from db.postgres.services.document import (
     DocumentService,
 )
 from parser.url import process_url
-from rag.graph_memory import get_graph_memory
-from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
+from rag.loader import DEFAULT_GRAPH_ID
 
 logger = logging.getLogger(__name__)
 
@@ -149,27 +149,21 @@ class DocumentUpdateService:
             raise ValueError("После обработки текст документа пустой")
 
         previous_hash = document.content_hash
-        old_rag_doc_id = document.rag_doc_id
-        memory = get_graph_memory()
-        await memory.delete_doc(self.graph_id, old_rag_doc_id)
-        saved_count = await add_texts_async(
-            texts=[prepared_text],
+        indexed_doc = await index_document(
+            document=document,
+            text=prepared_text,
+            content_hash=content_hash,
+            file_path=document.source_url,
             graph_id=self.graph_id,
-            source_ids=[document.id],
-            file_paths=[document.source_url],
+            session=self.session,
+            document_service=self.documents,
         )
-        if saved_count == 0:
+        if not indexed_doc:
             raise ValueError("Не удалось сохранить обновленный документ в RAG")
 
-        updated = await self.documents.mark_indexed(
-            document.id,
-            content_hash=content_hash,
-            content_length=len(prepared_text),
-            rag_doc_id=document.id,
-        )
         return {
             "id": document.id,
-            "title": updated.title if updated else document.title,
+            "title": indexed_doc.title if indexed_doc else document.title,
             "source_url": document.source_url,
             "status": DOCUMENT_STATUS_UPDATED,
             "content_hash": content_hash,

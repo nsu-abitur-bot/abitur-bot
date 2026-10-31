@@ -11,6 +11,7 @@ from urllib.parse import unquote, urlsplit
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
+from lightrag.base import DocStatus
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
 
@@ -634,7 +635,7 @@ class GraphMemory:
                         graph_id,
                         error,
                     )
-                    await self.delete_doc(graph_id, doc_id)
+                    await self.delete_doc_safe(graph_id, doc_id)
                 return False
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
@@ -1581,6 +1582,205 @@ class GraphMemory:
                     zf.write(file_path, arcname=os.path.join(graph_id, filename))
         buffer.seek(0)
         return buffer.getvalue()
+
+    async def get_doc_status(self, graph_id: str, doc_id: str) -> str | None:
+        """Возвращает статус документа в LightRAG («pending», «processed», «failed»).
+
+        Возвращает None, если документ не найден в doc_status.
+        """
+        try:
+            async with self._use_graph(graph_id) as rag:
+                record = await rag.doc_status.get_by_id(doc_id)
+            if record is None:
+                return None
+            status = (
+                record.get("status")
+                if isinstance(record, dict)
+                else getattr(record, "status", None)
+            )
+            return getattr(status, "value", status)
+        except Exception as exc:
+            logger.warning(
+                "Не удалось получить статус документа %s в графе %s: %s",
+                doc_id,
+                graph_id,
+                exc,
+            )
+            return None
+
+    async def get_chunks_list(self, graph_id: str, doc_id: str) -> list[str]:
+        """Возвращает chunks_list документа из doc_status LightRAG.
+
+        Используется для проверки общих чанков перед удалением старой версии.
+        """
+        try:
+            async with self._use_graph(graph_id) as rag:
+                record = await rag.doc_status.get_by_id(doc_id)
+            if record is None:
+                return []
+            chunks = (
+                record.get("chunks_list")
+                if isinstance(record, dict)
+                else getattr(record, "chunks_list", None)
+            )
+            return list(chunks) if chunks else []
+        except Exception as exc:
+            logger.warning(
+                "Не удалось получить chunks_list документа %s в графе %s: %s",
+                doc_id,
+                graph_id,
+                exc,
+            )
+            return []
+
+    async def delete_doc_safe(
+        self,
+        graph_id: str,
+        old_doc_id: str,
+        preserve_chunk_ids: set[str] | None = None,
+    ) -> bool:
+        """Удаляет документ из RAG, сохраняя чанки, используемые другими документами.
+
+        В LightRAG 1.4.9.8 chunk_id = hash(chunk_text), не включает doc_id.
+        Поэтому чанки, общие у старой и новой версии документа, имеют одинаковые
+        IDs. Обычный adelete_by_doc_id удалит их из chunks_vdb и text_chunks,
+        после чего новая версия окажется недоступна поиску.
+
+        Перед вызовом adelete_by_doc_id вычитаем из chunks_list все ID,
+        принадлежащие другим документам или указанные в preserve_chunk_ids.
+        Метаданные общих чанков перепривязываем к оставшемуся владельцу.
+        adelete_by_doc_id читает chunks_list из doc_status и удаляет только их —
+        общие чанки при этом не затрагиваются.
+
+        Args:
+            graph_id: ID графа в GraphMemory.
+            old_doc_id: ID документа-старой-версии, который нужно удалить.
+            preserve_chunk_ids: chunk_id-ы, которые нельзя удалять из хранилищ.
+                Обычно это chunks_list новой версии. Остальные владельцы
+                определяются по doc_status независимо от этого аргумента.
+        """
+        try:
+            async with self._use_graph(graph_id) as rag:
+                if not hasattr(rag, "adelete_by_doc_id"):
+                    logger.warning(
+                        "LightRAG не поддерживает adelete_by_doc_id (попытка удалить %s)",
+                        old_doc_id,
+                    )
+                    return False
+
+                # Chunk IDs are global within a workspace. Failed inserts overwrite
+                # their metadata too, even before entity extraction succeeds.
+                owners: dict[str, tuple[str, str]] = {}
+                for status in (
+                    DocStatus.PROCESSED,
+                    DocStatus.PREPROCESSED,
+                    DocStatus.PROCESSING,
+                    DocStatus.PENDING,
+                    DocStatus.FAILED,
+                ):
+                    documents = await rag.doc_status.get_docs_by_status(status)
+                    for doc_id, document in documents.items():
+                        if doc_id == old_doc_id:
+                            continue
+                        for chunk_id in document.chunks_list or []:
+                            owners.setdefault(chunk_id, (doc_id, document.file_path))
+                preserve_chunk_ids = set(preserve_chunk_ids or ()) | owners.keys()
+
+                status_record = await rag.doc_status.get_by_id(old_doc_id)
+                if preserve_chunk_ids:
+                    # Вычитаем общие чанки из chunks_list перед удалением
+                    if status_record is not None:
+                        existing = (
+                            status_record.get("chunks_list")
+                            if isinstance(status_record, dict)
+                            else getattr(status_record, "chunks_list", None)
+                        ) or []
+                        exclusive = [
+                            cid for cid in existing if cid not in preserve_chunk_ids
+                        ]
+                        shared_count = len(existing) - len(exclusive)
+                        if shared_count:
+                            shared_ids = [cid for cid in existing if cid in owners]
+                            records = await rag.text_chunks.get_by_ids(shared_ids)
+                            vectors = await rag.chunks_vdb.get_by_ids(shared_ids)
+                            repairs: dict[str, dict[str, Any]] = {}
+                            for chunk_id, record, vector in zip(
+                                shared_ids, records, vectors
+                            ):
+                                if record is None:
+                                    raise RuntimeError(
+                                        f"Shared chunk {chunk_id} is missing"
+                                    )
+                                if (
+                                    record.get("full_doc_id") == old_doc_id
+                                    or not vector
+                                    or vector.get("full_doc_id") == old_doc_id
+                                ):
+                                    owner_id, file_path = owners[chunk_id]
+                                    repairs[chunk_id] = {
+                                        **record,
+                                        "full_doc_id": owner_id,
+                                        "file_path": file_path,
+                                    }
+                            if repairs:
+                                # Repair vectors first: if embedding fails, retain
+                                # the failed document rather than delete its owner.
+                                await rag.chunks_vdb.upsert(repairs)
+                                await rag.text_chunks.upsert(repairs)
+                            logger.info(
+                                "Сохраняем %d общих чанка(ов) при удалении %s (граф %s)",
+                                shared_count,
+                                old_doc_id,
+                                graph_id,
+                            )
+                        patch: dict[str, Any] = (
+                            {**status_record, "chunks_list": exclusive}
+                            if isinstance(status_record, dict)
+                            else {"chunks_list": exclusive}
+                        )
+                        await rag.doc_status.upsert({old_doc_id: patch})
+
+                result = await rag.adelete_by_doc_id(old_doc_id)
+                if result.status not in {"success", "not_found"}:
+                    if status_record is not None:
+                        await rag.doc_status.upsert({old_doc_id: status_record})
+                    logger.error(
+                        "LightRAG deletion failed for %s: %s", old_doc_id, result
+                    )
+                    return False
+                # LightRAG's empty-chunks shortcut skips these per-document
+                # indexes when every chunk was shared with a surviving document.
+                await rag.full_entities.delete([old_doc_id])
+                await rag.full_relations.delete([old_doc_id])
+                await asyncio.gather(
+                    rag.full_entities.index_done_callback(),
+                    rag.full_relations.index_done_callback(),
+                )
+        except Exception as exc:
+            logger.error(
+                "Ошибка при удалении документа %s из графа %s: %s",
+                old_doc_id,
+                graph_id,
+                exc,
+            )
+            return False
+
+        # Обновляем кэш сигнатуры
+        try:
+            async with self._get_lock(graph_id):
+                await asyncio.to_thread(self._remove_doc_metadata, graph_id, old_doc_id)
+                self._graph_signatures[graph_id] = await asyncio.to_thread(
+                    self._get_workspace_signature, graph_id
+                )
+                self._last_disk_check[graph_id] = time.monotonic()
+
+            await self.clear_cache(graph_id)
+        except Exception as exc:
+            logger.warning(
+                "Ошибка при обновлении кэша после удаления %s: %s", old_doc_id, exc
+            )
+
+        return True
 
     async def delete_doc(self, graph_id: str, doc_id: str) -> bool:
         """Удаляет документ из RAG по его ID."""
