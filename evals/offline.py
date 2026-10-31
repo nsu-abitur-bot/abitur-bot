@@ -3,12 +3,15 @@
 import os
 from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from evals.checks import Observation
 from evals.evaluator import Runner
+from evals.schema import Scenario
 
 
 @contextmanager
@@ -37,6 +40,7 @@ def _fixture_pipeline() -> Iterator[Runner]:
     from faq.matcher import FAQMatcher
     from llm.base import LLMResult
     from pipeline import llm_client
+    from rag.graph_memory import GraphMemory
 
     class MemoryHistory:
         async def add_message(self, session_id: str, message: dict) -> None:
@@ -87,11 +91,44 @@ def _fixture_pipeline() -> Iterator[Runner]:
     async def history() -> MemoryHistory:
         return MemoryHistory()
 
-    async def retrieve(*args, **kwargs):
+    class FailingRerankProvider:
+        async def generate(self, messages, profile):
+            # No suspension while the process-local provider patch is active.
+            raise TimeoutError("Synthetic reranker timeout (#291)")
+
+    async def retrieve(question, **kwargs):
+        if reranker_case.get():
+            candidates = [
+                {
+                    "url": f"https://example.test/rerank/{index}",
+                    "title": f"Synthetic source {index}",
+                    "snippet": "Тестовый контекст НГУ.",
+                }
+                for index in range(3)
+            ]
+            with patch("rag.graph_memory.get_llm_provider", FailingRerankProvider):
+                sources = await GraphMemory._rerank_sources_with_llm(
+                    object.__new__(GraphMemory),
+                    question,
+                    kwargs.get("conversation_history"),
+                    candidates,
+                    max_sources=2,
+                )
+            return "Тестовый контекст НГУ.", sources
         return "Тестовый контекст НГУ.", []
 
+    reranker_case = ContextVar("offline_reranker_case", default=False)
+
     async def config():
-        return SimpleNamespace(enabled=True)
+        return SimpleNamespace(enabled=not reranker_case.get())
+
+    async def run_case(scenario: Scenario, session_id: str) -> Observation:
+        # Per-task state: concurrent scenarios must keep their normal CRAG path.
+        token = reranker_case.set(scenario.id == "rag_rerank_failure")
+        try:
+            return await run_product(scenario, session_id)
+        finally:
+            reranker_case.reset(token)
 
     async def threshold() -> float:
         return 0.99
@@ -133,4 +170,4 @@ def _fixture_pipeline() -> Iterator[Runner]:
         }
         for name, value in replacements.items():
             stack.enter_context(patch.object(llm_client, name, value))
-        yield run_product
+        yield run_case
