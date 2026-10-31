@@ -11,6 +11,7 @@ from urllib.parse import unquote, urlsplit
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
+from lightrag.base import DocStatus
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
 
@@ -634,7 +635,7 @@ class GraphMemory:
                         graph_id,
                         error,
                     )
-                    await self.delete_doc(graph_id, doc_id)
+                    await self.delete_doc_safe(graph_id, doc_id)
                 return False
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
@@ -1645,8 +1646,9 @@ class GraphMemory:
         IDs. Обычный adelete_by_doc_id удалит их из chunks_vdb и text_chunks,
         после чего новая версия окажется недоступна поиску.
 
-        Решение: перед вызовом adelete_by_doc_id временно вычитаем из chunks_list
-        старого документа те ID, которые присутствуют в preserve_chunk_ids.
+        Перед вызовом adelete_by_doc_id вычитаем из chunks_list все ID,
+        принадлежащие другим документам или указанные в preserve_chunk_ids.
+        Метаданные общих чанков перепривязываем к оставшемуся владельцу.
         adelete_by_doc_id читает chunks_list из doc_status и удаляет только их —
         общие чанки при этом не затрагиваются.
 
@@ -1654,8 +1656,8 @@ class GraphMemory:
             graph_id: ID графа в GraphMemory.
             old_doc_id: ID документа-старой-версии, который нужно удалить.
             preserve_chunk_ids: chunk_id-ы, которые нельзя удалять из хранилищ.
-                Обычно это chunks_list новой версии. Если None или пусто,
-                поведение идентично обычному delete_doc.
+                Обычно это chunks_list новой версии. Остальные владельцы
+                определяются по doc_status независимо от этого аргумента.
         """
         try:
             async with self._use_graph(graph_id) as rag:
@@ -1666,9 +1668,27 @@ class GraphMemory:
                     )
                     return False
 
+                # Chunk IDs are global within a workspace. Failed inserts overwrite
+                # their metadata too, even before entity extraction succeeds.
+                owners: dict[str, tuple[str, str]] = {}
+                for status in (
+                    DocStatus.PROCESSED,
+                    DocStatus.PREPROCESSED,
+                    DocStatus.PROCESSING,
+                    DocStatus.PENDING,
+                    DocStatus.FAILED,
+                ):
+                    documents = await rag.doc_status.get_docs_by_status(status)
+                    for doc_id, document in documents.items():
+                        if doc_id == old_doc_id:
+                            continue
+                        for chunk_id in document.chunks_list or []:
+                            owners.setdefault(chunk_id, (doc_id, document.file_path))
+                preserve_chunk_ids = set(preserve_chunk_ids or ()) | owners.keys()
+
+                status_record = await rag.doc_status.get_by_id(old_doc_id)
                 if preserve_chunk_ids:
                     # Вычитаем общие чанки из chunks_list перед удалением
-                    status_record = await rag.doc_status.get_by_id(old_doc_id)
                     if status_record is not None:
                         existing = (
                             status_record.get("chunks_list")
@@ -1680,6 +1700,33 @@ class GraphMemory:
                         ]
                         shared_count = len(existing) - len(exclusive)
                         if shared_count:
+                            shared_ids = [cid for cid in existing if cid in owners]
+                            records = await rag.text_chunks.get_by_ids(shared_ids)
+                            vectors = await rag.chunks_vdb.get_by_ids(shared_ids)
+                            repairs: dict[str, dict[str, Any]] = {}
+                            for chunk_id, record, vector in zip(
+                                shared_ids, records, vectors
+                            ):
+                                if record is None:
+                                    raise RuntimeError(
+                                        f"Shared chunk {chunk_id} is missing"
+                                    )
+                                if (
+                                    record.get("full_doc_id") == old_doc_id
+                                    or not vector
+                                    or vector.get("full_doc_id") == old_doc_id
+                                ):
+                                    owner_id, file_path = owners[chunk_id]
+                                    repairs[chunk_id] = {
+                                        **record,
+                                        "full_doc_id": owner_id,
+                                        "file_path": file_path,
+                                    }
+                            if repairs:
+                                # Repair vectors first: if embedding fails, retain
+                                # the failed document rather than delete its owner.
+                                await rag.chunks_vdb.upsert(repairs)
+                                await rag.text_chunks.upsert(repairs)
                             logger.info(
                                 "Сохраняем %d общих чанка(ов) при удалении %s (граф %s)",
                                 shared_count,
@@ -1693,7 +1740,22 @@ class GraphMemory:
                         )
                         await rag.doc_status.upsert({old_doc_id: patch})
 
-                await rag.adelete_by_doc_id(old_doc_id)
+                result = await rag.adelete_by_doc_id(old_doc_id)
+                if result.status not in {"success", "not_found"}:
+                    if status_record is not None:
+                        await rag.doc_status.upsert({old_doc_id: status_record})
+                    logger.error(
+                        "LightRAG deletion failed for %s: %s", old_doc_id, result
+                    )
+                    return False
+                # LightRAG's empty-chunks shortcut skips these per-document
+                # indexes when every chunk was shared with a surviving document.
+                await rag.full_entities.delete([old_doc_id])
+                await rag.full_relations.delete([old_doc_id])
+                await asyncio.gather(
+                    rag.full_entities.index_done_callback(),
+                    rag.full_relations.index_done_callback(),
+                )
         except Exception as exc:
             logger.error(
                 "Ошибка при удалении документа %s из графа %s: %s",

@@ -28,11 +28,12 @@ class FakeOpenAIEmbedding:
 class FakeOpenAILLM:
     def __init__(self, should_fail: bool = False):
         self.should_fail = should_fail
+        self.extraction_response = "empty response<|COMPLETE|>"
 
     async def __call__(self, prompt: str, **kwargs: Any) -> str:
         if self.should_fail:
             raise RuntimeError("LLM extraction failed internally in LightRAG!")
-        return "empty response<|COMPLETE|>"
+        return self.extraction_response
 
     async def aclose(self) -> None:
         pass
