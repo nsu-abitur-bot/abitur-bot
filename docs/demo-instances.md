@@ -9,9 +9,9 @@ Dockerfile; менять исходники UI для каждого вуза н
 
 Нужны Git, Docker Engine с Compose v2+ и uv для подготовки env/проверки.
 Для двух малонагруженных демо начальный ориентир — 4 vCPU, 8 GiB RAM,
-30 GiB свободного SSD; сборка Python/эмбеддингов может требовать больше памяти и
-диска. Это бюджет для старта, не результат нагрузочного теста. Серверу нужен
-выход к реестрам образов, пакетным репозиториям и выбранным LLM-провайдерам.
+30 GiB свободного SSD. Это бюджет для старта, не результат нагрузочного теста.
+Серверу нужен выход к GHCR, пакетным репозиториям для сборки UI и выбранным
+LLM-провайдерам.
 
 Каждый env содержит только инфраструктуру и корневые секреты:
 
@@ -23,6 +23,7 @@ Dockerfile; менять исходники UI для каждого вуза н
 | API_ORIGIN | Адрес API, доступный **браузеру пользователя** |
 | WEB_ORIGIN | Адрес UI, доступный браузеру; единственный CORS origin API |
 | WEB_SOURCE | Путь к checkout abitur-web, относительно compose.yaml; по умолчанию соседний репозиторий |
+| BACKEND_IMAGE_TAG | Тег backend в GHCR; по умолчанию `main`, для воспроизводимого деплоя используйте `sha-<полный SHA>` |
 | DB_PASSWORD / REDIS_PASSWORD | Уникальные hex-пароли без URL-спецсимволов |
 | SECRET_KEY | Уникальный ключ JWT |
 | SETTINGS_ENCRYPTION_KEY | Уникальный Fernet-ключ секретов в БД |
@@ -48,8 +49,10 @@ mkdir -p /tmp/abitur-demo
 uv run python deploy/demo/create_env.py /tmp/abitur-demo/a.env demo-a --api-port 18001 --web-port 13001
 uv run python deploy/demo/create_env.py /tmp/abitur-demo/b.env demo-b --api-port 18002 --web-port 13002
 
-docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml up -d --build
-docker compose --env-file /tmp/abitur-demo/b.env -f deploy/demo/compose.yaml up -d --build
+docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml pull api migrate permissions
+docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml up -d
+docker compose --env-file /tmp/abitur-demo/b.env -f deploy/demo/compose.yaml pull api migrate permissions
+docker compose --env-file /tmp/abitur-demo/b.env -f deploy/demo/compose.yaml up -d
 ```
 
 `/tmp` пригоден только для локальной проверки. На сервере храните env постоянно,
@@ -93,14 +96,19 @@ localhost разделяют localStorage, но cookie не изолируютс
 ```bash
 git pull --ff-only
 git -C ../abitur-web pull --ff-only
-docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml up -d --build --force-recreate
+docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml pull api migrate permissions
+docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml up -d --force-recreate
 docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml logs --tail 100 api migrate web
 ```
 
 Миграции выполняются перед новым API; обновление не удаляет volumes и настройки.
 Другой Compose-проект продолжает работать на прежних контейнерах. Миграции могут
 менять схему: откат кода не заменяет восстановление совместимой БД из backup.
-Текущие Dockerfile используются без введения публикации образов (#238).
+GitHub Actions публикует backend в `ghcr.io/nsu-abitur-bot/abitur-bot` после
+каждого push в `main`: обновляемый тег `main` и неизменяемый
+`sha-<полный SHA коммита>`. Для приватного пакета серверу нужен `docker login ghcr.io`
+с токеном, имеющим `read:packages`. Backend на сервере только скачивается;
+UI по-прежнему собирается из соседнего checkout `abitur-web`.
 Новые healthcheck приложения относятся к #241; используются существующие проверки
 готовности PostgreSQL/Redis и порядок запуска, а не обещание готовности API/UI.
 

@@ -55,6 +55,9 @@ def test_two_demo_configs_have_distinct_storage_and_secrets(tmp_path: Path) -> N
         assert environments[0][key] != environments[1][key]
     for config, environment in zip(configs, environments, strict=True):
         services = config["services"]
+        for name in ("permissions", "migrate", "api"):
+            assert services[name]["image"] == "ghcr.io/nsu-abitur-bot/abitur-bot:main"
+            assert "build" not in services[name]
         assert "bot" not in services and "scheduler" not in services
         assert "ports" not in services["postgres"]
         assert "ports" not in services["redis"]
