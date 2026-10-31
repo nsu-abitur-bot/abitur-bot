@@ -1,6 +1,6 @@
 services:
   bot:
-    build: .
+    image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
     restart: always
     env_file:
       - .env
@@ -24,7 +24,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   api:
-    build: .
+    image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
     restart: always
     command: uvicorn api.main:app --host 0.0.0.0 --port 8000
     env_file:
@@ -55,7 +55,7 @@ services:
       - "host.docker.internal:host-gateway"
 
   scheduler:
-    build: .
+    image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
     restart: always
     command: python -m scheduler.main
     env_file:
