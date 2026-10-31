@@ -12,7 +12,13 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 class Assertion(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     kind: Literal[
-        "contains", "not_contains", "regex", "tool_called", "refusal", "faq_match"
+        "contains",
+        "not_contains",
+        "regex",
+        "tool_called",
+        "refusal",
+        "faq_match",
+        "source_contains",
     ]
     value: str | bool
 
@@ -46,6 +52,7 @@ class Scenario(BaseModel):
     assertions: list[Assertion] = Field(default_factory=list)
     judge_criteria: str | None = None
     min_score: int = Field(default=4, ge=1, le=5, strict=True)
+    history: list[dict[str, str]] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_checks(self) -> "Scenario":

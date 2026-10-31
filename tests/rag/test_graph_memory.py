@@ -3,12 +3,13 @@ from contextlib import asynccontextmanager
 
 import pytest
 
-from rag.crag import FacultyHint
 from rag.graph_memory import GraphMemory
 
 
 @pytest.mark.asyncio
 async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch):
+    from rag.crag import CragConfig
+
     memory = GraphMemory()
     searches: list[str] = []
 
@@ -18,30 +19,58 @@ async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch
 
     async def fake_retrieve(rag, question: str, mode: str):
         searches.append(question)
-        return []
+        if "ММФ" in question:
+            return [
+                {
+                    "content": (
+                        "Для направления подготовки «Математика и компьютерные науки "
+                        "(01.03.02, бакалавр)» на ММФ бюджетных мест: 80."
+                    ),
+                    "file_path": "https://mmf.nsu.ru",
+                }
+            ]
+        return [
+            {
+                "content": (
+                    "Для направления подготовки «Программная инженерия "
+                    "(09.03.04, бакалавр)» на ФИТ бюджетных мест: 125."
+                ),
+                "file_path": "https://nsu.ru/fit",
+            }
+        ]
 
     async def fake_config():
-        return None
+        return CragConfig(
+            enabled=True,
+            relevance_threshold=0.5,
+            min_chunks=1,
+            allow_refine=False,
+            use_faculty_table=True,
+        )
 
-    async def fake_run_crag(question, candidates, retrieve_fn, config):
-        assert "условия поступления" in question
-        assert "а на ММФ?" in question
-        await retrieve_fn("условия поступления на ММФ")
-        return [], FacultyHint()
+    class _FakeProvider:
+        async def generate(self, messages, profile=None, **kwargs):
+            return '{"score": 0.9, "relevant": true}'
 
+    monkeypatch.setattr("rag.crag.get_llm_provider", lambda: _FakeProvider())
     monkeypatch.setattr(memory, "_use_graph", fake_use_graph)
     monkeypatch.setattr(memory, "_retrieve_raw_chunks", fake_retrieve)
     monkeypatch.setattr("rag.graph_memory.load_crag_config", fake_config)
-    monkeypatch.setattr("rag.graph_memory.run_crag", fake_run_crag)
 
-    await memory.query_with_crag(
-        "test_graph", "а на ММФ?", conversation_history="user: условия поступления"
+    history_text = (
+        "user: какие условия поступления на ФИТ?\n"
+        "assistant: Факультет информационных технологий "
+        "ведет прием на программы бакалавриата."
+    )
+    context, sources = await memory.query_with_crag(
+        "test_graph",
+        "а на ММФ?",
+        conversation_history=history_text,
     )
 
-    assert searches == [
-        "user: условия поступления\n\nа на ММФ?",
-        "условия поступления на ММФ",
-    ]
+    assert searches == [f"{history_text}\n\nа на ММФ?"]
+    assert "математика и компьютерные науки" in context.lower()
+    assert any("https://mmf.nsu.ru" in s.get("url", "") for s in sources)
 
 
 class _FakeRag:

@@ -836,12 +836,21 @@ class GraphMemory:
                     more = await self._retrieve_raw_chunks(rag, refined, mode)
                     return _to_crag_chunks(more)
 
-                kept, hint = await run_crag(
-                    search_question,
-                    candidates,
-                    retrieve_fn=_retrieve_fn,
-                    config=config,
-                )
+                try:
+                    kept, hint = await run_crag(
+                        question,
+                        candidates,
+                        retrieve_fn=_retrieve_fn,
+                        config=config,
+                        conversation_history=history or None,
+                    )
+                except TypeError:
+                    kept, hint = await run_crag(
+                        question,
+                        candidates,
+                        retrieve_fn=_retrieve_fn,
+                        config=config,
+                    )
 
                 logger.info(
                     "CRAG retrieval result: graph_id=%s candidates=%d kept=%d "

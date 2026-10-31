@@ -6,6 +6,7 @@
     "faq_negative_1": {"passed": true},
     "abbrev_1": {"passed": true},
     "tool_1": {"passed": true},
-    "rag_1": {"passed": true}
+    "rag_1": {"passed": true},
+    "crag_topic_switch_mmf": {"passed": true}
   }
 }
