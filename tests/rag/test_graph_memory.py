@@ -3,7 +3,45 @@ from contextlib import asynccontextmanager
 
 import pytest
 
+from rag.crag import FacultyHint
 from rag.graph_memory import GraphMemory
+
+
+@pytest.mark.asyncio
+async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch):
+    memory = GraphMemory()
+    searches: list[str] = []
+
+    @asynccontextmanager
+    async def fake_use_graph(graph_id: str):
+        yield object()
+
+    async def fake_retrieve(rag, question: str, mode: str):
+        searches.append(question)
+        return []
+
+    async def fake_config():
+        return None
+
+    async def fake_run_crag(question, candidates, retrieve_fn, config):
+        assert "условия поступления" in question
+        assert "а на ММФ?" in question
+        await retrieve_fn("условия поступления на ММФ")
+        return [], FacultyHint()
+
+    monkeypatch.setattr(memory, "_use_graph", fake_use_graph)
+    monkeypatch.setattr(memory, "_retrieve_raw_chunks", fake_retrieve)
+    monkeypatch.setattr("rag.graph_memory.load_crag_config", fake_config)
+    monkeypatch.setattr("rag.graph_memory.run_crag", fake_run_crag)
+
+    await memory.query_with_crag(
+        "test_graph", "а на ММФ?", conversation_history="user: условия поступления"
+    )
+
+    assert searches == [
+        "user: условия поступления\n\nа на ММФ?",
+        "условия поступления на ММФ",
+    ]
 
 
 class _FakeRag:
