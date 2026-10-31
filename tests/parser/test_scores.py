@@ -77,7 +77,7 @@ class TestParseScores:
 
 
 class TestParseScoresAsync:
-    @patch("parser.scores.requests.get")
+    @patch("parser.scores.fetch_url_async")
     def test_parse_scores_fetches_and_parses(self, mock_get, scores_html):
         import asyncio
 
@@ -90,12 +90,12 @@ class TestParseScoresAsync:
         assert len(rows) > 100
         mock_get.assert_called_once()
 
-    @patch("parser.scores.requests.get")
+    @patch("parser.scores.fetch_url_async")
     def test_parse_scores_network_error_returns_empty(self, mock_get):
         import asyncio
 
-        import requests
+        import httpx
 
-        mock_get.side_effect = requests.exceptions.RequestException("boom")
+        mock_get.side_effect = httpx.RequestError("boom")
         rows = asyncio.run(parse_scores("http://example.test/itogi/"))
         assert rows == []

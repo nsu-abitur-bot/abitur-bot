@@ -1,7 +1,8 @@
-import requests
+import httpx
 from bs4 import BeautifulSoup
 
 from parser.config.load_config import get_parser_config
+from parser.safe_fetch import fetch_url
 from parser.utils import (
     calculate_page_hash,
     extract_documents_metadata,
@@ -16,7 +17,7 @@ def parse_page(url: str, selectors: list[dict], headers: dict) -> dict:
         headers = {}
 
     try:
-        response = requests.get(url, headers=headers)
+        response = fetch_url(url, headers=headers)
         response.raise_for_status()
 
         html_content = response.text
@@ -57,7 +58,7 @@ def parse_page(url: str, selectors: list[dict], headers: dict) -> dict:
 
         return data
 
-    except requests.exceptions.RequestException as e:
+    except httpx.HTTPError as e:
         print(f"Ошибка при запросе: {e}")
         return {}
     except Exception as e:

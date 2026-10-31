@@ -4,7 +4,7 @@ from parser.nsu import parse_nsu_faculty
 
 
 class TestNsuParser:
-    @patch("parser.nsu.requests.get")
+    @patch("parser.nsu.fetch_url")
     def test_parse_nsu_fit(self, mock_get, html_fixture_path):
         mock_response = MagicMock()
         mock_response.raise_for_status = MagicMock()
