@@ -197,3 +197,10 @@ offline regressions=[]; CI41306957095 все jobs green. Независимый 
 review:87focused+9adversarial, реальные offline leases/cancel/reacquire passed.
 Финальный docs-only HEAD и его CI фиксируются в PR; он не подменяет SHA runtime.
 Полный технический отчёт: `/tmp/abitur-latency-376/full-profile.md`.
+
+Standalone `instrument_sdk` uses the SDK execution context, which may retain the
+first caller inside reused LightRAG workers. Its persistent budget ledger and
+global attempt count remain valid, but SDK record request_id is not verified
+per-request attribution under worker reuse. The queue-boundary fix covers
+product rag_model_call/rag_embedding spans only. Historical production cohorts
+have no SDK instrumentation and their HTTP attempts/retries remain null.
