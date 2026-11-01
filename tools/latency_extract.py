@@ -5,7 +5,6 @@ Only the configured abitur.latency logger prefix and registered schemas are read
 """
 
 import json
-import math
 import re
 import sys
 from typing import Any
@@ -112,7 +111,9 @@ def extract(line: str) -> dict[str, Any] | None:
         "observed",
     }:
         return None
-    if type(duration) not in (float, int) or not math.isfinite(duration) or duration < 0:
+    if not isinstance(duration, (float, int)) or isinstance(duration, bool):
+        return None
+    if not 0 <= duration <= 86_400_000:
         return None
     if "process_first" in row:
         return None

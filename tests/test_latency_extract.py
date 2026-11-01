@@ -5,7 +5,7 @@ def test_extract_ignores_dialogs_and_strips_unapproved_fields():
     assert extract("INFO user=123 text=private") is None
     assert extract('latency {"request_id":"123", "process_first":true}') is None
     row = extract(
-        '2026-11-01 11:00:00 - abitur.latency - INFO - latency '
+        "2026-11-01 11:00:00 - abitur.latency - INFO - latency "
         '{"request_id":null,"stage":"faq","duration_ms":1.5,'
         '"status":"ok","error_type":null,"text":"private"}'
     )
@@ -44,12 +44,10 @@ def test_registered_schema_rejects_private_text_and_unhashable_status():
         {"stage": "synthetic_private_dialog"},
         {"process_first": "synthetic_private_dialog"},
         {"duration_ms": float("nan")},
+        {"duration_ms": 10**400},
         {"error_type": {}},
     ):
         assert extract(prefix + json.dumps({**base, **change})) is None
-    assert (
-        extract(prefix + json.dumps({**base, "error_type": "synthetic_private_dialog"}))[
-            "error_type"
-        ]
-        == "OtherError"
-    )
+    row = extract(prefix + json.dumps({**base, "error_type": "synthetic_private_dialog"}))
+    assert row is not None
+    assert row["error_type"] == "OtherError"
