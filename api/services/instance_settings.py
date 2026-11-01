@@ -102,7 +102,6 @@ async def guard_embeddings(
 ) -> None:
     embedding_keys = {
         "FAQ_EMBEDDING_PROVIDER",
-        "LIGHTRAG_LLM_PROVIDER",
         "LIGHTRAG_EMBEDDING_PROVIDER",
         "OPENAI_EMBEDDING_MODEL",
         "GEMINI_EMBEDDING_MODEL",
@@ -170,7 +169,26 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
             if not key:
                 raise ConfigurationError("Сначала задайте API-ключ")
             base_url = values[f"{prefix}_BASE_URL"] or None
-            if provider == "openai":
+            if provider == "deepseek":
+                if purpose not in {"chat", "graph"}:
+                    raise ConfigurationError(
+                        "DeepSeek доступен только для текста и графа"
+                    )
+                async with AsyncOpenAI(
+                    api_key=key,
+                    base_url=base_url or "https://api.deepseek.com",
+                    timeout=15,
+                    max_retries=0,
+                ) as client:
+                    response = await client.chat.completions.create(
+                        model=model,
+                        messages=[{"role": "user", "content": "Reply OK"}],
+                        max_tokens=16,
+                        extra_body={"thinking": {"type": "disabled"}},
+                    )
+                    if not response.choices or not response.choices[0].message.content:
+                        raise ConfigurationError("Модель не вернула текстовый ответ")
+            elif provider == "openai":
                 async with httpx.AsyncClient(
                     proxy=values["OPENAI_SOCKS5_PROXY"] or None
                 ) as transport:
@@ -236,7 +254,7 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
 
 def required_checks(changes: dict[str, str | None], values: dict[str, str]) -> set[str]:
     targets = set()
-    for provider in ("openai", "gemini"):
+    for provider in ("openai", "gemini", "deepseek"):
         prefix = provider.upper() + "_"
         changed = any(k.startswith(prefix) for k in changes)
         active = (

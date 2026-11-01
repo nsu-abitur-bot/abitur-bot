@@ -4,13 +4,13 @@
 
 ## Провайдеры
 
-Активные: **OpenAI**, **Gemini**. Выбор и ключи — в админке,
+Активные: **OpenAI**, **Gemini**, **DeepSeek** (только текст). Выбор и ключи — в админке,
 «Настройки экземпляра» (superadmin). Ключи параметров:
 
 | Переменная | Назначение | Значения |
 |-----------|-----------|---------|
-| `LLM_PROVIDER` | Ответы бота | `openai`, `gemini` |
-| `LIGHTRAG_LLM_PROVIDER` | LightRAG граф (независимо от бота) | `openai`, `gemini` |
+| `LLM_PROVIDER` | Ответы бота | `openai`, `gemini`, `deepseek` |
+| `LIGHTRAG_LLM_PROVIDER` | LightRAG граф (независимо от бота) | `openai`, `gemini`, `deepseek` |
 | `FAQ_EMBEDDING_PROVIDER` | Эмбеддинги FAQ | `openai`, `gemini` |
 | `LIGHTRAG_EMBEDDING_PROVIDER` | Эмбеддинги графа | `openai`, `gemini` |
 | `PDF_PARSER_PROVIDER` | Парсинг PDF (vision) | `openai`, `gemini` |
@@ -45,3 +45,6 @@
 
 Принцип: то, что можно посчитать или достать из SQL, должно отвечаться
 инструментом, а не генерироваться моделью. Проходные баллы — пример.
+
+Контракт DeepSeek, live-сценарии, условия перехода и откат —
+[DeepSeek](../deepseek.md). До live-сравнения назначение стенда не меняется.
