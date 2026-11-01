@@ -144,3 +144,45 @@ tool-round генераций **неизвестно**, нельзя выдав�
 этапу и полному Telegram пути. Нужен больший заранее ограниченный период для
 оценки p95 и ошибок. Без этого нельзя объявлять причину 30 с установленной или
 цель end-to-end задержки достигнутой. #219, #289 и #242 остаются отдельными.
+
+## Полное профилирование (продолжение, ещё не завершено)
+
+Provider probes выше не измеряют задержку бота. Для полного приложения добавлен
+`tools.latency_full_profile`: реальный `answer_message`/BotCore/pipeline, отдельные
+PostgreSQL/Redis, snapshot только справочников/KB и синтетический Telegram
+transport без polling/отправок. Обычные логи подавляются; наружу выходят только
+тайминги, счётчики и наблюдаемый trace FAQ/tools/sources. Настройки читаются только
+в память. Модель, профили и продуктовые промпты не меняются.
+
+Каждый запуск требует **нового** `--database latency376_<unique>` и нового
+`--output`; повторное использование старого snapshot отвергается. `--ledger`
+задаёт общий файл счётчика SDK HTTP attempts, включая retries, между процессами;
+`--attempt-limit` ограничивает его общий счётчик, а не число вопросов. Текущие
+лимиты и уже потраченные вызовы согласовываются с координатором до запуска.
+
+```bash
+uv run python -m tools.latency_full_profile \
+  --database latency376_<unique> \
+  --redis-url redis://<isolated-redis>:6379/0 \
+  --output /tmp/latency376-<unique> \
+  --ledger /tmp/latency376-budget.json --attempt-limit <agreed-limit> \
+  --source-sha <exact-runtime-sha> --cases fit_programs --repeats 2
+uv run python -m tools.latency_summarize <prefiltered-raw.jsonl>
+```
+
+`tools.latency_ingest_http` выполняет обычные authenticated login → parse →
+confirm для одного заранее согласованного официального URL ФИТ НГУ; credentials
+остаются в памяти. Он не переписывает текст и не загружает вложенные документы.
+При таймауте проверяет статус без повторной отправки confirm. Индексацию проводят
+отдельно от замеров ответов и только после разрешения координатора.
+
+`tools.latency_extract` фильтрует логи **на сервере до передачи**: принимает только
+prefix логгера `abitur.latency`, реестр статических этапов и валидированные типы.
+Неизвестный класс ошибки заменяется `OtherError`; поля payload/text/args не выходят.
+Использовать только прошедшую независимое ревью версию extractor.
+
+Диагностический runtime: `d407cc8c2942ce406f8b41c11caca9fc0c29a4a7`;
+Python 3.12 проверен отдельно. Финальный технический отчёт и обезличенные JSONL:
+`/tmp/abitur-latency-376/full-profile.md` (пока INCOMPLETE). Issue #376 снова
+In progress, PR #379 draft; окончательное решение ждёт populated KB и реальных
+Telegram incoming. Оптимизация empty KB по уточнению пользователя исключена.
