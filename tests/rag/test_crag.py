@@ -83,6 +83,17 @@ async def seeded(crag_sessionmaker, monkeypatch) -> async_sessionmaker:
                         }
                     ],
                 },
+                {
+                    "name": "Механико-математический факультет",
+                    "aliases": ["ММФ"],
+                    "programs": [
+                        {
+                            "name": "Математика и компьютерные науки",
+                            "code": "01.03.02",
+                            "level": "bachelor",
+                        }
+                    ],
+                },
             ]
         )
 
@@ -369,3 +380,86 @@ async def test_grading_is_parallel_but_bounded(seeded, monkeypatch):
 
     assert max_in_flight == 2
     assert [c.index for c in kept] == [0, 2, 4]
+
+
+@pytest.mark.asyncio
+async def test_topic_switch_preserves_new_faculty_over_history(seeded, monkeypatch):
+    """Регрессия: при смене темы уточняющим вопросом («а на ММФ?»)
+
+    факультет из текущего вопроса должен иметь приоритет над более длинным
+    названием («Факультет информационных технологий») из истории диалога.
+    Настоящий CRAG должен сохранить чанк ММФ и не просить rewriter сохранить ФИТ.
+    """
+    import rag.crag as crag_module
+    from rag.crag import CragChunk, CragConfig, detect_faculty_hint, run_crag
+
+    rewriter_prompts = []
+
+    class _CapturingProvider:
+        async def generate(self, messages, profile=None, **kwargs):
+            content = " ".join(str(m.content) for m in messages)
+            rewriter_prompts.append(content)
+            if "переформулируй вопрос" in content.lower():
+                return "условия поступления на ММФ"
+            return '{"score": 0.9, "relevant": true}'
+
+    monkeypatch.setattr(crag_module, "get_llm_provider", lambda: _CapturingProvider())
+
+    history = (
+        "user: какие условия поступления на ФИТ?\n"
+        "assistant: Факультет информационных технологий "
+        "ведет прием на программы бакалавриата."
+    )
+    question = "а на ММФ?"
+
+    mmf_chunk = CragChunk(
+        index=0,
+        content=(
+            "Для направления подготовки «Математика и компьютерные науки "
+            "(01.03.02, бакалавр)» на ММФ бюджетных мест: 80."
+        ),
+        source_url="https://mmf.nsu.ru",
+        file_path="https://mmf.nsu.ru",
+    )
+
+    config = CragConfig(
+        enabled=True,
+        relevance_threshold=0.5,
+        min_chunks=2,
+        allow_refine=True,
+        use_faculty_table=True,
+    )
+
+    retrieved_queries = []
+
+    async def fake_retrieve(refined: str):
+        retrieved_queries.append(refined)
+        return []
+
+    hint = await detect_faculty_hint(question, conversation_history=history)
+    assert hint.faculty is not None
+    assert hint.faculty.name == "Механико-математический факультет"
+
+    kept, final_hint = await run_crag(
+        question,
+        [mmf_chunk],
+        retrieve_fn=fake_retrieve,
+        config=config,
+        conversation_history=history,
+    )
+
+    assert len(kept) == 1
+    assert "математика и компьютерные науки" in kept[0].content.lower()
+    assert final_hint.faculty is not None
+    assert final_hint.faculty.name == "Механико-математический факультет"
+
+    rewriter_calls = [p for p in rewriter_prompts if "переформулируй вопрос" in p.lower()]
+    assert len(rewriter_calls) > 0
+    assert (
+        "Сохрани упоминание факультета «Механико-математический факультет»"
+        in rewriter_calls[0]
+    )
+    assert (
+        "Сохрани упоминание факультета «Факультет информационных технологий»"
+        not in rewriter_calls[0]
+    )
