@@ -78,12 +78,21 @@ def test_publish_image_workflow_concurrency_and_tags() -> None:
     workflow_path = ROOT / ".github/workflows/publish-image.yml"
     assert workflow_path.exists()
     data = yaml.safe_load(workflow_path.read_text())
-    assert "concurrency" in data
-    assert data["concurrency"]["cancel-in-progress"] is True
-    assert "github.ref" in str(data["concurrency"]["group"])
-    tags = data["jobs"]["publish"]["steps"][-1]["with"]["tags"]
-    assert "ghcr.io/${{ github.repository }}:main" in tags
-    assert "ghcr.io/${{ github.repository }}:sha-${{ github.sha }}" in tags
+    assert "concurrency" not in data
+    publish = data["jobs"]["publish"]
+    assert publish["outputs"]["digest"] == "${{ steps.build.outputs.digest }}"
+    tags = publish["steps"][-1]["with"]["tags"]
+    assert tags == "ghcr.io/${{ github.repository }}:sha-${{ github.sha }}"
+    promote = data["jobs"]["promote"]
+    assert promote["needs"] == "publish"
+    assert promote["concurrency"] == {
+        "group": "backend-image-main-promotion",
+        "cancel-in-progress": False,
+        "queue": "max",
+    }
+    step = promote["steps"][-1]
+    assert step["run"] == "bash tools/promote_backend_image.sh"
+    assert step["env"]["IMAGE_DIGEST"] == "${{ needs.publish.outputs.digest }}"
 
 
 def test_demo_instances_doc_rebuilds_web_on_update() -> None:
