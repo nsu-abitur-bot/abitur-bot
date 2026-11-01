@@ -3,7 +3,7 @@ import json
 import logging
 import re
 from contextlib import contextmanager, suppress
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from html import unescape
 from typing import Awaitable, Callable, Optional
 
@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from abbrev.expander import get_abbrev_expander
+from config.university import identity
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
@@ -18,7 +19,7 @@ from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import FAQMatcher, get_faq_matcher, load_faq_threshold
-from llm.base import LLMUsage, ToolExecutor
+from llm.base import LLMUsage, ToolExecutor, ToolSpec
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from pipeline.prompts import (
@@ -569,7 +570,11 @@ def _build_messages(
     они попадали в историю целиком и модель начинала их копировать.
     """
     system_prompt = SYSTEM_PROMPT_BASE.format(
-        context=rag_context, sources_hint=SOURCES_HINT
+        context=rag_context,
+        sources_hint=SOURCES_HINT,
+        assistant_name=identity()["assistant_name"],
+        university_short_name=identity()["short_name"],
+        university_full_name=identity()["full_name"],
     )
     messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
@@ -586,6 +591,20 @@ def _build_messages(
 
     messages.append(HumanMessage(content=question))
     return messages
+
+
+def _university_scores_tool() -> ToolSpec:
+    from copy import deepcopy
+
+    university = identity()["short_name"]
+    parameters = deepcopy(ADMISSION_SCORES_TOOL.parameters)
+    faculty = parameters["properties"]["faculty"]
+    faculty["description"] = faculty["description"].replace("НГУ", university)
+    return replace(
+        ADMISSION_SCORES_TOOL,
+        description=ADMISSION_SCORES_TOOL.description.replace("НГУ", university),
+        parameters=parameters,
+    )
 
 
 async def _run_tool_loop(
@@ -607,7 +626,7 @@ async def _run_tool_loop(
     if stream_callback is None:
         result = await provider.generate_with_tools(
             messages,
-            tools=[ADMISSION_SCORES_TOOL],
+            tools=[_university_scores_tool()],
             tool_executor=tool_executor,
             profile=LLMProfiles.CHAT,
         )
@@ -627,7 +646,7 @@ async def _run_tool_loop(
 
     result = await provider.generate_with_tools(
         messages,
-        tools=[ADMISSION_SCORES_TOOL],
+        tools=[_university_scores_tool()],
         tool_executor=tool_executor,
         profile=LLMProfiles.CHAT,
         on_delta=on_delta,

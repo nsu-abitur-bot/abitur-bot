@@ -26,6 +26,10 @@ data
 chroma_db
 lightrag_cache
 
+# Local knowledge files must not be baked into every university's image.
+faq/faq_data.yaml
+abbrev/abbrev_data.yaml
+
 .DS_Store
 *.swp
 *.swo

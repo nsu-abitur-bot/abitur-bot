@@ -1,7 +1,7 @@
 import fcntl
+import hashlib
 import logging
 import tempfile
-from os import getenv
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -11,11 +11,11 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message
-from dotenv import load_dotenv
 
 from bot.core import ERROR_REPLY_TEXT, BotCore
 from bot.streaming import TelegramStreamer
 from bot.utils import normalize_links_for_messaging
+from config.instance import get_setting as getenv
 
 logger = logging.getLogger(__name__)
 
@@ -130,13 +130,13 @@ async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
 
 async def run_telegram_bot() -> bool | None:
     """Запускает Telegram-адаптер на aiogram. Возвращает False, если запуск отменен."""
-    load_dotenv()
 
     lock_path = getenv(
         "TELEGRAM_POLLING_LOCK_FILE",
         str(Path(tempfile.gettempdir()) / "abitur_telegram_polling.lock"),
     )
-    polling_lock = _TelegramPollingLock(lock_path)
+    token_identity = hashlib.sha256((getenv("BOT_TOKEN") or "").encode()).hexdigest()
+    polling_lock = _TelegramPollingLock(lock_path + "." + token_identity)
     if not polling_lock.acquire():
         logger.error(
             "Telegram polling уже запущен в другом процессе. "
@@ -146,7 +146,7 @@ async def run_telegram_bot() -> bool | None:
         return False
 
     bot_token = getenv("BOT_TOKEN")
-    if bot_token is None:
+    if not bot_token:
         logger.error("Telegram bot skipped: BOT_TOKEN не задан")
         polling_lock.release()
         return False

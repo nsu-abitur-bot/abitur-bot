@@ -7,6 +7,7 @@
     "abbrev_1": {"passed": true},
     "tool_1": {"passed": true},
     "rag_1": {"passed": true},
-    "rag_rerank_failure": {"passed": true}
+    "rag_rerank_failure": {"passed": true},
+    "crag_topic_switch_mmf": {"passed": true}
   }
 }

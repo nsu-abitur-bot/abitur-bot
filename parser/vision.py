@@ -1,6 +1,5 @@
 import base64
 import logging
-import os
 from typing import Any, List, Optional
 
 import httpx
@@ -8,6 +7,7 @@ from google import genai
 from google.genai import types
 from openai import AsyncOpenAI
 
+from config.instance import get_setting
 from llm.profiles import LLMProfiles
 from parser.prompts import CONTEXT_ENRICHMENT_PROMPT
 
@@ -46,7 +46,7 @@ async def parse_images_with_llm(
     по умолчанию "gemini".
     """
     if not provider:
-        provider = os.getenv("PDF_PARSER_PROVIDER", "openai").lower()
+        provider = get_setting("PDF_PARSER_PROVIDER", "openai").lower()
 
     if not images_base64:
         return ""
@@ -80,17 +80,19 @@ async def parse_images_with_llm(
 
 async def _process_batch_openai(images_b64: List[str]) -> str:
     """Обрабатывает пачку страниц с помощью OpenAI Vision"""
-    api_key = os.getenv("OPENAI_API_KEY")
+    api_key = get_setting("OPENAI_API_KEY")
     if not api_key:
         logger.error("OPENAI_API_KEY не установлен для разбора PDF")
         return ""
 
-    proxy_url = os.getenv("OPENAI_SOCKS5_PROXY")
+    proxy_url = get_setting("OPENAI_SOCKS5_PROXY")
     http_client = httpx.AsyncClient(proxy=proxy_url) if proxy_url else None
 
-    client = AsyncOpenAI(api_key=api_key, http_client=http_client)
+    client = AsyncOpenAI(
+        base_url=get_setting("OPENAI_BASE_URL"), api_key=api_key, http_client=http_client
+    )
 
-    model = os.getenv("OPENAI_MODEL_VISION", "gpt-5.4-mini")
+    model = get_setting("OPENAI_MODEL_VISION", "gpt-5.4-mini")
 
     content: List[Any] = [
         {
@@ -130,13 +132,15 @@ async def _process_batch_openai(images_b64: List[str]) -> str:
 
 async def _process_batch_gemini(images_b64: List[str]) -> str:
     """Обрабатывает пачку страниц с помощью Gemini Vision"""
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = get_setting("GEMINI_API_KEY")
     if not api_key:
         logger.error("GEMINI_API_KEY не установлен для разбора PDF")
         return ""
 
-    client = genai.Client(api_key=api_key)
-    model = os.getenv("GEMINI_MODEL_VISION", "gemini-2.5-flash")
+    client = genai.Client(
+        api_key=api_key, http_options={"base_url": get_setting("GEMINI_BASE_URL")}
+    )
+    model = get_setting("GEMINI_MODEL_VISION", "gemini-2.5-flash")
 
     contents: List[Any] = [PARSE_PROMPT]
     for img in images_b64:

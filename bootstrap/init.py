@@ -3,6 +3,7 @@
 import asyncio
 import logging
 
+from bootstrap.runtime_settings import refresh_settings
 from bootstrap.seed import seed_admission_scores, seed_reference_data
 from db.postgres.init_db import create_database_if_not_exists, run_migrations
 
@@ -15,6 +16,7 @@ async def main() -> None:
     await create_database_if_not_exists()
     run_migrations()
 
+    await refresh_settings()
     await seed_reference_data()
     # После справочника: матчинг проходных баллов опирается на факультеты.
     await seed_admission_scores()
