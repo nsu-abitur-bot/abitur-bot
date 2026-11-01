@@ -59,3 +59,18 @@ The other component pin, environment, resources, volumes and settings stay intac
 `/opt/abitur/deploy-receipts.json` records current/previous digest and SHA per
 component after health passes. Retain those images and initial local rollback
 images; never blanket prune, `down -v`, or downgrade the database for rollback.
+
+## Retry and manual application rollback
+
+Retry the failed Actions run only while its checked SHA is still main. An old run
+will intentionally skip; push/merge a new checked commit to deliver a newer main.
+To roll back an application image manually, root must acquire the same lock and
+use `previous_image` for only the affected component from the receipt. Preserve
+the other component entries. For example, with `component` set literally to
+`backend` or `web`, a root-operated Python script can use this helper's
+`atomic_json`, `PINS`, `RECEIPT`, `LOCK`, `SERVICES`, `Host` and
+`start(host, component, migrate=False)` under `fcntl.flock(..., LOCK_EX)`.
+Choose an already retained local image and leave migrations disabled; this does
+not undo schema changes. Verify the public endpoints and bot state, then record
+the operator intervention in the deployment receipt. Never edit pins concurrently
+with Actions or force an old commit through the automatic main freshness guard.
