@@ -1,8 +1,10 @@
 """Утилита для прогрессивного показа ответа в Telegram/MAX."""
 
+import asyncio
 import logging
 import re
 import time
+from contextlib import suppress
 from typing import TYPE_CHECKING, Optional
 
 from aiogram import Bot
@@ -11,6 +13,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 from bot.splitting import split_message
 from bot.utils import normalize_links_for_messaging
+from config.latency import timed
 
 if TYPE_CHECKING:
     from maxapi import Bot as MaxBot
@@ -39,7 +42,30 @@ class TelegramStreamer:
         self._draft_id = time.time_ns() % 2_147_483_647 or 1
         self._last_sent_text: str = ""
         self._last_edit_monotonic: float = 0.0
+        self._pending_draft: str | None = None
+        self._draft_task: asyncio.Task[None] | None = None
 
+    def _queue_draft(self, text: str) -> None:
+        # At most one request in flight and one latest value, even on a slow proxy.
+        self._pending_draft = text
+        if self._draft_task is None or self._draft_task.done():
+            self._draft_task = asyncio.create_task(self._drain_drafts())
+
+    async def _drain_drafts(self) -> None:
+        while self._pending_draft is not None:
+            text, self._pending_draft = self._pending_draft, None
+            await self._send_draft(text)
+
+    async def close(self) -> None:
+        """Cancel ephemeral work on final delivery, errors and handler cancellation."""
+        self._pending_draft = None
+        if self._draft_task is not None:
+            self._draft_task.cancel()
+            with suppress(asyncio.CancelledError):
+                await self._draft_task
+            self._draft_task = None
+
+    @timed("telegram_draft")
     async def _send_draft(self, text: str) -> bool:
         try:
             await self._bot.send_message_draft(
@@ -55,12 +81,13 @@ class TelegramStreamer:
         return True
 
     async def set_status(self, text: str) -> None:
-        """Мгновенно ставит текст-статус (без throttle и без parse_mode).
+        """Ставит последний статус в очередь без throttle и без parse_mode.
 
         Используется для промежуточных фраз вроде "Поиск в базе знаний…": между
         статусами проходит сотни мс - секунды, throttle здесь только мешает.
-        Обновляет _last_edit_monotonic, чтобы первый последующий update() не
-        выстрелил мгновенно и не словил Telegram rate-limit.
+        Не ждёт Telegram: медленный draft не задерживает поиск и модель.
+        Обновляет _last_edit_monotonic, чтобы первый последующий update()
+        не выстрелил мгновенно и не словил Telegram rate-limit.
         """
         plain = normalize_links_for_messaging((text or "").strip())
         if not plain:
@@ -69,7 +96,8 @@ class TelegramStreamer:
         if plain == self._last_sent_text:
             return
 
-        await self._send_draft(plain)
+        self._last_edit_monotonic = time.monotonic()
+        self._queue_draft(plain)
 
     async def update(self, text: str) -> None:
         """Принимает накопленный текст ответа LLM. Безопасно для частых вызовов."""
@@ -85,8 +113,10 @@ class TelegramStreamer:
         if plain == self._last_sent_text:
             return
 
-        await self._send_draft(plain)
+        self._last_edit_monotonic = now
+        self._queue_draft(plain)
 
+    @timed("telegram_send")
     async def finalize(
         self,
         text: str,
@@ -98,6 +128,7 @@ class TelegramStreamer:
         Draft эфемерный, редактировать нечего: каждая часть уходит отдельным
         send_message.
         """
+        await self.close()
         final_text = normalize_links_for_messaging(text)
         is_html = parse_mode == "HTML"
         aiogram_parse_mode = ParseMode.HTML if is_html else None

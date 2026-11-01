@@ -27,6 +27,7 @@ from typing import Awaitable, Callable, Optional, Sequence
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from config.latency import stage, timed
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Faculty
 from db.postgres.services.faculty import FacultyService, normalize_name
@@ -455,6 +456,7 @@ def _parse_grade(raw: str) -> tuple[float, Optional[bool]]:
     return score_val, relevant_val
 
 
+@timed("crag_grade")
 async def grade_chunk(
     question: str,
     hint: FacultyHint,
@@ -468,13 +470,14 @@ async def grade_chunk(
     )
     provider = get_llm_provider()
     try:
-        raw = await provider.generate(
-            [
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=user_prompt),
-            ],
-            profile=LLMProfiles.INTENT,
-        )
+        with stage("crag_model_call"):
+            raw = await provider.generate(
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=user_prompt),
+                ],
+                profile=LLMProfiles.INTENT,
+            )
     except Exception as exc:
         logger.warning("CRAG: ошибка грейдинга чанка #%d: %s", chunk.index, exc)
         # Fail-open: при ошибке LLM не теряем потенциально полезный чанк.
@@ -494,6 +497,7 @@ async def grade_chunk(
     return keep
 
 
+@timed("crag_filter")
 async def filter_chunks(
     question: str,
     chunks: list[CragChunk],
@@ -573,6 +577,7 @@ async def filter_chunks(
     return kept, hint
 
 
+@timed("crag_refine")
 async def refine_query(
     question: str,
     hint: FacultyHint,
@@ -600,13 +605,14 @@ async def refine_query(
     )
     provider = get_llm_provider()
     try:
-        raw = await provider.generate(
-            [
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=question),
-            ],
-            profile=LLMProfiles.INTENT,
-        )
+        with stage("crag_refine_model_call"):
+            raw = await provider.generate(
+                [
+                    SystemMessage(content=system_prompt),
+                    HumanMessage(content=question),
+                ],
+                profile=LLMProfiles.INTENT,
+            )
     except Exception as exc:
         logger.warning("CRAG: ошибка переформулировки запроса: %s", exc)
         return question
@@ -618,6 +624,7 @@ async def refine_query(
 CragRetrieveFn = Callable[[str], Awaitable[list[CragChunk]]]
 
 
+@timed("crag_total")
 async def run_crag(
     question: str,
     chunks: list[CragChunk],

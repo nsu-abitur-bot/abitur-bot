@@ -16,6 +16,7 @@ from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
 
 from config.instance import get_setting
+from config.latency import stage, timed
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
@@ -368,6 +369,7 @@ class GraphMemory:
             except Exception as exc:
                 logger.warning(f"Failed to update {file_path} after deletion: {exc}")
 
+    @timed("graph_acquire")
     async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
         rag_to_finalize = None
 
@@ -486,6 +488,7 @@ class GraphMemory:
                 @wrap_embedding_func_with_attrs(
                     embedding_dim=embedding_adapter.embedding_dim
                 )
+                @timed("rag_embedding")
                 async def embedding_func(texts: List[str]) -> List[List[float]]:
                     provider = embedding_provider
                     if provider == "openai":
@@ -503,6 +506,7 @@ class GraphMemory:
                     finally:
                         await adapter.aclose()
 
+                @timed("rag_model_call")
                 async def llm_model_func(prompt: str, **kwargs) -> str:
                     provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
                     if provider == "openai":
@@ -741,6 +745,7 @@ class GraphMemory:
                 raise
             raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
+    @timed("search_embeddings")
     async def _retrieve_raw_chunks(
         self,
         rag: Any,
@@ -1088,6 +1093,7 @@ class GraphMemory:
             logger.warning("Failed to load documents signature for sources: %s", exc)
             return -1, None
 
+    @timed("source_titles")
     async def _get_source_titles(self, graph_id: str) -> dict[str, str]:
         """Соответствие «URL → человекочитаемый заголовок» для «Источников».
 
@@ -1163,6 +1169,7 @@ class GraphMemory:
         self._source_titles_cache[graph_id] = (signature, url_to_title)
         return url_to_title
 
+    @timed("source_ranking")
     async def _rerank_sources_with_llm(
         self,
         question: str,
@@ -1202,10 +1209,14 @@ class GraphMemory:
 
         try:
             provider = get_llm_provider()
-            raw = await provider.generate(
-                [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
-                profile=LLMProfiles.CHAT,
-            )
+            with stage("source_ranking_model_call"):
+                raw = await provider.generate(
+                    [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=user_prompt),
+                    ],
+                    profile=LLMProfiles.CHAT,
+                )
         except Exception as exc:
             # Ranking is optional: keep successful retrieval usable on provider failure.
             logger.warning(
