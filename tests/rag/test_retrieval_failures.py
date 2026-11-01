@@ -277,6 +277,8 @@ async def test_first_tokenizer_load_keeps_event_loop_responsive(monkeypatch, tmp
         "get_setting",
         lambda name, default=None: "synthetic-key"
         if name == "GEMINI_API_KEY"
+        else str(tmp_path)
+        if name == "LIGHTRAG_WORKSPACE_BASE"
         else default,
     )
     monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkAdapter)
@@ -284,7 +286,9 @@ async def test_first_tokenizer_load_keeps_event_loop_responsive(monkeypatch, tmp
     monkeypatch.setattr(
         graph_memory_module, "TiktokenTokenizer", slow_tokenizer, raising=False
     )
+    assert graph_memory_module.get_setting("LIGHTRAG_WORKSPACE_BASE") == str(tmp_path)
     memory = GraphMemory()
+    assert memory.workspace_path == str(tmp_path)
 
     async def acquire_graph():
         async with memory._use_graph("responsive-init") as rag:
@@ -339,11 +343,15 @@ async def test_cancel_tokenizer_load_releases_graph_lock(monkeypatch, tmp_path):
         "get_setting",
         lambda name, default=None: "synthetic-key"
         if name == "GEMINI_API_KEY"
+        else str(tmp_path)
+        if name == "LIGHTRAG_WORKSPACE_BASE"
         else default,
     )
     monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkAdapter)
     monkeypatch.setattr(graph_memory_module, "TiktokenTokenizer", slow_tokenizer)
+    assert graph_memory_module.get_setting("LIGHTRAG_WORKSPACE_BASE") == str(tmp_path)
     memory = GraphMemory()
+    assert memory.workspace_path == str(tmp_path)
 
     async def acquire():
         async with memory._use_graph("cancel-init") as rag:
