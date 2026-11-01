@@ -8,6 +8,7 @@ LightRAG и nano_vectordb, на подделке их не воспроизве�
 
 from contextlib import asynccontextmanager
 from types import SimpleNamespace
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -372,3 +373,80 @@ async def test_cancel_tokenizer_load_releases_graph_lock(monkeypatch, tmp_path):
     rag = await acquire()
     assert memory._graphs["cancel-init"].usage_count == 0
     await rag.finalize_storages()
+
+
+async def test_reused_graph_callbacks_keep_current_request_id(
+    monkeypatch, tmp_path, caplog
+):
+    """Real persistent LightRAG queues must not inherit the first caller's trace."""
+    import json
+    import logging
+
+    from config.latency import request_timed
+
+    class NoNetworkEmbedding:
+        embedding_dim = EMBEDDING_DIM
+
+        def __init__(self, **kwargs):
+            pass
+
+        async def __call__(self, texts):
+            return [[1.0] * EMBEDDING_DIM for _ in texts]
+
+        async def aclose(self):
+            pass
+
+    class NoNetworkModel(NoNetworkEmbedding):
+        async def __call__(self, prompt, **kwargs):
+            return "synthetic result"
+
+    monkeypatch.setattr(
+        graph_memory_module,
+        "get_setting",
+        lambda name, default=None: str(tmp_path)
+        if name == "LIGHTRAG_WORKSPACE_BASE"
+        else "synthetic-key"
+        if name == "GEMINI_API_KEY"
+        else "json"
+        if name == "LIGHTRAG_STORAGE"
+        else default,
+    )
+    monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkEmbedding)
+    monkeypatch.setattr(graph_memory_module, "GeminiLLM", NoNetworkModel)
+    monkeypatch.setattr(
+        graph_memory_module,
+        "TiktokenTokenizer",
+        lambda: Tokenizer("words", _WordTokenizer()),
+    )
+    memory = GraphMemory()
+    assert memory.workspace_path == str(tmp_path)
+    async with memory._use_graph("trace-reuse") as graph:
+        rag = cast(Any, graph)
+
+        @request_timed("synthetic_request")
+        async def request():
+            assert await rag.llm_model_func("synthetic prompt") == "synthetic result"
+            # The vector store retains its own callback reference.
+            assert await rag.chunks_vdb.embedding_func(["synthetic chunk"])
+
+        try:
+            with caplog.at_level(logging.INFO, logger="abitur.latency"):
+                await request()
+                await request()
+            rows = [
+                json.loads(record.getMessage().split(" ", 1)[1])
+                for record in caplog.records
+                if record.name == "abitur.latency"
+            ]
+            request_ids = [
+                r["request_id"] for r in rows if r.get("stage") == "synthetic_request"
+            ]
+            assert len(set(request_ids)) == 2
+            for name in ("rag_model_call", "rag_embedding"):
+                assert [
+                    r["request_id"] for r in rows if r.get("stage") == name
+                ] == request_ids
+        finally:
+            await rag.llm_model_func.shutdown()
+            await rag.embedding_func.shutdown()
+            await rag.finalize_storages()

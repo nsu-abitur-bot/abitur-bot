@@ -11,7 +11,7 @@ from urllib.parse import unquote, urlsplit
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
-from lightrag.base import DocStatus
+from lightrag.base import DocStatus, StorageNameSpace
 from lightrag.kg.shared_storage import initialize_pipeline_status
 from lightrag.utils import (
     TiktokenTokenizer,
@@ -35,6 +35,23 @@ from rag.crag import CragChunk, load_crag_config, run_crag
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def _time_queued_callbacks(rag: LightRAG) -> None:
+    """Time the caller's queue await, not a worker that retains an old context."""
+    embedding = cast(Any, rag.embedding_func)
+    timed_embedding = timed("rag_embedding")(embedding)
+    # LightRAG shares its queued callback with every storage at construction.
+    # Preserve that sharing and the queue's attributes (including shutdown).
+    for value in vars(rag).values():
+        if (
+            isinstance(value, StorageNameSpace)
+            and getattr(value, "embedding_func", None) is embedding
+        ):
+            cast(Any, value).embedding_func = timed_embedding
+    cast(Any, rag).embedding_func = timed_embedding
+    cast(Any, rag).llm_model_func = timed("rag_model_call")(cast(Any, rag.llm_model_func))
+
 
 GRAPH_QUERY_MODES: frozenset = frozenset(
     ["naive", "local", "global", "hybrid", "mix", "bypass"]
@@ -494,7 +511,6 @@ class GraphMemory:
                 @wrap_embedding_func_with_attrs(
                     embedding_dim=embedding_adapter.embedding_dim
                 )
-                @timed("rag_embedding")
                 async def embedding_func(texts: List[str]) -> List[List[float]]:
                     provider = embedding_provider
                     if provider == "openai":
@@ -512,7 +528,6 @@ class GraphMemory:
                     finally:
                         await adapter.aclose()
 
-                @timed("rag_model_call")
                 async def llm_model_func(prompt: str, **kwargs) -> str:
                     provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
                     if provider == "openai":
@@ -568,6 +583,8 @@ class GraphMemory:
                         llm_model_max_async=llm_workers,
                         **storage_kwargs,
                     )
+
+                _time_queued_callbacks(rag)
 
                 with stage("graph_storages_initialize"):
                     await rag.initialize_storages()
