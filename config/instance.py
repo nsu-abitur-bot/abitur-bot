@@ -94,6 +94,16 @@ for provider in ("OPENAI", "GEMINI"):
             if suffix in {"TEMPERATURE", "TIMEOUT_SECONDS", "MAX_TOKENS"}
             else "text",
         )
+define("DEEPSEEK_API_KEY", "API-ключ", "DeepSeek", secret=True)
+define("DEEPSEEK_BASE_URL", "Адрес API (пусто — официальный)", "DeepSeek", kind="url")
+for suffix, label, default, kind in (
+    ("MODEL", "Ответы и обработка текста", "deepseek-flash", "text"),
+    ("GRAPH_MODEL", "Построение графа", "deepseek-flash", "text"),
+    ("TEMPERATURE", "Температура", "0.2", "number"),
+    ("TIMEOUT_SECONDS", "Таймаут, секунд", "60", "number"),
+    ("MAX_TOKENS", "Максимум токенов по умолчанию", "1024", "number"),
+):
+    define(f"DEEPSEEK_{suffix}", label, "DeepSeek", default, kind=kind)
 # Proxy credentials are secrets too.
 define("OPENAI_SOCKS5_PROXY", "Прокси OpenAI", "OpenAI", secret=True, kind="proxy")
 for name, label, default in (
@@ -103,7 +113,15 @@ for name, label, default in (
     ("LIGHTRAG_EMBEDDING_PROVIDER", "Эмбеддинги графа", "gemini"),
     ("PDF_PARSER_PROVIDER", "Документы и изображения", "openai"),
 ):
-    define(name, label, "Назначение моделей", default, choices=("openai", "gemini"))
+    define(
+        name,
+        label,
+        "Назначение моделей",
+        default,
+        choices=("openai", "gemini", "deepseek")
+        if name in {"LLM_PROVIDER", "LIGHTRAG_LLM_PROVIDER"}
+        else ("openai", "gemini"),
+    )
 for name, label, group in (
     ("BOT_TOKEN", "Токен бота", "Telegram"),
     ("MAX_BOT_TOKEN", "Токен бота", "MAX"),

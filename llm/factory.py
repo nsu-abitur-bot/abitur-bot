@@ -15,12 +15,19 @@ def get_llm_provider() -> BaseLLMProvider:
     Поддерживаемые значения:
         - "openai"
         - "gemini" (по умолчанию)
+        - "deepseek" (только текст)
     """
     global _provider_instance, _provider_signature
     signature = tuple(
         get_setting(k)
         for k in (
             "LLM_PROVIDER",
+            "DEEPSEEK_API_KEY",
+            "DEEPSEEK_BASE_URL",
+            "DEEPSEEK_MODEL",
+            "DEEPSEEK_TEMPERATURE",
+            "DEEPSEEK_MAX_TOKENS",
+            "DEEPSEEK_TIMEOUT_SECONDS",
             "OPENAI_API_KEY",
             "OPENAI_BASE_URL",
             "OPENAI_SOCKS5_PROXY",
@@ -43,6 +50,10 @@ def get_llm_provider() -> BaseLLMProvider:
         from llm.providers.openai import OpenAIProvider
 
         _provider_instance = OpenAIProvider()
+    elif provider_name == "deepseek":
+        from llm.providers.deepseek import DeepSeekProvider
+
+        _provider_instance = DeepSeekProvider()
     elif provider_name == "gemini":
         from llm.providers.gemini import GeminiProvider
 
@@ -50,7 +61,7 @@ def get_llm_provider() -> BaseLLMProvider:
     else:
         raise ValueError(
             f"Неизвестный LLM провайдер: '{provider_name}'. "
-            f"Допустимые значения: openai, gemini"
+            f"Допустимые значения: openai, gemini, deepseek"
         )
 
     _provider_signature = signature
@@ -64,7 +75,10 @@ _faq_signature: tuple = ()
 
 def get_faq_provider() -> BaseLLMProvider:
     global _faq_provider, _faq_signature
-    name = get_setting("FAQ_EMBEDDING_PROVIDER", get_setting("LLM_PROVIDER", "gemini"))
+    default = get_setting("LLM_PROVIDER", "gemini")
+    name = get_setting(
+        "FAQ_EMBEDDING_PROVIDER", "gemini" if default == "deepseek" else default
+    )
     if name == get_setting("LLM_PROVIDER", "gemini"):
         return get_llm_provider()
     signature = (

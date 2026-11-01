@@ -21,6 +21,7 @@ from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from llm.providers.deepseek_graph_adapters import DeepSeekLLM
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
@@ -432,9 +433,10 @@ class GraphMemory:
             workspace_path = self._get_workspace_path(graph_id)
 
             try:
+                default_provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
                 graph_llm_provider = get_setting(
                     "LIGHTRAG_EMBEDDING_PROVIDER",
-                    get_setting("LIGHTRAG_LLM_PROVIDER", "gemini"),
+                    "gemini" if default_provider == "deepseek" else default_provider,
                 ).lower()
 
                 if graph_llm_provider == "openai":
@@ -509,6 +511,10 @@ class GraphMemory:
                         adapter = OpenAILLM(
                             api_key=get_setting("OPENAI_API_KEY", ""),
                             model=get_setting("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
+                        )
+                    elif provider == "deepseek":
+                        adapter = DeepSeekLLM(
+                            model=get_setting("DEEPSEEK_GRAPH_MODEL", "deepseek-flash"),
                         )
                     else:
                         adapter = GeminiLLM(
