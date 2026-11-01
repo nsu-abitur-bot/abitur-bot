@@ -74,3 +74,12 @@ Choose an already retained local image and leave migrations disabled; this does
 not undo schema changes. Verify the public endpoints and bot state, then record
 the operator intervention in the deployment receipt. Never edit pins concurrently
 with Actions or force an old commit through the automatic main freshness guard.
+
+Exact healthy retries are no-ops: migrations are not repeated and the rollback
+receipt is preserved. An unhealthy same-image retry repairs the application and
+retains the original previous image. Valid GitHub bot actors (`[bot]`) are accepted.
+Failure diagnostics expose only fixed stage, exception class, numeric subprocess
+return code and validated digest/SHA; never raw stderr or credential data. The
+same safe record is written to `/opt/abitur/deploy-failure.json`, leaving the last
+good receipt intact. `images.yaml` is canonical: editing old minimal overlay pins
+alone cannot roll back a component, because the third overlay overrides them.

@@ -18,6 +18,7 @@ REPOS = {"backend": "abitur-bot", "web": "abitur-web"}
 SERVICES = {"backend": ("api", "bot", "migrate", "permissions"), "web": ("web",)}
 PINS = Path("/opt/abitur/images.yaml")
 RECEIPT = Path("/opt/abitur/deploy-receipts.json")
+FAILURE = Path("/opt/abitur/deploy-failure.json")
 LOCK = Path("/run/lock/abitur-deploy.lock")
 COMPOSE = "/usr/local/bin/abitur-nsu-compose"
 
@@ -34,7 +35,9 @@ def validate(component: str, data: Any) -> dict[str, str]:
         raise ValueError("Invalid image digest")
     if not re.fullmatch(r"[0-9a-f]{40}", data["sha"]):
         raise ValueError("Invalid revision")
-    if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,99}", data["registry_username"]):
+    if not re.fullmatch(
+        r"[A-Za-z0-9][A-Za-z0-9-]{0,99}(?:\[bot\])?", data["registry_username"]
+    ):
         raise ValueError("Invalid registry username")
     if any(c.isspace() for c in data["registry_token"]):
         raise ValueError("Invalid registry token")
@@ -54,11 +57,31 @@ def atomic_json(path: Path, data: Any) -> None:
             os.unlink(name)
 
 
+class ProcessFailure(RuntimeError):
+    def __init__(self, returncode: int) -> None:
+        super().__init__("Deployment subprocess failed")
+        self.returncode = returncode
+
+
 class Host:
     def __init__(self, config: str) -> None:
         self.env = {**os.environ, "DOCKER_CONFIG": config}
+        self.stage = "request"
 
     def run(self, *args: str, stdin: str | None = None) -> str:
+        if args[0] == "docker":
+            self.stage = {
+                "login": "registry-login",
+                "pull": "image-pull",
+                "image": "revision-check",
+                "inspect": "container-state",
+            }.get(args[1], "docker")
+        elif args[0] == COMPOSE:
+            self.stage = (
+                ("migration" if args[-1] == "migrate" else "permissions")
+                if args[1] == "run"
+                else "services"
+            )
         # Never forward command output: docker errors may contain credentials.
         result = subprocess.run(
             args,
@@ -70,10 +93,11 @@ class Host:
             check=False,
         )
         if result.returncode:
-            raise RuntimeError("Deployment subprocess failed")
+            raise ProcessFailure(result.returncode)
         return result.stdout.strip()
 
     def current_sha(self, component: str, token: str) -> str:
+        self.stage = "main-freshness"
         request = urllib.request.Request(
             f"https://api.github.com/repos/nsu-abitur-bot/{REPOS[component]}"
             "/git/ref/heads/main",
@@ -86,6 +110,7 @@ class Host:
             return json.load(response)["object"]["sha"]
 
     def healthy(self, component: str) -> None:
+        self.stage = "health"
         url = (
             "http://127.0.0.1:18001/api/v1/university/profile"
             if component == "backend"
@@ -138,6 +163,22 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
         raise ValueError("Unexpected image overlay")
     if any(set(value) != {"image"} for value in pins["services"].values()):
         raise ValueError("Overlay must contain images only")
+    receipts = json.loads(RECEIPT.read_text()) if RECEIPT.exists() else {}
+    prior_receipt = receipts.get(component, {})
+    same_pin = all(
+        pins["services"][s]["image"] == data["image"] for s in SERVICES[component]
+    )
+    if (
+        same_pin
+        and prior_receipt.get("sha") == data["sha"]
+        and prior_receipt.get("image") == data["image"]
+    ):
+        try:
+            host.healthy(component)
+        except Exception:
+            pass
+        else:
+            return "Already deployed and healthy"
     previous = json.loads(json.dumps(pins))
     host.run(
         "docker",
@@ -168,16 +209,19 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
     try:
         start(host, component, migrate=True)
     except Exception:
+        failed_stage = getattr(host, "stage", "deploy")
         atomic_json(PINS, previous)
         start(host, component, migrate=False)
-        raise RuntimeError(
-            "Deploy failed; previous image restored (schema not downgraded)"
-        ) from None
-    receipts = json.loads(RECEIPT.read_text()) if RECEIPT.exists() else {}
+        host.stage = failed_stage
+        raise
     receipts[component] = {
         "sha": data["sha"],
         "image": data["image"],
-        "previous_image": previous["services"][SERVICES[component][0]]["image"],
+        "previous_image": (
+            prior_receipt["previous_image"]
+            if same_pin and prior_receipt.get("image") == data["image"]
+            else previous["services"][SERVICES[component][0]]["image"]
+        ),
         "completed_at": int(time.time()),
     }
     atomic_json(RECEIPT, receipts)
@@ -185,6 +229,8 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
 
 
 def main() -> int:
+    host = None
+    data = None
     try:
         data = validate(
             sys.argv[1] if len(sys.argv) == 2 else "", json.loads(sys.stdin.read(20000))
@@ -198,15 +244,28 @@ def main() -> int:
         ):
             os.chmod(config, 0o700)
             fcntl.flock(lock, fcntl.LOCK_EX)
-            result = deploy(sys.argv[1], data, Host(config))
+            host = Host(config)
+            result = deploy(sys.argv[1], data, host)
         try:
             print(result, flush=True)
         except BrokenPipeError:
             sys.stdout = open(os.devnull, "w")
         return 0
-    except Exception:
-        # Do not expose exception strings, payloads, registry responses or tokens.
-        print("Deployment failed; inspect root-owned state", file=sys.stderr)
+    except Exception as error:
+        # Only fixed stages, exception class names and numeric codes leave root.
+        detail = {
+            "stage": getattr(host, "stage", "request"),
+            "error": type(error).__name__,
+            "returncode": error.returncode if isinstance(error, ProcessFailure) else None,
+            "failed_at": int(time.time()),
+        }
+        if data is not None:
+            detail.update({"sha": data["sha"], "image": data["image"]})
+            try:
+                atomic_json(FAILURE, detail)
+            except OSError:
+                pass
+        print("Deployment failed: " + json.dumps(detail), file=sys.stderr)
         return 1
 
 

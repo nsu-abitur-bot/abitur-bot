@@ -214,3 +214,71 @@ def test_main_locks_before_freshness_and_cleans_private_registry_config(
     assert d.main() == 0
     assert configs and all(not path.exists() for path in configs)
     assert "secret" not in d.RECEIPT.read_text()
+
+
+@pytest.mark.parametrize(
+    "username", ["github-actions[bot]", "dependabot[bot]", "Marat-nsu"]
+)
+def test_valid_registry_actor(username: str) -> None:
+    data = payload()
+    data["registry_username"] = username
+    assert d.validate("backend", data) == data
+
+
+def test_healthy_exact_retry_preserves_rollback_receipt(state: dict) -> None:
+    d.deploy("backend", payload(), FakeHost())
+    original = d.RECEIPT.read_text()
+    retry = FakeHost()
+    assert d.deploy("backend", payload(), retry) == "Already deployed and healthy"
+    assert d.RECEIPT.read_text() == original
+    assert retry.calls == [("freshness",), ("health", "backend")]
+
+
+def test_unhealthy_retry_repairs_without_losing_previous_image(state: dict) -> None:
+    d.deploy("backend", payload(), FakeHost())
+    host = FakeHost()
+    host.health_failures = 1
+    # This retry legitimately pulls with the new pin already present.
+    original_run = host.run
+
+    def retry_run(*args: str, stdin: str | None = None) -> str:
+        if args[:2] == ("docker", "pull"):
+            host.calls.append(args)
+            return ""
+        return original_run(*args, stdin=stdin)
+
+    host.run = retry_run
+    assert d.deploy("backend", payload(), host) == "Deployment healthy"
+    assert json.loads(d.RECEIPT.read_text())["backend"]["previous_image"] == "old-backend"
+
+
+def test_failure_receipt_and_diagnostics_never_include_secret(
+    state: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture,
+) -> None:
+    import io
+    import signal
+    import sys
+
+    class FailedHost(FakeHost):
+        def __init__(self, config: str) -> None:
+            super().__init__()
+            self.stage = "image-pull"
+
+        def run(self, *args: str, stdin: str | None = None) -> str:
+            raise d.ProcessFailure(17)
+
+    monkeypatch.setattr(d, "LOCK", tmp_path / "lock")
+    monkeypatch.setattr(d, "FAILURE", tmp_path / "failure.json")
+    monkeypatch.setattr(d, "Host", FailedHost)
+    monkeypatch.setattr(signal, "signal", lambda *args: None)
+    monkeypatch.setattr(sys, "argv", ["deploy", "backend"])
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(payload())))
+    assert d.main() == 1
+    output = capsys.readouterr().err
+    assert '"stage": "image-pull"' in output
+    assert '"returncode": 17' in output
+    assert "secret" not in output + d.FAILURE.read_text()
+    assert json.loads(d.PINS.read_text()) == state
