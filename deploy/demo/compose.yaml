@@ -1,8 +1,7 @@
 name: ${INSTANCE_NAME:?Set INSTANCE_NAME}
 
 x-backend: &backend
-  build:
-    context: ../..
+  image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
   environment: &environment
     PYTHON_DOTENV_DISABLED: "1"
     DB_HOST: postgres
