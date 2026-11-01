@@ -9,6 +9,7 @@ class Observation:
     text: str
     tools_called: list[str] = field(default_factory=list)
     faq_matched: bool = False
+    sources: list[str] = field(default_factory=list)
 
 
 def check_assertion(assertion: Assertion, observation: Observation) -> bool:
@@ -31,4 +32,9 @@ def check_assertion(assertion: Assertion, observation: Observation) -> bool:
         case "refusal":
             refused = bool(re.search(r"не могу|не пишу код|только.*поступлен", text))
             return refused == value
+        case "source_contains":
+            return any(
+                str(value).casefold() in str(source).casefold()
+                for source in observation.sources
+            )
     raise ValueError("Unknown assertion kind")

@@ -5,7 +5,14 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+from config.instance import redact
+
 load_dotenv()
+
+
+class SecretSafeFormatter(logging.Formatter):
+    def format(self, record: logging.LogRecord) -> str:
+        return redact(super().format(record))
 
 
 def setup_logging():
@@ -19,7 +26,7 @@ def setup_logging():
     log_level = os.getenv("LOG_LEVEL", "INFO").upper()
 
     # Формат логов
-    formatter = logging.Formatter(
+    formatter = SecretSafeFormatter(
         fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )

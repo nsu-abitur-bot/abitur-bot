@@ -1,6 +1,6 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas.admission_score import (
@@ -13,6 +13,7 @@ from api.schemas.admission_score import (
     ScoreRowSchema,
     UnmatchedSample,
 )
+from config.university import is_nsu
 from db.postgres.db import get_async_session
 from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from parser.scores import DEFAULT_SCORES_URL, parse_scores
@@ -51,6 +52,8 @@ async def preview_scores(
     service: AdmissionScoreService = Depends(get_admission_score_service),
 ) -> PreviewResponse:
     """Парсит страницу (без записи в БД) и считает сопоставимость со справочником."""
+    if not is_nsu():
+        raise HTTPException(409, "Парсер баллов НГУ недоступен для другого вуза")
     url = data.url or DEFAULT_SCORES_URL
     parsed = await parse_scores(url)
 

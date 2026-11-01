@@ -14,11 +14,11 @@
 import asyncio
 import logging
 import math
-import os
 from typing import Any, List, TypedDict
 
+from config.instance import get_setting
 from db.postgres.services.message_log import MessageLogService, QuestionGroup
-from llm.factory import get_llm_provider
+from llm.factory import get_faq_provider as get_llm_provider
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ def _embedder_cache_identity(embedder: Any) -> tuple[str, str]:
     elif "gemini" in module_name or "gemini" in class_name:
         provider = "gemini"
     else:
-        provider = os.getenv("LLM_PROVIDER", "") or class_name
+        provider = get_setting("FAQ_EMBEDDING_PROVIDER", "") or class_name
 
     model = (
         getattr(embedder, "model", None)

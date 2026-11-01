@@ -1,0 +1,15 @@
+schema_version: 1
+scenarios:
+  - id: custom_university_material
+    question: Где находится центр поддержки студентов Университета Север?
+    reference_answer: Центр поддержки студентов Университета Север находится в корпусе С, кабинет 214.
+    topic: university-adaptation
+    source: 'Синтетическая фикстура: https://sever.example/student-support; не реальные сведения о вузе'
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: contains, value: '214'}
+      - {kind: contains, value: 'Север'}
+      - {kind: not_contains, value: 'НГУ'}
+    judge_criteria: Ответ относится к Университету Север, опирается на загруженный текст, без сведений о НГУ.

@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
 from urllib.parse import urlsplit
 
@@ -9,8 +8,9 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
 
+from config.instance import get_setting
 from llm.base import BaseLLMProvider, LLMResult, LLMUsage, ToolExecutor, ToolSpec
-from llm.profiles import LLMProfile
+from llm.profiles import LLMProfile, LLMProfiles
 
 # Максимум раундов «модель -> инструменты -> модель» перед финальным ответом.
 _MAX_TOOL_ITERATIONS = 3
@@ -34,15 +34,15 @@ def _mask_proxy_url(proxy_url: str | None) -> str:
 
 class OpenAIProvider(BaseLLMProvider):
     def __init__(self) -> None:
-        api_key = os.getenv("OPENAI_API_KEY")
+        api_key = get_setting("OPENAI_API_KEY")
         if not api_key:
             raise RuntimeError("Переменная окружения OPENAI_API_KEY не установлена.")
 
-        self.model_name = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
-        self.temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
-        self.max_tokens = int(os.getenv("OPENAI_MAX_TOKENS", "1024"))
-        self.timeout_seconds = float(os.getenv("OPENAI_TIMEOUT_SECONDS", "60"))
-        self.proxy_url = os.getenv("OPENAI_SOCKS5_PROXY")
+        self.model_name = get_setting("OPENAI_MODEL", "gpt-4o-mini")
+        self.temperature = float(get_setting("OPENAI_TEMPERATURE", "0.2"))
+        self.max_tokens = int(get_setting("OPENAI_MAX_TOKENS", "1024"))
+        self.timeout_seconds = float(get_setting("OPENAI_TIMEOUT_SECONDS", "60"))
+        self.proxy_url = get_setting("OPENAI_SOCKS5_PROXY")
 
         self._async_http_client: httpx.AsyncClient | None = None
         self._sync_http_client: httpx.Client | None = None
@@ -64,6 +64,7 @@ class OpenAIProvider(BaseLLMProvider):
 
         client_kwargs: dict[str, Any] = {
             "api_key": api_key,
+            "base_url": get_setting("OPENAI_BASE_URL"),
             "timeout": self.timeout_seconds,
         }
         if self._async_http_client is not None:
@@ -319,8 +320,10 @@ class OpenAIProvider(BaseLLMProvider):
 
     def get_embeddings_model(self) -> Any:
         embedding_kwargs: dict[str, Any] = {
-            "api_key": os.getenv("OPENAI_API_KEY"),
-            "model": os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+            "api_key": get_setting("OPENAI_API_KEY"),
+            "base_url": get_setting("OPENAI_BASE_URL"),
+            "model": get_setting("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+            "request_timeout": float(LLMProfiles.EMBEDDING.timeout or 60),
         }
         if self._sync_http_client is not None:
             embedding_kwargs["http_client"] = self._sync_http_client
