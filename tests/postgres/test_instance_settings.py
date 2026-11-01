@@ -419,3 +419,41 @@ async def test_concurrent_writers_cannot_lose_updates(test_engine):
         assert sum(isinstance(result, InstanceSnapshot) for result in results) == 1
     finally:
         await concurrent_engine.dispose()
+
+
+async def test_graph_llm_switch_and_rollback_preserve_populated_indexes(
+    session, tmp_path
+):
+    from db.postgres.models import FaqEntry
+
+    session.add(FaqEntry(question="q", answer="a"))
+    await session.flush()
+    graph = tmp_path / "abitur_kb"
+    graph.mkdir()
+    (graph / "kv_store_full_docs.json").write_text('{"doc": {"content": "old"}}')
+    before = InstanceSnapshot(1, {k: spec.default for k, spec in instance.SPECS.items()})
+    candidate = merge_changes(before, {"LIGHTRAG_LLM_PROVIDER": "deepseek"})
+    await guard_embeddings(session, before, candidate)
+    rollback = merge_changes(
+        InstanceSnapshot(2, candidate), {"LIGHTRAG_LLM_PROVIDER": "gemini"}
+    )
+    await guard_embeddings(session, InstanceSnapshot(2, candidate), rollback)
+    changed = merge_changes(before, {"LIGHTRAG_EMBEDDING_PROVIDER": "openai"})
+    with pytest.raises(ConfigurationError, match="переиндексации"):
+        await guard_embeddings(session, before, changed)
+
+
+async def test_deepseek_secret_is_encrypted_and_masked(session):
+    from api.routes.instance_settings import describe
+
+    await InstanceSettingsService(session).write(
+        {"DEEPSEEK_API_KEY": "deepseek-private-fixture"}, 0
+    )
+    raw = await session.scalar(select(Settings.value).where(Settings.key == SETTINGS_KEY))
+    assert "deepseek-private-fixture" not in raw
+    description = await describe(session)
+    key = next(s for s in description["settings"] if s["key"] == "DEEPSEEK_API_KEY")
+    assert key["configured"] and key["secret"] and key["value"] is None
+    assert (await InstanceSettingsService(session).read()).values[
+        "DEEPSEEK_API_KEY"
+    ] == "deepseek-private-fixture"
