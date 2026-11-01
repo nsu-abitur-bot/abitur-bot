@@ -1,0 +1,42 @@
+{
+  "runtime_sha": "1cb32678cd446e955481e9f95c2039590b001d41",
+  "settings_revision": 5,
+  "saved_utc": "2026-11-01T12:50:14.265034Z",
+  "extractor_sha256": "ec83a6fcfb63c45ac7c3356bbb3d868027c4452c439f295fd33bb37a8ce5b63e",
+  "chat_provider": "deepseek",
+  "chat_model": "deepseek-chat",
+  "graph_provider": "gemini",
+  "graph_model": "gemini-3.1-flash-lite",
+  "embedding_provider": "gemini",
+  "embedding_model": "gemini-embedding-001",
+  "chat_profile": {
+    "max_tokens": 1500,
+    "timeout": 45,
+    "temperature": 0.2
+  },
+  "worker_paid_overlap": false,
+  "cases": [
+    {
+      "artifact": "telegram-after-first-125636.jsonl",
+      "docker_since": "2026-11-01T12:56:30Z",
+      "docker_until": "2026-11-01T12:57:10Z",
+      "classification": "owner confirmed grounded success",
+      "rows": 55,
+      "request_ids": [
+        "4eb49dc05dfb463d9a9fb56e92c42d3a"
+      ],
+      "sha256": "23751ff2dae706b43be499a2c5de5dcd45b68b48b37e7283dd7e1ec410b9a108"
+    },
+    {
+      "artifact": "telegram-after-second-125711.jsonl",
+      "docker_since": "2026-11-01T12:57:10Z",
+      "docker_until": "2026-11-01T12:58:00Z",
+      "classification": "owner confirmed grounded success",
+      "rows": 56,
+      "request_ids": [
+        "b03fe811ffef4664b9defc565dd4e27a"
+      ],
+      "sha256": "cb618bbad9bf5cc6cdafac897334122f854d1e31006b8184216870204d257547"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "runtime_sha": "d407cc8c2942ce406f8b41c11caca9fc0c29a4a7",
+  "extractor_sha256": "a7f25c03120025e5e7e00174dc42bd0dbc34e8389fb668b12019301ee9e5804d",
+  "source_indexed_utc": "2026-11-01T11:48:08.947990Z",
+  "worker_paid_overlap": false,
+  "cases": [
+    {
+      "artifact": "telegram-success-120131.jsonl",
+      "docker_since": "2026-11-01T12:01:20Z",
+      "docker_until": "2026-11-01T12:02:53Z",
+      "classification": "owner confirmed grounded success",
+      "rows": 53,
+      "request_ids": [
+        "9ec76f8d27c54f5e8a018f9356d2db13"
+      ],
+      "sha256": "6911c5fdcac69ef30c45e81eff042ad60551f5dda6cf98f3f3a1f15f01051aa1"
+    },
+    {
+      "artifact": "telegram-failure-120254.jsonl",
+      "docker_since": "2026-11-01T12:02:53Z",
+      "docker_until": "2026-11-01T12:03:40Z",
+      "classification": "owner confirmed model unavailable failure",
+      "rows": 35,
+      "request_ids": [
+        "3c2e6f4b9ee2409c888d5c3d0e91e0bf"
+      ],
+      "sha256": "8bfbc1a28446bb1778578b526504c5de80f0c0332e1cf3d89e83ba1eb89f727b"
+    }
+  ]
+}
