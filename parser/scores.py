@@ -13,6 +13,7 @@
 :class:`ScoreRow` — по одной строке на тройку (направление, год, форма).
 """
 
+import asyncio
 import logging
 import re
 
@@ -230,8 +231,12 @@ async def parse_scores(url: str = DEFAULT_SCORES_URL) -> list[ScoreRow]:
     (направление, год, форма). Проходной/средний баллы за годы без данных
     пропускаются.
     """
+    return await asyncio.to_thread(_fetch_and_parse_scores, url)
+
+
+def _fetch_and_parse_scores(url: str) -> list[ScoreRow]:
     try:
-        response = requests.get(url, headers=_HEADERS, timeout=30)
+        response = requests.get(url, headers=_HEADERS, timeout=(5, 30))
         response.raise_for_status()
     except requests.exceptions.RequestException as exc:
         logger.error("Ошибка загрузки страницы итогов приёма %s: %s", url, exc)
