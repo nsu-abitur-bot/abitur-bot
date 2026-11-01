@@ -32,17 +32,25 @@ def summarize(rows: list[dict[str, Any]]) -> dict[str, Any]:
         if first and "finished_ms" in first and "started_ms" in total:
             first_from_entry = round(first["finished_ms"] - total["started_ms"], 3)
         sdk_calls = [row for row in events if row.get("event") == "sdk_call"]
+        attempt_spans = [
+            row
+            for row in events
+            if row.get("stage", "").startswith("provider_http_attempt_")
+        ]
+        attempts = (
+            sum(row["attempts"] for row in sdk_calls)
+            if sdk_calls
+            else len(attempt_spans)
+            if attempt_spans
+            else None
+        )
         output.append(
             {
                 "request_id": request_id,
                 "generation_completed": generated,
                 "wall_ms": total["duration_ms"],
                 "first_text_from_handler_ms": first_from_entry,
-                "http_attempts": sum(
-                    len(value)
-                    for name, value in stages.items()
-                    if name.startswith("provider_http_attempt_")
-                ),
+                "http_attempts": attempts,
                 "sdk_retries": sum(row["retries"] for row in sdk_calls)
                 if sdk_calls
                 else None,
