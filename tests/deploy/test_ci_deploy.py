@@ -174,3 +174,43 @@ def test_process_boundary_captures_output_and_passes_token_only_stdin(
     assert kwargs["capture_output"] is True
     assert kwargs["timeout"] == 240
     assert kwargs["env"]["DOCKER_CONFIG"] == str(tmp_path)
+
+
+def test_main_locks_before_freshness_and_cleans_private_registry_config(
+    state: dict,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    import fcntl
+    import io
+    import signal
+    import sys
+
+    lock_path = tmp_path / "shared.lock"
+    monkeypatch.setattr(d, "LOCK", lock_path)
+    monkeypatch.setattr(sys, "argv", ["abitur-deploy", "backend"])
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(payload())))
+    signals = []
+    configs = []
+    monkeypatch.setattr(
+        signal, "signal", lambda sig, action: signals.append((sig, action))
+    )
+
+    class LockedHost(FakeHost):
+        def __init__(self, config: str) -> None:
+            super().__init__()
+            configs.append(Path(config))
+            assert Path(config).stat().st_mode & 0o777 == 0o700
+
+        def current_sha(self, component: str, token: str) -> str:
+            assert (signal.SIGHUP, signal.SIG_IGN) in signals
+            assert (signal.SIGTERM, signal.SIG_IGN) in signals
+            with lock_path.open("w") as probe:
+                with pytest.raises(BlockingIOError):
+                    fcntl.flock(probe, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            return super().current_sha(component, token)
+
+    monkeypatch.setattr(d, "Host", LockedHost)
+    assert d.main() == 0
+    assert configs and all(not path.exists() for path in configs)
+    assert "secret" not in d.RECEIPT.read_text()
