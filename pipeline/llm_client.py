@@ -5,12 +5,14 @@ import re
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass, field, replace
 from html import unescape
+from time import perf_counter
 from typing import Awaitable, Callable, Optional
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from abbrev.expander import get_abbrev_expander
+from config.latency import observation, request_timed, stage, timed
 from config.university import identity
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
@@ -151,6 +153,7 @@ async def _save_log_to_db(
         logger.error(f"Ошибка сохранения лога в БД: {e}")
 
 
+@timed("intent_background")
 async def _classify_intent_bg(
     expanded_message: str,
     log_entry_id: Optional[int],
@@ -179,9 +182,10 @@ async def _classify_intent_bg(
             HumanMessage(content=expanded_message),
         ]
         intent_provider = get_llm_provider()
-        intent_response = await intent_provider.generate(
-            intent_messages, profile=LLMProfiles.INTENT
-        )
+        with stage("intent_model_call"):
+            intent_response = await intent_provider.generate(
+                intent_messages, profile=LLMProfiles.INTENT
+            )
 
         topic_id = None
         try:
@@ -341,6 +345,7 @@ class _Ctx:
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
 
+    @timed("tool_execution")
     async def execute_tool(self, name: str, args: dict) -> str:
         self.trace.tools_called.append(name)
         return await default_tool_executor(name, args)
@@ -418,6 +423,7 @@ async def _await_faq(
         return None
 
 
+@timed("faq")
 async def _match_faq(matcher: FAQMatcher, message: str) -> Optional[str]:
     """FAQ-матч с актуальным порогом.
 
@@ -430,6 +436,7 @@ async def _match_faq(matcher: FAQMatcher, message: str) -> Optional[str]:
     return await matcher.match_async(message)
 
 
+@timed("history")
 async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
     try:
         return await task
@@ -438,6 +445,7 @@ async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
         return []
 
 
+@timed("history_write")
 async def _remember_message(
     redis_client: RedisClient, session_id: str, entry: dict[str, str]
 ) -> None:
@@ -473,6 +481,7 @@ def _history_before_question(history_entries: list[dict], question: str) -> list
     return list(history_entries)
 
 
+@timed("retrieval_total")
 async def _retrieve_context(
     expanded_message: str,
     history_text: str,
@@ -607,6 +616,7 @@ def _university_scores_tool() -> ToolSpec:
     )
 
 
+@timed("generation_tools_total")
 async def _run_tool_loop(
     messages: list[BaseMessage],
     session_id: str,
@@ -633,11 +643,14 @@ async def _run_tool_loop(
         return result.text, result.usage, provider_name
 
     streamed = ""
+    started = perf_counter()
 
     async def on_delta(delta: str) -> None:
         nonlocal streamed
         if not delta:
             return
+        if not streamed:
+            observation("generation_first_delta", (perf_counter() - started) * 1000)
         streamed += delta
         try:
             await stream_callback(streamed)
@@ -751,6 +764,7 @@ async def _answer_without_kb(
     return processed.text, processed.sources
 
 
+@timed("answer_total")
 async def _generate_answer(
     rag: _RagResult,
     history_entries: list[dict],
@@ -815,6 +829,7 @@ def _store_answer(
         _spawn_bg(_save_message_to_pg(ctx.user_id, ctx.session_id, message, stored_text))
 
 
+@request_timed("pipeline_total")
 async def ask_local_llm(
     message: str,
     session_id: str,

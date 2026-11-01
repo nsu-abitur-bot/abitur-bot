@@ -11,11 +11,16 @@ from urllib.parse import unquote, urlsplit
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
-from lightrag.base import DocStatus
+from lightrag.base import DocStatus, StorageNameSpace
 from lightrag.kg.shared_storage import initialize_pipeline_status
-from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
+from lightrag.utils import (
+    TiktokenTokenizer,
+    compute_mdhash_id,
+    wrap_embedding_func_with_attrs,
+)
 
 from config.instance import get_setting
+from config.latency import stage, timed
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
@@ -30,6 +35,23 @@ from rag.crag import CragChunk, load_crag_config, run_crag
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def _time_queued_callbacks(rag: LightRAG) -> None:
+    """Time the caller's queue await, not a worker that retains an old context."""
+    embedding = cast(Any, rag.embedding_func)
+    timed_embedding = timed("rag_embedding")(embedding)
+    # LightRAG shares its queued callback with every storage at construction.
+    # Preserve that sharing and the queue's attributes (including shutdown).
+    for value in vars(rag).values():
+        if (
+            isinstance(value, StorageNameSpace)
+            and getattr(value, "embedding_func", None) is embedding
+        ):
+            cast(Any, value).embedding_func = timed_embedding
+    cast(Any, rag).embedding_func = timed_embedding
+    cast(Any, rag).llm_model_func = timed("rag_model_call")(cast(Any, rag.llm_model_func))
+
 
 GRAPH_QUERY_MODES: frozenset = frozenset(
     ["naive", "local", "global", "hybrid", "mix", "bypass"]
@@ -369,6 +391,7 @@ class GraphMemory:
             except Exception as exc:
                 logger.warning(f"Failed to update {file_path} after deletion: {exc}")
 
+    @timed("graph_acquire")
     async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
         rag_to_finalize = None
 
@@ -542,18 +565,29 @@ class GraphMemory:
                         "doc_status_storage": "PGDocStatusStorage",
                     }
 
-                rag = LightRAG(
-                    working_dir=workspace_path,
-                    llm_model_func=llm_model_func,
-                    embedding_func=embedding_func,
-                    chunk_token_size=400,
-                    chunk_overlap_token_size=50,
-                    embedding_func_max_async=embedding_workers,
-                    llm_model_max_async=llm_workers,
-                    **storage_kwargs,
-                )
+                # A missing dictionary can trigger synchronous HTTP in tiktoken.
+                # Only its tokenizer is built off-loop; storage ownership stays here.
+                with stage("graph_tokenizer_initialize"):
+                    tokenizer = await asyncio.to_thread(TiktokenTokenizer)
 
-                await rag.initialize_storages()
+                with stage("graph_constructor"):
+                    rag = LightRAG(
+                        working_dir=workspace_path,
+                        llm_model_func=llm_model_func,
+                        embedding_func=embedding_func,
+                        tokenizer=tokenizer,
+                        auto_manage_storages_states=False,
+                        chunk_token_size=400,
+                        chunk_overlap_token_size=50,
+                        embedding_func_max_async=embedding_workers,
+                        llm_model_max_async=llm_workers,
+                        **storage_kwargs,
+                    )
+
+                _time_queued_callbacks(rag)
+
+                with stage("graph_storages_initialize"):
+                    await rag.initialize_storages()
                 await initialize_pipeline_status()
 
                 wrapper = _GraphWrapper(rag)
@@ -747,6 +781,7 @@ class GraphMemory:
                 raise
             raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
+    @timed("search_embeddings")
     async def _retrieve_raw_chunks(
         self,
         rag: Any,
@@ -1094,6 +1129,7 @@ class GraphMemory:
             logger.warning("Failed to load documents signature for sources: %s", exc)
             return -1, None
 
+    @timed("source_titles")
     async def _get_source_titles(self, graph_id: str) -> dict[str, str]:
         """Соответствие «URL → человекочитаемый заголовок» для «Источников».
 
@@ -1169,6 +1205,7 @@ class GraphMemory:
         self._source_titles_cache[graph_id] = (signature, url_to_title)
         return url_to_title
 
+    @timed("source_ranking")
     async def _rerank_sources_with_llm(
         self,
         question: str,
@@ -1208,10 +1245,14 @@ class GraphMemory:
 
         try:
             provider = get_llm_provider()
-            raw = await provider.generate(
-                [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
-                profile=LLMProfiles.CHAT,
-            )
+            with stage("source_ranking_model_call"):
+                raw = await provider.generate(
+                    [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=user_prompt),
+                    ],
+                    profile=LLMProfiles.CHAT,
+                )
         except Exception as exc:
             # Ranking is optional: keep successful retrieval usable on provider failure.
             logger.warning(

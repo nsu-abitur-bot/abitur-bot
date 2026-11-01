@@ -19,6 +19,7 @@ from typing import Callable, Optional, Protocol
 import numpy as np
 import yaml
 
+from config.latency import stage
 from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.settings import SettingsService
@@ -327,7 +328,10 @@ class FAQMatcher:
         if self._embedder is None:
             return None
 
-        query_vec = np.array(self._embedder.embed_documents([cleaned])[0], dtype=float)
+        with stage("faq_embedding"):
+            query_vec = np.array(
+                self._embedder.embed_documents([cleaned])[0], dtype=float
+            )
         query_embedding = query_vec / max(float(np.linalg.norm(query_vec)), 1e-10)
 
         # Косинусное сходство со всеми FAQ-фразами

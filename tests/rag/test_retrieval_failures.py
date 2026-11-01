@@ -8,6 +8,7 @@ LightRAG и nano_vectordb, на подделке их не воспроизве�
 
 from contextlib import asynccontextmanager
 from types import SimpleNamespace
+from typing import Any, cast
 
 import numpy as np
 import pytest
@@ -241,3 +242,211 @@ async def test_query_with_crag_nothing_kept_is_empty(monkeypatch):
     monkeypatch.setattr(graph_memory_module, "run_crag", drop_everything)
 
     assert await memory.query_with_crag("test_graph", "Вопрос") == ("", [])
+
+
+async def test_first_tokenizer_load_keeps_event_loop_responsive(monkeypatch, tmp_path):
+    """A first dictionary download must not stall draft I/O and async timeouts."""
+    import asyncio
+    import threading
+
+    entered = threading.Event()
+    release = threading.Event()
+    finished = threading.Event()
+
+    def slow_tokenizer(*args, **kwargs):
+        entered.set()
+        try:
+            if not release.wait(2):
+                raise RuntimeError("test tokenizer was not released")
+            return Tokenizer("words", _WordTokenizer())
+        finally:
+            finished.set()
+
+    class NoNetworkAdapter:
+        embedding_dim = EMBEDDING_DIM
+
+        def __init__(self, **kwargs):
+            pass
+
+        async def aclose(self):
+            pass
+
+    monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(tmp_path))
+    monkeypatch.setenv("LIGHTRAG_STORAGE", "json")
+    monkeypatch.setattr(
+        graph_memory_module,
+        "get_setting",
+        lambda name, default=None: "synthetic-key"
+        if name == "GEMINI_API_KEY"
+        else str(tmp_path)
+        if name == "LIGHTRAG_WORKSPACE_BASE"
+        else default,
+    )
+    monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkAdapter)
+    monkeypatch.setattr("lightrag.lightrag.TiktokenTokenizer", slow_tokenizer)
+    monkeypatch.setattr(
+        graph_memory_module, "TiktokenTokenizer", slow_tokenizer, raising=False
+    )
+    assert graph_memory_module.get_setting("LIGHTRAG_WORKSPACE_BASE") == str(tmp_path)
+    memory = GraphMemory()
+    assert memory.workspace_path == str(tmp_path)
+
+    async def acquire_graph():
+        async with memory._use_graph("responsive-init") as rag:
+            return rag
+
+    # This external watchdog lets the broken synchronous implementation finish,
+    # so the test fails an assertion instead of hanging the entire suite.
+    watchdog = threading.Timer(1, release.set)
+    watchdog.start()
+    task = asyncio.create_task(acquire_graph())
+    try:
+        while not entered.is_set():
+            await asyncio.sleep(0)
+        assert not finished.is_set(), "tokenizer download blocked the event loop"
+    finally:
+        release.set()
+        watchdog.cancel()
+        rag = await task
+        await rag.finalize_storages()
+
+
+async def test_cancel_tokenizer_load_releases_graph_lock(monkeypatch, tmp_path):
+    import asyncio
+    import threading
+
+    entered = threading.Event()
+    release = threading.Event()
+    finished = threading.Event()
+
+    def slow_tokenizer(*args, **kwargs):
+        entered.set()
+        try:
+            if not release.wait(2):
+                raise RuntimeError("test tokenizer was not released")
+            return Tokenizer("words", _WordTokenizer())
+        finally:
+            finished.set()
+
+    class NoNetworkAdapter:
+        embedding_dim = EMBEDDING_DIM
+
+        def __init__(self, **kwargs):
+            pass
+
+        async def aclose(self):
+            pass
+
+    monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(tmp_path))
+    monkeypatch.setenv("LIGHTRAG_STORAGE", "json")
+    monkeypatch.setattr(
+        graph_memory_module,
+        "get_setting",
+        lambda name, default=None: "synthetic-key"
+        if name == "GEMINI_API_KEY"
+        else str(tmp_path)
+        if name == "LIGHTRAG_WORKSPACE_BASE"
+        else default,
+    )
+    monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkAdapter)
+    monkeypatch.setattr(graph_memory_module, "TiktokenTokenizer", slow_tokenizer)
+    assert graph_memory_module.get_setting("LIGHTRAG_WORKSPACE_BASE") == str(tmp_path)
+    memory = GraphMemory()
+    assert memory.workspace_path == str(tmp_path)
+
+    async def acquire():
+        async with memory._use_graph("cancel-init") as rag:
+            return rag
+
+    task = asyncio.create_task(acquire())
+    try:
+        while not entered.is_set():
+            await asyncio.sleep(0)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        assert "cancel-init" not in memory._graphs
+        assert not memory._get_lock("cancel-init").locked()
+    finally:
+        release.set()
+        assert await asyncio.to_thread(finished.wait, 2)
+    rag = await acquire()
+    assert memory._graphs["cancel-init"].usage_count == 0
+    await rag.finalize_storages()
+
+
+async def test_reused_graph_callbacks_keep_current_request_id(
+    monkeypatch, tmp_path, caplog
+):
+    """Real persistent LightRAG queues must not inherit the first caller's trace."""
+    import json
+    import logging
+
+    from config.latency import request_timed
+
+    class NoNetworkEmbedding:
+        embedding_dim = EMBEDDING_DIM
+
+        def __init__(self, **kwargs):
+            pass
+
+        async def __call__(self, texts):
+            return [[1.0] * EMBEDDING_DIM for _ in texts]
+
+        async def aclose(self):
+            pass
+
+    class NoNetworkModel(NoNetworkEmbedding):
+        async def __call__(self, prompt, **kwargs):
+            return "synthetic result"
+
+    monkeypatch.setattr(
+        graph_memory_module,
+        "get_setting",
+        lambda name, default=None: str(tmp_path)
+        if name == "LIGHTRAG_WORKSPACE_BASE"
+        else "synthetic-key"
+        if name == "GEMINI_API_KEY"
+        else "json"
+        if name == "LIGHTRAG_STORAGE"
+        else default,
+    )
+    monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkEmbedding)
+    monkeypatch.setattr(graph_memory_module, "GeminiLLM", NoNetworkModel)
+    monkeypatch.setattr(
+        graph_memory_module,
+        "TiktokenTokenizer",
+        lambda: Tokenizer("words", _WordTokenizer()),
+    )
+    memory = GraphMemory()
+    assert memory.workspace_path == str(tmp_path)
+    async with memory._use_graph("trace-reuse") as graph:
+        rag = cast(Any, graph)
+
+        @request_timed("synthetic_request")
+        async def request():
+            assert await rag.llm_model_func("synthetic prompt") == "synthetic result"
+            # The vector store retains its own callback reference.
+            assert await rag.chunks_vdb.embedding_func(["synthetic chunk"])
+
+        try:
+            with caplog.at_level(logging.INFO, logger="abitur.latency"):
+                await request()
+                await request()
+            rows = [
+                json.loads(record.getMessage().split(" ", 1)[1])
+                for record in caplog.records
+                if record.name == "abitur.latency"
+            ]
+            request_ids = [
+                r["request_id"] for r in rows if r.get("stage") == "synthetic_request"
+            ]
+            assert len(set(request_ids)) == 2
+            for name in ("rag_model_call", "rag_embedding"):
+                assert [
+                    r["request_id"] for r in rows if r.get("stage") == name
+                ] == request_ids
+        finally:
+            await rag.llm_model_func.shutdown()
+            await rag.embedding_func.shutdown()
+            await rag.finalize_storages()
