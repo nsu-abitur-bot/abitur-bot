@@ -82,7 +82,22 @@ def test_publish_image_workflow_concurrency_and_tags() -> None:
     publish = data["jobs"]["publish"]
     assert publish["outputs"]["digest"] == "${{ steps.build.outputs.digest }}"
     tags = publish["steps"][-1]["with"]["tags"]
-    assert tags == "ghcr.io/${{ github.repository }}:sha-${{ github.sha }}"
+    assert (
+        tags == "ghcr.io/${{ github.repository }}:sha-"
+        "${{ github.event.workflow_run.head_sha }}"
+    )
+    guard = publish["if"]
+    for condition in (
+        "github.event.workflow_run.event == 'push'",
+        "github.event.workflow_run.head_branch == 'main'",
+        "github.event.workflow_run.head_repository.full_name == github.repository",
+        "github.event.workflow_run.conclusion == 'success'",
+    ):
+        assert condition in guard
+    for job in data["jobs"].values():
+        assert job["steps"][0]["with"]["ref"] == (
+            "${{ github.event.workflow_run.head_sha }}"
+        )
     promote = data["jobs"]["promote"]
     assert promote["needs"] == "publish"
     assert promote["concurrency"] == {

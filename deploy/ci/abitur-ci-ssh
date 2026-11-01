@@ -1,0 +1,6 @@
+#!/bin/sh
+# Installed root-owned; authorized_keys supplies the literal component argument.
+[ "$#" = 1 ] || exit 1
+case "$1" in backend|web) ;; *) exit 1 ;; esac
+[ "${SSH_ORIGINAL_COMMAND-}" = deploy ] || exit 1
+exec sudo -n /usr/local/sbin/abitur-deploy "$1"

@@ -1,8 +1,9 @@
 name: Publish backend image
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: [PR checks]
+    types: [completed]
 
 permissions:
   contents: read
@@ -10,11 +11,18 @@ permissions:
 
 jobs:
   publish:
+    if: >-
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: docker/setup-buildx-action@v3
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -28,7 +36,10 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+          labels: org.opencontainers.image.revision=${{ github.event.workflow_run.head_sha }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,mode=max,scope=backend
+          tags: ghcr.io/${{ github.repository }}:sha-${{ github.event.workflow_run.head_sha }}
 
   promote:
     needs: publish
@@ -40,6 +51,8 @@ jobs:
       queue: max
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: docker/setup-buildx-action@v3
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -49,6 +62,38 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Promote only current main
         env:
+          TESTED_SHA: ${{ github.event.workflow_run.head_sha }}
           GH_TOKEN: ${{ github.token }}
           IMAGE_DIGEST: ${{ needs.publish.outputs.digest }}
         run: bash tools/promote_backend_image.sh
+
+  deploy:
+    needs: [publish, promote]
+    runs-on: ubuntu-latest
+    concurrency:
+      group: backend-production-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+      - name: Configure private SSH transport
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          umask 077
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+      - name: Deploy immutable checked image
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_IMAGE: ghcr.io/nsu-abitur-bot/abitur-bot@${{ needs.publish.outputs.digest }}
+          DEPLOY_SHA: ${{ github.event.workflow_run.head_sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 deploy/ci/send_deploy.py
+      - name: Remove SSH credentials
+        if: always()
+        run: rm -f ~/.ssh/deploy_key ~/.ssh/known_hosts
