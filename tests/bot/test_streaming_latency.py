@@ -72,3 +72,35 @@ async def test_draft_failure_does_not_prevent_final_send():
     await asyncio.sleep(0)
     await streamer.finalize("Ответ")
     assert sent == ["Ответ"]
+
+
+async def test_finalize_preserves_cancellation_during_draft_cleanup():
+    entered = asyncio.Event()
+    cleaning = asyncio.Event()
+    sent = []
+
+    class CleaningBot:
+        async def send_message_draft(self, **kwargs):
+            entered.set()
+            try:
+                await asyncio.Event().wait()
+            finally:
+                cleaning.set()
+                await asyncio.Event().wait()
+
+        async def send_message(self, chat_id, text, **kwargs):
+            sent.append(text)
+
+    streamer = TelegramStreamer(cast(Any, CleaningBot()), "100")
+    await streamer.set_status("Поиск…")
+    await entered.wait()
+    final = asyncio.create_task(streamer.finalize("Ответ"))
+    await cleaning.wait()
+    final.cancel()
+    try:
+        await final
+    except asyncio.CancelledError:
+        pass
+    assert final.cancelled()
+    assert sent == []
+    await streamer.close()

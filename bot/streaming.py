@@ -4,7 +4,6 @@ import asyncio
 import logging
 import re
 import time
-from contextlib import suppress
 from typing import TYPE_CHECKING, Optional
 
 from aiogram import Bot
@@ -61,9 +60,14 @@ class TelegramStreamer:
         self._pending_draft = None
         if self._draft_task is not None:
             self._draft_task.cancel()
-            with suppress(asyncio.CancelledError):
+            try:
                 await self._draft_task
-            self._draft_task = None
+            except asyncio.CancelledError:
+                parent = asyncio.current_task()
+                if parent is not None and parent.cancelling():
+                    raise
+            finally:
+                self._draft_task = None
 
     @timed("telegram_draft")
     async def _send_draft(self, text: str) -> bool:
