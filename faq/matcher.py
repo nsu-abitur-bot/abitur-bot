@@ -178,7 +178,6 @@ class FAQMatcher:
         faq_path: Optional[Path] = None,
         threshold: Optional[float] = None,
         embedder: Optional["EmbeddingClient"] = None,
-        sync_from_db: bool = False,
     ):
         # None → env-дефолт; явное значение передают тесты и вызовы,
         # которым нужен детерминированный порог.
@@ -186,7 +185,6 @@ class FAQMatcher:
             default_similarity_threshold() if threshold is None else threshold
         )
         self._faq_path = faq_path or FAQ_DATA_PATH
-        self._sync_from_db = sync_from_db
         self._refresh_lock = asyncio.Lock()
         self._items_signature: Optional[tuple[tuple[str, tuple[str, ...], str], ...]] = (
             None
@@ -332,7 +330,8 @@ class FAQMatcher:
             for item in items
         )
 
-    async def _refresh_from_db(self) -> None:
+    async def refresh_from_db(self) -> None:
+        """Перестраивает индекс только при изменении записей в БД."""
         async with self._refresh_lock:
             async with AsyncSessionLocal() as session:
                 result = await session.execute(
@@ -406,12 +405,7 @@ class FAQMatcher:
         return self._match(user_question)
 
     async def match_async(self, user_question: str) -> Optional[str]:
-        """Сверяет рабочий индекс с БД и ищет ответ без блокировки event loop."""
-        if self._sync_from_db:
-            try:
-                await self._refresh_from_db()
-            except Exception as exc:
-                logger.warning("FAQ не обновлён из БД, использую текущий индекс: %s", exc)
+        """Ищет ответ в текущем индексе без блокировки event loop."""
         return await asyncio.to_thread(self._match, user_question)
 
     def reload(self) -> None:
@@ -456,5 +450,5 @@ def get_faq_matcher() -> FAQMatcher:
     """Возвращает глобальный экземпляр FAQMatcher (lazy singleton)."""
     global _faq_matcher
     if _faq_matcher is None:
-        _faq_matcher = FAQMatcher(sync_from_db=True)
+        _faq_matcher = FAQMatcher()
     return _faq_matcher

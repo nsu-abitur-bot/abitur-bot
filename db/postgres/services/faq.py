@@ -1,12 +1,13 @@
 import logging
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import FaqEntry
 
 logger = logging.getLogger(__name__)
+FAQ_CHANGE_CHANNEL = "abitur_faq_changed"
 
 
 class FaqDbService:
@@ -27,6 +28,7 @@ class FaqDbService:
         entry = FaqEntry(question=question, aliases=aliases, answer=answer)
         self.session.add(entry)
         try:
+            await self._notify_changed()
             await self.session.commit()
             await self.session.refresh(entry)
             return entry
@@ -46,6 +48,7 @@ class FaqDbService:
         ]
         self.session.add_all(entries)
         try:
+            await self._notify_changed()
             await self.session.commit()
             for entry in entries:
                 await self.session.refresh(entry)
@@ -71,6 +74,7 @@ class FaqDbService:
         entry.aliases = aliases
         entry.answer = answer
         try:
+            await self._notify_changed()
             await self.session.commit()
             await self.session.refresh(entry)
         except Exception:
@@ -84,8 +88,14 @@ class FaqDbService:
             return False
         await self.session.delete(entry)
         try:
+            await self._notify_changed()
             await self.session.commit()
         except Exception:
             await self.session.rollback()
             raise
         return True
+
+    async def _notify_changed(self) -> None:
+        await self.session.execute(
+            text("SELECT pg_notify(:channel, '')"), {"channel": FAQ_CHANGE_CHANNEL}
+        )
