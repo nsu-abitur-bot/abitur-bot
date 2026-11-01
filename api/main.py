@@ -2,7 +2,7 @@ import logging
 import os
 import re
 from contextlib import asynccontextmanager
-from datetime import datetime
+from datetime import date, datetime
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query
@@ -28,7 +28,7 @@ from api.routes.system_logs import router as system_logs_router
 from api.routes.topic import router as topic_router
 from bootstrap.runtime_settings import runtime_settings
 from db.postgres.db import AsyncSessionLocal, get_async_session
-from db.postgres.models import Admin
+from db.postgres.models import Admin, Message
 from db.postgres.services.abbrev import AbbrevDbService
 from db.postgres.services.faq import FaqDbService
 from db.postgres.services.message import MessageService
@@ -56,6 +56,14 @@ class MessageResponse(BaseModel):
     user_text: str
     bot_response: str
     created_at: datetime
+
+
+class MessagePageResponse(BaseModel):
+    items: list[MessageResponse]
+    total: int
+    limit: int
+    offset: int
+    snapshot_id: str | None = None
 
 
 @asynccontextmanager
@@ -205,6 +213,10 @@ async def get_messages(
     except Exception:
         raise HTTPException(status_code=503, detail="Database unavailable")
 
+    return _describe_messages(messages)
+
+
+def _describe_messages(messages: list[Message]) -> list[MessageResponse]:
     result = []
     for msg in messages:
         # Извлекаем username из формата [from username] text
@@ -238,6 +250,50 @@ async def get_messages(
             )
         )
     return result
+
+
+@app.get("/api/v1/messages/page", response_model=MessagePageResponse)
+async def get_message_page(
+    user_id: int | None = Query(None),
+    limit: int = Query(25, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    search: str | None = Query(None, max_length=500),
+    channel: str | None = Query(None, pattern="(?i)^(telegram|max)$"),
+    from_date: date | None = Query(None, description="First UTC day, inclusive"),
+    to_date: date | None = Query(None, description="Last UTC day, inclusive"),
+    snapshot_id: str | None = Query(
+        None,
+        min_length=1,
+        max_length=36,
+        description="UUIDv7 upper bound returned by the first export page",
+    ),
+    session: AsyncSession = Depends(get_async_session),
+    _: Admin = Depends(get_current_admin),
+) -> MessagePageResponse:
+    """Return one filtered page and its total without loading the full history."""
+    if from_date is not None and to_date is not None and from_date > to_date:
+        raise HTTPException(422, detail="from_date must not be after to_date")
+    try:
+        messages, total, snapshot = await MessageService(session).get_message_page(
+            user_id=user_id,
+            limit=limit,
+            offset=offset,
+            search=search,
+            channel=channel.lower() if channel else None,
+            from_date=from_date,
+            to_date=to_date,
+            snapshot_id=snapshot_id,
+        )
+    except Exception:
+        logger.exception("Unable to load message page")
+        raise HTTPException(503, detail="Database unavailable") from None
+    return MessagePageResponse(
+        items=_describe_messages(messages),
+        total=total,
+        limit=limit,
+        offset=offset,
+        snapshot_id=snapshot,
+    )
 
 
 @app.get("/api/v1/university", dependencies=[Depends(get_current_admin)])
