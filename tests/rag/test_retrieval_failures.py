@@ -241,3 +241,126 @@ async def test_query_with_crag_nothing_kept_is_empty(monkeypatch):
     monkeypatch.setattr(graph_memory_module, "run_crag", drop_everything)
 
     assert await memory.query_with_crag("test_graph", "Вопрос") == ("", [])
+
+
+async def test_first_tokenizer_load_keeps_event_loop_responsive(monkeypatch, tmp_path):
+    """A first dictionary download must not stall draft I/O and async timeouts."""
+    import asyncio
+    import threading
+
+    entered = threading.Event()
+    release = threading.Event()
+    finished = threading.Event()
+
+    def slow_tokenizer(*args, **kwargs):
+        entered.set()
+        try:
+            if not release.wait(2):
+                raise RuntimeError("test tokenizer was not released")
+            return Tokenizer("words", _WordTokenizer())
+        finally:
+            finished.set()
+
+    class NoNetworkAdapter:
+        embedding_dim = EMBEDDING_DIM
+
+        def __init__(self, **kwargs):
+            pass
+
+        async def aclose(self):
+            pass
+
+    monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(tmp_path))
+    monkeypatch.setenv("LIGHTRAG_STORAGE", "json")
+    monkeypatch.setattr(
+        graph_memory_module,
+        "get_setting",
+        lambda name, default=None: "synthetic-key"
+        if name == "GEMINI_API_KEY"
+        else default,
+    )
+    monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkAdapter)
+    monkeypatch.setattr("lightrag.lightrag.TiktokenTokenizer", slow_tokenizer)
+    monkeypatch.setattr(
+        graph_memory_module, "TiktokenTokenizer", slow_tokenizer, raising=False
+    )
+    memory = GraphMemory()
+
+    async def acquire_graph():
+        async with memory._use_graph("responsive-init") as rag:
+            return rag
+
+    # This external watchdog lets the broken synchronous implementation finish,
+    # so the test fails an assertion instead of hanging the entire suite.
+    watchdog = threading.Timer(1, release.set)
+    watchdog.start()
+    task = asyncio.create_task(acquire_graph())
+    try:
+        while not entered.is_set():
+            await asyncio.sleep(0)
+        assert not finished.is_set(), "tokenizer download blocked the event loop"
+    finally:
+        release.set()
+        watchdog.cancel()
+        rag = await task
+        await rag.finalize_storages()
+
+
+async def test_cancel_tokenizer_load_releases_graph_lock(monkeypatch, tmp_path):
+    import asyncio
+    import threading
+
+    entered = threading.Event()
+    release = threading.Event()
+    finished = threading.Event()
+
+    def slow_tokenizer(*args, **kwargs):
+        entered.set()
+        try:
+            if not release.wait(2):
+                raise RuntimeError("test tokenizer was not released")
+            return Tokenizer("words", _WordTokenizer())
+        finally:
+            finished.set()
+
+    class NoNetworkAdapter:
+        embedding_dim = EMBEDDING_DIM
+
+        def __init__(self, **kwargs):
+            pass
+
+        async def aclose(self):
+            pass
+
+    monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(tmp_path))
+    monkeypatch.setenv("LIGHTRAG_STORAGE", "json")
+    monkeypatch.setattr(
+        graph_memory_module,
+        "get_setting",
+        lambda name, default=None: "synthetic-key"
+        if name == "GEMINI_API_KEY"
+        else default,
+    )
+    monkeypatch.setattr(graph_memory_module, "GeminiEmbedding", NoNetworkAdapter)
+    monkeypatch.setattr(graph_memory_module, "TiktokenTokenizer", slow_tokenizer)
+    memory = GraphMemory()
+
+    async def acquire():
+        async with memory._use_graph("cancel-init") as rag:
+            return rag
+
+    task = asyncio.create_task(acquire())
+    try:
+        while not entered.is_set():
+            await asyncio.sleep(0)
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        assert "cancel-init" not in memory._graphs
+        assert not memory._get_lock("cancel-init").locked()
+    finally:
+        release.set()
+        assert await asyncio.to_thread(finished.wait, 2)
+    rag = await acquire()
+    assert memory._graphs["cancel-init"].usage_count == 0
+    await rag.finalize_storages()

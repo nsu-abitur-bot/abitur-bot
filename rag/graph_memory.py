@@ -13,7 +13,11 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
 from lightrag.base import DocStatus
 from lightrag.kg.shared_storage import initialize_pipeline_status
-from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
+from lightrag.utils import (
+    TiktokenTokenizer,
+    compute_mdhash_id,
+    wrap_embedding_func_with_attrs,
+)
 
 from config.instance import get_setting
 from config.latency import stage, timed
@@ -540,18 +544,27 @@ class GraphMemory:
                         "doc_status_storage": "PGDocStatusStorage",
                     }
 
-                rag = LightRAG(
-                    working_dir=workspace_path,
-                    llm_model_func=llm_model_func,
-                    embedding_func=embedding_func,
-                    chunk_token_size=400,
-                    chunk_overlap_token_size=50,
-                    embedding_func_max_async=embedding_workers,
-                    llm_model_max_async=llm_workers,
-                    **storage_kwargs,
-                )
+                # A missing dictionary can trigger synchronous HTTP in tiktoken.
+                # Only its tokenizer is built off-loop; storage ownership stays here.
+                with stage("graph_tokenizer_initialize"):
+                    tokenizer = await asyncio.to_thread(TiktokenTokenizer)
 
-                await rag.initialize_storages()
+                with stage("graph_constructor"):
+                    rag = LightRAG(
+                        working_dir=workspace_path,
+                        llm_model_func=llm_model_func,
+                        embedding_func=embedding_func,
+                        tokenizer=tokenizer,
+                        auto_manage_storages_states=False,
+                        chunk_token_size=400,
+                        chunk_overlap_token_size=50,
+                        embedding_func_max_async=embedding_workers,
+                        llm_model_max_async=llm_workers,
+                        **storage_kwargs,
+                    )
+
+                with stage("graph_storages_initialize"):
+                    await rag.initialize_storages()
                 await initialize_pipeline_status()
 
                 wrapper = _GraphWrapper(rag)

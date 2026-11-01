@@ -193,7 +193,7 @@ def configure_numeric_logging() -> NumericTimings:
     return timings
 
 
-async def run(args: argparse.Namespace) -> None:
+async def run(args: argparse.Namespace, snapshot_override: Any = None) -> None:
     timings = configure_numeric_logging()
 
     from sqlalchemy import select, text
@@ -205,8 +205,11 @@ async def run(args: argparse.Namespace) -> None:
     from db.postgres.services.instance_settings import InstanceSettingsService
 
     source_engine = db.engine
-    async with db.AsyncSessionLocal() as session:
-        snapshot = await InstanceSettingsService(session).read()
+    if snapshot_override is None:
+        async with db.AsyncSessionLocal() as session:
+            snapshot = await InstanceSettingsService(session).read()
+    else:
+        snapshot = snapshot_override
     install(snapshot.values, snapshot.revision)
     if get_setting("LLM_PROVIDER", "gemini") != "gemini":
         raise RuntimeError("Harness requires Gemini attempt instrumentation")

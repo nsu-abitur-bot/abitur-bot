@@ -28,6 +28,18 @@ COPY --chown=app:app pyproject.toml uv.lock ./
 # --no-install-project installs only dependencies first (better caching)
 RUN uv sync --frozen --no-install-project
 
+# Keep the exact default LightRAG dictionary in the image instead of downloading
+# it synchronously on the first question. USER app owns this cache, not /tmp.
+ENV TIKTOKEN_CACHE_DIR=/app/.cache/tiktoken
+RUN timeout 120s uv run --no-sync python -c \
+    "from lightrag.utils import TiktokenTokenizer; TiktokenTokenizer()"
+# A separate interpreter proves the disk cache works without a network fetch.
+RUN uv run --no-sync python -c "\
+from unittest.mock import patch; \
+from lightrag.utils import TiktokenTokenizer; \
+patch('tiktoken.load.read_file', side_effect=RuntimeError('missing tokenizer cache')).start(); \
+TiktokenTokenizer()"
+
 # Copy the rest of the application.
 # Код принадлежит app, а не root: приложение пишет не только в смонтированные
 # каталоги — например, api/routes/evals.py сохраняет evals/eval_results.json.
