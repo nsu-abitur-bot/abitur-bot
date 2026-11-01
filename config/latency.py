@@ -34,7 +34,7 @@ def observation(name: str, duration_ms: float) -> None:
 
 
 @contextmanager
-def stage(name: str) -> Generator[None]:
+def stage(name: str) -> Generator[None, None, None]:
     """Record wall time, including failed/cancelled operations, without payloads."""
     started = perf_counter()
     status = "ok"
