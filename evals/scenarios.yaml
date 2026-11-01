@@ -88,6 +88,18 @@ scenarios:
       - {kind: contains, value: Тестовый контекст НГУ}
       - {kind: faq_match, value: false}
 
+  - id: rag_rerank_failure
+    question: Как добраться до главного корпуса НГУ?
+    reference_answer: Тестовый контекст НГУ сохраняется при таймауте ранжировщика.
+    topic: retrieval
+    source: "synthetic test fixture in evals/offline.py; issue #291; not real directions"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: Тестовый контекст НГУ}
+      - {kind: faq_match, value: false}
+
   - id: crag_topic_switch_mmf
     question: а на ММФ?
     history:
@@ -105,4 +117,3 @@ scenarios:
       - {kind: contains, value: Тестовый контекст ММФ}
       - {kind: source_contains, value: "https://mmf.nsu.ru"}
       - {kind: faq_match, value: false}
-
