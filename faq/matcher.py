@@ -242,8 +242,14 @@ class FAQMatcher:
 
     def _process_items(self, faq_items: list[dict]) -> None:
         """Строит in-memory индекс из списка FAQ-элементов."""
+        self._index = self._build_index(faq_items)
+
+    def _build_index(
+        self, faq_items: list[dict]
+    ) -> tuple[list[str], list[str], Optional[np.ndarray]]:
+        """Строит снимок без публикации в текущий индекс."""
         if self._embedder is None:
-            return
+            return self._index
 
         questions: list[str] = []
         answers: list[str] = []
@@ -266,9 +272,8 @@ class FAQMatcher:
                     answers.append(answer)
 
         if not questions:
-            self._index = ([], [], None)
             logger.warning("No valid FAQ entries found")
-            return
+            return ([], [], None)
 
         import pickle
 
@@ -304,12 +309,12 @@ class FAQMatcher:
         vectors_list = [cache[phrase] for phrase in questions]
         vectors = np.array(vectors_list, dtype=float)
         norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-        self._index = (questions, answers, vectors / np.maximum(norms, 1e-10))
         logger.info(
             f"FAQ loaded: {len(faq_items)} entries, "
             f"{len(questions)} total phrases "
             f"(cached {len(questions) - len(to_embed_phrases)})"
         )
+        return (questions, answers, vectors / np.maximum(norms, 1e-10))
 
     def load_items(self, items: list[dict]) -> None:
         """Загружает FAQ из списка словарей (из БД)."""
@@ -343,7 +348,11 @@ class FAQMatcher:
                     for e in entries
                 ]
             if self._items_fingerprint(items) != self._items_signature:
-                await asyncio.to_thread(self.load_items, items)
+                # Отмена ожидания не останавливает поток. Публикует только
+                # владелец async-lock после успешного завершения построения.
+                index = await asyncio.to_thread(self._build_index, items)
+                self._index = index
+                self._items_signature = self._items_fingerprint(items)
 
     def _match(self, user_question: str) -> Optional[str]:
         """Единая реализация сопоставления (см. match / match_async)."""
