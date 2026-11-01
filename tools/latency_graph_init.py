@@ -46,14 +46,14 @@ def instrument_graph_init() -> None:
 
         setattr(owner, name, wrapped)
 
-    sync_wrap(LightRAG, "__post_init__", "graph_constructor")
+    sync_wrap(LightRAG, "__post_init__", "graph_constructor_inner")
     sync_wrap(TiktokenTokenizer, "__init__", "tokenizer_constructor")
     sync_wrap(tiktoken, "get_encoding", "graph_tokenizer_get_encoding")
     sync_wrap(tiktoken.load, "read_file", "tokenizer_source_read")
     sync_wrap(genai.Client, "__init__", "sdk_client_initialize")
     sync_wrap(GeminiEmbedding, "__init__", "graph_embedding_client_initialize")
     async_wrap(GeminiEmbedding, "aclose", "graph_embedding_client_close")
-    async_wrap(LightRAG, "initialize_storages", "graph_storages_initialize")
+    async_wrap(LightRAG, "initialize_storages", "graph_storages_initialize_inner")
     async_wrap(
         graph_memory, "initialize_pipeline_status", "graph_pipeline_status_initialize"
     )
