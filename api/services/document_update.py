@@ -17,6 +17,7 @@ from db.postgres.services.document import (
     DOCUMENT_STATUS_UPDATED,
     DocumentService,
 )
+from parser.safe_fetch import UnsafeURLError, fetch_url_async
 from parser.url import process_url
 from rag.loader import DEFAULT_GRAPH_ID
 
@@ -173,13 +174,13 @@ class DocumentUpdateService:
 
 
 async def fetch_url_bytes(url: str) -> bytes:
-    async with httpx.AsyncClient(verify=False, timeout=30.0) as client:
-        response = await client.get(url, follow_redirects=True)
-        response.raise_for_status()
-        return response.content
+    response = await fetch_url_async(url)
+    return response.content
 
 
 def readable_fetch_error(exc: Exception) -> str:
+    if isinstance(exc, UnsafeURLError):
+        return f"Небезопасная ссылка на источник: {exc}"
     if isinstance(exc, httpx.HTTPStatusError):
         status_code = exc.response.status_code
         if status_code == 404:
@@ -194,6 +195,8 @@ def readable_fetch_error(exc: Exception) -> str:
     if isinstance(exc, httpx.TimeoutException):
         return "Источник не ответил вовремя"
     if isinstance(exc, httpx.ConnectError):
+        if "CERTIFICATE_VERIFY_FAILED" in str(exc):
+            return "Не удалось проверить TLS-сертификат источника"
         return "Не удалось подключиться к источнику"
     if isinstance(exc, httpx.InvalidURL):
         return "Некорректная ссылка на источник"
