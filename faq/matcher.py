@@ -18,9 +18,11 @@ from typing import Callable, Optional, Protocol
 
 import numpy as np
 import yaml
+from sqlalchemy import select
 
 from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
+from db.postgres.models import FaqEntry
 from db.postgres.services.settings import SettingsService
 from llm.factory import get_faq_provider as get_llm_provider
 
@@ -176,6 +178,7 @@ class FAQMatcher:
         faq_path: Optional[Path] = None,
         threshold: Optional[float] = None,
         embedder: Optional["EmbeddingClient"] = None,
+        sync_from_db: bool = False,
     ):
         # None → env-дефолт; явное значение передают тесты и вызовы,
         # которым нужен детерминированный порог.
@@ -183,13 +186,16 @@ class FAQMatcher:
             default_similarity_threshold() if threshold is None else threshold
         )
         self._faq_path = faq_path or FAQ_DATA_PATH
+        self._sync_from_db = sync_from_db
+        self._refresh_lock = asyncio.Lock()
+        self._items_signature: Optional[tuple[tuple[str, tuple[str, ...], str], ...]] = (
+            None
+        )
 
         self._embedder = embedder or _LiveEmbeddingClient(self._create_embedder)
 
         # Загружаем FAQ
-        self._questions: list[str] = []  # все формулировки (question + aliases)
-        self._answers: list[str] = []  # ответ для каждой формулировки
-        self._embeddings: Optional[np.ndarray] = None
+        self._index: tuple[list[str], list[str], Optional[np.ndarray]] = ([], [], None)
 
         self._load_faq()
 
@@ -241,9 +247,8 @@ class FAQMatcher:
         if self._embedder is None:
             return
 
-        self._questions.clear()
-        self._answers.clear()
-        self._embeddings = None
+        questions: list[str] = []
+        answers: list[str] = []
 
         for item in faq_items:
             question = (item.get("question") or "").strip()
@@ -253,16 +258,17 @@ class FAQMatcher:
             if not question or not answer:
                 continue
 
-            self._questions.append(question)
-            self._answers.append(answer)
+            questions.append(question)
+            answers.append(answer)
 
             for alias in aliases:
                 alias = alias.strip()
                 if alias:
-                    self._questions.append(alias)
-                    self._answers.append(answer)
+                    questions.append(alias)
+                    answers.append(answer)
 
-        if not self._questions:
+        if not questions:
+            self._index = ([], [], None)
             logger.warning("No valid FAQ entries found")
             return
 
@@ -277,7 +283,7 @@ class FAQMatcher:
             except Exception as e:
                 logger.warning(f"Failed to load FAQ embeddings cache: {e}")
 
-        needed_phrases = list(set(self._questions))
+        needed_phrases = list(set(questions))
         to_embed_phrases = [p for p in needed_phrases if p not in cache]
 
         if to_embed_phrases:
@@ -297,23 +303,53 @@ class FAQMatcher:
             except Exception as e:
                 logger.warning(f"Failed to save FAQ embeddings cache: {e}")
 
-        vectors_list = [cache[phrase] for phrase in self._questions]
+        vectors_list = [cache[phrase] for phrase in questions]
         vectors = np.array(vectors_list, dtype=float)
         norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-        self._embeddings = vectors / np.maximum(norms, 1e-10)
+        self._index = (questions, answers, vectors / np.maximum(norms, 1e-10))
         logger.info(
             f"FAQ loaded: {len(faq_items)} entries, "
-            f"{len(self._questions)} total phrases "
-            f"(cached {len(self._questions) - len(to_embed_phrases)})"
+            f"{len(questions)} total phrases "
+            f"(cached {len(questions) - len(to_embed_phrases)})"
         )
 
     def load_items(self, items: list[dict]) -> None:
         """Загружает FAQ из списка словарей (из БД)."""
+        signature = self._items_fingerprint(items)
         self._process_items(items)
+        self._items_signature = signature
+
+    @staticmethod
+    def _items_fingerprint(
+        items: list[dict],
+    ) -> tuple[tuple[str, tuple[str, ...], str], ...]:
+        return tuple(
+            (
+                item.get("question") or "",
+                tuple(item.get("aliases") or []),
+                item.get("answer") or "",
+            )
+            for item in items
+        )
+
+    async def _refresh_from_db(self) -> None:
+        async with self._refresh_lock:
+            async with AsyncSessionLocal() as session:
+                result = await session.execute(
+                    select(FaqEntry).order_by(FaqEntry.created_at, FaqEntry.id)
+                )
+                entries = result.scalars().all()
+                items = [
+                    {"question": e.question, "aliases": e.aliases, "answer": e.answer}
+                    for e in entries
+                ]
+            if self._items_fingerprint(items) != self._items_signature:
+                await asyncio.to_thread(self.load_items, items)
 
     def _match(self, user_question: str) -> Optional[str]:
         """Единая реализация сопоставления (см. match / match_async)."""
-        if self._embeddings is None or len(self._questions) == 0:
+        questions, answers, embeddings = self._index
+        if embeddings is None or not questions:
             return None
 
         # Очищаем вопрос от мусора
@@ -331,22 +367,22 @@ class FAQMatcher:
         query_embedding = query_vec / max(float(np.linalg.norm(query_vec)), 1e-10)
 
         # Косинусное сходство со всеми FAQ-фразами
-        similarities = _cosine_similarity(query_embedding, self._embeddings)
+        similarities = _cosine_similarity(query_embedding, embeddings)
 
         best_idx = int(np.argmax(similarities))
         best_score = float(similarities[best_idx])
 
         logger.info(
-            f"[FAQ] Match result: best='{self._questions[best_idx]}' "
+            f"[FAQ] Match result: best='{questions[best_idx]}' "
             f"score={best_score:.4f} threshold={self._threshold}"
         )
 
         if best_score >= self._threshold:
             logger.info(
-                f"[FAQ] HIT: '{cleaned}' → '{self._questions[best_idx]}' "
+                f"[FAQ] HIT: '{cleaned}' → '{questions[best_idx]}' "
                 f"(score={best_score:.4f})"
             )
-            return self._answers[best_idx]
+            return answers[best_idx]
 
         return None
 
@@ -370,8 +406,12 @@ class FAQMatcher:
         return self._match(user_question)
 
     async def match_async(self, user_question: str) -> Optional[str]:
-        """Async-обёртка над `_match`: вся работа, включая вызов эмбеддинга,
-        уезжает в отдельный поток, чтобы не блокировать event loop."""
+        """Сверяет рабочий индекс с БД и ищет ответ без блокировки event loop."""
+        if self._sync_from_db:
+            try:
+                await self._refresh_from_db()
+            except Exception as exc:
+                logger.warning("FAQ не обновлён из БД, использую текущий индекс: %s", exc)
         return await asyncio.to_thread(self._match, user_question)
 
     def reload(self) -> None:
@@ -389,7 +429,7 @@ class FAQMatcher:
     @property
     def size(self) -> int:
         """Количество FAQ-фраз (question + aliases)."""
-        return len(self._questions)
+        return len(self._index[0])
 
 
 class _LiveEmbeddingClient:
@@ -416,5 +456,5 @@ def get_faq_matcher() -> FAQMatcher:
     """Возвращает глобальный экземпляр FAQMatcher (lazy singleton)."""
     global _faq_matcher
     if _faq_matcher is None:
-        _faq_matcher = FAQMatcher()
+        _faq_matcher = FAQMatcher(sync_from_db=True)
     return _faq_matcher
