@@ -87,3 +87,22 @@ scenarios:
     assertions:
       - {kind: contains, value: Тестовый контекст НГУ}
       - {kind: faq_match, value: false}
+
+  - id: crag_topic_switch_mmf
+    question: а на ММФ?
+    history:
+      - role: user
+        content: Какие условия поступления на ФИТ?
+      - role: assistant
+        content: Факультет информационных технологий (ФИТ) ведет прием на программы бакалавриата.
+    reference_answer: Ответ про условия поступления на ММФ с опорой на контекст и источники ММФ.
+    topic: retrieval
+    source: CRAG follow-up topic switch regression; isolated MMF fixture in evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: Тестовый контекст ММФ}
+      - {kind: source_contains, value: "https://mmf.nsu.ru"}
+      - {kind: faq_match, value: false}
+

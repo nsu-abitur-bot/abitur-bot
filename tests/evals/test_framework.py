@@ -48,6 +48,16 @@ def test_tool_assertion_uses_trace_not_answer_text():
     )
 
 
+def test_source_contains_assertion():
+    assertion = Assertion(kind="source_contains", value="https://mmf.nsu.ru")
+    assert check_assertion(
+        assertion, Observation(text="ok", sources=["https://mmf.nsu.ru/info"])
+    )
+    assert not check_assertion(
+        assertion, Observation(text="ok", sources=["https://fit.nsu.ru/info"])
+    )
+
+
 def test_invalid_and_duplicate_scenarios_fail_closed(tmp_path):
     path = tmp_path / "cases.yaml"
     path.write_text("schema_version: 1\nscenarios: []\n", encoding="utf-8")
@@ -119,12 +129,13 @@ async def test_real_offline_pipeline_passes_and_records_trace(monkeypatch):
 
     with offline_pipeline() as runner:
         report = await PipelineEvaluator(runner=runner).run(offline=True)
-    assert report["total"] == report["passed_perfectly"] == 6
+    assert report["total"] == report["passed_perfectly"] == 7
     assert not connections
     by_id = {r["id"]: r for r in report["results"]}
     assert by_id["abbrev_1"]["faq_matched"]
     assert by_id["tool_1"]["tools_called"] == ["get_admission_scores"]
     assert not by_id["faq_negative_1"]["faq_matched"]
+    assert by_id["crag_topic_switch_mmf"]["passed"]
     assert report["skipped_ids"] == ["guardrails", "hallucination_check"]
 
 
@@ -195,7 +206,7 @@ async def test_judge_runs_only_after_deterministic_checks(monkeypatch):
     evaluator = PipelineEvaluator(runner=runner, judge=judge)
     report = await evaluator.run()
     assert all(c["question"] != "Напиши код калькулятора на Python." for c in called)
-    assert report["total"] == 8
+    assert report["total"] == 9
 
 
 @pytest.mark.parametrize(

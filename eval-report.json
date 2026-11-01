@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "mode": "offline",
+  "total": 6,
+  "passed_perfectly": 6,
+  "pass_rate": 1.0,
+  "skipped_ids": [
+    "guardrails",
+    "hallucination_check"
+  ],
+  "results": [
+    {
+      "id": "faq_1",
+      "question": "Какие факультеты есть в НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:faq_1",
+      "passed": true,
+      "answer": "ФИТ, ФЕН, ГГФ.",
+      "tools_called": [],
+      "faq_matched": true,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "faq_2",
+      "question": "Сколько стоит общежитие в НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:faq_2",
+      "passed": true,
+      "answer": "Стоимость общежития уточняется при заселении.",
+      "tools_called": [],
+      "faq_matched": true,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "faq_negative_1",
+      "question": "Какой проходной балл на Факультете Изучения Магии НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:faq_negative_1",
+      "passed": true,
+      "answer": "Информация не найдена.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "abbrev_1",
+      "question": "Что означает НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:abbrev_1",
+      "passed": true,
+      "answer": "НГУ — Новосибирский государственный университет.",
+      "tools_called": [],
+      "faq_matched": true,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        },
+        {
+          "kind": "contains",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "tool_1",
+      "question": "Какой проходной балл на ФИТ в 2024 году?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:tool_1",
+      "passed": true,
+      "answer": "Проходной балл: 246 (тестовая фикстура, 2024)",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "tool_called",
+          "passed": true
+        },
+        {
+          "kind": "regex",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "rag_1",
+      "question": "Как добраться до НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:rag_1",
+      "passed": true,
+      "answer": "Тестовый контекст НГУ.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "contains",
+          "passed": true
+        },
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "rag_results": [
+    {
+      "id": "tool_1",
+      "question": "Какой проходной балл на ФИТ в 2024 году?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:tool_1",
+      "passed": true,
+      "answer": "Проходной балл: 246 (тестовая фикстура, 2024)",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "tool_called",
+          "passed": true
+        },
+        {
+          "kind": "regex",
+          "passed": true
+        }
+      ],
+      "rag_answer": "Проходной балл: 246 (тестовая фикстура, 2024)"
+    }
+  ],
+  "faq_results": [
+    {
+      "id": "faq_1",
+      "question": "Какие факультеты есть в НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:faq_1",
+      "passed": true,
+      "answer": "ФИТ, ФЕН, ГГФ.",
+      "tools_called": [],
+      "faq_matched": true,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ],
+      "expected_match": true,
+      "actual_match": true,
+      "faq_answer": "ФИТ, ФЕН, ГГФ."
+    },
+    {
+      "id": "faq_2",
+      "question": "Сколько стоит общежитие в НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:faq_2",
+      "passed": true,
+      "answer": "Стоимость общежития уточняется при заселении.",
+      "tools_called": [],
+      "faq_matched": true,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ],
+      "expected_match": true,
+      "actual_match": true,
+      "faq_answer": "Стоимость общежития уточняется при заселении."
+    },
+    {
+      "id": "faq_negative_1",
+      "question": "Какой проходной балл на Факультете Изучения Магии НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:faq_negative_1",
+      "passed": true,
+      "answer": "Информация не найдена.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ],
+      "expected_match": false,
+      "actual_match": false,
+      "faq_answer": "Информация не найдена."
+    },
+    {
+      "id": "abbrev_1",
+      "question": "Что означает НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:abbrev_1",
+      "passed": true,
+      "answer": "НГУ — Новосибирский государственный университет.",
+      "tools_called": [],
+      "faq_matched": true,
+      "checks": [
+        {
+          "kind": "faq_match",
+          "passed": true
+        },
+        {
+          "kind": "contains",
+          "passed": true
+        }
+      ],
+      "expected_match": true,
+      "actual_match": true,
+      "faq_answer": "НГУ — Новосибирский государственный университет."
+    },
+    {
+      "id": "rag_1",
+      "question": "Как добраться до НГУ?",
+      "session_id": "eval:df3affa51f5a4a5195d2b55648717660:rag_1",
+      "passed": true,
+      "answer": "Тестовый контекст НГУ.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "contains",
+          "passed": true
+        },
+        {
+          "kind": "faq_match",
+          "passed": true
+        }
+      ],
+      "expected_match": false,
+      "actual_match": false,
+      "faq_answer": "Тестовый контекст НГУ."
+    }
+  ],
+  "regressions": []
+}

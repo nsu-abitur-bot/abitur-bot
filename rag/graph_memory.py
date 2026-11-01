@@ -802,6 +802,8 @@ class GraphMemory:
         код (llm_client) по этому контексту.
         """
         config = await load_crag_config()
+        history = conversation_history.strip() if conversation_history else ""
+        search_question = f"{history}\n\n{question}" if history else question
         try:
             async with self._use_graph(graph_id) as rag:
                 logger.info(
@@ -810,7 +812,7 @@ class GraphMemory:
                     mode,
                     _clip_for_log(question),
                 )
-                raw_chunks = await self._retrieve_raw_chunks(rag, question, mode)
+                raw_chunks = await self._retrieve_raw_chunks(rag, search_question, mode)
 
                 def _to_crag_chunks(items: list[dict]) -> list:
                     out = []
@@ -834,12 +836,21 @@ class GraphMemory:
                     more = await self._retrieve_raw_chunks(rag, refined, mode)
                     return _to_crag_chunks(more)
 
-                kept, hint = await run_crag(
-                    question,
-                    candidates,
-                    retrieve_fn=_retrieve_fn,
-                    config=config,
-                )
+                try:
+                    kept, hint = await run_crag(
+                        question,
+                        candidates,
+                        retrieve_fn=_retrieve_fn,
+                        config=config,
+                        conversation_history=history or None,
+                    )
+                except TypeError:
+                    kept, hint = await run_crag(
+                        question,
+                        candidates,
+                        retrieve_fn=_retrieve_fn,
+                        config=config,
+                    )
 
                 logger.info(
                     "CRAG retrieval result: graph_id=%s candidates=%d kept=%d "
