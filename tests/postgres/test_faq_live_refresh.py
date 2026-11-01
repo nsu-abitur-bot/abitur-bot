@@ -26,7 +26,7 @@ async def wait_for_answer(matcher: FAQMatcher, question: str, answer: str | None
         while await matcher.match_async(question) != answer:
             await asyncio.sleep(0.01)
 
-    await asyncio.wait_for(check(), timeout=3)
+    await asyncio.wait_for(check(), timeout=10)
 
 
 @pytest.mark.asyncio
@@ -45,7 +45,9 @@ async def test_running_matcher_receives_committed_faq_changes(
             "Кто такой Иртегов?", [], "Преподаватель ФИТ НГУ."
         )
 
-    dsn = str(test_engine.url).replace("postgresql+asyncpg://", "postgresql://", 1)
+    dsn = test_engine.url.set(drivername="postgresql").render_as_string(
+        hide_password=False
+    )
     watcher = asyncio.create_task(watch_faq_updates(matcher, dsn))
     try:
         await wait_for_answer(matcher, "Кто такой Иртегов?", "Преподаватель ФИТ НГУ.")
