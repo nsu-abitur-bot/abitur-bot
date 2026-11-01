@@ -48,9 +48,10 @@ class Stand:
         )
         self.token = ""
 
-    def compose(self, *args: str) -> str:
+    def compose(self, *args: str, input_data: str | None = None) -> str:
         result = subprocess.run(
             ["docker", "compose", "--env-file", self.env, "-f", str(COMPOSE), *args],
+            input=input_data,
             check=True,
             capture_output=True,
             text=True,
@@ -98,9 +99,27 @@ def main() -> None:
         stand.wait()
         with urllib.request.urlopen(stand.values["WEB_ORIGIN"] + "/login") as response:
             assert response.status == 200
-    assert (
-        a.request("/auth/register", {"username": marker, "password": password})[0] == 201
+    # Provision only disposable empty projects locally; secrets travel over stdin.
+    bootstrap = (
+        "import asyncio,json,sys; from api.auth.bootstrap import provision; "
+        "data=json.load(sys.stdin); asyncio.run(provision(**data))"
     )
+    for stand, username in ((a, marker), (b, marker + "b")):
+        assert (
+            stand.request("/auth/register", {"username": username, "password": password})[
+                0
+            ]
+            == 400
+        )
+        stand.compose(
+            "exec",
+            "-T",
+            "api",
+            "python",
+            "-c",
+            bootstrap,
+            input_data=json.dumps({"username": username, "password": password}),
+        )
     status, login = a.request("/auth/login", {"username": marker, "password": password})
     assert status == 200 and isinstance(login, dict)
     a.token = login["access_token"]
@@ -108,10 +127,6 @@ def main() -> None:
     b.token = a.token
     assert b.request("/auth/me")[0] == 401
     b.token = ""
-    assert (
-        b.request("/auth/register", {"username": marker + "b", "password": password})[0]
-        == 201
-    )
     _, login_b = b.request(
         "/auth/login", {"username": marker + "b", "password": password}
     )
