@@ -100,7 +100,7 @@ def fetch_url(
     *,
     method: str = "GET",
     headers: Mapping[str, str] | None = None,
-    timeout: float = 30.0,
+    timeout: float | httpx.Timeout = 30.0,
 ) -> httpx.Response:
     """Fetch at most 25 MiB through at most five validated redirects."""
     for hop in range(MAX_REDIRECTS + 1):
@@ -141,7 +141,7 @@ async def fetch_url_async(
     *,
     method: str = "GET",
     headers: Mapping[str, str] | None = None,
-    timeout: float = 30.0,
+    timeout: float | httpx.Timeout = 30.0,
 ) -> httpx.Response:
     """Async equivalent of :func:`fetch_url`, including DNS pinning."""
     for hop in range(MAX_REDIRECTS + 1):

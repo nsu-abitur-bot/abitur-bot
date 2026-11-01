@@ -11,13 +11,17 @@ from parser.utils import (
 )
 
 
-def parse_page(url: str, selectors: list[dict], headers: dict) -> dict:
+def parse_page(
+    url: str, selectors: list[dict], headers: dict, *, fallback_to_body: bool = False
+) -> dict:
     """Парсит произвольную страницу по указанным селекторам."""
     if headers is None:
         headers = {}
 
     try:
-        response = fetch_url(url, headers=headers)
+        response = fetch_url(
+            url, headers=headers, timeout=httpx.Timeout(30.0, connect=5.0)
+        )
         response.raise_for_status()
 
         html_content = response.text
@@ -55,6 +59,14 @@ def parse_page(url: str, selectors: list[dict], headers: dict) -> dict:
             )
 
         data["total_blocks"] = k_blocks
+
+        if fallback_to_body and not data.get("content_blocks"):
+            for element in soup(["script", "style"]):
+                element.extract()
+            if soup.body:
+                body_text = soup.body.get_text(separator="\n", strip=True)
+                if len(body_text) > 100:
+                    data["content_blocks"] = [body_text]
 
         return data
 

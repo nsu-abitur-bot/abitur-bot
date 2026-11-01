@@ -48,6 +48,16 @@ def test_tool_assertion_uses_trace_not_answer_text():
     )
 
 
+def test_source_contains_assertion():
+    assertion = Assertion(kind="source_contains", value="https://mmf.nsu.ru")
+    assert check_assertion(
+        assertion, Observation(text="ok", sources=["https://mmf.nsu.ru/info"])
+    )
+    assert not check_assertion(
+        assertion, Observation(text="ok", sources=["https://fit.nsu.ru/info"])
+    )
+
+
 def test_invalid_and_duplicate_scenarios_fail_closed(tmp_path):
     path = tmp_path / "cases.yaml"
     path.write_text("schema_version: 1\nscenarios: []\n", encoding="utf-8")
@@ -119,12 +129,13 @@ async def test_real_offline_pipeline_passes_and_records_trace(monkeypatch):
 
     with offline_pipeline() as runner:
         report = await PipelineEvaluator(runner=runner).run(offline=True)
-    assert report["total"] == report["passed_perfectly"] == 6
+    assert report["total"] == report["passed_perfectly"] == 8
     assert not connections
     by_id = {r["id"]: r for r in report["results"]}
     assert by_id["abbrev_1"]["faq_matched"]
     assert by_id["tool_1"]["tools_called"] == ["get_admission_scores"]
     assert not by_id["faq_negative_1"]["faq_matched"]
+    assert by_id["crag_topic_switch_mmf"]["passed"]
     assert report["skipped_ids"] == ["guardrails", "hallucination_check"]
 
 
@@ -195,7 +206,7 @@ async def test_judge_runs_only_after_deterministic_checks(monkeypatch):
     evaluator = PipelineEvaluator(runner=runner, judge=judge)
     report = await evaluator.run()
     assert all(c["question"] != "Напиши код калькулятора на Python." for c in called)
-    assert report["total"] == 8
+    assert report["total"] == 10
 
 
 @pytest.mark.parametrize(
@@ -299,3 +310,46 @@ async def test_generator_only_creates_unapproved_drafts(monkeypatch):
     assert first[0].approved_by is None and first[0].approved_at is None
     assert first[0].requires_llm
     assert first[0].source == "reviewed source"
+
+
+async def test_offline_reranker_failure_uses_real_helper(monkeypatch):
+    monkeypatch.setenv("PYTHON_DOTENV_DISABLED", "1")
+    from evals.offline import offline_pipeline
+    from rag.graph_memory import GraphMemory
+
+    original = GraphMemory._rerank_sources_with_llm
+    calls = []
+
+    async def observe(self, question, conversation_history, sources, max_sources):
+        result = await original(
+            self, question, conversation_history, sources, max_sources
+        )
+        calls.append((sources, max_sources, result))
+        return result
+
+    monkeypatch.setattr(GraphMemory, "_rerank_sources_with_llm", observe)
+    scenario = next(
+        s for s in load_scenarios("evals/scenarios.yaml") if s.id == "rag_rerank_failure"
+    )
+    from unittest.mock import patch
+
+    from pipeline import llm_client
+
+    async def forbidden_crag(*args, **kwargs):
+        raise AssertionError("Reranker regression must use the CRAG-disabled branch")
+
+    with offline_pipeline() as runner:
+        with patch.object(llm_client, "query_graph_with_crag", forbidden_crag):
+            observation = await runner(scenario, "eval:regression:rag_rerank_failure")
+    assert observation.text == "Тестовый контекст НГУ."
+    assert not observation.faq_matched
+    assert len(calls) == 1
+    candidates, limit, result = calls[0]
+    assert len(candidates) == 3 and limit == 2
+    assert result == [
+        {
+            "url": f"https://example.test/rerank/{index}",
+            "title": f"Synthetic source {index}",
+        }
+        for index in range(2)
+    ]

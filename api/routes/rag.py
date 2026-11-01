@@ -1,3 +1,4 @@
+import asyncio
 import csv
 import io
 import logging
@@ -49,7 +50,7 @@ from db.postgres.services.document import (
     DocumentService,
 )
 from parser.nsu import parse_page
-from parser.safe_fetch import UnsafeURLError, fetch_url, fetch_url_async
+from parser.safe_fetch import UnsafeURLError, fetch_url_async
 from parser.url import process_pdf_bytes
 from pipeline.preprocessor import clean_and_structure_text, generate_title_from_text
 from rag.graph_memory import get_graph_memory
@@ -170,7 +171,13 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
         {"style": "main", "attr": ""},
     ]
 
-    data = parse_page(str(url), selectors=default_selectors, headers=headers)
+    data = await asyncio.to_thread(
+        parse_page,
+        url_str,
+        selectors=default_selectors,
+        headers=headers,
+        fallback_to_body=True,
+    )
     if not data:
         raise HTTPException(
             status_code=400,
@@ -196,25 +203,6 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
             # Если этот блок еще не является частью уже добавленного блока
             if not any(block in existing for existing in cleaned_blocks):
                 cleaned_blocks.append(block)
-
-    # Если блоков не нашли, пытаемся достать хоть что-то из body (Fallback)
-    if not cleaned_blocks:
-        try:
-            resp = fetch_url(str(url), headers=headers)
-            if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, "html.parser")
-                # Убираем скрипты и стили
-                for script in soup(["script", "style"]):
-                    script.extract()
-                # Берем текст из body, если он там есть
-                body = soup.body
-                if body:
-                    # Пытаемся взять основной текст, пропуская навигацию если возможно
-                    body_text = body.get_text(separator="\n", strip=True)
-                    if len(body_text) > 100:
-                        cleaned_blocks = [body_text]
-        except Exception:
-            pass
 
     text_parts.extend(cleaned_blocks)
     raw_text = "\n\n".join(text_parts)

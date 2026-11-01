@@ -13,6 +13,7 @@
 :class:`ScoreRow` — по одной строке на тройку (направление, год, форма).
 """
 
+import asyncio
 import logging
 import re
 
@@ -232,10 +233,12 @@ async def parse_scores(url: str = DEFAULT_SCORES_URL) -> list[ScoreRow]:
     пропускаются.
     """
     try:
-        response = await fetch_url_async(url, headers=_HEADERS)
+        response = await fetch_url_async(
+            url, headers=_HEADERS, timeout=httpx.Timeout(30.0, connect=5.0)
+        )
         response.raise_for_status()
     except (httpx.HTTPError, UnsafeURLError) as exc:
         logger.error("Ошибка загрузки страницы итогов приёма %s: %s", url, exc)
         return []
 
-    return parse_scores_html(response.text)
+    return await asyncio.to_thread(parse_scores_html, response.text)
