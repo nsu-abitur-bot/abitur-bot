@@ -2,11 +2,11 @@
 # Must run inside the workflow's non-cancelling shared-tag promotion lock.
 set -euo pipefail
 
-: "${GITHUB_REPOSITORY:?}" "${GITHUB_SHA:?}" "${IMAGE_DIGEST:?}"
+: "${GITHUB_REPOSITORY:?}" "${TESTED_SHA:?}" "${IMAGE_DIGEST:?}"
 # Fail closed on an API error or unexpected response, including manual old reruns.
 current_sha=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/main" --jq '.object.sha')
-if [[ "$current_sha" != "$GITHUB_SHA" ]]; then
-    echo "Skipping outdated checkout ${GITHUB_SHA}; main is ${current_sha}"
+if [[ "$current_sha" != "$TESTED_SHA" ]]; then
+    echo "Skipping outdated checkout ${TESTED_SHA}; main is ${current_sha}"
     exit 0
 fi
 

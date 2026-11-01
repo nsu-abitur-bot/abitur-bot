@@ -38,7 +38,7 @@ def test_delayed_old_run_cannot_replace_current_main(tmp_path: Path) -> None:
     def promote(commit: str, next_head: str = "") -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             ["bash", str(ROOT / "tools/promote_backend_image.sh")],
-            env={**env, "GITHUB_SHA": commit, "NEXT_HEAD": next_head},
+            env={**env, "TESTED_SHA": commit, "NEXT_HEAD": next_head},
             text=True,
             capture_output=True,
             check=True,
@@ -82,7 +82,7 @@ def test_remote_lookup_failure_does_not_publish(tmp_path: Path) -> None:
             **os.environ,
             "PATH": str(bin_dir) + ":" + os.environ["PATH"],
             "GITHUB_REPOSITORY": "owner/repo",
-            "GITHUB_SHA": "a" * 40,
+            "TESTED_SHA": "a" * 40,
             "IMAGE_DIGEST": "sha256:" + "a" * 64,
         },
         capture_output=True,
