@@ -1,4 +1,6 @@
 import asyncio
+import json
+import logging
 from typing import Any, cast
 
 from bot.streaming import TelegramStreamer
@@ -57,7 +59,8 @@ async def test_drafts_coalesce_and_close_discards_pending_text():
     await streamer.close()
 
 
-async def test_draft_failure_does_not_prevent_final_send():
+async def test_draft_failure_does_not_prevent_final_send(caplog):
+    caplog.set_level(logging.INFO, logger="abitur.latency")
     sent = []
 
     class FailingBot:
@@ -72,6 +75,15 @@ async def test_draft_failure_does_not_prevent_final_send():
     await asyncio.sleep(0)
     await streamer.finalize("Ответ")
     assert sent == ["Ответ"]
+    rows = [
+        json.loads(record.getMessage().split(" ", 1)[1])
+        for record in caplog.records
+        if record.name == "abitur.latency"
+    ]
+    draft = next(row for row in rows if row.get("stage") == "telegram_draft")
+    assert draft["status"] == "error"
+    assert draft["error_type"] == "ConnectionError"
+    assert "proxy unavailable" not in caplog.text
 
 
 async def test_finalize_preserves_cancellation_during_draft_cleanup():

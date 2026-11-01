@@ -12,7 +12,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 from bot.splitting import split_message
 from bot.utils import normalize_links_for_messaging
-from config.latency import timed
+from config.latency import stage, timed
 
 if TYPE_CHECKING:
     from maxapi import Bot as MaxBot
@@ -69,14 +69,14 @@ class TelegramStreamer:
             finally:
                 self._draft_task = None
 
-    @timed("telegram_draft")
     async def _send_draft(self, text: str) -> bool:
         try:
-            await self._bot.send_message_draft(
-                chat_id=self._chat_id,
-                draft_id=self._draft_id,
-                text=text,
-            )
+            with stage("telegram_draft"):
+                await self._bot.send_message_draft(
+                    chat_id=self._chat_id,
+                    draft_id=self._draft_id,
+                    text=text,
+                )
         except Exception as exc:
             logger.debug("TelegramStreamer: draft update failed (%s)", exc)
             return False
