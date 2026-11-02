@@ -63,15 +63,17 @@ async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch
         "assistant: Факультет информационных технологий "
         "ведет прием на программы бакалавриата."
     )
-    context, sources = await memory.query_with_crag(
+    retrieval = await memory.query_with_crag(
         "test_graph",
         "а на ММФ?",
         conversation_history=history_text,
     )
 
     assert searches == [f"{history_text}\n\nа на ММФ?"]
-    assert "математика и компьютерные науки" in context.lower()
-    assert any("https://mmf.nsu.ru" in s.get("url", "") for s in sources)
+    assert "математика и компьютерные науки" in retrieval.context.lower()
+    assert any(
+        "https://mmf.nsu.ru" in s.get("url", "") for s in retrieval.sources
+    )
 
 
 class _FakeRag:
@@ -149,10 +151,10 @@ async def test_query_with_sources_uses_document_title(monkeypatch):
     monkeypatch.setattr(memory, "_get_source_titles", fake_get_source_titles)
     monkeypatch.setattr(memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm)
 
-    answer, sources = await memory.query_with_sources("test_graph", "Вопрос")
+    retrieval = await memory.query_with_sources("test_graph", "Вопрос")
 
-    assert answer == "Ответ"
-    assert sources == [{"url": source_url, "title": "Правила приема"}]
+    assert retrieval.context == "Ответ"
+    assert retrieval.sources == [{"url": source_url, "title": "Правила приема"}]
 
 
 @pytest.mark.asyncio
@@ -194,14 +196,14 @@ async def test_query_with_sources_logs_rag_query_and_response(monkeypatch, caplo
     monkeypatch.setattr(memory, "_rerank_sources_with_llm", fake_rerank_sources_with_llm)
 
     with caplog.at_level(logging.DEBUG, logger="rag.graph_memory"):
-        answer, sources = await memory.query_with_sources(
+        retrieval = await memory.query_with_sources(
             "test_graph",
             "Какие документы нужны?",
             conversation_history="user: До этого спрашивал про сроки",
         )
 
-    assert answer == "Ответ из RAG"
-    assert sources == [{"url": source_url, "title": "Правила приема"}]
+    assert retrieval.context == "Ответ из RAG"
+    assert retrieval.sources == [{"url": source_url, "title": "Правила приема"}]
     log_text = caplog.text
     assert "RAG retrieval query" in log_text
     assert "Какие документы нужны?" in log_text
@@ -266,10 +268,8 @@ async def test_source_reranker_failure_preserves_retrieved_context(
             == expected
         )
     else:
-        assert await memory.query_with_sources("test", "question", max_sources=2) == (
-            "Retrieved answer",
-            expected,
-        )
+        retrieval = await memory.query_with_sources("test", "question", max_sources=2)
+        assert (retrieval.context, retrieval.sources) == ("Retrieved answer", expected)
 
 
 async def test_source_reranker_propagates_cancellation(monkeypatch):

@@ -7,6 +7,7 @@ import pytest
 
 from llm.base import LLMResult, LLMUsage
 from pipeline.llm_client import ask_local_llm
+from rag.trace import RetrievalResult, capture_lightrag_trace
 
 
 class _FakeRedis:
@@ -58,13 +59,13 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         return _FakeRedis()
 
     async def fake_query_graph_with_sources(*args, **kwargs):
-        logging.getLogger("lightrag").info(
-            "Query nodes: IT, факультеты (top_k:40, cosine:0.2)"
+        return RetrievalResult(
+            context="Контекст",
+            trace=[
+                "INFO: Query nodes: IT, факультеты (top_k:40, cosine:0.2)",
+                "WARNING: Rerank is enabled but no rerank model is configured",
+            ],
         )
-        logging.getLogger("lightrag").warning(
-            "Rerank is enabled but no rerank model is configured"
-        )
-        return "Контекст", []
 
     async def fake_save_log_to_db(**kwargs) -> None:
         saved_logs.append(kwargs)
@@ -135,3 +136,103 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
     assert "Ответ базы знаний:\nКонтекст" in rag_response_logs[0]["content"]
     assert rag_response_logs[0]["message_metadata"]["title"] == "Ответ базы знаний"
     assert rag_response_logs[0]["message_metadata"]["internal_logs_count"] == 2
+
+
+@pytest.mark.asyncio
+async def test_lightrag_logs_are_isolated_between_concurrent_requests(monkeypatch):
+    saved_logs = []
+    background_tasks: list[asyncio.Task] = []
+    sync_event = asyncio.Event()
+    sync_lock = asyncio.Lock()
+    started = 0
+    call_order = 0
+
+    async def fake_get_redis_client() -> _FakeRedis:
+        return _FakeRedis()
+
+    async def fake_query_graph_with_sources(*args, **kwargs):
+        nonlocal started, call_order
+        question = args[0].splitlines()[0]
+        async with sync_lock:
+            started += 1
+            call_order += 1
+            order = call_order
+            if started == 2:
+                sync_event.set()
+
+        with capture_lightrag_trace() as trace:
+            logging.getLogger("lightrag").info(f"start: {question}")
+            await sync_event.wait()
+            if order == 1:
+                await asyncio.sleep(0.01)
+            else:
+                await asyncio.sleep(0.05)
+            logging.getLogger("lightrag").info(f"end: {question}")
+            return RetrievalResult(
+                context=f"Контекст: {question}", trace=trace.get_lines()
+            )
+
+    async def fake_save_log_to_db(**kwargs) -> None:
+        saved_logs.append(kwargs)
+
+    async def fake_classify_intent_bg(*args, **kwargs) -> None:
+        return None
+
+    def spawn_bg(coro: Coroutine[Any, Any, None]) -> None:
+        background_tasks.append(asyncio.create_task(coro))
+
+    monkeypatch.setattr("pipeline.llm_client.get_redis_client", fake_get_redis_client)
+    monkeypatch.setattr(
+        "pipeline.llm_client.get_abbrev_expander", lambda: _FakeAbbrevExpander()
+    )
+    monkeypatch.setattr("pipeline.llm_client.get_faq_matcher", lambda: _FakeFaqMatcher())
+    monkeypatch.setattr(
+        "pipeline.llm_client.query_graph_with_sources", fake_query_graph_with_sources
+    )
+    monkeypatch.setattr(
+        "pipeline.llm_client.query_graph_with_crag", fake_query_graph_with_sources
+    )
+    monkeypatch.setattr(
+        "pipeline.llm_client.get_llm_provider", lambda: _FakeStreamingProvider()
+    )
+    monkeypatch.setattr("pipeline.llm_client._save_log_to_db", fake_save_log_to_db)
+    monkeypatch.setattr(
+        "pipeline.llm_client._classify_intent_bg", fake_classify_intent_bg
+    )
+    monkeypatch.setattr("pipeline.llm_client._spawn_bg", spawn_bg)
+
+    lightrag_logger = logging.getLogger("lightrag")
+    original_level = lightrag_logger.level
+    original_propagate = lightrag_logger.propagate
+    lightrag_logger.setLevel(logging.ERROR)
+    lightrag_logger.propagate = False
+    try:
+        await asyncio.gather(
+            ask_local_llm("Вопрос 1?", session_id="s1", user_id=1),
+            ask_local_llm("Вопрос 2?", session_id="s2", user_id=2),
+        )
+        if background_tasks:
+            await asyncio.gather(*background_tasks)
+
+        rag_response_logs = {
+            log["session_id"]: log
+            for log in saved_logs
+            if log["message_type"] == "rag_response"
+        }
+        assert rag_response_logs.keys() == {"s1", "s2"}
+
+        s1_content = rag_response_logs["s1"]["content"]
+        assert "start: Вопрос 1?" in s1_content
+        assert "end: Вопрос 1?" in s1_content
+        assert "Вопрос 2?" not in s1_content
+
+        s2_content = rag_response_logs["s2"]["content"]
+        assert "start: Вопрос 2?" in s2_content
+        assert "end: Вопрос 2?" in s2_content
+        assert "Вопрос 1?" not in s2_content
+
+        assert lightrag_logger.level == logging.INFO
+        assert not lightrag_logger.propagate
+    finally:
+        lightrag_logger.setLevel(original_level)
+        lightrag_logger.propagate = original_propagate

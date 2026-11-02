@@ -213,3 +213,28 @@ HEAD 405/501 сохраняет отдельный безопасный GET дл
 connect — 5 секунд, read/write/pool — 30 секунд; requests-кортеж `(5, 30)`
 в HTTPX не передаётся. Read ограничивает ожидание очередных данных, а не общую
 длительность загрузки; отмена ожидания потока не останавливает работающий поток.
+
+## Трасса ретривера (#303)
+
+`query_with_sources` / `query_with_crag` и фасад `rag/retriever.py` возвращают
+`RetrievalResult(context, sources, trace)`. Pipeline пишет `trace` в `rag_response`.
+`rag/trace.py` адресует сообщения LightRAG текущему capture; после выхода буфер
+закрыт, `get_lines()` возвращает снимок, а не живой список.
+
+У LightRAG долгоживущие очереди embedding/LLM: workers наследуют контекст при
+первом вызове, а не при получении задания. Поэтому raw callbacks обёрнуты
+`trace_worker_callback`, а queued callbacks — `trace_queued_callback` **до**
+внешнего `timed` в `_time_queued_callbacks`. Traces передаются явным аргументом
+задания, который снимается до вызова провайдера. Общие workers/health checks
+создаются без request trace; их служебные сообщения остаются в process log.
+Ошибка задания/очереди добавляется в trace ожидающего caller, без повторной
+записи в process log. Семантика очереди (приоритеты, лимиты, отмена, timeout)
+остаётся у LightRAG. Отмена caller не гарантирует остановку уже исполняемого
+callback; закрытый буфер отбрасывает его поздние сообщения.
+
+Регрессии `tests/rag/test_queued_trace.py` используют реальный LightRAG и его
+очереди с локальными callbacks, без моделей и сетевых embeddings. Проверяются
+повторное использование, перекрывающиеся запросы, ошибки, caller/worker timeout,
+отмена и sharing callback в storage. Тайминги по-прежнему измеряют ожидание
+очереди в контексте caller; тест повторных request IDs — в
+`tests/rag/test_retrieval_failures.py`.

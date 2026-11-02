@@ -12,6 +12,7 @@ from unittest.mock import patch
 from evals.checks import Observation
 from evals.evaluator import Runner
 from evals.schema import Scenario
+from rag.trace import RetrievalResult
 
 
 @contextmanager
@@ -123,10 +124,16 @@ def _fixture_pipeline() -> Iterator[Runner]:
                     candidates,
                     max_sources=2,
                 )
-            return "Тестовый контекст НГУ.", sources
+            return RetrievalResult(context="Тестовый контекст НГУ.", sources=sources)
         if "ммф" in question.casefold():
-            return "Тестовый контекст ММФ.", [{"url": "https://mmf.nsu.ru/admission"}]
-        return "Тестовый контекст НГУ.", [{"url": "https://nsu.ru/info"}]
+            return RetrievalResult(
+                context="Тестовый контекст ММФ.",
+                sources=[{"url": "https://mmf.nsu.ru/admission"}],
+            )
+        return RetrievalResult(
+            context="Тестовый контекст НГУ.",
+            sources=[{"url": "https://nsu.ru/info"}],
+        )
 
     reranker_case = ContextVar("offline_reranker_case", default=False)
 

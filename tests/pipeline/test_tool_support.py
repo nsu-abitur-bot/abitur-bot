@@ -10,6 +10,7 @@ from llm.base import BaseLLMProvider, LLMResult, ToolSpec
 from llm.providers.gemini import tools_to_gemini
 from llm.providers.openai import tool_spec_to_openai
 from pipeline.tools import ADMISSION_SCORES_TOOL
+from rag.trace import RetrievalResult
 
 
 def test_tool_spec_to_openai_format():
@@ -124,7 +125,7 @@ async def test_ask_local_llm_passes_admission_tool(monkeypatch):
         return _FakeRedis()
 
     async def fake_query_graph_with_sources(*args, **kwargs):
-        return "Контекст из RAG", []
+        return RetrievalResult(context="Контекст из RAG")
 
     async def crag_disabled():
         # Иначе поиск пойдёт в настоящий CRAG и упадёт без ключа Gemini.

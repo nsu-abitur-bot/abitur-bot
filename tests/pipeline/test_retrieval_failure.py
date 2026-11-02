@@ -19,6 +19,7 @@ from pipeline.prompts import (
     RAG_UNAVAILABLE_ANSWER,
 )
 from rag.retriever import RetrievalError
+from rag.trace import RetrievalResult
 
 
 def _close_background_coro(coro) -> None:
@@ -127,7 +128,7 @@ async def test_generation_error_when_retrieval_fails_is_unavailable(
 
 async def test_empty_retrieval_still_means_not_found(monkeypatch, pipeline_without_io):
     async def empty_retrieval(query, conversation_history=None):
-        return "", []
+        return RetrievalResult(context="")
 
     text = await _answer_with_retrieval(monkeypatch, empty_retrieval)
 
@@ -138,7 +139,7 @@ async def test_empty_retrieval_still_means_not_found(monkeypatch, pipeline_witho
 
 async def test_found_context_goes_to_model(monkeypatch, pipeline_without_io):
     async def found_retrieval(query, conversation_history=None):
-        return "Приём документов с 20 июня.", []
+        return RetrievalResult(context="Приём документов с 20 июня.")
 
     text = await _answer_with_retrieval(monkeypatch, found_retrieval)
 
