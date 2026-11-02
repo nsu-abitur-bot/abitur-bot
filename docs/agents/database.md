@@ -17,7 +17,7 @@
 | `Document` | `document` | Метаданные документов в RAG |
 | `Faculty` / `Program` | `faculty` / `program` | Справочник факультетов и направлений (для CRAG) |
 | `AdmissionScore` | `admission_score` | Проходные баллы прошлых лет (program × year × form) |
-| `Settings` | `settings` | Настройки приложения (в т.ч. CRAG) |
+| `Settings` | `settings` | Настройки приложения, CRAG и зашифрованный снимок подключений `instance_settings_v1` |
 | `Admin` / `InviteCode` | `admins` / `invite_codes` | Аутентификация админки |
 | `QuestionEmbeddingCache` | `question_embedding_cache` | Кэш эмбеддингов вопросов |
 

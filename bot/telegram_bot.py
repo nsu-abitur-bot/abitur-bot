@@ -1,7 +1,8 @@
 import fcntl
+import hashlib
 import logging
 import tempfile
-from os import getenv
+from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -11,11 +12,12 @@ from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
 from aiogram.types import Message
-from dotenv import load_dotenv
 
 from bot.core import ERROR_REPLY_TEXT, BotCore
 from bot.streaming import TelegramStreamer
 from bot.utils import normalize_links_for_messaging
+from config.instance import get_setting as getenv
+from config.latency import observation, request_timed, stage
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +83,7 @@ def get_session_id(message: Message) -> str:
     )
 
 
+@request_timed("telegram_total")
 async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
     """Отвечает на обычное сообщение. Человек получает ответ при любой ошибке.
 
@@ -92,14 +95,21 @@ async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
     if not message.from_user:
         return
 
+    received_at = getattr(message, "date", None)
+    if isinstance(received_at, datetime):
+        observation(
+            "telegram_update_age",
+            max(0.0, (datetime.now(UTC) - received_at).total_seconds() * 1000),
+        )
     user_text = (message.text or "").strip()
     user_name = message.from_user.username or message.from_user.first_name or "Аноним"
     chat_id = str(message.chat.id)
 
+    streamer = TelegramStreamer(bot, chat_id)
     try:
         session_id = get_session_id(message)
-        await bot.send_chat_action(chat_id, "typing")
-        streamer = TelegramStreamer(bot, chat_id)
+        with stage("telegram_typing"):
+            await bot.send_chat_action(chat_id, "typing")
         reply = await core.handle_message(
             channel="telegram",
             external_user_id=str(message.from_user.id),
@@ -116,6 +126,7 @@ async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
             fallback_plain=reply.fallback_plain_on_format_error,
         )
     except Exception:
+        await streamer.close()
         logger.exception(
             "Не удалось ответить на сообщение в Telegram: chat_id=%s", chat_id
         )
@@ -126,17 +137,19 @@ async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
                 "Не удалось отправить сообщение об ошибке в Telegram: chat_id=%s",
                 chat_id,
             )
+    finally:
+        await streamer.close()
 
 
 async def run_telegram_bot() -> bool | None:
     """Запускает Telegram-адаптер на aiogram. Возвращает False, если запуск отменен."""
-    load_dotenv()
 
     lock_path = getenv(
         "TELEGRAM_POLLING_LOCK_FILE",
         str(Path(tempfile.gettempdir()) / "abitur_telegram_polling.lock"),
     )
-    polling_lock = _TelegramPollingLock(lock_path)
+    token_identity = hashlib.sha256((getenv("BOT_TOKEN") or "").encode()).hexdigest()
+    polling_lock = _TelegramPollingLock(lock_path + "." + token_identity)
     if not polling_lock.acquire():
         logger.error(
             "Telegram polling уже запущен в другом процессе. "
@@ -146,7 +159,7 @@ async def run_telegram_bot() -> bool | None:
         return False
 
     bot_token = getenv("BOT_TOKEN")
-    if bot_token is None:
+    if not bot_token:
         logger.error("Telegram bot skipped: BOT_TOKEN не задан")
         polling_lock.release()
         return False

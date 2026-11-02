@@ -3,12 +3,15 @@
 import os
 from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
+from contextvars import ContextVar
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from evals.checks import Observation
 from evals.evaluator import Runner
+from evals.schema import Scenario
 
 
 @contextmanager
@@ -37,13 +40,19 @@ def _fixture_pipeline() -> Iterator[Runner]:
     from faq.matcher import FAQMatcher
     from llm.base import LLMResult
     from pipeline import llm_client
+    from rag.graph_memory import GraphMemory
 
     class MemoryHistory:
-        async def add_message(self, session_id: str, message: dict) -> None:
-            pass
+        def __init__(self) -> None:
+            self._storage: dict[str, list[dict]] = {}
 
-        async def get_history(self, session_id: str) -> list:
-            return []
+        async def add_message(self, session_id: str, message: dict) -> None:
+            self._storage.setdefault(session_id, []).append(message)
+
+        async def get_history(self, session_id: str) -> list[dict]:
+            return list(self._storage.get(session_id, []))
+
+    mem_history = MemoryHistory()
 
     faq_items = [
         {"question": "Какие факультеты есть в НГУ?", "answer": "ФИТ, ФЕН, ГГФ."},
@@ -82,16 +91,55 @@ def _fixture_pipeline() -> Iterator[Runner]:
                 "Тестовый контекст НГУ." in str(message.content) for message in messages
             ):
                 return LLMResult(text="Тестовый контекст НГУ.")
+            if "ммф" in question.casefold() or any(
+                "Тестовый контекст ММФ." in str(message.content) for message in messages
+            ):
+                return LLMResult(text="Тестовый контекст ММФ.")
             return LLMResult(text="Информация не найдена.")
 
     async def history() -> MemoryHistory:
-        return MemoryHistory()
+        return mem_history
 
-    async def retrieve(*args, **kwargs):
-        return "Тестовый контекст НГУ.", []
+    class FailingRerankProvider:
+        async def generate(self, messages, profile):
+            # No suspension while the process-local provider patch is active.
+            raise TimeoutError("Synthetic reranker timeout (#291)")
+
+    async def retrieve(question: str, conversation_history: str | None = None, **kwargs):
+        if reranker_case.get():
+            candidates = [
+                {
+                    "url": f"https://example.test/rerank/{index}",
+                    "title": f"Synthetic source {index}",
+                    "snippet": "Тестовый контекст НГУ.",
+                }
+                for index in range(3)
+            ]
+            with patch("rag.graph_memory.get_llm_provider", FailingRerankProvider):
+                sources = await GraphMemory._rerank_sources_with_llm(
+                    object.__new__(GraphMemory),
+                    question,
+                    conversation_history,
+                    candidates,
+                    max_sources=2,
+                )
+            return "Тестовый контекст НГУ.", sources
+        if "ммф" in question.casefold():
+            return "Тестовый контекст ММФ.", [{"url": "https://mmf.nsu.ru/admission"}]
+        return "Тестовый контекст НГУ.", [{"url": "https://nsu.ru/info"}]
+
+    reranker_case = ContextVar("offline_reranker_case", default=False)
 
     async def config():
-        return SimpleNamespace(enabled=True)
+        return SimpleNamespace(enabled=not reranker_case.get())
+
+    async def run_case(scenario: Scenario, session_id: str) -> Observation:
+        # Per-task state: concurrent scenarios must keep their normal CRAG path.
+        token = reranker_case.set(scenario.id == "rag_rerank_failure")
+        try:
+            return await run_product(scenario, session_id)
+        finally:
+            reranker_case.reset(token)
 
     async def threshold() -> float:
         return 0.99
@@ -133,4 +181,4 @@ def _fixture_pipeline() -> Iterator[Runner]:
         }
         for name, value in replacements.items():
             stack.enter_context(patch.object(llm_client, name, value))
-        yield run_product
+        yield run_case

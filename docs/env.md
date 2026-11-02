@@ -1,68 +1,90 @@
-# Переменные окружения и настройки
+# Окружение и настройки проекта
 
-Открывай, когда добавляешь env-переменную, меняешь дефолт или решаешь,
-где должна жить новая настройка — в env или в таблице `settings`.
+`.env.example` содержит инфраструктуру для запуска. Прикладные
+настройки задаются в админке. Параметры снимка экземпляра и их дефолты
+описаны в `config/instance.py` (`SPECS`); FAQ, CRAG и лимиты хранятся отдельно. Порядок миграции существующего экземпляра — в
+[инструкции настроек](instance-settings.md).
 
-Полный актуальный список с дефолтами и комментариями — в `.env.example`
-(дефолты в нём синхронизированы с кодом). Эта страница — карта: что где
-живёт и что чем перекрывается.
+## Инфраструктура в .env
 
-## Где чей дефолт
+| Параметры | Назначение |
+|---|---|
+| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | PostgreSQL; пароль обязателен, остальные дефолты — в `db/postgres/config.py` |
+| `DATABASE_URL` | Необязательный полный URL SQLAlchemy; полностью перекрывает `DB_*` подключения. Пароль URL-кодируется |
+| `DB_ECHO`, `DB_POOL_SIZE`, `DB_MAX_OVERFLOW` | SQL-логирование и пул соединений; дефолты `False`, `5`, `10` |
+| `REDIS_URL`, `REDIS_PASSWORD` | URL клиента и пароль Redis в Compose. Пароль в URL должен быть URL-кодирован; в Compose и URL должны совпадать учётные данные |
+| `SECRET_KEY` | Подпись токенов админки; обязателен, минимум 32 байта, известные заглушки отклоняются при старте |
+| `SETTINGS_ENCRYPTION_KEY` | Fernet-ключ для секретов настроек. Хранить отдельно от БД; потеря ключа потребует повторного ввода подключений |
+| `CORS_ALLOW_ORIGINS` | Список разрешённых origin фронтенда через запятую. Пример ограничен localhost:3000; в production укажите свои HTTPS-origin |
+| `LIGHTRAG_WORKSPACE_BASE`, `LIGHTRAG_STORAGE` | Каталог и backend хранения индекса (`json` или `postgres`); для стендов используйте независимые каталоги/БД |
+| `LIGHTRAG_CACHE_CLEAR_TIMEOUT` | Таймаут очистки кеша LightRAG, по умолчанию 10 секунд |
+| `TELEGRAM_POLLING_LOCK_FILE` | Базовый путь файловой блокировки polling; не запускайте второй процесс с действующим токеном |
+| `LOG_LEVEL`, `LOG_DIR` | Уровень и каталог логов процессов |
+| `RAG_LOG_TEXT_PREVIEW_LIMIT`, `RAG_LOG_CHUNKS_LIMIT` | Ограничения диагностического текста и числа фрагментов, по умолчанию 2000 и 10 |
+| `TEST_DB_NAME` | Отдельная тестовая БД, по умолчанию `abitur_test`; тесты пересоздают таблицы, рабочую БД использовать нельзя |
 
-- env-переменные читаются `os.getenv` по месту использования. Значение в
-  `.env.example` — то же, что fallback в коде: расхождение считается багом (#326).
-- Дефолты LLM-моделей, работающих с несколькими провайдерами, — в
-  `llm/profiles.py` (`VISION_MODEL_DEFAULTS`); `.env.example` ссылается на них.
-- Дефолты параметров конкурсных списков (faculty/direction/condition/type) —
-  в `parser/config/config.yaml` (`rating.defaults`), в коде не дублируются.
-- `DATABASE_URL` полностью перекрывает все `DB_*`. Не задавай её, если
-  настраиваешь базу через `DB_HOST`/`DB_PORT`/... — правки `DB_*` действовать
-  не будут.
+Изменение инфраструктуры требует перезапуска соответствующего процесса.
+`CORS_ALLOW_ORIGINS` без значения в коде допускает `*`; это не безопасная
+настройка для публичной админки. Генераторы корневых секретов приведены в
+`.env.example`; не копируйте значения секретов из чужого стенда.
 
-## Настройки, управляемые через таблицу `settings` (веб-админка)
+## Прикладные настройки в админке
 
-Значения в БД меняются через API админки и применяются **без рестарта**.
-env-переменная здесь — только дефолт, если ключа в БД ещё нет (и fallback,
-когда БД недоступна).
+Через `/api/v1/settings/instance` суперадминистратор настраивает:
 
-| Ключ в settings | env-дефолт | Где меняется |
-|---|---|---|
-| `faq_similarity_threshold` | `FAQ_SIMILARITY_THRESHOLD` | `PUT /api/v1/settings/faq` |
-| `crag_enabled` | `CRAG_ENABLED` | `PUT /api/v1/settings/crag` |
-| `crag_relevance_threshold` | `CRAG_RELEVANCE_THRESHOLD` | там же |
-| `crag_min_chunks` | `CRAG_MIN_CHUNKS` | там же |
-| `crag_allow_refine` | `CRAG_ALLOW_REFINE` | там же |
-| `crag_use_faculty_table` | `CRAG_USE_FACULTY_TABLE` | там же |
-| `crag_max_graded_chunks` | `CRAG_MAX_GRADED_CHUNKS` | там же |
-| `rate_limit_system_requests_per_day` | — (дефолт 10000 в коде) | `PUT /api/v1/settings/rate-limit` |
-| `rate_limit_user_requests_per_day` | — (дефолт 100 в коде) | там же |
-| `admission_scores_last_import` | — | служебная: пишется автозаливкой баллов |
+- ключи и адреса OpenAI/Gemini/DeepSeek, назначение чат-, графовых, embedding-
+  и vision-моделей, профили вызовов;
+- токены, включение Telegram/MAX и прикладные прокси;
+- параметры LightRAG, загрузки и проверки документов;
+- конкурсные списки: степень, типы, интервалы, задержки и mock-источник;
+- профиль вуза, стартовое наполнение и флаги `SEED_*`.
 
-`CRAG_GRADING_CONCURRENCY` остаётся **только env**: влияет на параллелизм
-запросов к провайдеру, меняется вместе с инфраструктурой, а не из админки.
+API/бот/планировщик читают снимок экземпляра каждые две секунды. Для ключей
+этого снимка после загрузки
+значения БД имеют приоритет, в том числе очищенные секреты: старый токен из env
+не включится обратно. Сбой обновления оставляет последний рабочий снимок.
+Некоторые параметры применяются на границе операции: воркеры LightRAG — после
+активного поиска, планировщик — на границе цикла, `SEED_*` — на следующем старте.
 
-## Только env (рестарт требуется)
+## Отдельные настройки FAQ, CRAG и лимитов
 
-Секреты и ключи API, выбор провайдеров, параметры БД/Redis/CORS, пайплайн
-LightRAG, планировщик конкурсных списков, сиды справочников, логирование —
-полный список в `.env.example` по секциям:
+Порог FAQ, шесть настроек CRAG и rate limits хранятся отдельными ключами таблицы
+`settings`, а не внутри снимка экземпляра. API: `/api/v1/settings/faq`,
+`/api/v1/settings/crag`, `/api/v1/settings/rate-limit`.
 
-- **Провайдеры:** `LLM_PROVIDER`, `LIGHTRAG_LLM_PROVIDER`, `PDF_PARSER_PROVIDER`.
-- **LightRAG:** `LIGHTRAG_WORKSPACE_BASE`, `LIGHTRAG_LLM_WORKERS`,
-  `LIGHTRAG_EMBEDDING_WORKERS`, `LIGHTRAG_CACHE_CLEAR_TIMEOUT`,
-  `LIGHTRAG_STORAGE` (json | postgres; `POSTGRES_WORKSPACE` при этом не задавать).
-- **Планировщик списков:** `RATING_DEGREE`, `RATING_TYPES`, `RATING_POLL_*`,
-  `RATING_REQUEST_DELAY`, `RATING_FAILED_LISTS_THRESHOLD`,
-  `RATING_MAX_SESSION_REFRESHES`, `RATING_USE_MOCK` + `MOCK_RATING_URL`.
-- **Сиды:** `SEED_FACULTIES_FORCE`, `SEED_ADMISSION_SCORES`,
-  `SEED_ADMISSION_SCORES_FORCE`, `ADMISSION_SCORES_URL`,
-  `ADMISSION_SCORES_MAX_AGE_HOURS`.
+| Настройка | Fallback при отсутствии значения в БД |
+|---|---|
+| `faq_similarity_threshold` | `FAQ_SIMILARITY_THRESHOLD`, затем 0.95 |
+| `crag_enabled` | `CRAG_ENABLED`, затем true |
+| `crag_relevance_threshold` | `CRAG_RELEVANCE_THRESHOLD`, затем 0.5 |
+| `crag_min_chunks` | `CRAG_MIN_CHUNKS`, затем 2 |
+| `crag_allow_refine` | `CRAG_ALLOW_REFINE`, затем true |
+| `crag_use_faculty_table` | `CRAG_USE_FACULTY_TABLE`, затем true |
+| `crag_max_graded_chunks` | `CRAG_MAX_GRADED_CHUNKS`, затем 12 |
+| `rate_limit_system_requests_per_day` | 10000 |
+| `rate_limit_user_requests_per_day` | 100 |
 
-## Известные ловушки
+При ошибке чтения CRAG из БД используется env-конфигурация, а не последний
+снимок экземпляра. `CRAG_GRADING_CONCURRENCY` пока читается только из env
+(по умолчанию 5); для его изменения нужен перезапуск процесса. Этот параметр
+не доступен через API админки. Служебный `admission_scores_last_import`
+записывается импортом проходных баллов.
 
-- `REDIS_URL` без значения падает понятной ошибкой только при создании
-  клиента (`db/redis/client.py`); пароль — только буквы/цифры, иначе сломает URL.
-- `SECRET_KEY` в примере — заглушка; при деплое обязательно заменить
-  (проверки на «не сменили секрет» пока нет — отдельная задача).
-- `CORS_ALLOW_ORIGINS` по умолчанию `*` — для прода с админкой сузить
-  до явных доменов фронта.
+## Источники дефолтов и переход
+
+- Реестр параметров снимка экземпляра — `config/instance.py`; не добавляйте отдельные
+  константы vision-моделей в `LLMProfiles`. Профили читают снимок настроек.
+- `parser/config/config.yaml`, `rating.defaults` — параметры URL конкурсных
+  списков, когда они отсутствуют в самом URL. `build_leaderboard_url` требует
+  явный `type_`: тип запрошенного списка не выбирается скрытым аргументом.
+- Значения из `.env.example` — пример размещения, не перечень всех дефолтов
+  приложения. Например, CORS в примере намеренно ограничен локальным фронтендом.
+- Для старой установки сохраните старый `.env`, задайте мастер-ключ и выполните
+  `uv run python -m bootstrap.runtime_settings` до запуска новой версии.
+  Импорт не перезаписывает существующий снимок. Затем удалите из env перенесённые
+  ключи моделей/ботов. Новый экземпляр настраивается через админку без импорта.
+
+Не храните ключи, токены и пароли в git или в диагностических отчётах.
+Для демонстрационной Compose-сборки дополнительные параметры размещения описаны
+в [deploy/demo/README.md](../deploy/demo/README.md), а секреты GitHub Actions и
+доставка образов — в [deploy/ci/README.md](../deploy/ci/README.md).

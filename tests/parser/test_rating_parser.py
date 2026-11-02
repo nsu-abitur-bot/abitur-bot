@@ -38,6 +38,12 @@ class TestBuildLeaderboardUrl:
 
 
 class TestExtractParamsFromUrl:
+    def test_explicit_params_do_not_require_defaults(self, monkeypatch):
+        monkeypatch.setattr("parser.rating.get_rating_config", lambda: {})
+        assert extract_params_from_url(
+            "https://example.org/?faculty=1&direction=2&condition=3&type=4"
+        ) == {"faculty": 1, "direction": 2, "condition": 3, "type": 4}
+
     def test_extracts_all_params(self):
         url = (
             "https://abiturient.nsu.ru/bachelor?faculty=8&direction=7&condition=10&type=0"

@@ -11,14 +11,22 @@ from urllib.parse import unquote, urlsplit
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from lightrag import LightRAG, QueryParam
+from lightrag.base import DocStatus, StorageNameSpace
 from lightrag.kg.shared_storage import initialize_pipeline_status
-from lightrag.utils import compute_mdhash_id, wrap_embedding_func_with_attrs
+from lightrag.utils import (
+    TiktokenTokenizer,
+    compute_mdhash_id,
+    wrap_embedding_func_with_attrs,
+)
 
+from config.instance import get_setting
+from config.latency import stage, timed
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from llm.providers.deepseek_graph_adapters import DeepSeekLLM
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
@@ -27,6 +35,23 @@ from rag.crag import CragChunk, load_crag_config, run_crag
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def _time_queued_callbacks(rag: LightRAG) -> None:
+    """Time the caller's queue await, not a worker that retains an old context."""
+    embedding = cast(Any, rag.embedding_func)
+    timed_embedding = timed("rag_embedding")(embedding)
+    # LightRAG shares its queued callback with every storage at construction.
+    # Preserve that sharing and the queue's attributes (including shutdown).
+    for value in vars(rag).values():
+        if (
+            isinstance(value, StorageNameSpace)
+            and getattr(value, "embedding_func", None) is embedding
+        ):
+            cast(Any, value).embedding_func = timed_embedding
+    cast(Any, rag).embedding_func = timed_embedding
+    cast(Any, rag).llm_model_func = timed("rag_model_call")(cast(Any, rag.llm_model_func))
+
 
 GRAPH_QUERY_MODES: frozenset = frozenset(
     ["naive", "local", "global", "hybrid", "mix", "bypass"]
@@ -37,8 +62,8 @@ UUID_RE = re.compile(
     r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
     re.IGNORECASE,
 )
-LOG_TEXT_PREVIEW_LIMIT = int(os.getenv("RAG_LOG_TEXT_PREVIEW_LIMIT", "2000"))
-LOG_CHUNKS_LIMIT = int(os.getenv("RAG_LOG_CHUNKS_LIMIT", "10"))
+LOG_TEXT_PREVIEW_LIMIT = int(get_setting("RAG_LOG_TEXT_PREVIEW_LIMIT", "2000"))
+LOG_CHUNKS_LIMIT = int(get_setting("RAG_LOG_CHUNKS_LIMIT", "10"))
 
 
 def _clip_for_log(value: Any, limit: int = LOG_TEXT_PREVIEW_LIMIT) -> str:
@@ -151,6 +176,19 @@ def _ensure_query_succeeded(result: Any) -> bool:
     raise RetrievalError(str(result.get("message") or "LightRAG query failed"))
 
 
+def graph_configuration() -> tuple:
+    return tuple(
+        get_setting(k)
+        for k in (
+            "LIGHTRAG_EMBEDDING_PROVIDER",
+            "OPENAI_GRAPH_EMBEDDING_MODEL",
+            "GEMINI_GRAPH_EMBEDDING_MODEL",
+            "LIGHTRAG_EMBEDDING_WORKERS",
+            "LIGHTRAG_LLM_WORKERS",
+        )
+    )
+
+
 class _GraphWrapper:
     """Wrapper to track usage count of LightRAG instances for safe finalization."""
 
@@ -158,6 +196,7 @@ class _GraphWrapper:
         self.rag = rag
         self.usage_count = 0
         self.marked_for_deletion = False
+        self.configuration = graph_configuration()
 
 
 class GraphMemory:
@@ -175,7 +214,7 @@ class GraphMemory:
         self._clearing_events: Dict[str, asyncio.Event] = {}
         self._last_cache_clear_marker: Dict[str, float] = {}
         self._cache_clear_timeout: float = float(
-            os.getenv("LIGHTRAG_CACHE_CLEAR_TIMEOUT", "10")
+            get_setting("LIGHTRAG_CACHE_CLEAR_TIMEOUT", "10")
         )
         self._check_interval: float = 2.0  # limit disk scanning (os.scandir) frequency
         # Кэш «URL → заголовок» для блока «Источники»: строится из KV-файлов и
@@ -184,7 +223,7 @@ class GraphMemory:
             str, tuple[tuple[tuple[float, float], tuple[int, Any]], dict[str, str]]
         ] = {}
 
-        self.workspace_path = os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
+        self.workspace_path = get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
 
         # LIGHTRAG_STORAGE=postgres: KV-стораджи и doc_status — в PostgreSQL
@@ -352,6 +391,7 @@ class GraphMemory:
             except Exception as exc:
                 logger.warning(f"Failed to update {file_path} after deletion: {exc}")
 
+    @timed("graph_acquire")
     async def _get_or_create_graph(self, graph_id: str) -> _GraphWrapper:
         rag_to_finalize = None
 
@@ -362,6 +402,15 @@ class GraphMemory:
         await self._await_cache_clear_if_needed(graph_id)
 
         async with self._get_lock(graph_id):
+            current = self._graphs.get(graph_id)
+            if current is not None and current.configuration != graph_configuration():
+                if current.usage_count:
+                    current.usage_count += 1
+                    return current
+                # Rebuild only when there are no users; never share mutable stores
+                # with an old worker configuration during the transition.
+                await current.rag.finalize_storages()
+                self._graphs.pop(graph_id)
             now = time.monotonic()
             check_disk = False
 
@@ -407,42 +456,36 @@ class GraphMemory:
             workspace_path = self._get_workspace_path(graph_id)
 
             try:
-                graph_llm_provider = os.getenv("LIGHTRAG_LLM_PROVIDER", "gemini").lower()
+                default_provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
+                graph_llm_provider = get_setting(
+                    "LIGHTRAG_EMBEDDING_PROVIDER",
+                    "gemini" if default_provider == "deepseek" else default_provider,
+                ).lower()
 
                 if graph_llm_provider == "openai":
-                    openai_api_key = os.getenv("OPENAI_API_KEY", "")
+                    openai_api_key = get_setting("OPENAI_API_KEY", "")
                     if not openai_api_key:
                         raise RuntimeError(
                             "LIGHTRAG_LLM_PROVIDER=openai,"
                             + " но OPENAI_API_KEY не установлен."
                         )
-                    llm_adapter: Any = OpenAILLM(
-                        api_key=openai_api_key,
-                        model=os.getenv("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
-                    )
                     embedding_adapter: Any = OpenAIEmbedding(
                         api_key=openai_api_key,
-                        model=os.getenv(
+                        model=get_setting(
                             "OPENAI_GRAPH_EMBEDDING_MODEL",
                             "text-embedding-3-small",
                         ),
                     )
                 elif graph_llm_provider == "gemini":
-                    gemini_api_key = os.getenv("GEMINI_API_KEY", "")
+                    gemini_api_key = get_setting("GEMINI_API_KEY", "")
                     if not gemini_api_key:
                         raise RuntimeError(
                             "LIGHTRAG_LLM_PROVIDER=gemini,"
                             + " но GEMINI_API_KEY не установлен."
                         )
-                    llm_adapter: Any = GeminiLLM(
-                        api_key=gemini_api_key,
-                        model=os.getenv(
-                            "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
-                        ),
-                    )
                     embedding_adapter: Any = GeminiEmbedding(
                         api_key=gemini_api_key,
-                        model=os.getenv(
+                        model=get_setting(
                             "GEMINI_GRAPH_EMBEDDING_MODEL",
                             "gemini-embedding-2-preview",
                         ),
@@ -453,17 +496,63 @@ class GraphMemory:
                         "Допустимые значения: openai, gemini"
                     )
 
+                await embedding_adapter.aclose()
+
+                embedding_provider = graph_llm_provider
+                embedding_model = get_setting(
+                    "OPENAI_GRAPH_EMBEDDING_MODEL"
+                    if embedding_provider == "openai"
+                    else "GEMINI_GRAPH_EMBEDDING_MODEL",
+                    "text-embedding-3-small"
+                    if embedding_provider == "openai"
+                    else "gemini-embedding-2-preview",
+                )
+
                 @wrap_embedding_func_with_attrs(
                     embedding_dim=embedding_adapter.embedding_dim
                 )
                 async def embedding_func(texts: List[str]) -> List[List[float]]:
-                    return await embedding_adapter(texts)
+                    provider = embedding_provider
+                    if provider == "openai":
+                        adapter = OpenAIEmbedding(
+                            api_key=get_setting("OPENAI_API_KEY", ""),
+                            model=embedding_model,
+                        )
+                    else:
+                        adapter = GeminiEmbedding(
+                            api_key=get_setting("GEMINI_API_KEY", ""),
+                            model=embedding_model,
+                        )
+                    try:
+                        return await adapter(texts)
+                    finally:
+                        await adapter.aclose()
 
                 async def llm_model_func(prompt: str, **kwargs) -> str:
-                    return await llm_adapter(prompt, **kwargs)
+                    provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
+                    if provider == "openai":
+                        adapter = OpenAILLM(
+                            api_key=get_setting("OPENAI_API_KEY", ""),
+                            model=get_setting("OPENAI_GRAPH_MODEL", "gpt-4o-mini"),
+                        )
+                    elif provider == "deepseek":
+                        adapter = DeepSeekLLM(
+                            model=get_setting("DEEPSEEK_GRAPH_MODEL", "deepseek-flash"),
+                        )
+                    else:
+                        adapter = GeminiLLM(
+                            api_key=get_setting("GEMINI_API_KEY", ""),
+                            model=get_setting(
+                                "GEMINI_GRAPH_MODEL", "gemini-3.1-flash-lite-preview"
+                            ),
+                        )
+                    try:
+                        return await adapter(prompt, **kwargs)
+                    finally:
+                        await adapter.aclose()
 
-                embedding_workers = int(os.getenv("LIGHTRAG_EMBEDDING_WORKERS", "2"))
-                llm_workers = int(os.getenv("LIGHTRAG_LLM_WORKERS", "1"))
+                embedding_workers = int(get_setting("LIGHTRAG_EMBEDDING_WORKERS", "2"))
+                llm_workers = int(get_setting("LIGHTRAG_LLM_WORKERS", "1"))
 
                 # PG-режим: KV и doc_status — в PostgreSQL (workspace=graph_id
                 # разделяет базы знаний), векторный стор и граф — файловые.
@@ -476,18 +565,29 @@ class GraphMemory:
                         "doc_status_storage": "PGDocStatusStorage",
                     }
 
-                rag = LightRAG(
-                    working_dir=workspace_path,
-                    llm_model_func=llm_model_func,
-                    embedding_func=embedding_func,
-                    chunk_token_size=400,
-                    chunk_overlap_token_size=50,
-                    embedding_func_max_async=embedding_workers,
-                    llm_model_max_async=llm_workers,
-                    **storage_kwargs,
-                )
+                # A missing dictionary can trigger synchronous HTTP in tiktoken.
+                # Only its tokenizer is built off-loop; storage ownership stays here.
+                with stage("graph_tokenizer_initialize"):
+                    tokenizer = await asyncio.to_thread(TiktokenTokenizer)
 
-                await rag.initialize_storages()
+                with stage("graph_constructor"):
+                    rag = LightRAG(
+                        working_dir=workspace_path,
+                        llm_model_func=llm_model_func,
+                        embedding_func=embedding_func,
+                        tokenizer=tokenizer,
+                        auto_manage_storages_states=False,
+                        chunk_token_size=400,
+                        chunk_overlap_token_size=50,
+                        embedding_func_max_async=embedding_workers,
+                        llm_model_max_async=llm_workers,
+                        **storage_kwargs,
+                    )
+
+                _time_queued_callbacks(rag)
+
+                with stage("graph_storages_initialize"):
+                    await rag.initialize_storages()
                 await initialize_pipeline_status()
 
                 wrapper = _GraphWrapper(rag)
@@ -575,7 +675,7 @@ class GraphMemory:
                         graph_id,
                         error,
                     )
-                    await self.delete_doc(graph_id, doc_id)
+                    await self.delete_doc_safe(graph_id, doc_id)
                 return False
             # Обновляем кэш сигнатуры самого процесса, чтобы не было ложной инвалидации
             async with self._get_lock(graph_id):
@@ -681,6 +781,7 @@ class GraphMemory:
                 raise
             raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
+    @timed("search_embeddings")
     async def _retrieve_raw_chunks(
         self,
         rag: Any,
@@ -742,6 +843,8 @@ class GraphMemory:
         код (llm_client) по этому контексту.
         """
         config = await load_crag_config()
+        history = conversation_history.strip() if conversation_history else ""
+        search_question = f"{history}\n\n{question}" if history else question
         try:
             async with self._use_graph(graph_id) as rag:
                 logger.info(
@@ -750,7 +853,7 @@ class GraphMemory:
                     mode,
                     _clip_for_log(question),
                 )
-                raw_chunks = await self._retrieve_raw_chunks(rag, question, mode)
+                raw_chunks = await self._retrieve_raw_chunks(rag, search_question, mode)
 
                 def _to_crag_chunks(items: list[dict]) -> list:
                     out = []
@@ -774,12 +877,21 @@ class GraphMemory:
                     more = await self._retrieve_raw_chunks(rag, refined, mode)
                     return _to_crag_chunks(more)
 
-                kept, hint = await run_crag(
-                    question,
-                    candidates,
-                    retrieve_fn=_retrieve_fn,
-                    config=config,
-                )
+                try:
+                    kept, hint = await run_crag(
+                        question,
+                        candidates,
+                        retrieve_fn=_retrieve_fn,
+                        config=config,
+                        conversation_history=history or None,
+                    )
+                except TypeError:
+                    kept, hint = await run_crag(
+                        question,
+                        candidates,
+                        retrieve_fn=_retrieve_fn,
+                        config=config,
+                    )
 
                 logger.info(
                     "CRAG retrieval result: graph_id=%s candidates=%d kept=%d "
@@ -1017,6 +1129,7 @@ class GraphMemory:
             logger.warning("Failed to load documents signature for sources: %s", exc)
             return -1, None
 
+    @timed("source_titles")
     async def _get_source_titles(self, graph_id: str) -> dict[str, str]:
         """Соответствие «URL → человекочитаемый заголовок» для «Источников».
 
@@ -1092,6 +1205,7 @@ class GraphMemory:
         self._source_titles_cache[graph_id] = (signature, url_to_title)
         return url_to_title
 
+    @timed("source_ranking")
     async def _rerank_sources_with_llm(
         self,
         question: str,
@@ -1129,11 +1243,22 @@ class GraphMemory:
             bool(history_block),
         )
 
-        provider = get_llm_provider()
-        raw = await provider.generate(
-            [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)],
-            profile=LLMProfiles.CHAT,
-        )
+        try:
+            provider = get_llm_provider()
+            with stage("source_ranking_model_call"):
+                raw = await provider.generate(
+                    [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=user_prompt),
+                    ],
+                    profile=LLMProfiles.CHAT,
+                )
+        except Exception as exc:
+            # Ranking is optional: keep successful retrieval usable on provider failure.
+            logger.warning(
+                "LLM rerank fallback: provider failed (%s)", type(exc).__name__
+            )
+            return [{"url": s["url"], "title": s["title"]} for s in sources[:max_sources]]
 
         logger.debug("LLM rerank raw response: %s", raw)
 
@@ -1522,6 +1647,205 @@ class GraphMemory:
                     zf.write(file_path, arcname=os.path.join(graph_id, filename))
         buffer.seek(0)
         return buffer.getvalue()
+
+    async def get_doc_status(self, graph_id: str, doc_id: str) -> str | None:
+        """Возвращает статус документа в LightRAG («pending», «processed», «failed»).
+
+        Возвращает None, если документ не найден в doc_status.
+        """
+        try:
+            async with self._use_graph(graph_id) as rag:
+                record = await rag.doc_status.get_by_id(doc_id)
+            if record is None:
+                return None
+            status = (
+                record.get("status")
+                if isinstance(record, dict)
+                else getattr(record, "status", None)
+            )
+            return getattr(status, "value", status)
+        except Exception as exc:
+            logger.warning(
+                "Не удалось получить статус документа %s в графе %s: %s",
+                doc_id,
+                graph_id,
+                exc,
+            )
+            return None
+
+    async def get_chunks_list(self, graph_id: str, doc_id: str) -> list[str]:
+        """Возвращает chunks_list документа из doc_status LightRAG.
+
+        Используется для проверки общих чанков перед удалением старой версии.
+        """
+        try:
+            async with self._use_graph(graph_id) as rag:
+                record = await rag.doc_status.get_by_id(doc_id)
+            if record is None:
+                return []
+            chunks = (
+                record.get("chunks_list")
+                if isinstance(record, dict)
+                else getattr(record, "chunks_list", None)
+            )
+            return list(chunks) if chunks else []
+        except Exception as exc:
+            logger.warning(
+                "Не удалось получить chunks_list документа %s в графе %s: %s",
+                doc_id,
+                graph_id,
+                exc,
+            )
+            return []
+
+    async def delete_doc_safe(
+        self,
+        graph_id: str,
+        old_doc_id: str,
+        preserve_chunk_ids: set[str] | None = None,
+    ) -> bool:
+        """Удаляет документ из RAG, сохраняя чанки, используемые другими документами.
+
+        В LightRAG 1.4.9.8 chunk_id = hash(chunk_text), не включает doc_id.
+        Поэтому чанки, общие у старой и новой версии документа, имеют одинаковые
+        IDs. Обычный adelete_by_doc_id удалит их из chunks_vdb и text_chunks,
+        после чего новая версия окажется недоступна поиску.
+
+        Перед вызовом adelete_by_doc_id вычитаем из chunks_list все ID,
+        принадлежащие другим документам или указанные в preserve_chunk_ids.
+        Метаданные общих чанков перепривязываем к оставшемуся владельцу.
+        adelete_by_doc_id читает chunks_list из doc_status и удаляет только их —
+        общие чанки при этом не затрагиваются.
+
+        Args:
+            graph_id: ID графа в GraphMemory.
+            old_doc_id: ID документа-старой-версии, который нужно удалить.
+            preserve_chunk_ids: chunk_id-ы, которые нельзя удалять из хранилищ.
+                Обычно это chunks_list новой версии. Остальные владельцы
+                определяются по doc_status независимо от этого аргумента.
+        """
+        try:
+            async with self._use_graph(graph_id) as rag:
+                if not hasattr(rag, "adelete_by_doc_id"):
+                    logger.warning(
+                        "LightRAG не поддерживает adelete_by_doc_id (попытка удалить %s)",
+                        old_doc_id,
+                    )
+                    return False
+
+                # Chunk IDs are global within a workspace. Failed inserts overwrite
+                # their metadata too, even before entity extraction succeeds.
+                owners: dict[str, tuple[str, str]] = {}
+                for status in (
+                    DocStatus.PROCESSED,
+                    DocStatus.PREPROCESSED,
+                    DocStatus.PROCESSING,
+                    DocStatus.PENDING,
+                    DocStatus.FAILED,
+                ):
+                    documents = await rag.doc_status.get_docs_by_status(status)
+                    for doc_id, document in documents.items():
+                        if doc_id == old_doc_id:
+                            continue
+                        for chunk_id in document.chunks_list or []:
+                            owners.setdefault(chunk_id, (doc_id, document.file_path))
+                preserve_chunk_ids = set(preserve_chunk_ids or ()) | owners.keys()
+
+                status_record = await rag.doc_status.get_by_id(old_doc_id)
+                if preserve_chunk_ids:
+                    # Вычитаем общие чанки из chunks_list перед удалением
+                    if status_record is not None:
+                        existing = (
+                            status_record.get("chunks_list")
+                            if isinstance(status_record, dict)
+                            else getattr(status_record, "chunks_list", None)
+                        ) or []
+                        exclusive = [
+                            cid for cid in existing if cid not in preserve_chunk_ids
+                        ]
+                        shared_count = len(existing) - len(exclusive)
+                        if shared_count:
+                            shared_ids = [cid for cid in existing if cid in owners]
+                            records = await rag.text_chunks.get_by_ids(shared_ids)
+                            vectors = await rag.chunks_vdb.get_by_ids(shared_ids)
+                            repairs: dict[str, dict[str, Any]] = {}
+                            for chunk_id, record, vector in zip(
+                                shared_ids, records, vectors
+                            ):
+                                if record is None:
+                                    raise RuntimeError(
+                                        f"Shared chunk {chunk_id} is missing"
+                                    )
+                                if (
+                                    record.get("full_doc_id") == old_doc_id
+                                    or not vector
+                                    or vector.get("full_doc_id") == old_doc_id
+                                ):
+                                    owner_id, file_path = owners[chunk_id]
+                                    repairs[chunk_id] = {
+                                        **record,
+                                        "full_doc_id": owner_id,
+                                        "file_path": file_path,
+                                    }
+                            if repairs:
+                                # Repair vectors first: if embedding fails, retain
+                                # the failed document rather than delete its owner.
+                                await rag.chunks_vdb.upsert(repairs)
+                                await rag.text_chunks.upsert(repairs)
+                            logger.info(
+                                "Сохраняем %d общих чанка(ов) при удалении %s (граф %s)",
+                                shared_count,
+                                old_doc_id,
+                                graph_id,
+                            )
+                        patch: dict[str, Any] = (
+                            {**status_record, "chunks_list": exclusive}
+                            if isinstance(status_record, dict)
+                            else {"chunks_list": exclusive}
+                        )
+                        await rag.doc_status.upsert({old_doc_id: patch})
+
+                result = await rag.adelete_by_doc_id(old_doc_id)
+                if result.status not in {"success", "not_found"}:
+                    if status_record is not None:
+                        await rag.doc_status.upsert({old_doc_id: status_record})
+                    logger.error(
+                        "LightRAG deletion failed for %s: %s", old_doc_id, result
+                    )
+                    return False
+                # LightRAG's empty-chunks shortcut skips these per-document
+                # indexes when every chunk was shared with a surviving document.
+                await rag.full_entities.delete([old_doc_id])
+                await rag.full_relations.delete([old_doc_id])
+                await asyncio.gather(
+                    rag.full_entities.index_done_callback(),
+                    rag.full_relations.index_done_callback(),
+                )
+        except Exception as exc:
+            logger.error(
+                "Ошибка при удалении документа %s из графа %s: %s",
+                old_doc_id,
+                graph_id,
+                exc,
+            )
+            return False
+
+        # Обновляем кэш сигнатуры
+        try:
+            async with self._get_lock(graph_id):
+                await asyncio.to_thread(self._remove_doc_metadata, graph_id, old_doc_id)
+                self._graph_signatures[graph_id] = await asyncio.to_thread(
+                    self._get_workspace_signature, graph_id
+                )
+                self._last_disk_check[graph_id] = time.monotonic()
+
+            await self.clear_cache(graph_id)
+        except Exception as exc:
+            logger.warning(
+                "Ошибка при обновлении кэша после удаления %s: %s", old_doc_id, exc
+            )
+
+        return True
 
     async def delete_doc(self, graph_id: str, doc_id: str) -> bool:
         """Удаляет документ из RAG по его ID."""

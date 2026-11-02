@@ -2,10 +2,10 @@ import logging
 from typing import Optional
 from urllib.parse import urlparse
 
-import httpx
 from bs4 import BeautifulSoup
 
 from parser.pdf import pdf_to_base64_images
+from parser.safe_fetch import fetch_url_async
 from parser.vision import parse_images_with_llm
 
 logger = logging.getLogger(__name__)
@@ -15,24 +15,23 @@ async def process_url(url: str) -> Optional[str]:
     """Скачивает и парсит контент (PDF или HTML) по URL."""
 
     try:
-        async with httpx.AsyncClient(verify=False) as client:
-            response = await client.get(url, follow_redirects=True, timeout=30.0)
-            response.raise_for_status()
+        response = await fetch_url_async(url)
+        response.raise_for_status()
 
-            content_type = response.headers.get("Content-Type", "").lower()
-            logger.info(f"Обработка URL: {url} (Content-Type: {content_type})")
+        content_type = response.headers.get("Content-Type", "").lower()
+        logger.info(f"Обработка URL: {url} (Content-Type: {content_type})")
 
-            path = urlparse(url).path.lower()
+        path = urlparse(url).path.lower()
 
-            if "application/pdf" in content_type or path.endswith(".pdf"):
-                logger.info("Обнаружен PDF-документ. Запуск PDF-парсера...")
-                return await process_pdf_bytes(response.content)
+        if "application/pdf" in content_type or path.endswith(".pdf"):
+            logger.info("Обнаружен PDF-документ. Запуск PDF-парсера...")
+            return await process_pdf_bytes(response.content)
 
-            # Если это не PDF, возвращаем сырой текст страницы
-            # без дополнительного препроцессинга,
-            # чтобы его можно было отправить в LLM-cleaner, если нужно
-            logger.info("Обнаружена HTML-страница. Запуск базового парсера...")
-            return process_html(response.text)
+        # Если это не PDF, возвращаем сырой текст страницы
+        # без дополнительного препроцессинга,
+        # чтобы его можно было отправить в LLM-cleaner, если нужно
+        logger.info("Обнаружена HTML-страница. Запуск базового парсера...")
+        return process_html(response.text)
 
     except Exception as e:
         logger.error(f"Ошибка при загрузке или парсинге {url}: {e}")

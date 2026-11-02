@@ -1,0 +1,44 @@
+# Live comparison candidates for #377. These are not measured or expert-approved answers.
+schema_version: 1
+scenarios:
+  - id: deepseek_scores_tool
+    question: Какой проходной балл на ФИТ в 2024 году?
+    reference_answer: Ответ использует get_admission_scores; числа совпадают с результатом инструмента в проверяемой базе.
+    topic: admission_scores
+    source: "issue #377; compare against SQL tool output in isolated live environment"
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: faq_match, value: false}
+      - {kind: regex, value: '\d+'}
+
+  - id: deepseek_followup_history
+    question: а на ММФ?
+    history:
+      - role: user
+        content: Какие условия поступления на ФИТ?
+      - role: assistant
+        content: Обсуждаем условия поступления на факультет информационных технологий.
+    reference_answer: Ответ относится к ММФ, учитывает историю и ссылается на найденные источники ММФ; не переносит сведения ФИТ.
+    topic: retrieval
+    source: "issue #377; same faculty-switch scenario as crag_topic_switch_mmf"
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: faq_match, value: false}
+      - {kind: source_contains, value: "https://mmf.nsu.ru"}
+
+  - id: deepseek_rag_sources
+    question: Как добраться до главного корпуса НГУ?
+    reference_answer: Ответ опирается на найденный контекст и реальные ссылки источников; факты проверяются по зафиксированной базе знаний.
+    topic: retrieval
+    source: "issue #377; same question as rag_rerank_failure, without synthetic failure"
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: faq_match, value: false}
+      - {kind: source_contains, value: "https://"}

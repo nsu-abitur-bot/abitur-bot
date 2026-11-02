@@ -6,6 +6,7 @@ import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from abbrev.expander import get_abbrev_expander
+from api.services.document_indexer import index_document
 from db.postgres.models import Document
 from db.postgres.services.document import (
     DOCUMENT_STATUS_CHANGED,
@@ -16,9 +17,9 @@ from db.postgres.services.document import (
     DOCUMENT_STATUS_UPDATED,
     DocumentService,
 )
+from parser.safe_fetch import UnsafeURLError, fetch_url_async
 from parser.url import process_url
-from rag.graph_memory import get_graph_memory
-from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
+from rag.loader import DEFAULT_GRAPH_ID
 
 logger = logging.getLogger(__name__)
 
@@ -149,27 +150,21 @@ class DocumentUpdateService:
             raise ValueError("После обработки текст документа пустой")
 
         previous_hash = document.content_hash
-        old_rag_doc_id = document.rag_doc_id
-        memory = get_graph_memory()
-        await memory.delete_doc(self.graph_id, old_rag_doc_id)
-        saved_count = await add_texts_async(
-            texts=[prepared_text],
+        indexed_doc = await index_document(
+            document=document,
+            text=prepared_text,
+            content_hash=content_hash,
+            file_path=document.source_url,
             graph_id=self.graph_id,
-            source_ids=[document.id],
-            file_paths=[document.source_url],
+            session=self.session,
+            document_service=self.documents,
         )
-        if saved_count == 0:
+        if not indexed_doc:
             raise ValueError("Не удалось сохранить обновленный документ в RAG")
 
-        updated = await self.documents.mark_indexed(
-            document.id,
-            content_hash=content_hash,
-            content_length=len(prepared_text),
-            rag_doc_id=document.id,
-        )
         return {
             "id": document.id,
-            "title": updated.title if updated else document.title,
+            "title": indexed_doc.title if indexed_doc else document.title,
             "source_url": document.source_url,
             "status": DOCUMENT_STATUS_UPDATED,
             "content_hash": content_hash,
@@ -179,13 +174,13 @@ class DocumentUpdateService:
 
 
 async def fetch_url_bytes(url: str) -> bytes:
-    async with httpx.AsyncClient(verify=False, timeout=30.0) as client:
-        response = await client.get(url, follow_redirects=True)
-        response.raise_for_status()
-        return response.content
+    response = await fetch_url_async(url)
+    return response.content
 
 
 def readable_fetch_error(exc: Exception) -> str:
+    if isinstance(exc, UnsafeURLError):
+        return f"Небезопасная ссылка на источник: {exc}"
     if isinstance(exc, httpx.HTTPStatusError):
         status_code = exc.response.status_code
         if status_code == 404:
@@ -200,6 +195,8 @@ def readable_fetch_error(exc: Exception) -> str:
     if isinstance(exc, httpx.TimeoutException):
         return "Источник не ответил вовремя"
     if isinstance(exc, httpx.ConnectError):
+        if "CERTIFICATE_VERIFY_FAILED" in str(exc):
+            return "Не удалось проверить TLS-сертификат источника"
         return "Не удалось подключиться к источнику"
     if isinstance(exc, httpx.InvalidURL):
         return "Некорректная ссылка на источник"

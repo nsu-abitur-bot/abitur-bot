@@ -5,9 +5,10 @@
 """
 
 import logging
-import os
 from datetime import UTC, datetime, timedelta
 
+from config.instance import get_setting
+from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.admission_score import AdmissionScoreService
 from db.postgres.services.settings import SettingsService
@@ -30,7 +31,7 @@ MIN_FILLED_SCORES_SHARE = 0.9
 
 
 def _env_flag(name: str, default: bool) -> bool:
-    raw = os.getenv(name)
+    raw = get_setting(name)
     if raw is None:
         return default
     return raw.strip().lower() in {"1", "true", "yes", "on", "да"}
@@ -38,7 +39,7 @@ def _env_flag(name: str, default: bool) -> bool:
 
 def _scores_max_age_hours() -> float:
     try:
-        return float(os.getenv("ADMISSION_SCORES_MAX_AGE_HOURS", "24"))
+        return float(get_setting("ADMISSION_SCORES_MAX_AGE_HOURS", "24"))
     except (TypeError, ValueError):
         return 24.0
 
@@ -52,6 +53,8 @@ async def seed_reference_data() -> None:
     записи сида при каждом деплое. SEED_FACULTIES_FORCE=1 — жёстко перезалить.
     """
     try:
+        if not is_nsu() or not _env_flag("SEED_FACULTIES", True):
+            return
         if _env_flag("SEED_FACULTIES_FORCE", False):
             stats = await seed_faculties(soft=False)
             logger.info("Справочник факультетов принудительно перезалит: %s", stats)
@@ -89,7 +92,7 @@ async def seed_admission_scores() -> None:
     безопасны. Отключить целиком: SEED_ADMISSION_SCORES=0. Игнорировать
     свежесть: SEED_ADMISSION_SCORES_FORCE=1.
     """
-    if not _env_flag("SEED_ADMISSION_SCORES", True):
+    if not is_nsu() or not _env_flag("SEED_ADMISSION_SCORES", True):
         logger.info("Автозаливка проходных баллов отключена (SEED_ADMISSION_SCORES=0)")
         return
 
@@ -101,7 +104,7 @@ async def seed_admission_scores() -> None:
         ):
             return
 
-        url = os.getenv("ADMISSION_SCORES_URL", DEFAULT_SCORES_URL)
+        url = get_setting("ADMISSION_SCORES_URL", DEFAULT_SCORES_URL)
         logger.info("Загружаю проходные баллы: %s", url)
         rows = await parse_scores(url)
         if not rows:

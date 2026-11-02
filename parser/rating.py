@@ -1,13 +1,13 @@
 """Парсер рейтинговых списков абитуриентов НГУ."""
 
 import logging
-import os
 from dataclasses import dataclass, field
 from urllib.parse import parse_qs, urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
+from config.instance import get_setting
 from db.postgres.dto import RatingEntry
 from parser.config.load_config import get_rating_config
 from parser.utils import calculate_page_hash
@@ -66,7 +66,7 @@ def _parse_list_response(text: str, data: object) -> ListFetchResult:
 
 
 def _resolve_type_ids() -> list[int]:
-    raw = os.getenv("RATING_TYPES", DEFAULT_LIST_TYPES)
+    raw = get_setting("RATING_TYPES", DEFAULT_LIST_TYPES)
     ids = [v for part in raw.split(",") if (v := _to_int(part.strip())) is not None]
     return ids or [30]
 
@@ -411,7 +411,7 @@ def extract_params_from_url(url: str) -> dict:
     """Извлекает faculty/direction/condition/type из URL.
 
     Дефолты для отсутствующих в URL параметров берёт из parser/config/config.yaml
-    (rating.defaults) — это единственное место, где живут эти числа (#326).
+    (rating.defaults) — это единственное место, где живут эти числа (#306).
     """
     parsed = urlparse(url)
     qs = parse_qs(parsed.query)
@@ -419,7 +419,9 @@ def extract_params_from_url(url: str) -> dict:
     config = get_rating_config()
     defaults = config.get("defaults", {}) if isinstance(config, dict) else {}
 
-    def _default(name: str) -> int:
+    def _param(name: str) -> int:
+        if name in qs:
+            return int(qs[name][0])
         value = defaults.get(name)
         if value is None:
             raise RuntimeError(
@@ -428,10 +430,10 @@ def extract_params_from_url(url: str) -> dict:
         return int(value)
 
     return {
-        "faculty": int(qs.get("faculty", [_default("faculty")])[0]),
-        "direction": int(qs.get("direction", [_default("direction")])[0]),
-        "condition": int(qs.get("condition", [_default("condition")])[0]),
-        "type": int(qs.get("type", [_default("type")])[0]),
+        "faculty": _param("faculty"),
+        "direction": _param("direction"),
+        "condition": _param("condition"),
+        "type": _param("type"),
     }
 
 

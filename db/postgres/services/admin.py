@@ -1,10 +1,14 @@
 from datetime import UTC, datetime
 from typing import Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.postgres.models import Admin, AdminRole, InviteCode
+from ..models import Admin, AdminRole, InviteCode
+
+
+class BootstrapRefusedError(ValueError):
+    """First-admin provisioning was attempted on a nonempty database."""
 
 
 class AdminService:
@@ -95,9 +99,29 @@ class AdminService:
         )
         return result.scalar_one_or_none()
 
+    async def consume_invite_code(self, code: str) -> Optional[InviteCode]:
+        now = datetime.now(UTC).replace(tzinfo=None)
+        result = await self.session.execute(
+            update(InviteCode)
+            .where(
+                InviteCode.code == code,
+                InviteCode.used_at.is_(None),
+                or_(InviteCode.expires_at.is_(None), InviteCode.expires_at > now),
+            )
+            .values(used_at=now)
+            .returning(InviteCode)
+        )
+        return result.scalar_one_or_none()
+
     async def use_invite_code(self, code: str, used_by_id: str) -> None:
-        invite = await self.get_invite_code(code)
+        invite = await self.consume_invite_code(code)
         if invite is not None:
             invite.used_by_id = used_by_id
-            invite.used_at = datetime.now(UTC).replace(tzinfo=None)
             await self.session.flush()
+
+    async def bootstrap_superadmin(self, username: str, password_hash: str) -> Admin:
+        # Conflicts with every INSERT, including another bootstrap. Held until commit.
+        await self.session.execute(text("LOCK TABLE admins IN EXCLUSIVE MODE"))
+        if await self.count() != 0:
+            raise BootstrapRefusedError("Bootstrap requires an empty admins table")
+        return await self.create(username, password_hash, AdminRole.superadmin)

@@ -4,6 +4,7 @@ from typing import List
 from google import genai
 from google.genai import types
 
+from config.instance import get_setting
 from llm.profiles import LLMProfiles
 
 logger = logging.getLogger(__name__)
@@ -19,8 +20,18 @@ class GeminiLLM:
 
     def __init__(self, api_key: str, model: str = "gemini-2.5-flash-lite") -> None:
         self.model = model
-        self.client = genai.Client(api_key=api_key)
+        self.client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(
+                base_url=get_setting("GEMINI_BASE_URL"),
+                timeout=int(float(get_setting("GEMINI_TIMEOUT_SECONDS", "60")) * 1000),
+            ),
+        )
         self.profile = LLMProfiles.GRAPH
+
+    async def aclose(self) -> None:
+        await self.client.aio.aclose()
+        self.client.close()
 
     async def __call__(self, prompt: str, **kwargs) -> str:
         try:
@@ -30,6 +41,9 @@ class GeminiLLM:
             config = types.GenerateContentConfig(
                 temperature=kwargs.get("temperature", self.profile.temperature),
                 max_output_tokens=kwargs.get("max_tokens", self.profile.max_tokens),
+                http_options=types.HttpOptions(
+                    timeout=int(float(self.profile.timeout or 180) * 1000)
+                ),
             )
 
             if system_prompt:
@@ -52,9 +66,19 @@ class GeminiEmbedding:
 
     def __init__(self, api_key: str, model: str = "gemini-embedding-2-preview") -> None:
         self.model = model
-        self.client = genai.Client(api_key=api_key)
+        self.client = genai.Client(
+            api_key=api_key,
+            http_options=types.HttpOptions(
+                base_url=get_setting("GEMINI_BASE_URL"),
+                timeout=int(float(get_setting("GEMINI_TIMEOUT_SECONDS", "60")) * 1000),
+            ),
+        )
         self.embedding_dim = GEMINI_EMBEDDING_DIMS.get(model, 768)
         self.profile = LLMProfiles.EMBEDDING
+
+    async def aclose(self) -> None:
+        await self.client.aio.aclose()
+        self.client.close()
 
     async def __call__(self, texts: List[str]) -> List[List[float]]:
         # Ошибку не глотаем и нулевой вектор не подставляем: в nano_vectordb
@@ -66,6 +90,9 @@ class GeminiEmbedding:
                 model=self.model,
                 contents=texts,
                 config=types.EmbedContentConfig(
+                    http_options=types.HttpOptions(
+                        timeout=int(float(self.profile.timeout or 60) * 1000)
+                    ),
                     task_type="RETRIEVAL_DOCUMENT",
                     output_dimensionality=self.embedding_dim,
                 ),

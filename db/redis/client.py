@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 class RedisClient:
     def __init__(self):
         # Без явной проверки redis.from_url(None) падает TypeError'ом из
-        # недр redis-py — непонятно, что именно не задано (#326).
+        # недр redis-py — непонятно, что именно не задано (#306).
         if not REDIS_URL:
             raise RuntimeError(
                 "REDIS_URL не задана: добавь её в .env "

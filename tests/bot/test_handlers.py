@@ -97,6 +97,31 @@ async def test_telegram_cancellation_is_not_swallowed():
     assert bot.sent == []
 
 
+async def test_telegram_cancellation_stops_inflight_draft():
+    started = asyncio.Event()
+    stopped = asyncio.Event()
+
+    class SlowDraftBot(FakeTelegramBot):
+        async def send_message_draft(self, **kwargs) -> None:
+            started.set()
+            try:
+                await asyncio.Event().wait()
+            finally:
+                stopped.set()
+
+    class CancelledCore(FakeCore):
+        async def handle_message(self, **kwargs) -> BotReply:
+            await kwargs["status_callback"]("Поиск…")
+            await started.wait()
+            raise asyncio.CancelledError()
+
+    bot = SlowDraftBot()
+    with pytest.raises(asyncio.CancelledError):
+        await run_telegram(bot, CancelledCore())
+    assert stopped.is_set()
+    assert bot.sent == []
+
+
 async def test_telegram_long_answer_arrives_in_several_messages():
     bot = FakeTelegramBot()
     reply = BotReply(

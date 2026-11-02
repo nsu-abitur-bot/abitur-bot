@@ -1,8 +1,6 @@
 import asyncio
 import logging
-from os import getenv
 
-from dotenv import load_dotenv
 from maxapi import Bot, Dispatcher
 from maxapi.enums.parse_mode import ParseMode
 from maxapi.enums.sender_action import SenderAction
@@ -13,6 +11,7 @@ from bot.core import ERROR_REPLY_TEXT, BotCore
 from bot.splitting import split_message
 from bot.streaming import MaxStreamer
 from bot.utils import normalize_links_for_messaging
+from config.instance import get_setting as getenv
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +88,6 @@ async def run_max_bot() -> bool | None:
     не настроены, процесс не падает и Telegram продолжает работать. Возвращает False
     для отмены перезапуска.
     """
-    load_dotenv()
 
     token = getenv("MAX_BOT_TOKEN")
     if not token:

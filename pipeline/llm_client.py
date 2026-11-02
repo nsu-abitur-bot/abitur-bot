@@ -3,14 +3,17 @@ import json
 import logging
 import re
 from contextlib import contextmanager, suppress
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from html import unescape
+from time import perf_counter
 from typing import Awaitable, Callable, Optional
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from abbrev.expander import get_abbrev_expander
+from config.latency import observation, request_timed, stage, timed
+from config.university import identity
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
@@ -18,7 +21,7 @@ from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
 from db.redis.client import RedisClient
 from faq.matcher import FAQMatcher, get_faq_matcher, load_faq_threshold
-from llm.base import LLMUsage, ToolExecutor
+from llm.base import LLMUsage, ToolExecutor, ToolSpec
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from pipeline.prompts import (
@@ -150,6 +153,7 @@ async def _save_log_to_db(
         logger.error(f"Ошибка сохранения лога в БД: {e}")
 
 
+@timed("intent_background")
 async def _classify_intent_bg(
     expanded_message: str,
     log_entry_id: Optional[int],
@@ -178,9 +182,10 @@ async def _classify_intent_bg(
             HumanMessage(content=expanded_message),
         ]
         intent_provider = get_llm_provider()
-        intent_response = await intent_provider.generate(
-            intent_messages, profile=LLMProfiles.INTENT
-        )
+        with stage("intent_model_call"):
+            intent_response = await intent_provider.generate(
+                intent_messages, profile=LLMProfiles.INTENT
+            )
 
         topic_id = None
         try:
@@ -340,6 +345,7 @@ class _Ctx:
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
 
+    @timed("tool_execution")
     async def execute_tool(self, name: str, args: dict) -> str:
         self.trace.tools_called.append(name)
         return await default_tool_executor(name, args)
@@ -417,6 +423,7 @@ async def _await_faq(
         return None
 
 
+@timed("faq")
 async def _match_faq(matcher: FAQMatcher, message: str) -> Optional[str]:
     """FAQ-матч с актуальным порогом.
 
@@ -429,6 +436,7 @@ async def _match_faq(matcher: FAQMatcher, message: str) -> Optional[str]:
     return await matcher.match_async(message)
 
 
+@timed("history")
 async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
     try:
         return await task
@@ -437,6 +445,7 @@ async def _await_history(task: "asyncio.Task[list]", session_id: str) -> list:
         return []
 
 
+@timed("history_write")
 async def _remember_message(
     redis_client: RedisClient, session_id: str, entry: dict[str, str]
 ) -> None:
@@ -472,6 +481,7 @@ def _history_before_question(history_entries: list[dict], question: str) -> list
     return list(history_entries)
 
 
+@timed("retrieval_total")
 async def _retrieve_context(
     expanded_message: str,
     history_text: str,
@@ -569,7 +579,11 @@ def _build_messages(
     они попадали в историю целиком и модель начинала их копировать.
     """
     system_prompt = SYSTEM_PROMPT_BASE.format(
-        context=rag_context, sources_hint=SOURCES_HINT
+        context=rag_context,
+        sources_hint=SOURCES_HINT,
+        assistant_name=identity()["assistant_name"],
+        university_short_name=identity()["short_name"],
+        university_full_name=identity()["full_name"],
     )
     messages: list[BaseMessage] = [SystemMessage(content=system_prompt)]
 
@@ -588,6 +602,21 @@ def _build_messages(
     return messages
 
 
+def _university_scores_tool() -> ToolSpec:
+    from copy import deepcopy
+
+    university = identity()["short_name"]
+    parameters = deepcopy(ADMISSION_SCORES_TOOL.parameters)
+    faculty = parameters["properties"]["faculty"]
+    faculty["description"] = faculty["description"].replace("НГУ", university)
+    return replace(
+        ADMISSION_SCORES_TOOL,
+        description=ADMISSION_SCORES_TOOL.description.replace("НГУ", university),
+        parameters=parameters,
+    )
+
+
+@timed("generation_tools_total")
 async def _run_tool_loop(
     messages: list[BaseMessage],
     session_id: str,
@@ -607,18 +636,21 @@ async def _run_tool_loop(
     if stream_callback is None:
         result = await provider.generate_with_tools(
             messages,
-            tools=[ADMISSION_SCORES_TOOL],
+            tools=[_university_scores_tool()],
             tool_executor=tool_executor,
             profile=LLMProfiles.CHAT,
         )
         return result.text, result.usage, provider_name
 
     streamed = ""
+    started = perf_counter()
 
     async def on_delta(delta: str) -> None:
         nonlocal streamed
         if not delta:
             return
+        if not streamed:
+            observation("generation_first_delta", (perf_counter() - started) * 1000)
         streamed += delta
         try:
             await stream_callback(streamed)
@@ -627,7 +659,7 @@ async def _run_tool_loop(
 
     result = await provider.generate_with_tools(
         messages,
-        tools=[ADMISSION_SCORES_TOOL],
+        tools=[_university_scores_tool()],
         tool_executor=tool_executor,
         profile=LLMProfiles.CHAT,
         on_delta=on_delta,
@@ -732,6 +764,7 @@ async def _answer_without_kb(
     return processed.text, processed.sources
 
 
+@timed("answer_total")
 async def _generate_answer(
     rag: _RagResult,
     history_entries: list[dict],
@@ -796,6 +829,7 @@ def _store_answer(
         _spawn_bg(_save_message_to_pg(ctx.user_id, ctx.session_id, message, stored_text))
 
 
+@request_timed("pipeline_total")
 async def ask_local_llm(
     message: str,
     session_id: str,

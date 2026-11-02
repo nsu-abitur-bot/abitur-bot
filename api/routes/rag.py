@@ -1,10 +1,10 @@
+import asyncio
 import csv
 import io
 import logging
 from urllib.parse import unquote
 
 import httpx
-import requests
 from bs4 import BeautifulSoup
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import Response
@@ -34,10 +34,12 @@ from api.schemas.rag import (
     RagDocumentUpdateRequest,
     RagUploadResponse,
 )
+from api.services.document_indexer import index_document
 from api.services.document_update import (
     DocumentUpdateService,
     calculate_content_hash,
     fetch_url_bytes,
+    readable_fetch_error,
 )
 from api.services.rag_upload import RagUploadService
 from api.services.url_to_rag import parse_and_save_url
@@ -48,10 +50,11 @@ from db.postgres.services.document import (
     DocumentService,
 )
 from parser.nsu import parse_page
+from parser.safe_fetch import UnsafeURLError, fetch_url_async
 from parser.url import process_pdf_bytes
 from pipeline.preprocessor import clean_and_structure_text, generate_title_from_text
 from rag.graph_memory import get_graph_memory
-from rag.loader import DEFAULT_GRAPH_ID, add_texts_async
+from rag.loader import DEFAULT_GRAPH_ID
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/rag", tags=["RAG Management"])
@@ -96,50 +99,56 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
 
     # 1. Проверяем тип контента (может это PDF документ)
     try:
-        async with httpx.AsyncClient(verify=False, timeout=30.0) as client:
-            resp = await client.head(url_str, follow_redirects=True)
-            content_type = resp.headers.get("Content-Type", "").lower()
+        try:
+            resp = await fetch_url_async(url_str, method="HEAD")
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code not in {405, 501}:
+                raise
+            resp = await fetch_url_async(url_str)
+        content_type = resp.headers.get("Content-Type", "").lower()
 
-            if "application/pdf" in content_type or url_str.lower().endswith(".pdf"):
-                logger.info(
-                    f"Обнаружен PDF по URL: {url_str}. Запуск Vision парсера для превью."
-                )
+        if "application/pdf" in content_type or url_str.lower().endswith(".pdf"):
+            logger.info(
+                f"Обнаружен PDF по URL: {url_str}. Запуск Vision парсера для превью."
+            )
 
-                resp_get = await client.get(url_str, follow_redirects=True)
-                resp_get.raise_for_status()
+            resp_get = await fetch_url_async(url_str)
+            resp_get.raise_for_status()
 
-                pdf_markdown = get_abbrev_expander().expand(
-                    await process_pdf_bytes(resp_get.content)
-                )
+            pdf_markdown = get_abbrev_expander().expand(
+                await process_pdf_bytes(resp_get.content)
+            )
 
-                # Декодируем URL для fallback
-                # (чтобы вместо %D0%98 было нормальное русское название)
-                raw_filename = url_str.split("/")[-1]
-                decoded_title = unquote(raw_filename)
+            # Декодируем URL для fallback
+            # (чтобы вместо %D0%98 было нормальное русское название)
+            raw_filename = url_str.split("/")[-1]
+            decoded_title = unquote(raw_filename)
 
-                generated_title = await generate_title_from_text(pdf_markdown)
-                title_to_use = (
-                    generated_title
-                    if generated_title and generated_title != "Без названия"
-                    else decoded_title
-                )
+            generated_title = await generate_title_from_text(pdf_markdown)
+            title_to_use = (
+                generated_title
+                if generated_title and generated_title != "Без названия"
+                else decoded_title
+            )
 
-                # Добавляем сгенерированный заголовок в текст, если его там нет
-                if title_to_use != decoded_title and not pdf_markdown.startswith(
-                    f"# {title_to_use}"
-                ):
-                    pdf_markdown = f"# {title_to_use}\n\n{pdf_markdown}"
+            # Добавляем сгенерированный заголовок в текст, если его там нет
+            if title_to_use != decoded_title and not pdf_markdown.startswith(
+                f"# {title_to_use}"
+            ):
+                pdf_markdown = f"# {title_to_use}\n\n{pdf_markdown}"
 
-                return ParsedPageResult(
-                    # Сгенерированное нейронкой или нормальное имя файла как заголовок
-                    title=title_to_use,
-                    url=url_str,
-                    text=pdf_markdown,
-                    documents=[],  # Внутри PDF ссылок на другие документы мы не собираем
-                )
+            return ParsedPageResult(
+                # Сгенерированное нейронкой или нормальное имя файла как заголовок
+                title=title_to_use,
+                url=url_str,
+                text=pdf_markdown,
+                documents=[],  # Внутри PDF ссылок на другие документы мы не собираем
+            )
+    except UnsafeURLError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error(f"Ошибка загрузки {url_str} перед превью: {e}")
-        raise HTTPException(status_code=400, detail="Failed to fetch URL check") from e
+        raise HTTPException(status_code=400, detail=readable_fetch_error(e)) from e
 
     # 2. Если это обычная HTML страница
     # Добавляем стандартные заголовки, чтобы избежать блокировки (Requirement 1 - Fix)
@@ -162,7 +171,13 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
         {"style": "main", "attr": ""},
     ]
 
-    data = parse_page(str(url), selectors=default_selectors, headers=headers)
+    data = await asyncio.to_thread(
+        parse_page,
+        url_str,
+        selectors=default_selectors,
+        headers=headers,
+        fallback_to_body=True,
+    )
     if not data:
         raise HTTPException(
             status_code=400,
@@ -188,25 +203,6 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
             # Если этот блок еще не является частью уже добавленного блока
             if not any(block in existing for existing in cleaned_blocks):
                 cleaned_blocks.append(block)
-
-    # Если блоков не нашли, пытаемся достать хоть что-то из body (Fallback)
-    if not cleaned_blocks:
-        try:
-            resp = requests.get(str(url), headers=headers)
-            if resp.status_code == 200:
-                soup = BeautifulSoup(resp.text, "html.parser")
-                # Убираем скрипты и стили
-                for script in soup(["script", "style"]):
-                    script.extract()
-                # Берем текст из body, если он там есть
-                body = soup.body
-                if body:
-                    # Пытаемся взять основной текст, пропуская навигацию если возможно
-                    body_text = body.get_text(separator="\n", strip=True)
-                    if len(body_text) > 100:
-                        cleaned_blocks = [body_text]
-        except Exception:
-            pass
 
     text_parts.extend(cleaned_blocks)
     raw_text = "\n\n".join(text_parts)
@@ -257,28 +253,18 @@ async def confirm_rag_upload(
                 graph_id=DEFAULT_GRAPH_ID,
                 title=request.title,
                 source_url=request.url,
-                content_hash=content_hash,
-                content_length=len(prepared_text),
             )
-            old_rag_doc_id = document.rag_doc_id
-
-            memory = get_graph_memory()
-            await memory.delete_doc(DEFAULT_GRAPH_ID, old_rag_doc_id)
-            saved_count = await add_texts_async(
-                texts=[prepared_text],
+            indexed_doc = await index_document(
+                document=document,
+                text=prepared_text,
+                content_hash=content_hash,
+                file_path=request.url,
                 graph_id=DEFAULT_GRAPH_ID,
-                source_ids=[document.id],
-                file_paths=[request.url],
+                session=session,
+                document_service=document_service,
             )
-            if saved_count == 0:
-                await document_service.mark_error(document.id)
+            if not indexed_doc:
                 raise HTTPException(status_code=500, detail="Failed to upload")
-            await document_service.mark_indexed(
-                document.id,
-                content_hash=content_hash,
-                content_length=len(prepared_text),
-                rag_doc_id=document.id,
-            )
 
         # 2. Вложенные документы больше не загружаем (по запросу)
         # if request.documents:
@@ -556,12 +542,11 @@ async def upload_csv_documents(
                     title = unquote(raw_filename)
                 else:
                     # Для веб-страниц пытаемся получить <title>
-                    async with httpx.AsyncClient(verify=False, timeout=10.0) as client:
-                        resp = await client.get(url, follow_redirects=True)
-                        if resp.status_code == 200:
-                            soup = BeautifulSoup(resp.text, "html.parser")
-                            if soup.title and soup.title.string:
-                                title = soup.title.string.strip()
+                    resp = await fetch_url_async(url, timeout=10.0)
+                    if resp.status_code == 200:
+                        soup = BeautifulSoup(resp.text, "html.parser")
+                        if soup.title and soup.title.string:
+                            title = soup.title.string.strip()
             except Exception as title_e:
                 logger.warning(f"Не удалось извлечь название для {url}: {title_e}")
 
