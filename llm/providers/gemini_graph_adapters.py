@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, cast
 
 from google import genai
 from google.genai import types
@@ -88,7 +88,7 @@ class GeminiEmbedding:
         try:
             result = await self.client.aio.models.embed_content(
                 model=self.model,
-                contents=texts,
+                contents=cast(types.ContentListUnion, texts),
                 config=types.EmbedContentConfig(
                     http_options=types.HttpOptions(
                         timeout=int(float(self.profile.timeout or 60) * 1000)

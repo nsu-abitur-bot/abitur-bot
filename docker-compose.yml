@@ -37,6 +37,7 @@ services:
       # Без ключа compose не стартует: иначе api молча перезапускался бы по кругу
       # (restart: always), а проверка в api/auth/security.py видна только в логах.
       - SECRET_KEY=${SECRET_KEY:?SECRET_KEY is required in .env}
+      - BRANDING_MEDIA_DIR=/app/branding-media
     # Порт открыт на всех интерфейсах: админка (abitur-web) ходит в API напрямую
     # по адресу сервера. Закрыть его на 127.0.0.1 можно только вместе с
     # реверс-прокси и переключением NUXT_PUBLIC_API_BASE_URL на него.
@@ -46,6 +47,7 @@ services:
       - ./faq:/app/faq
       - ./data:/app/data
       - ./logs:/app/logs
+      - branding_media:/app/branding-media
     depends_on:
       redis:
         condition: service_healthy
@@ -110,5 +112,6 @@ services:
       retries: 10
 
 volumes:
+  branding_media:
   redis_data:
   postgres_data:

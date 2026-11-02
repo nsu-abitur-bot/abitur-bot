@@ -16,15 +16,17 @@ x-backend: &backend
     LIGHTRAG_WORKSPACE_BASE: /app/data/lightrag
     LIGHTRAG_STORAGE: json
     LOG_DIR: /app/logs
+    BRANDING_MEDIA_DIR: /app/branding-media
   volumes:
     - files:/app/data
     - logs:/app/logs
+    - branding:/app/branding-media
 
 services:
   permissions:
     <<: *backend
     user: root
-    command: [sh, -eu, -c, "chown 1000:1000 /app/data /app/logs"]
+    command: [sh, -eu, -c, "chown 1000:1000 /app/data /app/logs /app/branding-media"]
 
   migrate:
     <<: *backend
@@ -97,3 +99,4 @@ volumes:
   redis:
   files:
   logs:
+  branding:

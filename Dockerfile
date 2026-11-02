@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN groupadd -g 1000 app && useradd -m -u 1000 -g 1000 -s /usr/sbin/nologin app
 
 WORKDIR /app
-RUN chown app:app /app
+RUN mkdir /app/branding-media && chown app:app /app /app/branding-media
 USER app
 
 # Copy dependency files
