@@ -168,7 +168,9 @@ async def test_lightrag_logs_are_isolated_between_concurrent_requests(monkeypatc
             else:
                 await asyncio.sleep(0.05)
             logging.getLogger("lightrag").info(f"end: {question}")
-            return RetrievalResult(context=f"Контекст: {question}", trace=trace.get_lines())
+            return RetrievalResult(
+                context=f"Контекст: {question}", trace=trace.get_lines()
+            )
 
     async def fake_save_log_to_db(**kwargs) -> None:
         saved_logs.append(kwargs)

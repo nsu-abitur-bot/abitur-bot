@@ -48,13 +48,7 @@ async def test_records_after_capture_are_not_routed():
 
 
 async def test_stale_task_does_not_leak_into_live_trace():
-    """Задача, переживший свою трассу, не загрязняет трассу нового запроса.
-
-    Воркер создан внутри первой трассы и стреляет позже, когда открыта вторая:
-    осиротевшая строка может достаться только закрытому буферу первой трассы,
-    но не живой второй. LightRAG держит пул воркеров между запросами, так что
-    этот случай реален, а не теоретичен.
-    """
+    """A descendant outliving capture cannot append to its closed buffer."""
     release = asyncio.Event()
 
     async def stale_worker() -> None:
@@ -71,9 +65,7 @@ async def test_stale_task_does_not_leak_into_live_trace():
         _emit("second request line")
 
     assert second.get_lines() == ["INFO: second request line"]
-    # Буфер первой трассы уже никем не читается: осиротевшие строки в нём
-    # безвредны, состояние второй трассы от них не зависит.
-    assert "second request line" not in "\n".join(first.get_lines())
+    assert first.get_lines() == ["INFO: first request line"]
 
 
 def test_capture_does_not_touch_logger_configuration():
@@ -106,3 +98,22 @@ def test_install_is_idempotent_and_only_lowers_level():
     # INFO — рабочий уровень lightrag из logging_config; строже ему быть нельзя,
     # иначе записи не дойдут до хендлера и трасса опустеет.
     assert logger.level == logging.INFO
+
+
+def test_trace_lines_are_snapshots():
+    with capture_lightrag_trace() as trace:
+        _emit("first")
+        snapshot = trace.get_lines()
+        _emit("second")
+    assert snapshot == ["INFO: first"]
+    assert trace.get_lines() == ["INFO: first", "INFO: second"]
+
+
+def test_nested_capture_restores_outer_trace():
+    with capture_lightrag_trace() as outer:
+        _emit("outer-before")
+        with capture_lightrag_trace() as inner:
+            _emit("inner")
+        _emit("outer-after")
+    assert outer.get_lines() == ["INFO: outer-before", "INFO: outer-after"]
+    assert inner.get_lines() == ["INFO: inner"]

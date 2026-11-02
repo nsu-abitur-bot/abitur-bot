@@ -31,7 +31,12 @@ from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
 from rag.crag import CragChunk, load_crag_config, run_crag
-from rag.trace import RetrievalResult, capture_lightrag_trace
+from rag.trace import (
+    RetrievalResult,
+    capture_lightrag_trace,
+    trace_queued_callback,
+    trace_worker_callback,
+)
 
 load_dotenv()
 
@@ -41,7 +46,9 @@ logger = logging.getLogger(__name__)
 def _time_queued_callbacks(rag: LightRAG) -> None:
     """Time the caller's queue await, not a worker that retains an old context."""
     embedding = cast(Any, rag.embedding_func)
-    timed_embedding = timed("rag_embedding")(embedding)
+    timed_embedding = timed("rag_embedding")(
+        trace_queued_callback(embedding, "Embedding func")
+    )
     # LightRAG shares its queued callback with every storage at construction.
     # Preserve that sharing and the queue's attributes (including shutdown).
     for value in vars(rag).values():
@@ -51,7 +58,9 @@ def _time_queued_callbacks(rag: LightRAG) -> None:
         ):
             cast(Any, value).embedding_func = timed_embedding
     cast(Any, rag).embedding_func = timed_embedding
-    cast(Any, rag).llm_model_func = timed("rag_model_call")(cast(Any, rag.llm_model_func))
+    cast(Any, rag).llm_model_func = timed("rag_model_call")(
+        trace_queued_callback(cast(Any, rag.llm_model_func), "LLM func")
+    )
 
 
 GRAPH_QUERY_MODES: frozenset = frozenset(
@@ -512,6 +521,7 @@ class GraphMemory:
                 @wrap_embedding_func_with_attrs(
                     embedding_dim=embedding_adapter.embedding_dim
                 )
+                @trace_worker_callback
                 async def embedding_func(texts: List[str]) -> List[List[float]]:
                     provider = embedding_provider
                     if provider == "openai":
@@ -529,6 +539,7 @@ class GraphMemory:
                     finally:
                         await adapter.aclose()
 
+                @trace_worker_callback
                 async def llm_model_func(prompt: str, **kwargs) -> str:
                     provider = get_setting("LIGHTRAG_LLM_PROVIDER", "gemini")
                     if provider == "openai":
