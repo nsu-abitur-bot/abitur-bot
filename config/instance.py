@@ -45,6 +45,9 @@ for key, label, kind in (
     define(key, label, "Вуз", kind=kind)
 
 
+define("UNIVERSITY_ACCENT_COLOR", "Акцентный цвет", "Вуз", "#4b4bd2")
+
+
 for provider in ("OPENAI", "GEMINI"):
     group = "OpenAI" if provider == "OPENAI" else "Gemini"
     define(f"{provider}_API_KEY", "API-ключ", group, secret=True)

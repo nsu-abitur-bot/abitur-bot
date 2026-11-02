@@ -15,6 +15,7 @@ from api.auth.dependencies import get_current_admin, require_admin
 from api.auth.router import router as auth_router
 from api.routes.abbrev import router as abbrev_router
 from api.routes.admission_score import router as admission_score_router
+from api.routes.branding import router as branding_router
 from api.routes.evals import router as evals_router
 from api.routes.faculty import router as faculty_router
 from api.routes.faq import router as faq_router
@@ -111,6 +112,7 @@ app.add_middleware(
 
 # Auth роутер — публичные эндпоинты /login и /register, остальное защищено внутри
 app.include_router(auth_router, prefix="/api/v1")
+app.include_router(branding_router, prefix="/api/v1")
 app.include_router(instance_settings_router, prefix="/api/v1")
 
 # Все остальные роутеры требуют аутентификации

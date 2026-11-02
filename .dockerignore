@@ -33,3 +33,5 @@ abbrev/abbrev_data.yaml
 .DS_Store
 *.swp
 *.swo
+
+branding-media/

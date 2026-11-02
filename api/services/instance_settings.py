@@ -1,5 +1,6 @@
 import asyncio
 import math
+import re
 from urllib.parse import urlsplit
 
 import httpx
@@ -50,6 +51,14 @@ def validate_value(spec: SettingSpec, value: str) -> None:
         raise ConfigurationError("Недопустимое значение настройки")
     if spec.group == "Вуз" and (len(value) > 300 or any(c in value for c in "{}<>")):
         raise ConfigurationError("Реквизиты должны быть обычным текстом до 300 символов")
+    if spec == SPECS["UNIVERSITY_ACCENT_COLOR"] and not re.fullmatch(
+        r"#[0-9a-fA-F]{6}", value
+    ):
+        raise ConfigurationError("Цвет должен быть в формате #RRGGBB")
+    if spec == SPECS["UNIVERSITY_LOGO_URL"] and re.fullmatch(
+        r"/api/v1/branding/media/[0-9a-f]{32}\.png", value
+    ):
+        return
     if spec.choices and value not in spec.choices:
         raise ConfigurationError("Выберите допустимое значение")
     if spec.kind == "boolean" and value not in {"true", "false"}:
