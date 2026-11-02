@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -26,8 +28,7 @@ def _program_item(program: Program) -> ProgramItem:
     return ProgramItem.model_validate(program)
 
 
-async def _faculty_item(faculty: Faculty, service: FacultyService) -> FacultyItem:
-    programs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+def _faculty_item(faculty: Faculty, programs: Sequence[Program]) -> FacultyItem:
     return FacultyItem(
         id=faculty.id,
         name=faculty.name,
@@ -46,8 +47,13 @@ async def get_faculties(
     service: FacultyService = Depends(get_faculty_service),
 ) -> list[FacultyItem]:
     """Возвращает все факультеты (включая выключенные) с их направлениями."""
-    faculties = await service.get_all_faculties(only_active=False)
-    return [await _faculty_item(faculty, service) for faculty in faculties]
+    directory = await service.load_directory(
+        faculties_only_active=False, programs_only_active=False
+    )
+    return [
+        _faculty_item(faculty, directory.programs_by_faculty.get(faculty.id, []))
+        for faculty in directory.faculties
+    ]
 
 
 @router.post(
@@ -65,7 +71,8 @@ async def create_faculty(
         aliases=data.aliases,
         is_active=data.is_active,
     )
-    return await _faculty_item(faculty, service)
+    programs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+    return _faculty_item(faculty, programs)
 
 
 @router.put(
@@ -89,7 +96,8 @@ async def update_faculty(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Факультет с ID {faculty_id} не найден",
         )
-    return await _faculty_item(faculty, service)
+    programs = await service.get_programs_by_faculty(faculty.id, only_active=False)
+    return _faculty_item(faculty, programs)
 
 
 @router.delete(

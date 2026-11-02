@@ -109,6 +109,9 @@ async def test_update_changed_documents_preserves_old_doc_when_indexing_fails(
         async def get_by_id(self, document_id):  # noqa: ANN001
             return doc if doc.id == document_id else None
 
+        async def get_by_ids(self, document_ids):  # noqa: ANN001
+            return [doc] if doc.id in document_ids else []
+
         async def save_check_results(self, results):  # noqa: ANN001
             pass
 
@@ -162,6 +165,9 @@ async def test_update_changed_documents_success_switches_rag_doc_id(monkeypatch)
 
         async def get_by_id(self, document_id):  # noqa: ANN001
             return doc if doc.id == document_id else None
+
+        async def get_by_ids(self, document_ids):  # noqa: ANN001
+            return [doc] if doc.id in document_ids else []
 
         async def save_check_results(self, results):  # noqa: ANN001
             pass
