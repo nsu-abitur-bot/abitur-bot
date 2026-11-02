@@ -1,7 +1,10 @@
 # Новый демостенд вуза на существующем сервере
 
-Инструкция для инженера или AI-агента. Пример — СИБГИУ. Она добавляет третий
-изолированный стенд к НГУ и НГТУ, не меняя архитектуру приложения. Для переноса
+Инструкция для инженера или AI-агента на примере действующего стенда НГТУ.
+Она показывает, как добавить изолированный стенд нового вуза рядом с НГУ,
+не меняя архитектуру приложения. НГТУ уже развёрнут: команды его создания
+повторять не нужно. Для нового вуза замените идентификатор, домены, пути и порты
+примера на собственные свободные значения. Для переноса
 на другую машину используйте [инструкцию переноса](demo-host-migration.md), для
 устройства CI — [deploy/ci/README.md](../deploy/ci/README.md).
 
@@ -31,19 +34,20 @@ ss -ltn
 cat /etc/abitur-instances/deploy-targets.json
 ```
 
-Предложение для третьего стенда — сначала убедиться, что имена и порты свободны:
+Параметры действующего НГТУ приведены ниже как образец. Они уже заняты;
+для нового вуза выберите другие имена и порты и проверьте, что они свободны:
 
 | Поле | Пример |
 | --- | --- |
-| Короткий идентификатор | `sibgiu` |
-| Compose project | `abitur-sibgiu` |
-| Env | `/etc/abitur-instances/sibgiu.env` |
-| Root wrapper | `/usr/local/bin/abitur-sibgiu-compose` |
-| UI / API порты, только loopback | `13003` / `18003` |
-| UI / API домены | `sibgiu.abitur.site` / `api.sibgiu.abitur.site` |
+| Короткий идентификатор | `nstu` |
+| Compose project | `abitur-nstu` |
+| Env | `/etc/abitur-instances/nstu.env` |
+| Root wrapper | `/usr/local/bin/abitur-nstu-compose` |
+| UI / API порты, только loopback | `13002` / `18002` |
+| UI / API домены | `nstu.abitur.site` / `api.nstu.abitur.site` |
 
-Домены примера ещё не означают, что DNS создан. Helper поддерживает максимум
-три стенда. Если уже есть три, остановиться и согласовать состав. На текущей
+Домены НГТУ уже настроены. Для нового вуза нужны отдельные записи DNS.
+Helper поддерживает максимум три стенда. Если уже есть три, остановиться и согласовать состав. На текущей
 машине около3.3GiB доступной ОС RAM; три одновременно обрабатывающих документы
 стенда не проверялись. Не индексировать большие документы параллельно с показом
 другого вуза. Если памяти недостаточно, согласовать остановку неиспользуемого
@@ -55,24 +59,24 @@ cat /etc/abitur-instances/deploy-targets.json
 
 ```sh
 umask 077
-mkdir -p "$HOME/.config/abitur-deployment/sibgiu"
+mkdir -p "$HOME/.config/abitur-deployment/nstu"
 uv run python deploy/demo/create_env.py \
-  "$HOME/.config/abitur-deployment/sibgiu/sibgiu.env" abitur-sibgiu \
-  --api-port 18003 --web-port 13003
+  "$HOME/.config/abitur-deployment/nstu/nstu.env" abitur-nstu \
+  --api-port 18002 --web-port 13002
 ```
 
 Генератор создаёт новые DB/Redis/JWT/encryption/session secrets и отказывается
 перезаписывать файл. В этом файле заменить localhost origins и добавить hosts:
 
 ```dotenv
-API_HOST=api.sibgiu.abitur.site
-WEB_HOST=sibgiu.abitur.site
-API_ORIGIN=https://api.sibgiu.abitur.site
-WEB_ORIGIN=https://sibgiu.abitur.site
+API_HOST=api.nstu.abitur.site
+WEB_HOST=nstu.abitur.site
+API_ORIGIN=https://api.nstu.abitur.site
+WEB_ORIGIN=https://nstu.abitur.site
 OUTBOUND_HTTP_PROXY=
 ```
 
-Передать по SSH и установить root:root0600 в `/etc/abitur-instances/sibgiu.env`.
+Передать по SSH и установить root:root0600 в `/etc/abitur-instances/nstu.env`.
 Не копировать nsu.env и не менять существующие env. Сохранить новую конфигурацию
 в защищённой резервной копии: потеря SETTINGS_ENCRYPTION_KEY делает сохранённые
 ключи моделей нечитаемыми.
@@ -94,7 +98,7 @@ OUTBOUND_HTTP_PROXY=
 
 ```sh
 #!/bin/sh
-exec docker compose --env-file /etc/abitur-instances/sibgiu.env \
+exec docker compose --env-file /etc/abitur-instances/nstu.env \
   -f /opt/abitur/backend/deploy/demo/compose.yaml \
   -f /opt/abitur/backend/deploy/demo/runtime.yaml \
   -f /opt/abitur/images.yaml "$@"
@@ -104,11 +108,11 @@ exec docker compose --env-file /etc/abitur-instances/sibgiu.env \
 секретов и подготовить пустую БД:
 
 ```sh
-/usr/local/bin/abitur-sibgiu-compose config --quiet
-/usr/local/bin/abitur-sibgiu-compose up -d postgres redis
-/usr/local/bin/abitur-sibgiu-compose run --rm permissions
-/usr/local/bin/abitur-sibgiu-compose run --rm migrate
-/usr/local/bin/abitur-sibgiu-compose up -d --no-deps --no-build --pull never api
+/usr/local/bin/abitur-nstu-compose config --quiet
+/usr/local/bin/abitur-nstu-compose up -d postgres redis
+/usr/local/bin/abitur-nstu-compose run --rm permissions
+/usr/local/bin/abitur-nstu-compose run --rm migrate
+/usr/local/bin/abitur-nstu-compose up -d --no-deps --no-build --pull never api
 ```
 
 API запускается без бота. После входа в админку обязательно выбрать custom-профиль
@@ -123,17 +127,17 @@ AAAA, указывающих на другой сервер. Записи НГУ
 остальные и существующие ограничения загрузки:
 
 ```caddyfile
-sibgiu.abitur.site {
+nstu.abitur.site {
     encode zstd gzip
-    reverse_proxy 127.0.0.1:13003
+    reverse_proxy 127.0.0.1:13002
 }
-api.sibgiu.abitur.site {
+api.nstu.abitur.site {
     encode zstd gzip
     @brandingUpload path /api/v1/settings/instance/branding
     request_body @brandingUpload {
         max_size 3MB
     }
-    reverse_proxy 127.0.0.1:18003
+    reverse_proxy 127.0.0.1:18002
 }
 ```
 
@@ -150,8 +154,8 @@ systemctl reload caddy
 сначала должен заработать HTTPS API. Проверку TLS не отключать.
 
 ```sh
-/usr/local/bin/abitur-sibgiu-compose up -d --no-deps --no-build --pull never web
-/usr/local/bin/abitur-sibgiu-compose exec api uv run --no-sync python -m api.auth.bootstrap --username admin
+/usr/local/bin/abitur-nstu-compose up -d --no-deps --no-build --pull never web
+/usr/local/bin/abitur-nstu-compose exec api uv run --no-sync python -m api.auth.bootstrap --username admin
 ```
 
 Последняя команда требует интерактивного терминала (SSH с TTY): пароль вводится
@@ -160,7 +164,7 @@ systemctl reload caddy
 
 ## 4. Настроить вуз и модели через админку
 
-Открыть `https://sibgiu.abitur.site`, войти и в разделе подключений:
+Открыть `https://nstu.abitur.site`, войти и в разделе подключений:
 
 1. Выбрать профиль `custom`, задать название, сайт и имя помощника. Загрузить
    **один логотип**: он используется и в панели, и как favicon. Задать цвет вуза.
@@ -187,8 +191,8 @@ systemctl reload caddy
 процессом на локальной машине, старом сервере или в другом стенде.
 
 ```sh
-/usr/local/bin/abitur-sibgiu-compose up -d --no-deps --no-build --pull never bot
-/usr/local/bin/abitur-sibgiu-compose ps
+/usr/local/bin/abitur-nstu-compose up -d --no-deps --no-build --pull never bot
+/usr/local/bin/abitur-nstu-compose ps
 ```
 
 Переключатель в админке не создаёт отсутствующий контейнер. MAX оставить
@@ -200,7 +204,7 @@ systemctl reload caddy
 `/etc/abitur-instances/deploy-targets.json`:
 
 ```json
-{"name":"sibgiu","api_port":18003,"web_port":13003,"bot":true}
+{"name":"nstu","api_port":18002,"web_port":13002,"bot":true}
 ```
 
 Если бот не нужен/не настроен, указать `false`. Файл — обычный, root:root0600,
@@ -214,7 +218,7 @@ systemctl reload caddy
 в backend и web (проверить SHA; старый workflow намеренно не доставляется).
 Helper обнаруживает новый target даже при том же image. Проверить зелёный
 результат и оба компонента в `/opt/abitur/deploy-receipts.json`: там должны быть
-три стенда и актуальные SHA/digest. Общий деплой обновляет все включённые targets.
+все включённые стенды и актуальные SHA/digest. Общий деплой обновляет все включённые targets.
 
 ## Приёмка и передача коллеге
 
@@ -222,12 +226,12 @@ Helper обнаруживает новый target даже при том же im
   логотип, favicon и цвет появляются сразу; проверить также узкое окно.
 - Вход и авторизованный `/api/v1/auth/me` работают. Токен другого стенда даёт401.
   Один200 на странице входа не доказывает исправность авторизации.
-- В СИБГИУ нет чужих документов, FAQ, переписки и справочников НГУ.
+- В НГТУ нет чужих документов, FAQ, переписки и справочников НГУ.
 - Реальный документ обработан, бот отвечает с правильным источником; записать
   время двух последовательных ответов. Ошибку квоты не считать успешным ответом.
 - API/UI доступны только через loopback и Caddy, PostgreSQL/Redis не опубликованы.
   У новых контейнеров действуют существующие ограничения ресурсов и логов.
-- Оба старых стенда продолжают работать; проверить память, swap и рестарты
+- Ранее работавшие стенды продолжают работать; проверить память, swap и рестарты
   после индексации. Не менять SSH-политику, firewall и автообновления без задачи.
 - Сделать `pg_dump -Fc` новой БД, сохранить files/branding и инфраструктурные
   секреты отдельно. Проверить читаемость дампа; копию хранить вне сервера.
@@ -236,14 +240,15 @@ Helper обнаруживает новый target даже при том же im
 проверок, место резервных копий и оставшиеся ограничения. Секреты не прикладывать.
 
 При неудаче удалить только новую запись из targets, остановить только новый
-проект (`abitur-sibgiu-compose stop`), сохранить данные и разобраться в причине.
+проект (`abitur-nstu-compose stop`), сохранить данные и разобраться в причине.
 Не применять `down -v`, общий `docker system prune`, откат БД или изменение общих
 image pins. Откат приложения и миграций описан в CI-инструкции.
 
 ## Готовое задание агенту
 
 > Прочитай AGENTS.md и docs/new-demo-stand.md. Подготовь изолированный демостенд
-> СИБГИУ по этой инструкции. Сначала проверь доступы, свободные порты и ресурсы,
+> нового вуза по образцу НГТУ из этой инструкции. Сначала проверь доступы,
+> свободные порты и ресурсы,
 > согласуй домены и получи данные/ключи вуза. Не меняй работающие НГУ и НГТУ,
 > не копируй их данные и токены. Настрой custom-профиль, оформление, модели,
 > реальный документ и собственного бота, затем подключи стенд к автодеплою.
