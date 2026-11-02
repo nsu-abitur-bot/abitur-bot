@@ -1,10 +1,12 @@
 import asyncio
+import contextvars
 import json
 import logging
 import re
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass, field, replace
 from html import unescape
+from threading import Lock
 from time import perf_counter
 from typing import Awaitable, Callable, Optional
 
@@ -80,6 +82,13 @@ def _strip_markup(text: str) -> str:
 
 RAG_LOG_CONTENT_LIMIT = 12000
 RAG_INTERNAL_LOG_LIMIT = 120
+_lightrag_trace_context: contextvars.ContextVar[object | None] = contextvars.ContextVar(
+    "lightrag_trace_context", default=None
+)
+_lightrag_capture_lock = Lock()
+_lightrag_capture_active = 0
+_lightrag_capture_prev_level: int | None = None
+_lightrag_capture_prev_propagate: bool | None = None
 
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
@@ -262,13 +271,23 @@ def _truncate_log_content(content: str, limit: int = RAG_LOG_CONTENT_LIMIT) -> s
 
 
 class _RagTraceLogHandler(logging.Handler):
-    def __init__(self, limit: int = RAG_INTERNAL_LOG_LIMIT) -> None:
+    def __init__(
+        self,
+        limit: int = RAG_INTERNAL_LOG_LIMIT,
+        trace_context: object | None = None,
+    ) -> None:
         super().__init__(level=logging.INFO)
         self.limit = limit
+        self.trace_context = trace_context
         self.lines: list[str] = []
         self.dropped = 0
 
     def emit(self, record: logging.LogRecord) -> None:
+        if (
+            self.trace_context is not None
+            and _lightrag_trace_context.get() is not self.trace_context
+        ):
+            return
         try:
             line = f"{record.levelname}: {record.getMessage()}"
         except Exception:
@@ -286,19 +305,39 @@ class _RagTraceLogHandler(logging.Handler):
 
 @contextmanager
 def _capture_lightrag_logs():
+    global _lightrag_capture_active
+    global _lightrag_capture_prev_level
+    global _lightrag_capture_prev_propagate
+
     lightrag_logger = logging.getLogger("lightrag")
-    handler = _RagTraceLogHandler()
-    previous_level = lightrag_logger.level
-    previous_propagate = lightrag_logger.propagate
-    lightrag_logger.setLevel(logging.INFO)
-    lightrag_logger.propagate = True
-    lightrag_logger.addHandler(handler)
+    trace_context = object()
+    token = _lightrag_trace_context.set(trace_context)
+    handler = _RagTraceLogHandler(trace_context=trace_context)
+    with _lightrag_capture_lock:
+        if _lightrag_capture_active == 0:
+            _lightrag_capture_prev_level = lightrag_logger.level
+            _lightrag_capture_prev_propagate = lightrag_logger.propagate
+            lightrag_logger.setLevel(logging.INFO)
+            lightrag_logger.propagate = True
+        _lightrag_capture_active += 1
+        lightrag_logger.addHandler(handler)
     try:
         yield handler
     finally:
-        lightrag_logger.removeHandler(handler)
-        lightrag_logger.setLevel(previous_level)
-        lightrag_logger.propagate = previous_propagate
+        with _lightrag_capture_lock:
+            lightrag_logger.removeHandler(handler)
+            if _lightrag_capture_active > 0:
+                _lightrag_capture_active -= 1
+            if (
+                _lightrag_capture_active == 0
+                and _lightrag_capture_prev_level is not None
+                and _lightrag_capture_prev_propagate is not None
+            ):
+                lightrag_logger.setLevel(_lightrag_capture_prev_level)
+                lightrag_logger.propagate = _lightrag_capture_prev_propagate
+                _lightrag_capture_prev_level = None
+                _lightrag_capture_prev_propagate = None
+        _lightrag_trace_context.reset(token)
 
 
 def _format_rag_response_log(context: str, trace_lines: list[str]) -> str:
