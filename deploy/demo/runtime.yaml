@@ -1,0 +1,62 @@
+# Image pins belong to the final images.yaml overlay, never to this resource profile.
+services:
+  api:
+    mem_limit: 640m
+    memswap_limit: 1280m
+    cpus: 1.5
+    environment:
+      HTTP_PROXY: ${OUTBOUND_HTTP_PROXY:-}
+      HTTPS_PROXY: ${OUTBOUND_HTTP_PROXY:-}
+      NO_PROXY: localhost,127.0.0.1,postgres,redis,api,web,${API_HOST:?Set API_HOST},${WEB_HOST:?Set WEB_HOST}
+      DB_POOL_SIZE: "2"
+      DB_MAX_OVERFLOW: "2"
+      MALLOC_ARENA_MAX: "2"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    command: [uvicorn, api.main:app, --host, 0.0.0.0, --port, "8000", --workers, "1"]
+
+  migrate:
+    mem_limit: 450m
+    memswap_limit: 900m
+
+  permissions:
+    mem_limit: 64m
+
+  postgres:
+    mem_limit: 192m
+    memswap_limit: 384m
+    command: [postgres, -c, shared_buffers=32MB, -c, effective_cache_size=96MB, -c, work_mem=2MB, -c, maintenance_work_mem=16MB, -c, max_connections=30]
+
+  redis:
+    mem_limit: 64m
+    memswap_limit: 128m
+    command: [redis-server, --requirepass, "${REDIS_PASSWORD}", --appendonly, "yes", --maxmemory, 32mb, --maxmemory-policy, noeviction, --auto-aof-rewrite-percentage, "100", --auto-aof-rewrite-min-size, 16mb]
+
+  web:
+    mem_limit: 192m
+    memswap_limit: 384m
+    extra_hosts:
+      - "${API_HOST:?Set API_HOST}:host-gateway"
+    environment:
+      NODE_OPTIONS: --max-old-space-size=144
+
+  bot:
+    extends:
+      file: compose.yaml
+      service: api
+    profiles: [telegram]
+    restart: unless-stopped
+    ports: !reset []
+    mem_limit: 512m
+    memswap_limit: 1024m
+    cpus: 1.5
+    environment:
+      HTTP_PROXY: ${OUTBOUND_HTTP_PROXY:-}
+      HTTPS_PROXY: ${OUTBOUND_HTTP_PROXY:-}
+      NO_PROXY: localhost,127.0.0.1,postgres,redis,api,web,${API_HOST:?Set API_HOST},${WEB_HOST:?Set WEB_HOST}
+      DB_POOL_SIZE: "2"
+      DB_MAX_OVERFLOW: "2"
+      MALLOC_ARENA_MAX: "2"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    command: [uv, run, --no-sync, python, main.py]
