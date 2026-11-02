@@ -1,5 +1,5 @@
 import logging
-from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional
+from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional, cast
 
 from google import genai
 from google.genai import types
@@ -97,7 +97,7 @@ class GeminiProvider(BaseLLMProvider):
 
         response = await self.client.aio.models.generate_content(
             model=self.model_name,
-            contents=gemini_messages,
+            contents=cast(types.ContentListUnion, gemini_messages),
             config=config,
         )
 
@@ -121,7 +121,7 @@ class GeminiProvider(BaseLLMProvider):
 
         stream = await self.client.aio.models.generate_content_stream(
             model=self.model_name,
-            contents=gemini_messages,
+            contents=cast(types.ContentListUnion, gemini_messages),
             config=config,
         )
         async for chunk in stream:
@@ -142,7 +142,7 @@ class GeminiProvider(BaseLLMProvider):
         usage = LLMUsage()
         stream = await self.client.aio.models.generate_content_stream(
             model=self.model_name,
-            contents=gemini_messages,
+            contents=cast(types.ContentListUnion, gemini_messages),
             config=config,
         )
         async for chunk in stream:
@@ -259,7 +259,7 @@ class GeminiEmbeddings:
         # google-genai SDK поддерживает пакетную обработку
         response = self.client.models.embed_content(
             model=self.model,
-            contents=texts,
+            contents=cast(types.ContentListUnion, texts),
         )
         # response.embeddings — список объектов с полем values
         if not response.embeddings:
