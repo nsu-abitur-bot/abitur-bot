@@ -24,6 +24,10 @@ instances additionally require a stable running bot. A failure restores the old
 component pin and restarts that component across all instances without repeating
 migrations. Successful receipts include the affected instance names. Application
 rollback does not reverse database migrations; back up every database first.
+An exact retry is a no-op only when the recorded target configuration also
+matches: adding an instance or changing its ports/bot selection reconciles the
+targets even when the tested image is unchanged. Older receipts are reconciled
+once and retain their previous-image rollback reference.
 
 Set `bot: false` until the instance has its own enabled bot token. Never use one
 Telegram token in two projects or leave an old server polling during cutover.

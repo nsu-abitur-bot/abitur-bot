@@ -12,7 +12,7 @@ import sys
 import tempfile
 import time
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -249,6 +249,7 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
         raise ValueError("Overlay must contain images only")
     receipts = json.loads(RECEIPT.read_text()) if RECEIPT.exists() else {}
     prior_receipt = receipts.get(component, {})
+    targets = [asdict(target) for target in host.targets]
     same_pin = all(
         pins["services"][s]["image"] == data["image"] for s in SERVICES[component]
     )
@@ -256,6 +257,7 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
         same_pin
         and prior_receipt.get("sha") == data["sha"]
         and prior_receipt.get("image") == data["image"]
+        and prior_receipt.get("targets") == targets
     ):
         try:
             host.healthy(component)
@@ -308,6 +310,7 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
         ),
         "completed_at": int(time.time()),
         "instances": [target.name for target in host.targets],
+        "targets": targets,
     }
     atomic_json(RECEIPT, receipts)
     return "Deployment healthy"

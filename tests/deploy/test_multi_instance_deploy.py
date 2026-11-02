@@ -197,3 +197,62 @@ def test_health_requires_both_instances_to_answer_http(
             server.shutdown()
             server.server_close()
             thread.join(timeout=2)
+
+
+@pytest.mark.parametrize("change", ["add_instance", "port", "bot", "legacy_receipt"])
+def test_same_image_reconciles_changed_target_configuration(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, change: str
+) -> None:
+    monkeypatch.setattr(d, "PINS", tmp_path / "images.json")
+    monkeypatch.setattr(d, "RECEIPT", tmp_path / "receipts.json")
+    d.atomic_json(
+        d.PINS,
+        {
+            "services": {
+                s: {"image": "old-" + component}
+                for component, services in d.SERVICES.items()
+                for s in services
+            }
+        },
+    )
+    sha = "a" * 40
+    data = {
+        "sha": sha,
+        "image": "ghcr.io/nsu-abitur-bot/abitur-bot@sha256:" + "b" * 64,
+        "registry_username": "actor",
+        "registry_token": "token",
+    }
+
+    class Host(d.Host):
+        def __init__(self) -> None:
+            self.calls: list[tuple[str, ...]] = []
+
+        def current_sha(self, component: str, token: str) -> str:
+            return sha
+
+        def run(self, *args: str, stdin: str | None = None) -> str:
+            self.calls.append(args)
+            return sha if "inspect" in args else ""
+
+        def healthy(self, component: str) -> None:
+            pass
+
+    d.deploy("backend", data, Host())
+    retry = Host()
+    if change == "add_instance":
+        retry.targets = d.parse_targets(configured_targets())
+    elif change == "port":
+        retry.targets = (d.Target("nsu", 18003, 13001, True),)
+    elif change == "bot":
+        retry.targets = (d.Target("nsu", 18001, 13001, False),)
+    else:
+        receipt = json.loads(d.RECEIPT.read_text())
+        receipt["backend"].pop("targets", None)
+        d.atomic_json(d.RECEIPT, receipt)
+    assert d.deploy("backend", data, retry) == "Deployment healthy"
+    for target in retry.targets:
+        assert any(call[0] == target.compose and "up" in call for call in retry.calls)
+    receipt = json.loads(d.RECEIPT.read_text())["backend"]
+    assert receipt["instances"] == [target.name for target in retry.targets]
+    assert len(receipt["targets"]) == len(retry.targets)
+    assert receipt["previous_image"] == "old-backend"
