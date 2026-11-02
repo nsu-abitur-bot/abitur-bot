@@ -1,0 +1,4 @@
+[
+  {"name": "nsu", "api_port": 18001, "web_port": 13001, "bot": true},
+  {"name": "nstu", "api_port": 18002, "web_port": 13002, "bot": false}
+]

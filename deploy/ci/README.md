@@ -1,4 +1,4 @@
-# NSU CI deployment
+# CI deployment for demo instances
 
 Backend publication is triggered by successful `PR checks` for a push to this
 repository's main branch; every checkout uses the tested `head_sha`. Frontend
@@ -7,6 +7,31 @@ Both use ephemeral GITHUB_TOKEN, GHCR immutable digest pins and OCI revision.
 The backend main-tag promotion keeps its separate non-cancelling freshness lock.
 A server lock serializes backend and web, including old reruns; GitHub main is
 checked inside that lock and again after pull. No production builds occur.
+
+The default remains the original NSU deployment. For multiple instances install
+`deploy-targets.example.json` as `/etc/abitur-instances/deploy-targets.json`, owned
+by root and not writable by group/others (recommended mode `0600`). Each entry
+declares an instance name, distinct local API/UI ports and whether its Telegram
+process must run. The helper derives `/usr/local/bin/abitur-<name>-compose`; paths
+and URLs cannot be supplied by an Actions request. The file is limited to three
+instances and 4 KiB; malformed, symlinked or untrusted files fail closed.
+
+All wrappers use the same image-only `/opt/abitur/images.yaml`, but separate
+environment files, Compose project names, credentials, networks and volumes.
+An update pulls once, migrates each database once, starts the requested component
+in every instance and requires every instance's HTTP health check. Bot-enabled
+instances additionally require a stable running bot. A failure restores the old
+component pin and restarts that component across all instances without repeating
+migrations. Successful receipts include the affected instance names. Application
+rollback does not reverse database migrations; back up every database first.
+An exact retry is a no-op only when the recorded target configuration also
+matches: adding an instance or changing its ports/bot selection reconciles the
+targets even when the tested image is unchanged. Older receipts are reconciled
+once and retain their previous-image rollback reference.
+
+Set `bot: false` until the instance has its own enabled bot token. Never use one
+Telegram token in two projects or leave an old server polling during cutover.
+Details of host preparation and transfer: [migration runbook](../../docs/demo-host-migration.md).
 
 ## Root provisioning (outside Actions)
 

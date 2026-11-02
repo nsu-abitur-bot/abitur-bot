@@ -6,11 +6,13 @@ import json
 import os
 import re
 import signal
+import stat
 import subprocess
 import sys
 import tempfile
 import time
 import urllib.request
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +23,66 @@ RECEIPT = Path("/opt/abitur/deploy-receipts.json")
 FAILURE = Path("/opt/abitur/deploy-failure.json")
 LOCK = Path("/run/lock/abitur-deploy.lock")
 COMPOSE = "/usr/local/bin/abitur-nsu-compose"
+TARGETS_FILE = Path("/etc/abitur-instances/deploy-targets.json")
+HEALTH_TIMEOUT = 90
+HEALTH_INTERVAL = 3
+
+
+@dataclass(frozen=True)
+class Target:
+    name: str
+    api_port: int
+    web_port: int
+    bot: bool
+
+    @property
+    def compose(self) -> str:
+        return f"/usr/local/bin/abitur-{self.name}-compose"
+
+
+DEFAULT_TARGET = Target("nsu", 18001, 13001, True)
+
+
+def parse_targets(data: Any) -> tuple[Target, ...]:
+    """Only root configuration selects instances; the SSH request cannot select paths."""
+    if not isinstance(data, list) or not 1 <= len(data) <= 3:
+        raise ValueError("Invalid deployment targets")
+    targets: list[Target] = []
+    ports: set[int] = set()
+    names: set[str] = set()
+    for item in data:
+        if not isinstance(item, dict) or set(item) != {
+            "name",
+            "api_port",
+            "web_port",
+            "bot",
+        }:
+            raise ValueError("Invalid deployment target fields")
+        name = item["name"]
+        if not isinstance(name, str) or not re.fullmatch(r"[a-z][a-z0-9-]{1,24}", name):
+            raise ValueError("Invalid deployment target name")
+        if name in names or type(item["bot"]) is not bool:
+            raise ValueError("Duplicate target or invalid bot selection")
+        for key in ("api_port", "web_port"):
+            port = item[key]
+            if type(port) is not int or not 1024 <= port <= 65535 or port in ports:
+                raise ValueError("Invalid or duplicate deployment port")
+            ports.add(port)
+        names.add(name)
+        targets.append(Target(name, item["api_port"], item["web_port"], item["bot"]))
+    return tuple(targets)
+
+
+def load_targets(path: Path) -> tuple[Target, ...]:
+    try:
+        info = path.lstat()
+    except FileNotFoundError:
+        return (DEFAULT_TARGET,)
+    if not stat.S_ISREG(info.st_mode) or info.st_uid != 0 or info.st_mode & 0o022:
+        raise ValueError("Deployment targets must be a root-owned protected regular file")
+    if info.st_size > 4096:
+        raise ValueError("Deployment targets file too large")
+    return parse_targets(json.loads(path.read_text()))
 
 
 def validate(component: str, data: Any) -> dict[str, str]:
@@ -64,9 +126,12 @@ class ProcessFailure(RuntimeError):
 
 
 class Host:
+    targets: tuple[Target, ...] = (DEFAULT_TARGET,)
+
     def __init__(self, config: str) -> None:
         self.env = {**os.environ, "DOCKER_CONFIG": config}
         self.stage = "request"
+        self.targets = load_targets(TARGETS_FILE)
 
     def run(self, *args: str, stdin: str | None = None) -> str:
         if args[0] == "docker":
@@ -76,7 +141,7 @@ class Host:
                 "image": "revision-check",
                 "inspect": "container-state",
             }.get(args[1], "docker")
-        elif args[0] == COMPOSE:
+        elif args[0] in {target.compose for target in self.targets}:
             self.stage = (
                 ("migration" if args[-1] == "migrate" else "permissions")
                 if args[1] == "run"
@@ -110,13 +175,17 @@ class Host:
             return json.load(response)["object"]["sha"]
 
     def healthy(self, component: str) -> None:
+        for target in self.targets:
+            self.healthy_target(component, target)
+
+    def healthy_target(self, component: str, target: Target) -> None:
         self.stage = "health"
         url = (
-            "http://127.0.0.1:18001/api/v1/university/profile"
+            f"http://127.0.0.1:{target.api_port}/api/v1/university/profile"
             if component == "backend"
-            else "http://127.0.0.1:13001/login"
+            else f"http://127.0.0.1:{target.web_port}/login"
         )
-        deadline = time.monotonic() + 90
+        deadline = time.monotonic() + HEALTH_TIMEOUT
         stable = None
         consecutive = 0
         while time.monotonic() < deadline:
@@ -124,8 +193,8 @@ class Host:
                 with urllib.request.urlopen(url, timeout=3) as response:
                     if response.status != 200:
                         raise RuntimeError("Unhealthy HTTP status")
-                if component == "backend":
-                    container = self.run(COMPOSE, "ps", "-q", "bot")
+                if component == "backend" and target.bot:
+                    container = self.run(target.compose, "ps", "-q", "bot")
                     if not container:
                         raise RuntimeError("Bot absent")
                     state = json.loads(self.run("docker", "inspect", container))[0]
@@ -135,21 +204,36 @@ class Host:
                     consecutive = consecutive + 1 if observation == stable else 1
                     stable = observation
                     if consecutive < 4:
-                        time.sleep(3)
+                        time.sleep(HEALTH_INTERVAL)
                         continue
                 return
             except (OSError, ValueError, RuntimeError):
                 consecutive = 0
-                time.sleep(3)
+                time.sleep(HEALTH_INTERVAL)
         raise RuntimeError("Health deadline exceeded")
 
 
 def start(host: Host, component: str, *, migrate: bool) -> None:
     if component == "backend" and migrate:
-        for service in ("permissions", "migrate"):
-            host.run(COMPOSE, "run", "--rm", "--no-deps", "--pull", "never", service)
-    services = ("api", "bot") if component == "backend" else ("web",)
-    host.run(COMPOSE, "up", "-d", "--no-build", "--pull", "never", "--no-deps", *services)
+        for target in host.targets:
+            for service in ("permissions", "migrate"):
+                host.run(
+                    target.compose, "run", "--rm", "--no-deps", "--pull", "never", service
+                )
+    for target in host.targets:
+        services = ("api", "bot") if target.bot else ("api",)
+        if component == "web":
+            services = ("web",)
+        host.run(
+            target.compose,
+            "up",
+            "-d",
+            "--no-build",
+            "--pull",
+            "never",
+            "--no-deps",
+            *services,
+        )
     host.healthy(component)
 
 
@@ -165,6 +249,7 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
         raise ValueError("Overlay must contain images only")
     receipts = json.loads(RECEIPT.read_text()) if RECEIPT.exists() else {}
     prior_receipt = receipts.get(component, {})
+    targets = [asdict(target) for target in host.targets]
     same_pin = all(
         pins["services"][s]["image"] == data["image"] for s in SERVICES[component]
     )
@@ -172,6 +257,7 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
         same_pin
         and prior_receipt.get("sha") == data["sha"]
         and prior_receipt.get("image") == data["image"]
+        and prior_receipt.get("targets") == targets
     ):
         try:
             host.healthy(component)
@@ -223,6 +309,8 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
             else previous["services"][SERVICES[component][0]]["image"]
         ),
         "completed_at": int(time.time()),
+        "instances": [target.name for target in host.targets],
+        "targets": targets,
     }
     atomic_json(RECEIPT, receipts)
     return "Deployment healthy"
