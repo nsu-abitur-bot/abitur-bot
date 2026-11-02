@@ -49,6 +49,14 @@ class DocumentService:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_ids(self, document_ids: Sequence[str]) -> Sequence[Document]:
+        """Документы одним IN-запросом: чекер зовёт это для сотен строк (#300)."""
+        ids = list(dict.fromkeys(document_ids))
+        if not ids:
+            return []
+        stmt = select(Document).where(Document.id.in_(ids))
+        return (await self.session.execute(stmt)).scalars().all()
+
     async def get_by_rag_doc_id(
         self, graph_id: str, rag_doc_id: str
     ) -> Optional[Document]:
@@ -210,9 +218,10 @@ class DocumentService:
 
     async def save_check_results(self, results: Sequence[dict]) -> None:
         checked_at = timestamp()
+        # Один IN-запрос вместо SELECT на каждый результат (#300).
+        documents = {d.id: d for d in await self.get_by_ids([r["id"] for r in results])}
         for result in results:
-            document_id = result["id"]
-            document = await self.get_by_id(document_id)
+            document = documents.get(result["id"])
             if document is None:
                 continue
             document_status = CHECK_TO_DOCUMENT_STATUS.get(result["status"])

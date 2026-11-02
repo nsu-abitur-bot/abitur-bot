@@ -49,13 +49,18 @@ class DocumentUpdateService:
         self, document_ids: list[str] | None = None
     ) -> list[dict]:
         checks = await self.check_documents(document_ids)
+        # Изменённые документы одним IN-запросом до цикла (#300).
+        changed_ids = [
+            check["id"] for check in checks if check["status"] == DOCUMENT_STATUS_CHANGED
+        ]
+        documents = {d.id: d for d in await self.documents.get_by_ids(changed_ids)}
         results = []
         for check in checks:
             if check["status"] != DOCUMENT_STATUS_CHANGED:
                 results.append(check)
                 continue
 
-            document = await self.documents.get_by_id(check["id"])
+            document = documents.get(check["id"])
             if document is None:
                 results.append(
                     {

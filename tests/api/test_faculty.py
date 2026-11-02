@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from api.main import app
 from api.routes.faculty import get_faculty_service
 from db.postgres.models import EDUCATION_LEVELS, EducationLevel
+from db.postgres.services.faculty import FacultyDirectory
 
 
 @dataclass
@@ -46,6 +47,22 @@ class FakeFacultyService:
         if only_active:
             items = [f for f in items if f.is_active]
         return sorted(items, key=lambda f: f.name)
+
+    async def load_directory(
+        self, faculties_only_active: bool = True, programs_only_active: bool = True
+    ):
+        """Снимок справочника в памяти — как FacultyService.load_directory."""
+        faculties = await self.get_all_faculties(only_active=faculties_only_active)
+        programs_by_faculty: dict[str, list] = {}
+        for faculty in faculties:
+            programs_by_faculty[faculty.id] = await self.get_programs_by_faculty(
+                faculty.id, only_active=programs_only_active
+            )
+        return FacultyDirectory(
+            # Фейк-факультеты — не ORM, но датаклассу нужны только .id/.name.
+            faculties=faculties,  # type: ignore[bad-argument-type]
+            programs_by_faculty=programs_by_faculty,
+        )
 
     async def get_faculty_by_id(self, faculty_id: str):
         return self.faculties.get(faculty_id)
