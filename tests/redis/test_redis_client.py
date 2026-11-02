@@ -9,6 +9,8 @@ from db.redis.client import HISTORY_LIMIT, RedisClient
 async def redis_client(monkeypatch):
     fake_redis = await fakeredis.FakeRedis(decode_responses=True)
 
+    monkeypatch.setattr("db.redis.client.REDIS_URL", "redis://localhost:6379/15")
+
     # подменяем redis.from_url внутри RedisClient
     monkeypatch.setattr("db.redis.client.redis.from_url", lambda *a, **kw: fake_redis)
 
@@ -81,3 +83,10 @@ async def test_reset_dialog_session_rotates_history_session(redis_client):
     assert await redis_client.get_dialog_session_id(base_session_id) == new_session_id
     assert await redis_client.get_history(base_session_id) == []
     assert await redis_client.get_history(new_session_id) == []
+
+
+@pytest.mark.parametrize("url", [None, ""])
+def test_missing_redis_url_has_actionable_error(monkeypatch, url):
+    monkeypatch.setattr("db.redis.client.REDIS_URL", url)
+    with pytest.raises(RuntimeError, match="REDIS_URL не задана"):
+        RedisClient()
