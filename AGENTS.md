@@ -78,6 +78,7 @@ uv run pyrefly check
 | [docs/agents/testing.md](docs/agents/testing.md) | Пишешь тесты или разбираешься, почему упал CI |
 | [docs/agents/debugging.md](docs/agents/debugging.md) | Бот ответил не так, как ожидалось: логи, session_id, частые причины |
 | [docs/agents/worktrees.md](docs/agents/worktrees.md) | Работаешь в воркспейсе Orca: общая БД, общий stash, один поллинг на токен |
+| [docs/new-demo-stand.md](docs/new-demo-stand.md) | Добавляешь демостенд нового вуза на существующий сервер: доступы, запуск, оформление, бот, автодеплой и приёмка |
 
 ## Где какая документация живёт
 
