@@ -46,7 +46,11 @@ async def get_branding(
     }
 
 
-@router.get("/media/{filename}")
+@router.get(
+    "/media/{filename}",
+    response_class=FileResponse,
+    responses={200: {"content": {"image/png": {}}}},
+)
 async def get_media(filename: str) -> FileResponse:
     if not re.fullmatch(r"[0-9a-f]{32}(?:-icon)?\.png", filename):
         raise HTTPException(404)
