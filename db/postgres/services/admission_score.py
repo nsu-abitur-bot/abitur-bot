@@ -13,6 +13,7 @@ from typing import Iterable, Optional, Sequence
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ..models import ADMISSION_FORMS, AdmissionScore, Faculty, Program
 from .faculty import FacultyService, normalize_level, normalize_name
@@ -202,6 +203,40 @@ class AdmissionScoreService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.faculty_service = FacultyService(session)
+        self._faculties_with_programs_cache: dict[bool, Sequence[Faculty]] = {}
+
+    async def _get_faculties_with_programs(
+        self, only_active: bool = True
+    ) -> Sequence[Faculty]:
+        cached = self._faculties_with_programs_cache.get(only_active)
+        if cached is not None:
+            return cached
+
+        stmt = select(Faculty).options(selectinload(Faculty.programs))
+        if only_active:
+            stmt = stmt.where(Faculty.is_active)
+        stmt = stmt.order_by(Faculty.name)
+        result = await self.session.execute(stmt)
+        faculties = result.scalars().all()
+        self._faculties_with_programs_cache[only_active] = faculties
+        return faculties
+
+    async def _find_faculty_by_alias_preloaded(
+        self, query: str, only_active: bool = True
+    ) -> Optional[Faculty]:
+        normalized = normalize_name(query)
+        if not normalized:
+            return None
+
+        faculties = await self._get_faculties_with_programs(only_active=only_active)
+        for faculty in faculties:
+            if normalize_name(faculty.name) == normalized:
+                return faculty
+        for faculty in faculties:
+            for alias in faculty.aliases or []:
+                if normalize_name(alias) == normalized:
+                    return faculty
+        return None
 
     async def _resolve_program_detailed(
         self, faculty_name: str, program_name: str, level: Optional[str]
@@ -219,14 +254,16 @@ class AdmissionScoreService:
         агрегаты поля/УГСН (несколько профилей под одним полем) осознанно
         отсекаются (`ambiguous_field`). Возвращает (program|None, reason).
         """
-        faculty = await self.faculty_service.find_faculty_by_alias(faculty_name)
+        faculty = await self._find_faculty_by_alias_preloaded(faculty_name)
         if faculty is None:
             return None, "faculty_unknown"
 
         canonical_level = normalize_level(level) or level
-        programs = await self.faculty_service.get_programs_by_faculty(
-            faculty.id, level=canonical_level
-        )
+        programs = [program for program in faculty.programs if program.is_active]
+        if canonical_level is not None:
+            programs = [
+                program for program in programs if program.level == canonical_level
+            ]
 
         target = normalize_name(program_name)
         if not target:

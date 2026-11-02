@@ -210,9 +210,20 @@ class DocumentService:
 
     async def save_check_results(self, results: Sequence[dict]) -> None:
         checked_at = timestamp()
+        document_ids = {result.get("id") for result in results if result.get("id")}
+        documents_by_id: dict[str, Document] = {}
+        if document_ids:
+            stmt = select(Document).where(Document.id.in_(document_ids))
+            loaded = await self.session.execute(stmt)
+            documents_by_id = {
+                document.id: document for document in loaded.scalars().all()
+            }
+
         for result in results:
-            document_id = result["id"]
-            document = await self.get_by_id(document_id)
+            document_id = result.get("id")
+            if not document_id:
+                continue
+            document = documents_by_id.get(document_id)
             if document is None:
                 continue
             document_status = CHECK_TO_DOCUMENT_STATUS.get(result["status"])

@@ -10,6 +10,7 @@ from typing import Iterable, Optional, Sequence
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ..models import EDUCATION_LEVELS, EducationLevel, Faculty, Program
 
@@ -68,8 +69,12 @@ class FacultyService:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def get_all_faculties(self, only_active: bool = True) -> Sequence[Faculty]:
+    async def get_all_faculties(
+        self, only_active: bool = True, include_programs: bool = False
+    ) -> Sequence[Faculty]:
         stmt = select(Faculty)
+        if include_programs:
+            stmt = stmt.options(selectinload(Faculty.programs))
         if only_active:
             stmt = stmt.where(Faculty.is_active)
         stmt = stmt.order_by(Faculty.name)

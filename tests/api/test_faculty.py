@@ -17,6 +17,7 @@ class FakeFaculty:
     name: str
     aliases: list = field(default_factory=list)
     is_active: bool = True
+    programs: list = field(default_factory=list)
 
 
 @dataclass
@@ -36,12 +37,16 @@ class FakeFacultyService:
         self.faculties: dict[str, FakeFaculty] = {}
         self.programs: dict[str, FakeProgram] = {}
         self._seq = 0
+        self.include_programs_calls: list[bool] = []
 
     def _next_id(self, prefix: str) -> str:
         self._seq += 1
         return f"{prefix}-{self._seq}"
 
-    async def get_all_faculties(self, only_active: bool = True):
+    async def get_all_faculties(
+        self, only_active: bool = True, include_programs: bool = False
+    ):
+        self.include_programs_calls.append(include_programs)
         items = list(self.faculties.values())
         if only_active:
             items = [f for f in items if f.is_active]
@@ -111,6 +116,9 @@ class FakeFacultyService:
             is_active=is_active,
         )
         self.programs[program.id] = program
+        faculty = self.faculties.get(faculty_id)
+        if faculty is not None:
+            faculty.programs.append(program)
         return program
 
     async def update_program(
@@ -134,7 +142,11 @@ class FakeFacultyService:
     async def delete_program(self, program_id):
         if program_id not in self.programs:
             return False
+        program = self.programs[program_id]
         del self.programs[program_id]
+        faculty = self.faculties.get(program.faculty_id)
+        if faculty is not None:
+            faculty.programs = [p for p in faculty.programs if p.id != program_id]
         return True
 
 
@@ -184,7 +196,7 @@ def test_create_program(client: TestClient):
     assert data["faculty_id"] == faculty_id
 
 
-def test_list_faculties_with_programs(client: TestClient):
+def test_list_faculties_with_programs(client: TestClient, service: FakeFacultyService):
     faculty_id = _create_faculty(client).json()["id"]
     client.post(
         f"/api/v1/faculties/{faculty_id}/programs",
@@ -198,6 +210,7 @@ def test_list_faculties_with_programs(client: TestClient):
     assert len(faculties) == 1
     assert len(faculties[0]["programs"]) == 1
     assert faculties[0]["programs"][0]["level"] == "master"
+    assert service.include_programs_calls[-1] is True
 
 
 def test_list_includes_inactive_faculties(client: TestClient):

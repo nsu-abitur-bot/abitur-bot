@@ -225,6 +225,34 @@ async def test_resolve_program_id(session: AsyncSession):
     assert await service.resolve_program_id("ФИТ", "Направление, которого нет") is None
 
 
+@pytest.mark.asyncio
+async def test_resolve_program_id_reuses_preloaded_faculties(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+):
+    await _seed_fit(session)
+    service = AdmissionScoreService(session)
+
+    execute_calls = 0
+    original_execute = session.execute
+
+    async def counting_execute(*args, **kwargs):  # noqa: ANN002, ANN003
+        nonlocal execute_calls
+        execute_calls += 1
+        return await original_execute(*args, **kwargs)
+
+    monkeypatch.setattr(session, "execute", counting_execute)
+
+    first = await service.resolve_program_id("ФИТ", "Компьютерные науки и системотехника")
+    second = await service.resolve_program_id(
+        "Факультет информационных технологий",
+        "Программная инженерия и компьютерные науки",
+    )
+
+    assert first is not None
+    assert second is not None
+    assert execute_calls == 1
+
+
 async def _seed_granularity(session: AsyncSession) -> FacultyService:
     """Справочник в гранулярности «Поле. Профиль» + один специалитет.
 
