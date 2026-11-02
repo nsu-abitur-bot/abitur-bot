@@ -15,7 +15,12 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import ADMISSION_FORMS, AdmissionScore, Faculty, Program
-from .faculty import FacultyService, normalize_level, normalize_name
+from .faculty import (
+    FacultyDirectory,
+    FacultyService,
+    normalize_level,
+    normalize_name,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -202,6 +207,18 @@ class AdmissionScoreService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.faculty_service = FacultyService(session)
+        self._directory: Optional[FacultyDirectory] = None
+
+    async def _get_directory(self) -> FacultyDirectory:
+        """Справочник один раз на сервис (один HTTP-запрос админки).
+
+        Резолвер вызывается на каждую строку импорта/предпросмотра; без кеша
+        каждая строка тянула все факультеты и их направления заново (#300).
+        Справочник — reference data, за время запроса админки не меняется.
+        """
+        if self._directory is None:
+            self._directory = await self.faculty_service.load_directory()
+        return self._directory
 
     async def _resolve_program_detailed(
         self, faculty_name: str, program_name: str, level: Optional[str]
@@ -219,14 +236,13 @@ class AdmissionScoreService:
         агрегаты поля/УГСН (несколько профилей под одним полем) осознанно
         отсекаются (`ambiguous_field`). Возвращает (program|None, reason).
         """
-        faculty = await self.faculty_service.find_faculty_by_alias(faculty_name)
+        directory = await self._get_directory()
+        faculty = directory.find_by_alias(faculty_name)
         if faculty is None:
             return None, "faculty_unknown"
 
         canonical_level = normalize_level(level) or level
-        programs = await self.faculty_service.get_programs_by_faculty(
-            faculty.id, level=canonical_level
-        )
+        programs = directory.programs(faculty.id, level=canonical_level)
 
         target = normalize_name(program_name)
         if not target:
@@ -289,9 +305,10 @@ class AdmissionScoreService:
     ) -> Optional[Faculty]:
         """Факультет по формулировке из вопроса: «ФИТ», «ФИТ НГУ»,
         «ФИТ (Факультет информационных технологий)»."""
+        directory = await self._get_directory()
         for variant in query_variants(query, inner=inner):
             for candidate in (variant, re.sub(r"\bнгу\b", " ", _fold(variant))):
-                faculty = await self.faculty_service.find_faculty_by_alias(candidate)
+                faculty = directory.find_by_alias(candidate)
                 if faculty is not None:
                     return faculty
         return None

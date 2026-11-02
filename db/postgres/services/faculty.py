@@ -6,10 +6,12 @@
 """
 
 import re
+from dataclasses import dataclass, field
 from typing import Iterable, Optional, Sequence
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from ..models import EDUCATION_LEVELS, EducationLevel, Faculty, Program
 
@@ -30,6 +32,54 @@ def normalize_level(level: Optional[str]) -> Optional[str]:
     if normalized in EDUCATION_LEVELS:
         return normalized
     return None
+
+
+def _match_faculty_alias(
+    faculties: Sequence[Faculty], normalized: str
+) -> Optional[Faculty]:
+    """Матчит нормализованную строку по списку факультетов.
+
+    Сначала точное совпадение по имени среди всех, затем по алиасам среди
+    всех. Один алгоритм для запроса в БД и для снимка справочника — чтобы
+    приоритеты поиска не разошлись.
+    """
+    for faculty in faculties:
+        if normalize_name(faculty.name) == normalized:
+            return faculty
+
+    for faculty in faculties:
+        for alias in faculty.aliases or []:
+            if normalize_name(alias) == normalized:
+                return faculty
+    return None
+
+
+@dataclass
+class FacultyDirectory:
+    """Снимок справочника «факультеты + их направления», загруженный пакетно.
+
+    In-memory двойник выборок FacultyService: тем же правилам матчинга, что и
+    запросы в БД, но без похода в БД на каждую строку импорта баллов (#300).
+    """
+
+    faculties: Sequence[Faculty]
+    programs_by_faculty: dict[str, list[Program]] = field(default_factory=dict)
+
+    def find_by_alias(self, query: str) -> Optional[Faculty]:
+        """Те же приоритеты, что у FacultyService.find_faculty_by_alias."""
+        normalized = normalize_name(query)
+        if not normalized:
+            return None
+        return _match_faculty_alias(self.faculties, normalized)
+
+    def programs(self, faculty_id: str, level: Optional[str] = None) -> list[Program]:
+        """Направления факультета; фильтр по уровню — в памяти."""
+        canonical_level = normalize_level(level)
+        return [
+            p
+            for p in self.programs_by_faculty.get(faculty_id, [])
+            if canonical_level is None or p.level == canonical_level
+        ]
 
 
 class FacultyService:
@@ -89,16 +139,36 @@ class FacultyService:
             return None
 
         faculties = await self.get_all_faculties(only_active=only_active)
+        return _match_faculty_alias(faculties, normalized)
 
-        for faculty in faculties:
-            if normalize_name(faculty.name) == normalized:
-                return faculty
+    async def load_directory(
+        self,
+        faculties_only_active: bool = True,
+        programs_only_active: bool = True,
+    ) -> FacultyDirectory:
+        """Все факультеты с направлениями за два запроса (факультеты + selectinload).
 
+        SELECT на каждый факультет (1+N) тормозил админку и импорт баллов (#300).
+        Программы фильтруются и сортируются в памяти копией, а не мутацией
+        relationship: трогать загруженную коллекцию faculty.programs нельзя —
+        SQLAlchemy пометил бы её изменённой.
+        """
+        stmt = select(Faculty).options(selectinload(Faculty.programs))
+        if faculties_only_active:
+            stmt = stmt.where(Faculty.is_active)
+        stmt = stmt.order_by(Faculty.name)
+        faculties = (await self.session.execute(stmt)).scalars().all()
+
+        programs_by_faculty: dict[str, list[Program]] = {}
         for faculty in faculties:
-            for alias in faculty.aliases or []:
-                if normalize_name(alias) == normalized:
-                    return faculty
-        return None
+            programs = list(faculty.programs)
+            if programs_only_active:
+                programs = [p for p in programs if p.is_active]
+            programs.sort(key=lambda p: p.name)
+            programs_by_faculty[faculty.id] = programs
+        return FacultyDirectory(
+            faculties=faculties, programs_by_faculty=programs_by_faculty
+        )
 
     async def update_faculty(
         self,
