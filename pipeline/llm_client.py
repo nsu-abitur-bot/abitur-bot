@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 import re
-from contextlib import contextmanager, suppress
+from contextlib import suppress
 from dataclasses import dataclass, field, replace
 from html import unescape
 from time import perf_counter
@@ -79,7 +79,6 @@ def _strip_markup(text: str) -> str:
 
 
 RAG_LOG_CONTENT_LIMIT = 12000
-RAG_INTERNAL_LOG_LIMIT = 120
 
 # Создаем глобальный экземпляр для переиспользования соединения
 _redis_client: Optional[RedisClient] = None
@@ -259,46 +258,6 @@ def _truncate_log_content(content: str, limit: int = RAG_LOG_CONTENT_LIMIT) -> s
     if len(content) <= limit:
         return content
     return f"{content[:limit]}\n\n... [truncated {len(content) - limit} chars]"
-
-
-class _RagTraceLogHandler(logging.Handler):
-    def __init__(self, limit: int = RAG_INTERNAL_LOG_LIMIT) -> None:
-        super().__init__(level=logging.INFO)
-        self.limit = limit
-        self.lines: list[str] = []
-        self.dropped = 0
-
-    def emit(self, record: logging.LogRecord) -> None:
-        try:
-            line = f"{record.levelname}: {record.getMessage()}"
-        except Exception:
-            return
-        if len(self.lines) < self.limit:
-            self.lines.append(line)
-        else:
-            self.dropped += 1
-
-    def get_lines(self) -> list[str]:
-        if self.dropped <= 0:
-            return self.lines
-        return [*self.lines, f"... [truncated {self.dropped} internal RAG log lines]"]
-
-
-@contextmanager
-def _capture_lightrag_logs():
-    lightrag_logger = logging.getLogger("lightrag")
-    handler = _RagTraceLogHandler()
-    previous_level = lightrag_logger.level
-    previous_propagate = lightrag_logger.propagate
-    lightrag_logger.setLevel(logging.INFO)
-    lightrag_logger.propagate = True
-    lightrag_logger.addHandler(handler)
-    try:
-        yield handler
-    finally:
-        lightrag_logger.removeHandler(handler)
-        lightrag_logger.setLevel(previous_level)
-        lightrag_logger.propagate = previous_propagate
 
 
 def _format_rag_response_log(context: str, trace_lines: list[str]) -> str:
@@ -510,19 +469,22 @@ async def _retrieve_context(
         )
 
         use_crag = (await load_crag_config()).enabled
-        with _capture_lightrag_logs() as rag_trace:
-            if use_crag:
-                logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
-                raw_context, metadata_sources = await query_graph_with_crag(
-                    rag_query,
-                    conversation_history=history_text or None,
-                )
-            else:
-                raw_context, metadata_sources = await query_graph_with_sources(
-                    rag_query,
-                    conversation_history=history_text or None,
-                )
-        rag_trace_lines = rag_trace.get_lines()
+        if use_crag:
+            logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
+            retrieval = await query_graph_with_crag(
+                rag_query,
+                conversation_history=history_text or None,
+            )
+        else:
+            retrieval = await query_graph_with_sources(
+                rag_query,
+                conversation_history=history_text or None,
+            )
+        # Трасса внутренних логов LightRAG приходит в результате ретрива:
+        # перехват процессного логгера отсюда смешивал конкурентные запросы (#303).
+        raw_context = retrieval.context
+        metadata_sources = retrieval.sources
+        rag_trace_lines = retrieval.trace
 
         found = bool(raw_context and raw_context.strip())
         if found:

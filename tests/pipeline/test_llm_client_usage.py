@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from collections.abc import Coroutine
 from typing import Any
 
@@ -7,6 +6,7 @@ import pytest
 
 from llm.base import LLMResult, LLMUsage
 from pipeline.llm_client import ask_local_llm
+from rag.trace import RetrievalResult
 
 
 class _FakeRedis:
@@ -58,13 +58,13 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         return _FakeRedis()
 
     async def fake_query_graph_with_sources(*args, **kwargs):
-        logging.getLogger("lightrag").info(
-            "Query nodes: IT, факультеты (top_k:40, cosine:0.2)"
+        return RetrievalResult(
+            context="Контекст",
+            trace=[
+                "INFO: Query nodes: IT, факультеты (top_k:40, cosine:0.2)",
+                "WARNING: Rerank is enabled but no rerank model is configured",
+            ],
         )
-        logging.getLogger("lightrag").warning(
-            "Rerank is enabled but no rerank model is configured"
-        )
-        return "Контекст", []
 
     async def fake_save_log_to_db(**kwargs) -> None:
         saved_logs.append(kwargs)

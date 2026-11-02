@@ -7,6 +7,7 @@ import pytest
 from evals.checks import Observation, check_assertion
 from evals.evaluator import PipelineEvaluator, compare_baseline
 from evals.schema import Assertion, load_scenarios
+from rag.trace import RetrievalResult
 
 
 @pytest.mark.parametrize(
@@ -167,7 +168,7 @@ async def test_pipeline_regressions_fail_gate(monkeypatch, break_step, failed_ca
         elif break_step == "retrieval":
 
             async def no_context(*args, **kwargs):
-                return "", []
+                return RetrievalResult(context="")
 
             monkeypatch.setattr(llm_client, "query_graph_with_crag", no_context)
         else:

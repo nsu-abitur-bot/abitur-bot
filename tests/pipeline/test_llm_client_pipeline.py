@@ -6,6 +6,7 @@ from redis.exceptions import ConnectionError as RedisConnectionError
 
 from llm.base import LLMResult
 from pipeline import llm_client
+from rag.trace import RetrievalResult
 
 
 class _FakeRedis:
@@ -58,7 +59,7 @@ async def test_rag_does_not_start_before_faq_matcher_finishes(monkeypatch):
 
     async def fake_query_graph_with_sources(query: str, conversation_history=None):
         assert faq_done
-        return "Контекст из RAG", []
+        return RetrievalResult(context="Контекст из RAG")
 
     monkeypatch.setattr(llm_client, "get_redis_client", _get_fake_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
@@ -89,7 +90,7 @@ async def test_faq_hit_returns_without_rag(monkeypatch):
     async def fake_query_graph_with_sources(query: str, conversation_history=None):
         nonlocal rag_started
         rag_started = True
-        return "Контекст из RAG", []
+        return RetrievalResult(context="Контекст из RAG")
 
     monkeypatch.setattr(llm_client, "get_redis_client", _get_fake_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
@@ -133,7 +134,7 @@ def _patch_pipeline(monkeypatch, redis, provider) -> None:
         return redis
 
     async def fake_query(query: str, conversation_history=None):
-        return "Контекст из RAG", []
+        return RetrievalResult(context="Контекст из RAG")
 
     monkeypatch.setattr(llm_client, "get_redis_client", get_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())

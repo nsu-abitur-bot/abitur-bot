@@ -6,6 +6,8 @@ LightRAG и nano_vectordb, на подделке их не воспроизве�
 эмбеддинг, модель и токенизатор подменены.
 """
 
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 from types import SimpleNamespace
 from typing import Any, cast
@@ -208,7 +210,8 @@ async def test_query_with_sources_no_results_is_empty_not_error(monkeypatch):
     memory = _memory_with_rag(monkeypatch, _RagReturning(NO_RESULTS))
 
     # Текст fail_response LightRAG не должен уйти модели как «контекст».
-    assert await memory.query_with_sources("test_graph", "Вопрос") == ("", [])
+    result = await memory.query_with_sources("test_graph", "Вопрос")
+    assert result.context == "" and result.sources == []
 
 
 @pytest.mark.asyncio
@@ -241,7 +244,69 @@ async def test_query_with_crag_nothing_kept_is_empty(monkeypatch):
 
     monkeypatch.setattr(graph_memory_module, "run_crag", drop_everything)
 
-    assert await memory.query_with_crag("test_graph", "Вопрос") == ("", [])
+    result = await memory.query_with_crag("test_graph", "Вопрос")
+    assert result.context == "" and result.sources == []
+
+
+class _LoggingRag:
+    """Фейка LightRAG, пишущая в процессный логгер lightrag как настоящая."""
+
+    def __init__(self, marker: str, delay: bool = False) -> None:
+        self.marker = marker
+        self.delay = delay
+
+    async def aquery_llm(self, question, param):
+        for step in range(3):
+            logging.getLogger("lightrag").info(f"{self.marker} step {step}")
+            if self.delay:
+                await asyncio.sleep(0)
+        return {
+            "llm_response": {"content": f"Ответ для {self.marker}"},
+            "data": {"chunks": []},
+        }
+
+
+@pytest.mark.asyncio
+async def test_query_with_sources_returns_lightrag_trace(monkeypatch):
+    """Трасса внутренних логов LightRAG приходит в результате ретрива (#303)."""
+    memory = _memory_with_rag(monkeypatch, _LoggingRag("FIRST"))
+
+    result = await memory.query_with_sources("test_graph", "Вопрос")
+
+    assert result.context == "Ответ для FIRST"
+    assert result.trace, "трасса пуста: записи lightrag не собраны"
+    assert all("FIRST" in line for line in result.trace)
+    assert result.trace[0].startswith("INFO: FIRST step 0")
+
+
+@pytest.mark.asyncio
+async def test_concurrent_retrievals_keep_traces_separate(monkeypatch):
+    """Трассы двух одновременных ретривов не смешиваются (#303).
+
+    Регрессия прежнего перехвата: временный хендлер на общий логгер ловил
+    строки обоих запросов в обе трассы.
+    """
+    rags = {
+        "FIRST": _LoggingRag("FIRST", delay=True),
+        "SECOND": _LoggingRag("SECOND", delay=True),
+    }
+
+    class _RoutingByQuestion:
+        async def aquery_llm(self, question, param):
+            marker = question.split()[-1]
+            return await rags[marker].aquery_llm(question, param)
+
+    memory = _memory_with_rag(monkeypatch, _RoutingByQuestion())
+
+    first, second = await asyncio.gather(
+        memory.query_with_sources("test_graph", "запрос FIRST"),
+        memory.query_with_sources("test_graph", "запрос SECOND"),
+    )
+
+    assert first.trace and all("FIRST" in line for line in first.trace), first.trace
+    assert second.trace and all("SECOND" in line for line in second.trace), second.trace
+    assert first.context == "Ответ для FIRST"
+    assert second.context == "Ответ для SECOND"
 
 
 async def test_first_tokenizer_load_keeps_event_loop_responsive(monkeypatch, tmp_path):

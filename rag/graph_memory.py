@@ -31,6 +31,7 @@ from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
 from rag.crag import CragChunk, load_crag_config, run_crag
+from rag.trace import RetrievalResult, capture_lightrag_trace
 
 load_dotenv()
 
@@ -834,109 +835,118 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
         max_sources: int = 3,
         conversation_history: str | None = None,
-    ) -> tuple[str, list[dict]]:
+    ) -> RetrievalResult:
         """CRAG-вариант ретрива: фильтрует чанки до генерации ответа.
 
-        Возвращает (context, sources), где context — текст из чанков, прошедших
+        Возвращает RetrievalResult, где context — текст из чанков, прошедших
         CRAG-фильтр (грейдинг релевантности + авторитетная таблица факультетов),
-        а sources — соответствующие URL. Финальную генерацию выполняет вызывающий
-        код (llm_client) по этому контексту.
+        sources — соответствующие URL, trace — внутренние логи LightRAG.
+        Финальную генерацию выполняет вызывающий код (llm_client) по этому
+        контексту.
         """
         config = await load_crag_config()
         history = conversation_history.strip() if conversation_history else ""
         search_question = f"{history}\n\n{question}" if history else question
         try:
-            async with self._use_graph(graph_id) as rag:
-                logger.info(
-                    "CRAG retrieval start: graph_id=%s mode=%s question=%s",
-                    graph_id,
-                    mode,
-                    _clip_for_log(question),
-                )
-                raw_chunks = await self._retrieve_raw_chunks(rag, search_question, mode)
+            with capture_lightrag_trace() as trace:
+                async with self._use_graph(graph_id) as rag:
+                    logger.info(
+                        "CRAG retrieval start: graph_id=%s mode=%s question=%s",
+                        graph_id,
+                        mode,
+                        _clip_for_log(question),
+                    )
+                    raw_chunks = await self._retrieve_raw_chunks(
+                        rag, search_question, mode
+                    )
 
-                def _to_crag_chunks(items: list[dict]) -> list:
-                    out = []
-                    for idx, chunk in enumerate(items):
-                        content = self._chunk_text(chunk)
-                        if not content:
-                            continue
-                        out.append(
-                            CragChunk(
-                                index=idx,
-                                content=content,
-                                source_url=self._chunk_source_url(chunk),
-                                file_path=str(chunk.get("file_path", "") or "") or None,
+                    def _to_crag_chunks(items: list[dict]) -> list:
+                        out = []
+                        for idx, chunk in enumerate(items):
+                            content = self._chunk_text(chunk)
+                            if not content:
+                                continue
+                            out.append(
+                                CragChunk(
+                                    index=idx,
+                                    content=content,
+                                    source_url=self._chunk_source_url(chunk),
+                                    file_path=str(chunk.get("file_path", "") or "")
+                                    or None,
+                                )
                             )
+                        return out
+
+                    candidates = _to_crag_chunks(raw_chunks)
+
+                    async def _retrieve_fn(refined: str) -> list:
+                        more = await self._retrieve_raw_chunks(rag, refined, mode)
+                        return _to_crag_chunks(more)
+
+                    try:
+                        kept, hint = await run_crag(
+                            question,
+                            candidates,
+                            retrieve_fn=_retrieve_fn,
+                            config=config,
+                            conversation_history=history or None,
                         )
-                    return out
+                    except TypeError:
+                        kept, hint = await run_crag(
+                            question,
+                            candidates,
+                            retrieve_fn=_retrieve_fn,
+                            config=config,
+                        )
 
-                candidates = _to_crag_chunks(raw_chunks)
-
-                async def _retrieve_fn(refined: str) -> list:
-                    more = await self._retrieve_raw_chunks(rag, refined, mode)
-                    return _to_crag_chunks(more)
-
-                try:
-                    kept, hint = await run_crag(
-                        question,
-                        candidates,
-                        retrieve_fn=_retrieve_fn,
-                        config=config,
-                        conversation_history=history or None,
-                    )
-                except TypeError:
-                    kept, hint = await run_crag(
-                        question,
-                        candidates,
-                        retrieve_fn=_retrieve_fn,
-                        config=config,
+                    logger.info(
+                        "CRAG retrieval result: graph_id=%s candidates=%d kept=%d "
+                        "faculty=%s level=%s",
+                        graph_id,
+                        len(candidates),
+                        len(kept),
+                        hint.faculty.name if hint.faculty else None,
+                        hint.level,
                     )
 
-                logger.info(
-                    "CRAG retrieval result: graph_id=%s candidates=%d kept=%d "
-                    "faculty=%s level=%s",
-                    graph_id,
-                    len(candidates),
-                    len(kept),
-                    hint.faculty.name if hint.faculty else None,
-                    hint.level,
-                )
+                    if not kept:
+                        return RetrievalResult(
+                            context="", sources=[], trace=trace.get_lines()
+                        )
 
-                if not kept:
-                    return "", []
+                    url_to_title = await self._get_source_titles(graph_id)
 
-                url_to_title = await self._get_source_titles(graph_id)
+                    context_parts: list[str] = []
+                    aggregated: dict[str, dict] = {}
+                    for chunk in kept:
+                        context_parts.append(chunk.content)
+                        url = chunk.source_url
+                        if not url:
+                            continue
+                        current = aggregated.get(url)
+                        if current is None:
+                            aggregated[url] = {
+                                "first_index": chunk.index,
+                                "snippet": chunk.content,
+                            }
 
-                context_parts: list[str] = []
-                aggregated: dict[str, dict] = {}
-                for chunk in kept:
-                    context_parts.append(chunk.content)
-                    url = chunk.source_url
-                    if not url:
-                        continue
-                    current = aggregated.get(url)
-                    if current is None:
-                        aggregated[url] = {
-                            "first_index": chunk.index,
-                            "snippet": chunk.content,
-                        }
+                    context = "\n\n---\n\n".join(context_parts)
 
-                context = "\n\n---\n\n".join(context_parts)
-
-                ordered = sorted(
-                    aggregated.items(), key=lambda item: item[1]["first_index"]
-                )
-                sources: list[dict] = []
-                for url, metrics in ordered[:max_sources]:
-                    sources.append(
-                        {
-                            "url": url,
-                            "title": url_to_title.get(url, DEFAULT_SOURCE_TITLE),
-                        }
+                    ordered = sorted(
+                        aggregated.items(), key=lambda item: item[1]["first_index"]
                     )
+                    sources: list[dict] = []
+                    for url, metrics in ordered[:max_sources]:
+                        sources.append(
+                            {
+                                "url": url,
+                                "title": url_to_title.get(url, DEFAULT_SOURCE_TITLE),
+                            }
+                        )
 
-                return context, sources
+                    return RetrievalResult(
+                        context=context, sources=sources, trace=trace.get_lines()
+                    )
         except Exception as e:
             logger.error(f"Error in CRAG query for graph {graph_id}: {e}")
             if isinstance(e, RetrievalError):
@@ -950,142 +960,154 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
         max_sources: int = 3,
         conversation_history: str | None = None,
-    ) -> tuple[str, list[dict]]:
+    ) -> RetrievalResult:
         try:
-            async with self._use_graph(graph_id) as rag:
-                query_param = QueryParam(mode=mode)
-                for attr_name, attr_value in (
-                    ("enable_rerank", True),
-                    ("chunk_top_k", 12),
-                    ("min_rerank_score", 0.0),
-                ):
-                    if hasattr(query_param, attr_name):
-                        setattr(query_param, attr_name, attr_value)
+            with capture_lightrag_trace() as trace:
+                async with self._use_graph(graph_id) as rag:
+                    query_param = QueryParam(mode=mode)
+                    for attr_name, attr_value in (
+                        ("enable_rerank", True),
+                        ("chunk_top_k", 12),
+                        ("min_rerank_score", 0.0),
+                    ):
+                        if hasattr(query_param, attr_name):
+                            setattr(query_param, attr_name, attr_value)
 
-                query_settings = {
-                    "mode": mode,
-                    "enable_rerank": getattr(query_param, "enable_rerank", None),
-                    "chunk_top_k": getattr(query_param, "chunk_top_k", None),
-                    "top_k": getattr(query_param, "top_k", None),
-                    "min_rerank_score": getattr(query_param, "min_rerank_score", None),
-                }
-                logger.info(
-                    (
-                        "RAG retrieval query: graph_id=%s settings=%s "
-                        "history_present=%s question=%s"
-                    ),
-                    graph_id,
-                    _json_for_log(query_settings),
-                    bool(conversation_history),
-                    _clip_for_log(question),
-                )
-                if conversation_history:
-                    logger.debug(
-                        "RAG retrieval conversation history: graph_id=%s history=%s",
-                        graph_id,
-                        _clip_for_log(conversation_history),
-                    )
-
-                result = await rag.aquery_llm(question, param=query_param)
-                if _ensure_query_succeeded(result):
+                    query_settings = {
+                        "mode": mode,
+                        "enable_rerank": getattr(query_param, "enable_rerank", None),
+                        "chunk_top_k": getattr(query_param, "chunk_top_k", None),
+                        "top_k": getattr(query_param, "top_k", None),
+                        "min_rerank_score": getattr(
+                            query_param, "min_rerank_score", None
+                        ),
+                    }
                     logger.info(
-                        "RAG retrieval response: graph_id=%s no results", graph_id
+                        (
+                            "RAG retrieval query: graph_id=%s settings=%s "
+                            "history_present=%s question=%s"
+                        ),
+                        graph_id,
+                        _json_for_log(query_settings),
+                        bool(conversation_history),
+                        _clip_for_log(question),
                     )
-                    return "", []
-                answer = result.get("llm_response", {}).get("content", "") or ""
-                data = result.get("data", {})
-                chunks = data.get("chunks", [])
-                entities = data.get("entities")
-                relations = data.get("relations")
+                    if conversation_history:
+                        logger.debug(
+                            "RAG retrieval conversation history: graph_id=%s history=%s",
+                            graph_id,
+                            _clip_for_log(conversation_history),
+                        )
 
-                logger.info(
-                    ("RAG retrieval response: graph_id=%s answer_length=%d answer=%s"),
-                    graph_id,
-                    len(str(answer)),
-                    _clip_for_log(answer),
-                )
-                logger.debug(
-                    "RAG retrieval raw response: graph_id=%s result=%s",
-                    graph_id,
-                    _json_for_log(result, limit=10000),
-                )
-                _log_rag_data_summary(
-                    graph_id=graph_id,
-                    chunks=chunks if isinstance(chunks, list) else [],
-                    entities=entities if isinstance(entities, list) else None,
-                    relations=relations if isinstance(relations, list) else None,
-                )
+                    result = await rag.aquery_llm(question, param=query_param)
+                    if _ensure_query_succeeded(result):
+                        logger.info(
+                            "RAG retrieval response: graph_id=%s no results", graph_id
+                        )
+                        return RetrievalResult(
+                            context="", sources=[], trace=trace.get_lines()
+                        )
+                    answer = result.get("llm_response", {}).get("content", "") or ""
+                    data = result.get("data", {})
+                    chunks = data.get("chunks", [])
+                    entities = data.get("entities")
+                    relations = data.get("relations")
 
-                if not isinstance(chunks, list):
-                    chunks = []
-
-                url_to_title = await self._get_source_titles(graph_id)
-
-                aggregated: dict[str, dict] = {}
-                for idx, chunk in enumerate(chunks):
-                    file_path_value = str(chunk.get("file_path", "") or "").strip()
-                    if not file_path_value:
-                        continue
-
-                    chunk_text = (
-                        chunk.get("content")
-                        or chunk.get("text")
-                        or chunk.get("chunk_content")
-                        or ""
+                    logger.info(
+                        (
+                            "RAG retrieval response: graph_id=%s answer_length=%d "
+                            "answer=%s"
+                        ),
+                        graph_id,
+                        len(str(answer)),
+                        _clip_for_log(answer),
                     )
-                    if chunk_text:
-                        chunk_text = str(chunk_text).strip()
+                    logger.debug(
+                        "RAG retrieval raw response: graph_id=%s result=%s",
+                        graph_id,
+                        _json_for_log(result, limit=10000),
+                    )
+                    _log_rag_data_summary(
+                        graph_id=graph_id,
+                        chunks=chunks if isinstance(chunks, list) else [],
+                        entities=entities if isinstance(entities, list) else None,
+                        relations=relations if isinstance(relations, list) else None,
+                    )
 
-                    for source in file_path_value.split(","):
-                        source = source.strip()
-                        if not source.startswith("http://") and not source.startswith(
-                            "https://"
-                        ):
+                    if not isinstance(chunks, list):
+                        chunks = []
+
+                    url_to_title = await self._get_source_titles(graph_id)
+
+                    aggregated: dict[str, dict] = {}
+                    for idx, chunk in enumerate(chunks):
+                        file_path_value = str(chunk.get("file_path", "") or "").strip()
+                        if not file_path_value:
                             continue
 
-                        current = aggregated.get(source)
-                        if current is None:
-                            aggregated[source] = {
-                                "count": 1,
-                                "first_index": idx,
-                                "snippet": chunk_text,
-                            }
-                        else:
-                            current["count"] += 1
-                            if not current.get("snippet") and chunk_text:
-                                current["snippet"] = chunk_text
+                        chunk_text = (
+                            chunk.get("content")
+                            or chunk.get("text")
+                            or chunk.get("chunk_content")
+                            or ""
+                        )
+                        if chunk_text:
+                            chunk_text = str(chunk_text).strip()
 
-                ordered_candidates = sorted(
-                    aggregated.items(), key=lambda item: item[1]["first_index"]
-                )
-                sources_candidates = []
-                for url, metrics in ordered_candidates:
-                    title = url_to_title.get(url, "Источник информации")
-                    snippet = str(metrics.get("snippet") or "").strip()
-                    if len(snippet) > 500:
-                        snippet = snippet[:500] + "..."
-                    sources_candidates.append(
-                        {"url": url, "title": title, "snippet": snippet}
+                        for source in file_path_value.split(","):
+                            source = source.strip()
+                            if not source.startswith("http://") and not source.startswith(
+                                "https://"
+                            ):
+                                continue
+
+                            current = aggregated.get(source)
+                            if current is None:
+                                aggregated[source] = {
+                                    "count": 1,
+                                    "first_index": idx,
+                                    "snippet": chunk_text,
+                                }
+                            else:
+                                current["count"] += 1
+                                if not current.get("snippet") and chunk_text:
+                                    current["snippet"] = chunk_text
+
+                    ordered_candidates = sorted(
+                        aggregated.items(), key=lambda item: item[1]["first_index"]
+                    )
+                    sources_candidates = []
+                    for url, metrics in ordered_candidates:
+                        title = url_to_title.get(url, "Источник информации")
+                        snippet = str(metrics.get("snippet") or "").strip()
+                        if len(snippet) > 500:
+                            snippet = snippet[:500] + "..."
+                        sources_candidates.append(
+                            {"url": url, "title": title, "snippet": snippet}
+                        )
+
+                    reranked_sources = await self._rerank_sources_with_llm(
+                        question=question,
+                        conversation_history=conversation_history,
+                        sources=sources_candidates,
+                        max_sources=max_sources,
+                    )
+                    logger.info(
+                        (
+                            "RAG retrieval sources: graph_id=%s candidates=%d "
+                            "selected=%d selected_sources=%s"
+                        ),
+                        graph_id,
+                        len(sources_candidates),
+                        len(reranked_sources),
+                        _json_for_log(reranked_sources, limit=4000),
                     )
 
-                reranked_sources = await self._rerank_sources_with_llm(
-                    question=question,
-                    conversation_history=conversation_history,
-                    sources=sources_candidates,
-                    max_sources=max_sources,
-                )
-                logger.info(
-                    (
-                        "RAG retrieval sources: graph_id=%s candidates=%d "
-                        "selected=%d selected_sources=%s"
-                    ),
-                    graph_id,
-                    len(sources_candidates),
-                    len(reranked_sources),
-                    _json_for_log(reranked_sources, limit=4000),
-                )
-
-                return str(answer), reranked_sources
+                    return RetrievalResult(
+                        context=str(answer),
+                        sources=reranked_sources,
+                        trace=trace.get_lines(),
+                    )
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")
             if isinstance(e, RetrievalError):
