@@ -83,6 +83,7 @@ jobs:
           --health-retries 10
 
     env:
+      UV_PYTHON: "3.12"
       DB_HOST: localhost
       DB_PORT: "5432"
       DB_USER: postgres
@@ -99,7 +100,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: "3.12"
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
