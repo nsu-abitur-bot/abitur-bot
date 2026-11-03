@@ -1,10 +1,15 @@
 # Image pins belong to the final images.yaml overlay, never to this resource profile.
+x-provider-locks: &provider-locks
+  - provider-locks:/app/provider-locks
+
 services:
   api:
+    volumes: *provider-locks
     mem_limit: 640m
     memswap_limit: 1280m
     cpus: 1.5
     environment:
+      GIGACHAT_LOCK_DIRECTORY: /app/provider-locks
       HTTP_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       HTTPS_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       NO_PROXY: localhost,127.0.0.1,postgres,redis,api,web,${API_HOST:?Set API_HOST},${WEB_HOST:?Set WEB_HOST}
@@ -16,10 +21,15 @@ services:
     command: [uvicorn, api.main:app, --host, 0.0.0.0, --port, "8000", --workers, "1"]
 
   migrate:
+    volumes: *provider-locks
+    environment:
+      GIGACHAT_LOCK_DIRECTORY: /app/provider-locks
     mem_limit: 450m
     memswap_limit: 900m
 
   permissions:
+    volumes: *provider-locks
+    command: [sh, -eu, -c, "chown 1000:1000 /app/data /app/logs /app/branding-media /app/provider-locks"]
     mem_limit: 64m
 
   postgres:
@@ -41,6 +51,7 @@ services:
       NODE_OPTIONS: --max-old-space-size=144
 
   bot:
+    volumes: *provider-locks
     extends:
       file: compose.yaml
       service: api
@@ -51,6 +62,7 @@ services:
     memswap_limit: 1024m
     cpus: 1.5
     environment:
+      GIGACHAT_LOCK_DIRECTORY: /app/provider-locks
       HTTP_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       HTTPS_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       NO_PROXY: localhost,127.0.0.1,postgres,redis,api,web,${API_HOST:?Set API_HOST},${WEB_HOST:?Set WEB_HOST}
@@ -60,3 +72,8 @@ services:
       OMP_NUM_THREADS: "1"
       OPENBLAS_NUM_THREADS: "1"
     command: [uv, run, --no-sync, python, main.py]
+
+volumes:
+  # Only opaque lock files; university data and credentials remain separate.
+  provider-locks:
+    name: abitur-provider-locks

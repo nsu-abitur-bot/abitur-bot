@@ -117,3 +117,64 @@ def test_demo_instances_doc_rebuilds_web_on_update() -> None:
         "docker compose --env-file /tmp/abitur-demo/a.env -f deploy/demo/compose.yaml "
         "up -d --build --force-recreate"
     ) in content
+
+
+def test_runtime_shares_only_provider_coordination_files(tmp_path: Path) -> None:
+    configs = []
+    for name, api, web in (("demo-a", 18001, 13001), ("demo-b", 18002, 13002)):
+        env = tmp_path / (name + ".env")
+        subprocess.run(
+            [
+                sys.executable,
+                str(ROOT / "deploy/demo/create_env.py"),
+                str(env),
+                name,
+                "--api-port",
+                str(api),
+                "--web-port",
+                str(web),
+            ],
+            check=True,
+        )
+        with env.open("a") as output:
+            output.write(f"API_HOST=api.{name}.example\nWEB_HOST={name}.example\n")
+        result = subprocess.run(
+            [
+                "docker",
+                "compose",
+                "--env-file",
+                str(env),
+                "-f",
+                str(ROOT / "deploy/demo/compose.yaml"),
+                "-f",
+                str(ROOT / "deploy/demo/runtime.yaml"),
+                "--profile",
+                "telegram",
+                "config",
+                "--format",
+                "json",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        configs.append(json.loads(result.stdout))
+    a, b = configs
+    shared = set(v["name"] for v in a["volumes"].values()) & set(
+        v["name"] for v in b["volumes"].values()
+    )
+    assert shared == {"abitur-provider-locks"}
+    for config in configs:
+        for name in ("api", "bot", "migrate"):
+            service = config["services"][name]
+            assert (
+                service["environment"]["GIGACHAT_LOCK_DIRECTORY"] == "/app/provider-locks"
+            )
+            assert any(
+                v["source"] == "provider-locks" and v["target"] == "/app/provider-locks"
+                for v in service["volumes"]
+            )
+            assert any(
+                v["source"] == "files" and v["target"] == "/app/data"
+                for v in service["volumes"]
+            )
