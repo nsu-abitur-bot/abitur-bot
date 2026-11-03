@@ -2,12 +2,15 @@
 
 import argparse
 import asyncio
+import fcntl
 import json
 import os
 import shutil
 import sys
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator
 
 from sqlalchemy import select
 
@@ -28,13 +31,34 @@ def private_json(path: Path, data: object) -> None:
         json.dump(data, output, ensure_ascii=False)
 
 
+@contextmanager
+def _migration_lock(root: Path) -> Iterator[None]:
+    root.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(
+        root.parent / ".embedding-migration.lock",
+        os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW,
+        0o600,
+    )
+    with os.fdopen(descriptor, "w") as lock:
+        fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+
+
 async def migrate(changes: dict[str, str]) -> dict:
-    if os.getenv("LIGHTRAG_STORAGE", "json") != "json":
-        raise ValueError("Эта процедура поддерживает файловое JSON-хранилище")
     root = Path(os.environ.get("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
     if root.is_symlink():
         raise ValueError("Символическая ссылка вместо индекса")
     root = root.resolve()
+    with _migration_lock(root):
+        return await _migrate(changes, root)
+
+
+async def _migrate(changes: dict[str, str], root: Path) -> dict:
+    if os.getenv("LIGHTRAG_STORAGE", "json") != "json":
+        raise ValueError("Эта процедура поддерживает файловое JSON-хранилище")
     root.parent.mkdir(parents=True, exist_ok=True)
     if root.exists() and any(path.is_symlink() for path in root.rglob("*")):
         raise ValueError("Символические ссылки не поддерживаются")

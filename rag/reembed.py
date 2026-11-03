@@ -32,14 +32,35 @@ def rebuild_workspace(
     allowed = {"vdb_chunks.json", "vdb_entities.json", "vdb_relationships.json"}
     if any(path.name not in allowed for path in files):
         raise ValueError("Неизвестный формат векторного индекса")
-    shutil.copytree(source, destination)
     chunks_path = source / "kv_store_text_chunks.json"
     chunks = json.loads(chunks_path.read_text()) if chunks_path.exists() else {}
     graph_path = source / "graph_chunk_entity_relation.graphml"
     graph = read_graphml(graph_path) if graph_path.exists() else nx.Graph()
+    stores = {path.name: json.loads(path.read_text()) for path in files}
+    canonical = {
+        "vdb_chunks.json": set(chunks),
+        "vdb_entities.json": set(graph.nodes),
+        "vdb_relationships.json": {frozenset((src, tgt)) for src, tgt in graph.edges},
+    }
+    for name, expected in canonical.items():
+        rows = stores.get(name, {}).get("data", [])
+        if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows):
+            raise ValueError("Некорректный векторный индекс")
+        if name == "vdb_chunks.json":
+            actual = {row["__id__"] for row in rows}
+        elif name == "vdb_entities.json":
+            actual = {row["entity_name"] for row in rows}
+        else:
+            actual = {frozenset((row["src_id"], row["tgt_id"])) for row in rows}
+        if actual != expected or len(actual) != len(rows):
+            raise ValueError("Исходный векторный индекс неполный или несогласован")
+    shutil.copytree(source, destination)
+    response_cache = destination / "kv_store_llm_response_cache.json"
+    if response_cache.exists():
+        response_cache.write_text("{}")
     counts: dict[str, int] = {}
     for path in files:
-        original = json.loads(path.read_text())
+        original = stores[path.name]
         rows = original["data"]
         if not isinstance(rows, list):
             raise ValueError("Некорректный векторный индекс")

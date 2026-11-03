@@ -39,7 +39,19 @@ def fixture(source):
     }
     for name, row in rows.items():
         database = NanoVectorDB(2, storage_file=str(source / f"vdb_{name}.json"))
-        database.upsert([cast(Data, {**row, "__vector__": np.array([1.0, 0.5])})])
+        records = [cast(Data, {**row, "__vector__": np.array([1.0, 0.5])})]
+        if name == "entities":
+            records.append(
+                cast(
+                    Data,
+                    {
+                        "__id__": "faculty",
+                        "entity_name": "ФАК",
+                        "__vector__": np.array([0.5, 1.0]),
+                    },
+                )
+            )
+        database.upsert(records)
         database.save()
 
 
@@ -51,12 +63,13 @@ def test_rebuilds_all_vectors_preserving_ids_and_source(tmp_path):
     counts = rebuild_workspace(source, target, embedder)
     assert counts == {
         "vdb_chunks.json": 1,
-        "vdb_entities.json": 1,
+        "vdb_entities.json": 2,
         "vdb_relationships.json": 1,
     }
     assert set(embedder.texts) == {
         "Документ вуза",
         "ВУЗ\nУниверситет",
+        "ФАК\nФакультет",
         "включает\tВУЗ\nФАК\nФакультет вуза",
     }
     for path in source.iterdir():
@@ -86,6 +99,37 @@ def test_missing_canonical_text_does_not_publish_partial_index(tmp_path):
     source = tmp_path / "source"
     fixture(source)
     (source / "kv_store_text_chunks.json").write_text("{}")
-    with pytest.raises(KeyError):
+    with pytest.raises(ValueError, match="неполный"):
         rebuild_workspace(source, tmp_path / "stage", Embeddings())
     assert json.loads((source / "vdb_chunks.json").read_text())["embedding_dim"] == 2
+
+
+@pytest.mark.parametrize("store", ["chunks", "entities", "relationships"])
+def test_missing_vector_store_is_rejected(tmp_path, store):
+    source = tmp_path / "source"
+    fixture(source)
+    (source / f"vdb_{store}.json").unlink()
+    with pytest.raises(ValueError, match="неполный"):
+        rebuild_workspace(source, tmp_path / "stage", Embeddings())
+
+
+def test_missing_vector_row_is_rejected(tmp_path):
+    source = tmp_path / "source"
+    fixture(source)
+    path = source / "vdb_chunks.json"
+    data = json.loads(path.read_text())
+    data["data"] = []
+    path.write_text(json.dumps(data))
+    with pytest.raises(ValueError, match="неполный"):
+        rebuild_workspace(source, tmp_path / "stage", Embeddings())
+
+
+def test_rebuilt_index_drops_cached_answers_but_keeps_original_backup_source(tmp_path):
+    source = tmp_path / "source"
+    fixture(source)
+    cache = source / "kv_store_llm_response_cache.json"
+    cache.write_text('{"old-query": {"return": "old answer"}}')
+    target = tmp_path / "stage"
+    rebuild_workspace(source, target, Embeddings())
+    assert json.loads((target / cache.name).read_text()) == {}
+    assert "old-query" in json.loads(cache.read_text())
