@@ -180,7 +180,8 @@ class GigaChatEmbedding:
     def _embed_batch(self, client: httpx.Client, batch: list[str]) -> list[list[float]]:
         with _request_slot(self._identity):
             refreshed = False
-            for attempt in range(4):
+            transient_retries = 0
+            while True:
                 token = self._access_token(client)
                 response = client.post(
                     EMBEDDINGS_URL,
@@ -193,20 +194,22 @@ class GigaChatEmbedding:
                             self._token.value = ""
                     refreshed = True
                     continue
-                if response.status_code in {429, 500, 502, 503, 504} and attempt < 3:
+                if (
+                    response.status_code in {429, 500, 502, 503, 504}
+                    and transient_retries < 3
+                ):
                     try:
                         delay = float(response.headers.get("Retry-After", ""))
                         if not math.isfinite(delay) or delay < 0:
                             raise ValueError
                     except ValueError:
-                        delay = float(2**attempt)
+                        delay = float(2**transient_retries)
+                    transient_retries += 1
                     # Keep the shared slot during cooldown, avoiding another burst.
                     time.sleep(min(delay, 10))
                     continue
                 self._check_status(response)
                 return self._vectors(response.json(), len(batch))
-            self._check_status(response)
-            raise GigaChatError("Не удалось обновить авторизацию GigaChat")
 
     def _vectors(self, data: Any, count: int) -> list[list[float]]:
         rows = data.get("data") if isinstance(data, dict) else None

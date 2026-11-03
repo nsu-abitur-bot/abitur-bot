@@ -247,3 +247,31 @@ def test_shared_directory_serializes_independent_processes(tmp_path):
             if worker.is_alive():
                 worker.terminate()
                 worker.join(timeout=5)
+
+
+@pytest.mark.parametrize(
+    "statuses", [[503, 503, 503, 401, 200], [401, 503, 503, 503, 200]]
+)
+def test_auth_refresh_does_not_consume_transient_retry_budget(statuses, monkeypatch):
+    sequence = iter(statuses)
+    oauth = []
+    embeddings = []
+    monkeypatch.setattr(time, "sleep", lambda _: None)
+
+    def handler(request):
+        if request.url.path.endswith("/oauth"):
+            oauth.append(True)
+            return httpx.Response(
+                200,
+                json={
+                    "access_token": f"token-{len(oauth)}",
+                    "expires_at": time.time() + 1800,
+                },
+            )
+        status = next(sequence)
+        embeddings.append(status)
+        return httpx.Response(status, json={"data": [vector()]} if status == 200 else {})
+
+    assert len(adapter(handler).embed_query("question")) == 2560
+    assert len(oauth) == 2
+    assert embeddings == statuses
