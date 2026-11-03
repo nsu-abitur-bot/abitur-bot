@@ -8,6 +8,10 @@ from pipeline.tools.admission_scores import (
     ADMISSION_SCORES_TOOL,
     execute_admission_scores,
 )
+from pipeline.tools.content_proposal import (
+    CONTENT_PROPOSAL_TOOL,
+    execute_content_proposal,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +21,7 @@ _SingleToolExecutor = Callable[[dict], Awaitable[str]]
 # Имя инструмента -> (описание, исполнитель).
 TOOLS: dict[str, tuple[ToolSpec, _SingleToolExecutor]] = {
     ADMISSION_SCORES_TOOL.name: (ADMISSION_SCORES_TOOL, execute_admission_scores),
+    CONTENT_PROPOSAL_TOOL.name: (CONTENT_PROPOSAL_TOOL, execute_content_proposal),
 }
 
 

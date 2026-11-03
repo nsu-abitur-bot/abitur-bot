@@ -25,8 +25,8 @@ class TestRagUploadEndpoint:
         self.mock_service.ingest_files.return_value = [
             UploadedDocumentResult(
                 filename="example.md",
-                status="indexed",
-                message="Document indexed in RAG",
+                status="queued",
+                message="Waiting for editor review",
                 chars=42,
             )
         ]
@@ -38,7 +38,7 @@ class TestRagUploadEndpoint:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["indexed_count"] == 1
+        assert data["queued_count"] == 1
         assert data["skipped_count"] == 0
         assert data["results"][0]["filename"] == "example.md"
 
@@ -59,7 +59,7 @@ class TestRagUploadEndpoint:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["indexed_count"] == 0
+        assert data["queued_count"] == 0
         assert data["skipped_count"] == 1
         assert data["results"][0]["status"] == "skipped"
 
@@ -151,26 +151,10 @@ class TestRagUploadService:
                 assert "PDF exceeds maximum allowed pages" in results[0].message
 
     @pytest.mark.asyncio
-    async def test_ingest_files_preserves_old_doc_when_indexing_fails(
+    async def test_ingest_files_queues_extracted_text(
         self, rag_service: RagUploadService, monkeypatch
     ):
-        deleted_calls = []
-
-        class FakeDocument:
-            id = "doc-123"
-            rag_doc_id = "rag-v1"
-            title = "test.txt"
-            source_url = None
-
-        class FakeDocumentService:
-            def __init__(self, session):  # noqa: ANN001
-                pass
-
-            async def create_or_update_for_source(self, **kwargs):  # noqa: ANN001
-                return FakeDocument()
-
-            async def mark_error(self, doc_id):  # noqa: ANN001
-                pass
+        saved = {}
 
         class FakeSessionContext:
             async def __aenter__(self):  # noqa: ANN001
@@ -179,20 +163,17 @@ class TestRagUploadService:
             async def __aexit__(self, exc_type, exc, traceback):  # noqa: ANN001
                 return None
 
-        async def failing_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
-            raise RuntimeError("LightRAG failure")
+        class FakeProposalService:
+            def __init__(self, session):  # noqa: ANN001
+                pass
 
-        class FakeMemory:
-            async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
-                deleted_calls.append((graph_id, doc_id))
-                return True
+            async def create(self, **kwargs):  # noqa: ANN001
+                saved.update(kwargs)
 
-        from api.services import document_indexer, rag_upload
+        from api.services import rag_upload
 
         monkeypatch.setattr(rag_upload, "AsyncSessionLocal", lambda: FakeSessionContext())
-        monkeypatch.setattr(rag_upload, "DocumentService", FakeDocumentService)
-        monkeypatch.setattr(document_indexer, "add_texts_async", failing_add_texts_async)
-        monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+        monkeypatch.setattr(rag_upload, "ContentProposalService", FakeProposalService)
 
         mock_file = MagicMock(spec=UploadFile)
         mock_file.filename = "test.txt"
@@ -201,7 +182,11 @@ class TestRagUploadService:
         with patch.object(rag_service, "_get_settings", AsyncMock(return_value={})):
             results = await rag_service.ingest_files([mock_file], graph_id="test_graph")
 
-        assert len(results) == 1
-        assert results[0].status == "skipped"
-        # Старая версия в LightRAG не удалена!
-        assert ("test_graph", "rag-v1") not in deleted_calls
+        assert results[0].status == "queued"
+        assert saved == {
+            "source": "parser",
+            "graph_id": "test_graph",
+            "title": "test.txt",
+            "source_url": None,
+            "text": "plain text content",
+        }

@@ -1,16 +1,14 @@
+import hashlib
+
 import pytest
 
 from abbrev.expander import AbbrevExpander
-from api.services import document_indexer, url_to_rag
+from api.services import url_to_rag
 
 
 @pytest.mark.asyncio
-async def test_parse_and_save_url_expands_before_saving(monkeypatch):
-    saved_payload = {}
-
-    # Свой расширитель с известной аббревиатурой: abbrev/abbrev_data.yaml в
-    # .gitignore, и тест, опирающийся на него, проходит только там, где файл
-    # случайно оказался — в CI и у нового участника он падал.
+async def test_parse_and_save_url_queues_expanded_text(monkeypatch):
+    saved = {}
     expander = AbbrevExpander()
     expander.load_items(
         [{"short": "НГУ", "full": "Новосибирский государственный университет"}]
@@ -20,12 +18,6 @@ async def test_parse_and_save_url_expands_before_saving(monkeypatch):
     async def fake_process_url(url: str) -> str:
         return "Документы принимает НГУ."
 
-    async def fake_add_texts_async(texts, *args, **kwargs):  # noqa: ANN001
-        saved_payload["texts"] = texts
-        saved_payload["source_ids"] = kwargs.get("source_ids")
-        saved_payload["file_paths"] = kwargs.get("file_paths")
-        return 1
-
     class FakeSessionContext:
         async def __aenter__(self):  # noqa: ANN001
             return object()
@@ -33,92 +25,37 @@ async def test_parse_and_save_url_expands_before_saving(monkeypatch):
         async def __aexit__(self, exc_type, exc, traceback):  # noqa: ANN001
             return None
 
-    class FakeDocument:
-        id = "document-id"
-        rag_doc_id = "old-document-id"
-
-    class FakeDocumentService:
+    class FakeProposalService:
         def __init__(self, session):  # noqa: ANN001
             pass
 
-        async def create_or_update_for_source(self, **kwargs):  # noqa: ANN001
-            saved_payload["document_kwargs"] = kwargs
-            return FakeDocument()
-
-        async def mark_indexed(self, *args, **kwargs):  # noqa: ANN001
-            saved_payload["mark_indexed"] = (args, kwargs)
-            return FakeDocument()
-
-    class FakeMemory:
-        async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
-            saved_payload["deleted"] = (graph_id, doc_id)
-            return True
+        async def create(self, **kwargs):  # noqa: ANN001
+            saved.update(kwargs)
 
     monkeypatch.setattr(url_to_rag, "process_url", fake_process_url)
-    monkeypatch.setattr(document_indexer, "add_texts_async", fake_add_texts_async)
+
+    async def fake_fetch_url_bytes(url: str) -> bytes:
+        return b"<html>original source</html>"
+
+    monkeypatch.setattr(url_to_rag, "fetch_url_bytes", fake_fetch_url_bytes)
     monkeypatch.setattr(url_to_rag, "AsyncSessionLocal", lambda: FakeSessionContext())
-    monkeypatch.setattr(url_to_rag, "DocumentService", FakeDocumentService)
-    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
+    monkeypatch.setattr(url_to_rag, "ContentProposalService", FakeProposalService)
 
-    result = await url_to_rag.parse_and_save_url("https://example.test/doc", "Документ")
-
-    assert result is True
-    assert saved_payload["texts"] == [
-        "Документы принимает НГУ (Новосибирский государственный университет)."
-    ]
-    assert saved_payload["source_ids"] != ["document-id"]
-    assert len(saved_payload["source_ids"]) == 1
-    assert saved_payload["file_paths"] == ["https://example.test/doc"]
-    assert saved_payload["deleted"] == ("abitur_kb", "old-document-id")
+    assert await url_to_rag.parse_and_save_url("https://example.test/doc", "Документ")
+    assert saved == {
+        "source": "parser",
+        "graph_id": "abitur_kb",
+        "title": "Документ",
+        "source_url": "https://example.test/doc",
+        "source_hash": hashlib.sha256(b"<html>original source</html>").hexdigest(),
+        "text": "Документы принимает НГУ (Новосибирский государственный университет).",
+    }
 
 
 @pytest.mark.asyncio
-async def test_parse_and_save_url_does_not_delete_old_doc_when_indexing_fails(
-    monkeypatch,
-):
-    saved_payload = {}
-
+async def test_parse_and_save_url_skips_empty_content(monkeypatch):
     async def fake_process_url(url: str) -> str:
-        return "Текст документа"
-
-    async def failing_add_texts_async(texts, source_ids=None, file_paths=None, **kwargs):  # noqa: ANN001
-        return 0
-
-    class FakeSessionContext:
-        async def __aenter__(self):  # noqa: ANN001
-            return object()
-
-        async def __aexit__(self, exc_type, exc, traceback):  # noqa: ANN001
-            return None
-
-    class FakeDocument:
-        id = "document-id"
-        rag_doc_id = "old-document-id"
-
-    class FakeDocumentService:
-        def __init__(self, session):  # noqa: ANN001
-            pass
-
-        async def create_or_update_for_source(self, **kwargs):  # noqa: ANN001
-            return FakeDocument()
-
-        async def mark_error(self, document_id):  # noqa: ANN001
-            saved_payload["marked_error"] = document_id
-
-    class FakeMemory:
-        async def delete_doc(self, graph_id, doc_id):  # noqa: ANN001
-            saved_payload["deleted"] = (graph_id, doc_id)
-            return True
+        return ""
 
     monkeypatch.setattr(url_to_rag, "process_url", fake_process_url)
-    monkeypatch.setattr(document_indexer, "add_texts_async", failing_add_texts_async)
-    monkeypatch.setattr(url_to_rag, "AsyncSessionLocal", lambda: FakeSessionContext())
-    monkeypatch.setattr(url_to_rag, "DocumentService", FakeDocumentService)
-    monkeypatch.setattr(document_indexer, "get_graph_memory", lambda: FakeMemory())
-
-    result = await url_to_rag.parse_and_save_url("https://example.test/doc", "Документ")
-
-    assert result is False
-    assert "deleted" not in saved_payload, (
-        "Old document must not be deleted when indexing fails"
-    )
+    assert not await url_to_rag.parse_and_save_url("https://example.test/doc", "Документ")

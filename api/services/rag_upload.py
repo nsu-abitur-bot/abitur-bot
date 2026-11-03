@@ -9,12 +9,11 @@ from sqlalchemy import select
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import UploadedDocumentResult
-from api.services.document_indexer import index_document
-from api.services.document_update import calculate_content_hash, first_http_url
+from api.services.document_update import first_http_url
 from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Settings
-from db.postgres.services.document import DocumentService
+from db.postgres.services.content_proposal import ContentProposalService
 from parser.pdf import pdf_to_base64_images
 from parser.utils import extract_sources
 from parser.vision import parse_images_with_llm
@@ -150,40 +149,20 @@ class RagUploadService:
 
             source_id, file_paths_str = extract_sources(prepared, fallback=filename)
             source_url = first_http_url(file_paths_str)
-            content_hash = calculate_content_hash(raw)
-
             async with AsyncSessionLocal() as session:
-                document_service = DocumentService(session)
-                document = await document_service.create_or_update_for_source(
+                await ContentProposalService(session).create(
+                    source="parser",
                     graph_id=graph_id,
                     title=source_id,
                     source_url=source_url,
-                )
-                indexed_doc = await index_document(
-                    document=document,
                     text=prepared,
-                    content_hash=content_hash,
-                    file_path=file_paths_str,
-                    graph_id=graph_id,
-                    session=session,
-                    document_service=document_service,
                 )
-
-            if not indexed_doc:
-                results.append(
-                    UploadedDocumentResult(
-                        filename=filename,
-                        status="skipped",
-                        message="Failed to save document to RAG",
-                    )
-                )
-                continue
 
             results.append(
                 UploadedDocumentResult(
                     filename=filename,
-                    status="indexed",
-                    message="Document indexed in RAG",
+                    status="queued",
+                    message="Waiting for editor review",
                     chars=len(prepared),
                 )
             )

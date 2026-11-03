@@ -67,6 +67,12 @@ class DocumentService:
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def get_by_source_proposal_id(self, proposal_id: str) -> Optional[Document]:
+        result = await self.session.execute(
+            select(Document).where(Document.source_proposal_id == proposal_id)
+        )
+        return result.scalar_one_or_none()
+
     async def get_by_source_url(
         self, graph_id: str, source_url: str
     ) -> Optional[Document]:
@@ -105,6 +111,7 @@ class DocumentService:
         content_hash: str | None = None,
         content_length: int | None = None,
         rag_doc_id: str | None = None,
+        source_proposal_id: str | None = None,
     ) -> Document:
         document = (
             await self.get_by_source_url(graph_id, source_url) if source_url else None
@@ -119,10 +126,11 @@ class DocumentService:
                 source_url=source_url,
                 graph_id=graph_id,
                 rag_doc_id=rag_doc_id or "",
+                source_proposal_id=source_proposal_id,
                 content_hash=content_hash,
                 content_length=content_length,
-                status=DOCUMENT_STATUS_INDEXED,
-                last_indexed_at=timestamp(),
+                status="pending" if source_proposal_id else DOCUMENT_STATUS_INDEXED,
+                last_indexed_at=None if source_proposal_id else timestamp(),
             )
             self.session.add(document)
             await self.session.flush()
@@ -152,6 +160,7 @@ class DocumentService:
         title: str | None = None,
         source_url: str | None = None,
         rag_doc_id: str | None = None,
+        source_proposal_id: str | None = None,
     ) -> Optional[Document]:
         document = await self.get_by_id(document_id)
         if document is None:
@@ -162,6 +171,8 @@ class DocumentService:
             document.source_url = source_url
         if rag_doc_id is not None:
             document.rag_doc_id = rag_doc_id
+        if source_proposal_id is not None:
+            document.source_proposal_id = source_proposal_id
         document.content_hash = content_hash
         document.content_length = content_length
         document.status = DOCUMENT_STATUS_INDEXED

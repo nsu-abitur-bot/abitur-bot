@@ -79,12 +79,12 @@ async def upload_documents_to_rag(
     except Exception:
         raise HTTPException(status_code=503, detail="RAG ingestion unavailable")
 
-    indexed_count = sum(1 for result in results if result.status == "indexed")
-    skipped_count = len(results) - indexed_count
+    queued_count = sum(1 for result in results if result.status == "queued")
+    skipped_count = len(results) - queued_count
 
     return RagUploadResponse(
         accepted_formats=service.accepted_formats,
-        indexed_count=indexed_count,
+        queued_count=queued_count,
         skipped_count=skipped_count,
         results=results,
     )
@@ -498,7 +498,7 @@ async def update_changed_rag_documents(
 @router.post(
     "/upload/csv",
     response_model=CsvImportResponse,
-    summary="Импорт документов по ссылкам из CSV",
+    summary="Добавить документы из CSV в очередь редактора",
 )
 async def upload_csv_documents(
     file: UploadFile = File(
@@ -558,9 +558,9 @@ async def upload_csv_documents(
         try:
             success = await parse_and_save_url(url=url, title=title)
             message = (
-                "Успешно"
+                "Добавлено в очередь предложений"
                 if success
-                else "Не удалось сохранить (возможно пустой контент или недоступен)"
+                else "Не удалось создать предложение (пустой или недоступный контент)"
             )
             results.append(
                 CsvImportResult(title=title, url=url, success=success, message=message)
@@ -572,7 +572,7 @@ async def upload_csv_documents(
             )
 
     return CsvImportResponse(
-        imported_count=sum(1 for r in results if r.success),
+        queued_count=sum(1 for r in results if r.success),
         total_found=len(results),
         results=results,
     )

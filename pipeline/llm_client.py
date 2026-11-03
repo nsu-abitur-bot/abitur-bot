@@ -34,7 +34,11 @@ from pipeline.prompts import (
     SOURCES_HINT,
     SYSTEM_PROMPT_BASE,
 )
-from pipeline.tools import ADMISSION_SCORES_TOOL, default_tool_executor
+from pipeline.tools import (
+    ADMISSION_SCORES_TOOL,
+    CONTENT_PROPOSAL_TOOL,
+    default_tool_executor,
+)
 from rag.crag import load_crag_config
 from rag.retriever import (
     RetrievalError,
@@ -598,7 +602,7 @@ async def _run_tool_loop(
     if stream_callback is None:
         result = await provider.generate_with_tools(
             messages,
-            tools=[_university_scores_tool()],
+            tools=[_university_scores_tool(), CONTENT_PROPOSAL_TOOL],
             tool_executor=tool_executor,
             profile=LLMProfiles.CHAT,
         )
@@ -621,7 +625,7 @@ async def _run_tool_loop(
 
     result = await provider.generate_with_tools(
         messages,
-        tools=[_university_scores_tool()],
+        tools=[_university_scores_tool(), CONTENT_PROPOSAL_TOOL],
         tool_executor=tool_executor,
         profile=LLMProfiles.CHAT,
         on_delta=on_delta,

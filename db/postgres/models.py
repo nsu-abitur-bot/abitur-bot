@@ -370,6 +370,7 @@ class Document(Base):
     source_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
     graph_id: Mapped[str] = mapped_column(String(100), nullable=False)
     rag_doc_id: Mapped[str] = mapped_column(String(500), nullable=False)
+    source_proposal_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     content_length: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     status: Mapped[str] = mapped_column(
@@ -390,10 +391,36 @@ class Document(Base):
         Index("ix_document_source_url", "source_url"),
         Index("ix_document_content_hash", "content_hash"),
         Index("ix_document_status", "status"),
+        Index("ix_document_source_proposal_id", "source_proposal_id", unique=True),
     )
 
     def __repr__(self) -> str:
         return f"<Document(id='{self.id}', title='{self.title}', status='{self.status}')>"
+
+
+class ContentProposal(Base):
+    """Текст для проверки редактором перед индексацией."""
+
+    __tablename__ = "content_proposal"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    source: Mapped[str] = mapped_column(String(20), nullable=False)
+    graph_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    title: Mapped[str] = mapped_column(String(500), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    source_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    source_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    reviewer_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    document_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ix_content_proposal_status_created", "status", "created_at"),
+    )
 
 
 class FaqEntry(Base):
