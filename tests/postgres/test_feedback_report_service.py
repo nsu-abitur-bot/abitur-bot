@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.postgres.services.answer_feedback import AnswerFeedbackService
 from db.postgres.services.feedback_report import FeedbackReportService
 from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
@@ -81,3 +82,25 @@ async def test_update_feedback_report_invalid_status(session: AsyncSession):
 
     with pytest.raises(ValueError):
         await service.update_status(1, "closed")
+
+
+@pytest.mark.asyncio
+async def test_answer_rating_is_saved_once_for_its_owner(session: AsyncSession):
+    service = AnswerFeedbackService(session)
+    candidate = await service.create_candidate(
+        user_id=200001,
+        session_id="dialog-1",
+        channel="telegram",
+        question="Когда подать документы?",
+        bot_response="До 25 июля.",
+    )
+
+    assert await service.rate(candidate.id, 200002, "positive") is False
+    assert await service.rate(candidate.id, 200001, "negative") is True
+    assert await service.rate(candidate.id, 200001, "positive") is False
+
+    await session.refresh(candidate)
+    assert candidate.rating == "negative"
+    assert candidate.rated_at is not None
+    assert candidate.question == "Когда подать документы?"
+    assert candidate.bot_response == "До 25 июля."

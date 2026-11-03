@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Optional
 from aiogram import Bot
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 from bot.splitting import split_message
 from bot.utils import normalize_links_for_messaging
@@ -16,8 +17,39 @@ from config.latency import stage, timed
 
 if TYPE_CHECKING:
     from maxapi import Bot as MaxBot
+    from maxapi.types.attachments.attachment import Attachment
 
 logger = logging.getLogger(__name__)
+
+
+def telegram_feedback_keyboard(feedback_id: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text="👍 Полезно", callback_data=f"rate:positive:{feedback_id}"
+                ),
+                InlineKeyboardButton(
+                    text="👎 Неверно", callback_data=f"rate:negative:{feedback_id}"
+                ),
+            ]
+        ]
+    )
+
+
+def max_feedback_keyboard(feedback_id: str) -> "Attachment":
+    from maxapi.types import CallbackButton
+    from maxapi.types.attachments.attachment import ButtonsPayload
+
+    return ButtonsPayload(
+        buttons=[
+            [
+                CallbackButton(text="👍 Полезно", payload=f"rate:positive:{feedback_id}"),
+                CallbackButton(text="👎 Неверно", payload=f"rate:negative:{feedback_id}"),
+            ]
+        ]
+    ).pack()
+
 
 DEFAULT_MIN_EDIT_INTERVAL = 1.2  # Не спамим Telegram draft-обновлениями
 
@@ -126,6 +158,7 @@ class TelegramStreamer:
         text: str,
         parse_mode: Optional[str] = None,
         fallback_plain: bool = False,
+        feedback_id: str | None = None,
     ) -> None:
         """Отправляет финальный ответ с нужным parse_mode, длинный — частями.
 
@@ -137,12 +170,19 @@ class TelegramStreamer:
         is_html = parse_mode == "HTML"
         aiogram_parse_mode = ParseMode.HTML if is_html else None
 
-        for chunk in split_message(final_text, html=is_html):
+        chunks = split_message(final_text, html=is_html)
+        for index, chunk in enumerate(chunks):
+            reply_markup = (
+                telegram_feedback_keyboard(feedback_id)
+                if feedback_id and index == len(chunks) - 1
+                else None
+            )
             try:
                 await self._bot.send_message(
                     self._chat_id,
                     chunk,
                     parse_mode=aiogram_parse_mode,
+                    reply_markup=reply_markup,
                 )
             except TelegramBadRequest:
                 if not fallback_plain:
@@ -150,7 +190,11 @@ class TelegramStreamer:
                 logger.warning(
                     "TelegramStreamer: HTML parse failed on send, sending plain text"
                 )
-                await self._bot.send_message(self._chat_id, _strip_tags(chunk))
+                await self._bot.send_message(
+                    self._chat_id,
+                    _strip_tags(chunk),
+                    reply_markup=reply_markup,
+                )
             self._last_sent_text = chunk
 
 
@@ -213,6 +257,7 @@ class MaxStreamer:
         text: str,
         parse_mode: Optional[str] = None,
         fallback_plain: bool = False,
+        feedback_id: str | None = None,
     ) -> None:
         final_text = normalize_links_for_messaging(text)
         max_parse_mode = self._resolve_parse_mode(parse_mode)
@@ -222,24 +267,45 @@ class MaxStreamer:
 
         # Первая часть заменяет статус-сообщение, остальные идут следом.
         first, *others = chunks
+        attachments = [max_feedback_keyboard(feedback_id)] if feedback_id else None
         if self._message_id is None:
-            await self._send(first, max_parse_mode, fallback_plain)
+            await self._send(
+                first, max_parse_mode, fallback_plain, attachments if not others else None
+            )
         else:
-            await self._edit(self._message_id, first, max_parse_mode, fallback_plain)
-        for chunk in others:
-            await self._send(chunk, max_parse_mode, fallback_plain)
+            await self._edit(
+                self._message_id,
+                first,
+                max_parse_mode,
+                fallback_plain,
+                attachments if not others else None,
+            )
+        for index, chunk in enumerate(others):
+            await self._send(
+                chunk,
+                max_parse_mode,
+                fallback_plain,
+                attachments if index == len(others) - 1 else None,
+            )
 
-    async def _send(self, text: str, parse_mode, fallback_plain: bool) -> None:
+    async def _send(
+        self, text: str, parse_mode, fallback_plain: bool, attachments=None
+    ) -> None:
         try:
             sent = await self._client.send_message(
-                chat_id=self._chat_id, text=text, parse_mode=parse_mode
+                chat_id=self._chat_id,
+                text=text,
+                parse_mode=parse_mode,
+                attachments=attachments,
             )
         except Exception:
             if not fallback_plain:
                 raise
             logger.warning("MaxStreamer: HTML parse failed on send, sending plain text")
             sent = await self._client.send_message(
-                chat_id=self._chat_id, text=_strip_tags(text)
+                chat_id=self._chat_id,
+                text=_strip_tags(text),
+                attachments=attachments,
             )
         if (
             sent is not None
@@ -250,13 +316,19 @@ class MaxStreamer:
             self._last_sent_text = text
 
     async def _edit(
-        self, message_id: str, text: str, parse_mode, fallback_plain: bool
+        self,
+        message_id: str,
+        text: str,
+        parse_mode,
+        fallback_plain: bool,
+        attachments=None,
     ) -> None:
         try:
             await self._client.edit_message(
                 message_id=message_id,
                 text=text,
                 parse_mode=parse_mode,
+                attachments=attachments,
             )
             self._last_sent_text = text
         except Exception:
@@ -267,7 +339,9 @@ class MaxStreamer:
             )
             try:
                 await self._client.edit_message(
-                    message_id=message_id, text=_strip_tags(text)
+                    message_id=message_id,
+                    text=_strip_tags(text),
+                    attachments=attachments,
                 )
             except Exception as exc2:
                 logger.debug("MaxStreamer: plain fallback edit failed (%s)", exc2)

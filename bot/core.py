@@ -6,6 +6,7 @@ from typing import Awaitable, Callable, Optional
 from bot.formatting import format_for_channel
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
+from db.postgres.services.answer_feedback import AnswerFeedbackService
 from db.postgres.services.feedback_report import FeedbackReportService
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.settings import SettingsService
@@ -44,7 +45,10 @@ WELCOME_TEXT = (
     "Напишите свой вопрос или используйте команду /track, чтобы начать! 🚀"
 )
 
-FEEDBACK_FOOTER = "Я ответил неправильно?\nПоделитесь обратной связью командой /feedback"
+FEEDBACK_FOOTER = (
+    "Бот ответил неверно? Оцените ответ кнопкой ниже — будем благодарны. "
+    "Подробности можно отправить через /feedback."
+)
 
 SYSTEM_RATE_LIMIT_MESSAGE = (
     "Сегодняшний общий лимит запросов к боту исчерпан. Попробуйте завтра."
@@ -82,10 +86,12 @@ class BotReply:
         parse_mode: str | None = None,
         fallback_plain_on_format_error: bool = False,
         include_feedback_footer: bool = False,
+        feedback_id: str | None = None,
     ):
         self.text = self._with_feedback_footer(text) if include_feedback_footer else text
         self.parse_mode = parse_mode
         self.fallback_plain_on_format_error = fallback_plain_on_format_error
+        self.feedback_id = feedback_id
 
     @staticmethod
     def _with_feedback_footer(text: str) -> str:
@@ -143,6 +149,37 @@ class BotCore:
                 channel=channel,
                 comment=comment,
             )
+
+    async def rate_answer(
+        self, channel: str, external_user_id: str, feedback_id: str, rating: str
+    ) -> bool:
+        user_id = await self.resolve_internal_user_id(channel, external_user_id)
+        async with AsyncSessionLocal() as session:
+            return await AnswerFeedbackService(session).rate(feedback_id, user_id, rating)
+
+    async def _create_answer_feedback(
+        self,
+        user_id: int,
+        session_id: str,
+        channel: str,
+        question: str,
+        bot_response: str,
+    ) -> str | None:
+        try:
+            async with AsyncSessionLocal() as session:
+                candidate = await AnswerFeedbackService(session).create_candidate(
+                    user_id=user_id,
+                    session_id=session_id,
+                    channel=channel,
+                    question=question,
+                    bot_response=bot_response,
+                )
+            return candidate.id
+        except Exception:
+            logger.exception(
+                "Не удалось создать оценку ответа: session_id=%s", session_id
+            )
+            return None
 
     async def _check_rate_limit(self, user_id: int) -> RateLimitResult:
         day_start = datetime.now(UTC).replace(
@@ -400,9 +437,18 @@ class BotCore:
         if not text:
             return BotReply(text="Ответ не найден")
 
+        feedback_id = await self._create_answer_feedback(
+            user_id=internal_user_id,
+            session_id=dialog_session_id,
+            channel=channel,
+            question=user_text,
+            bot_response=answer.text,
+        )
+
         return BotReply(
             text=text,
             parse_mode="HTML" if channel == "telegram" else None,
             fallback_plain_on_format_error=(channel == "telegram"),
-            include_feedback_footer=True,
+            include_feedback_footer=feedback_id is not None,
+            feedback_id=feedback_id,
         )

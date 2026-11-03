@@ -168,6 +168,9 @@ async def test_normal_reply_has_feedback_footer(monkeypatch):
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
     monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
     monkeypatch.setattr(
+        core, "_create_answer_feedback", AsyncMock(return_value="feedback-1")
+    )
+    monkeypatch.setattr(
         core,
         "_check_rate_limit",
         AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
@@ -185,6 +188,7 @@ async def test_normal_reply_has_feedback_footer(monkeypatch):
     )
 
     assert reply.text.endswith(FEEDBACK_FOOTER)
+    assert reply.feedback_id == "feedback-1"
 
 
 @pytest.mark.asyncio
