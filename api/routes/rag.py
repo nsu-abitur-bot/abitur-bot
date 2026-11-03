@@ -6,10 +6,20 @@ from urllib.parse import unquote
 
 import httpx
 from bs4 import BeautifulSoup
-from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+)
 from fastapi.responses import Response
 from pydantic import HttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.datastructures import UploadFile as StarletteUploadFile
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import (
@@ -41,7 +51,12 @@ from api.services.document_update import (
     fetch_url_bytes,
     readable_fetch_error,
 )
-from api.services.rag_upload import RagUploadService
+from api.services.rag_upload import (
+    MAX_MULTIPART_OVERHEAD_BYTES,
+    MAX_UPLOAD_FILES,
+    RagUploadService,
+    max_document_size_bytes,
+)
 from api.services.url_to_rag import parse_and_save_url
 from db.postgres.db import get_async_session
 from db.postgres.services.document import (
@@ -65,19 +80,60 @@ def get_rag_upload_service() -> RagUploadService:
 
 
 @router.post(
-    "/upload", response_model=RagUploadResponse, summary="Загрузить документы в RAG"
+    "/upload",
+    response_model=RagUploadResponse,
+    summary="Загрузить документы в RAG",
+    openapi_extra={
+        "requestBody": {
+            "required": True,
+            "content": {
+                "multipart/form-data": {
+                    "schema": {
+                        "type": "object",
+                        "required": ["files"],
+                        "properties": {
+                            "files": {
+                                "type": "array",
+                                "items": {"type": "string", "format": "binary"},
+                            }
+                        },
+                    }
+                }
+            },
+        }
+    },
 )
 async def upload_documents_to_rag(
-    files: list[UploadFile] = File(..., description="Файлы для индексации в RAG"),
+    request: Request,
     service: RagUploadService = Depends(get_rag_upload_service),
 ) -> RagUploadResponse:
-    if not files:
-        raise HTTPException(status_code=400, detail="No files provided")
+    declared_size = request.headers.get("content-length")
+    if declared_size is not None:
+        try:
+            if int(declared_size) > (
+                MAX_UPLOAD_FILES * max_document_size_bytes()
+                + MAX_MULTIPART_OVERHEAD_BYTES
+            ):
+                raise HTTPException(status_code=413, detail="Upload request is too large")
+        except ValueError:
+            raise HTTPException(
+                status_code=400, detail="Invalid Content-Length"
+            ) from None
 
-    try:
-        results = await service.ingest_files(files=files, graph_id=DEFAULT_GRAPH_ID)
-    except Exception:
-        raise HTTPException(status_code=503, detail="RAG ingestion unavailable")
+    async with request.form(max_files=MAX_UPLOAD_FILES, max_fields=0) as form:
+        items = form.getlist("files")
+        if not items:
+            raise HTTPException(status_code=400, detail="No files provided")
+        files = [item for item in items if isinstance(item, StarletteUploadFile)]
+        if len(files) != len(items):
+            raise HTTPException(status_code=400, detail="Invalid files")
+
+        try:
+            results = await service.ingest_files(files=files, graph_id=DEFAULT_GRAPH_ID)
+        except Exception:
+            raise HTTPException(
+                status_code=503, detail="RAG ingestion unavailable"
+            ) from None
 
     queued_count = sum(1 for result in results if result.status == "queued")
     skipped_count = len(results) - queued_count

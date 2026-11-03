@@ -44,7 +44,7 @@ def _request_gate(identity: str) -> _RequestGate:
 
 
 @contextmanager
-def _request_slot(identity: str) -> Generator[None]:
+def _request_slot(identity: str) -> Generator[None, None, None]:
     # One personal account has one stream, shared by API/bot and all demo instances.
     deadline = time.monotonic() + 120
     gate = _request_gate(identity)
