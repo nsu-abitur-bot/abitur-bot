@@ -1,7 +1,9 @@
 from typing import Optional, Sequence
 
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from uuid6 import uuid7
 
 from db.postgres.models import Document, timestamp
 
@@ -13,6 +15,22 @@ DOCUMENT_STATUS_NO_SOURCE = "нет ссылки"
 DOCUMENT_STATUS_INDEXING_FAILED = "ошибка индексации"
 DOCUMENT_STATUS_DELETED = "удалён"
 DOCUMENT_STATUS_UPDATED = "обновлён"
+SOURCE_URL_UNIQUE_INDEX = "ix_document_graph_source_url_active"
+
+
+class DocumentSourceUrlConflict(ValueError):
+    """The URL already belongs to another active document in this graph."""
+
+
+def _is_source_url_unique_violation(exc: IntegrityError) -> bool:
+    cause = getattr(exc.orig, "__cause__", None)
+    diagnostic = getattr(exc.orig, "diag", None)
+    return SOURCE_URL_UNIQUE_INDEX in {
+        getattr(exc.orig, "constraint_name", None),
+        getattr(cause, "constraint_name", None),
+        getattr(diagnostic, "constraint_name", None),
+    }
+
 
 CHECK_TO_DOCUMENT_STATUS = {
     DOCUMENT_STATUS_UNCHANGED: DOCUMENT_STATUS_INDEXED,
@@ -76,10 +94,15 @@ class DocumentService:
     async def get_by_source_url(
         self, graph_id: str, source_url: str
     ) -> Optional[Document]:
-        stmt = select(Document).where(
-            Document.graph_id == graph_id,
-            Document.source_url == source_url,
-            Document.status.not_in({"deleted", DOCUMENT_STATUS_DELETED}),
+        stmt = (
+            select(Document)
+            .where(
+                Document.graph_id == graph_id,
+                Document.source_url == source_url,
+                Document.status.not_in({"deleted", DOCUMENT_STATUS_DELETED}),
+            )
+            .order_by(Document.updated_at.desc(), Document.id.desc())
+            .limit(1)
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
@@ -120,23 +143,34 @@ class DocumentService:
         if document is None and rag_doc_id:
             document = await self.get_by_rag_doc_id(graph_id, rag_doc_id)
 
+        created = False
         if document is None:
+            document_id = str(uuid7())
             document = Document(
+                id=document_id,
                 title=title,
                 source_url=source_url,
                 graph_id=graph_id,
-                rag_doc_id=rag_doc_id or "",
+                rag_doc_id=rag_doc_id or document_id,
                 source_proposal_id=source_proposal_id,
                 content_hash=content_hash,
                 content_length=content_length,
                 status="pending" if source_proposal_id else DOCUMENT_STATUS_INDEXED,
                 last_indexed_at=None if source_proposal_id else timestamp(),
             )
-            self.session.add(document)
-            await self.session.flush()
-            if not document.rag_doc_id:
-                document.rag_doc_id = document.id
-        else:
+            try:
+                async with self.session.begin_nested():
+                    self.session.add(document)
+                    await self.session.flush()
+                created = True
+            except IntegrityError as exc:
+                if not source_url or not _is_source_url_unique_violation(exc):
+                    raise
+                document = await self.get_by_source_url(graph_id, source_url)
+                if document is None:
+                    raise
+
+        if not created:
             document.title = title
             if source_url is not None:
                 document.source_url = source_url
@@ -212,6 +246,10 @@ class DocumentService:
             return None
 
         source_url_changed = source_url is not None and source_url != document.source_url
+        if source_url_changed and source_url:
+            existing = await self.get_by_source_url(document.graph_id, source_url)
+            if existing is not None and existing.id != document.id:
+                raise DocumentSourceUrlConflict(source_url)
         if title is not None:
             document.title = title
         if source_url is not None:
@@ -223,7 +261,13 @@ class DocumentService:
             document.last_checked_hash = None
             document.last_check_message = "Ссылка на источник изменена"
 
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError as exc:
+            await self.session.rollback()
+            if _is_source_url_unique_violation(exc):
+                raise DocumentSourceUrlConflict(source_url or "") from exc
+            raise
         await self.session.refresh(document)
         return document
 

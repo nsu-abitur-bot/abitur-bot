@@ -14,6 +14,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -412,6 +413,15 @@ class Document(Base):
         UniqueConstraint("graph_id", "rag_doc_id", name="uq_document_graph_rag_doc_id"),
         Index("ix_document_graph_id", "graph_id"),
         Index("ix_document_source_url", "source_url"),
+        Index(
+            "ix_document_graph_source_url_active",
+            "graph_id",
+            "source_url",
+            unique=True,
+            postgresql_where=text(
+                "source_url IS NOT NULL AND status NOT IN ('deleted', 'удалён')"
+            ),
+        ),
         Index("ix_document_content_hash", "content_hash"),
         Index("ix_document_status", "status"),
         Index("ix_document_source_proposal_id", "source_proposal_id", unique=True),
