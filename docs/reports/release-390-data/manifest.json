@@ -4,11 +4,11 @@
   "platform": "Windows-11-10.0.26300-SP0",
   "python": "3.13.2",
   "files": {
-    "functional.json": "3a8b9d3def8a0de327ba4b456f92d05b92014a0a59e9ccb2c47892a30114b546",
-    "local-tests.json": "213304a6ea6a50652c55cbeb2ce01e01b6e3c94fed72235b10043d16f3ba6cc6",
-    "offline-c1.json": "5c23812a8b1ccb81f6c5bd83059503eda1fbcfc2135816719c5eeaaf1c4a5499",
-    "offline-c4.json": "320be76a623e2ecc04e094b930e4d10fb66373826c2fc150bc62d88fc2603962",
-    "restore.json": "d4ee2f7a6b767ede3b8e845c99e7650f014441747d2cb3cd9e72a7f18fe3be5f"
+    "functional.json": "51018c6b7a5ace08579965787dfad53edfe0724c0b52473fd587a47ff538bbcd",
+    "local-tests.json": "caf30620af84b51c0b51d4b20d5d1bca95b1240833cc117db4271925020ebdd3",
+    "offline-c1.json": "88bc965147a019dae1e94dd734bfeb080d0217d44a8fb519198e89fee7a12c3d",
+    "offline-c4.json": "f10936427ced07830fbdd7c98fe1522aa0c3a0bdab79c1208537306400828c53",
+    "restore.json": "6fbcee209497eda912834a0368233230e9c7565c32ce13316d0e8585151a187f"
   },
   "provider_configuration": "not inspected at runtime; no live model calls",
   "quality_dataset": "#388 not consumed; confirmation pending",
@@ -18,5 +18,6 @@
     "tools/release_restore_probe.py": "01cd398f201cc5c44bc2e2281d8d94993ac9f6016d54569b3474e4574199668f",
     "tests/postgres/test_release_readiness.py": "4a2927177f7f97424bef7071a9b529845876d5a454dde46b1bc4a080e8c947da"
   },
-  "annotation": "Percentile labels clarified after execution; observations and computed numbers unchanged"
+  "annotation": "Percentile labels clarified after execution; observations and computed numbers unchanged",
+  "hash_basis": "UTF-8 text with LF line endings (Git canonical form)"
 }
