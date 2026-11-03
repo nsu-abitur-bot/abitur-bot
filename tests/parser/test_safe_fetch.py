@@ -178,7 +178,7 @@ async def test_all_download_entrypoints_reject_private_url():
     result = await upload_csv_documents(
         UploadFile(filename="sources.csv", file=io.BytesIO(b"Link\nhttp://127.0.0.1/\n"))
     )
-    assert result.imported_count == 0
+    assert result.queued_count == 0
 
 
 @pytest.mark.parametrize(

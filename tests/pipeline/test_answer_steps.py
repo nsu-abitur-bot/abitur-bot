@@ -147,7 +147,10 @@ class TestRunToolLoop:
         await _run_tool_loop([], "session-1")
 
         assert provider.tools_seen is not None
-        assert [t.name for t in provider.tools_seen] == ["get_admission_scores"]
+        assert [t.name for t in provider.tools_seen] == [
+            "get_admission_scores",
+            "propose_content",
+        ]
 
     @pytest.mark.asyncio
     async def test_streaming_reports_accumulated_text(self, monkeypatch):

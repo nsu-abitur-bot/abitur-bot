@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Предложения материалов</title>
+  <style>
+    :root { font-family: system-ui, sans-serif; color: #17212b; background: #f5f7fa; }
+    body { max-width: 960px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { font-size: 1.8rem; }
+    form, article { background: white; border: 1px solid #dce2e9; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    label { display: block; margin: .5rem 0; }
+    input { width: min(100%, 24rem); padding: .5rem; box-sizing: border-box; }
+    button { padding: .55rem .8rem; margin: .2rem .4rem .2rem 0; cursor: pointer; }
+    .accept { background: #17653d; color: white; border: 0; border-radius: 4px; }
+    .reject { background: #8d2525; color: white; border: 0; border-radius: 4px; }
+    .meta { color: #526274; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 20rem; overflow: auto; }
+    #error { color: #9b1c1c; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <h1>Предложения материалов</h1>
+  <p>Материалы модели и парсеров ожидают проверки перед добавлением в базу знаний.</p>
+  <form id="login">
+    <label>Имя пользователя <input name="username" autocomplete="username" required></label>
+    <label>Пароль <input name="password" type="password" autocomplete="current-password" required></label>
+    <button type="submit">Войти</button>
+  </form>
+  <section id="queue" hidden>
+    <button id="refresh" type="button">Обновить список</button>
+    <button id="logout" type="button">Выйти</button>
+    <div id="items"></div>
+  </section>
+  <p id="error" role="alert"></p>
+  <script>
+    let token = "";
+    const login = document.getElementById("login");
+    const queue = document.getElementById("queue");
+    const items = document.getElementById("items");
+    const error = document.getElementById("error");
+    async function request(path, options = {}) {
+      const response = await fetch(`/api/v1${path}`, {
+        ...options,
+        headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) }
+      });
+      if (!response.ok) throw new Error(response.status === 401 ? "Нужно войти снова" : `Ошибка ${response.status}`);
+      return response.json();
+    }
+    async function refresh() {
+      error.textContent = "";
+      try {
+        const proposals = await request("/content-proposals");
+        items.replaceChildren();
+        if (!proposals.length) { items.textContent = "Новых предложений нет."; return; }
+        for (const proposal of proposals) {
+          const card = document.createElement("article");
+          const title = document.createElement("h2");
+          title.textContent = proposal.title;
+          const meta = document.createElement("p");
+          meta.className = "meta";
+          meta.textContent = `${proposal.source === "model" ? "Модель" : "Парсер"} · ${new Date(proposal.created_at + "Z").toLocaleString("ru-RU")}`;
+          const source = document.createElement("p");
+          source.textContent = proposal.source_url || "Источник не указан";
+          const content = document.createElement("pre");
+          content.textContent = proposal.text;
+          card.append(title, meta, source, content);
+          for (const [action, label, className] of [["approve", "Принять", "accept"], ["reject", "Отклонить", "reject"]]) {
+            const button = document.createElement("button");
+            button.textContent = label;
+            button.className = className;
+            button.onclick = async () => {
+              button.disabled = true;
+              try { await request(`/content-proposals/${proposal.id}/${action}`, { method: "POST" }); await refresh(); }
+              catch (exc) { error.textContent = exc.message; button.disabled = false; }
+            };
+            card.append(button);
+          }
+          items.append(card);
+        }
+      } catch (exc) { error.textContent = exc.message; }
+    }
+    login.onsubmit = async event => {
+      event.preventDefault();
+      error.textContent = "";
+      try {
+        const form = new FormData(login);
+        const result = await request("/auth/login", {
+          method: "POST",
+          body: JSON.stringify({ username: form.get("username"), password: form.get("password") })
+        });
+        token = result.access_token;
+        const me = await request("/auth/me");
+        if (me.role === "viewer") throw new Error("Для проверки предложений нужна роль редактора");
+        login.reset();
+        login.hidden = true;
+        queue.hidden = false;
+        await refresh();
+      } catch (exc) { token = ""; error.textContent = exc.message; }
+    };
+    document.getElementById("refresh").onclick = refresh;
+    document.getElementById("logout").onclick = () => {
+      token = "";
+      items.replaceChildren();
+      queue.hidden = true;
+      login.hidden = false;
+    };
+  </script>
+</body>
+</html>

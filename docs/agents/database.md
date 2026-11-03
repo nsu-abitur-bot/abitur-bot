@@ -15,6 +15,7 @@
 | `FaqEntry` / `Abbreviation` | `faq_entry` / `abbreviation` | FAQ и аббревиатуры (грузятся в память при старте) |
 | `Topic` | `topic` | Темы для аналитической intent-классификации |
 | `Document` | `document` | Метаданные документов в RAG |
+| `ContentProposal` | `content_proposal` | Очередь материалов модели и парсеров до проверки редактором |
 | `Faculty` / `Program` | `faculty` / `program` | Справочник факультетов и направлений (для CRAG) |
 | `AdmissionScore` | `admission_score` | Проходные баллы прошлых лет (program × year × form) |
 | `Settings` | `settings` | Настройки приложения, CRAG и зашифрованный снимок подключений `instance_settings_v1` |

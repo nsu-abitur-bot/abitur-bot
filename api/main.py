@@ -3,10 +3,12 @@ import os
 import re
 from contextlib import asynccontextmanager
 from datetime import date, datetime
+from pathlib import Path
 from typing import List, Optional
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,6 +18,7 @@ from api.auth.router import router as auth_router
 from api.routes.abbrev import router as abbrev_router
 from api.routes.admission_score import router as admission_score_router
 from api.routes.branding import router as branding_router
+from api.routes.content_proposal import router as content_proposal_router
 from api.routes.evals import router as evals_router
 from api.routes.faculty import router as faculty_router
 from api.routes.faq import router as faq_router
@@ -97,6 +100,12 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Abitur API", lifespan=lifespan)
 
+
+@app.get("/review/proposals", include_in_schema=False)
+async def proposal_review_page() -> FileResponse:
+    return FileResponse(Path(__file__).parent / "static" / "proposals.html")
+
+
 cors_origins_env = os.getenv("CORS_ALLOW_ORIGINS", "*")
 cors_origins = [
     origin.strip() for origin in cors_origins_env.split(",") if origin.strip()
@@ -135,6 +144,11 @@ app.include_router(
 )
 app.include_router(
     admission_score_router,
+    prefix="/api/v1",
+    dependencies=[Depends(require_admin)],
+)
+app.include_router(
+    content_proposal_router,
     prefix="/api/v1",
     dependencies=[Depends(require_admin)],
 )
