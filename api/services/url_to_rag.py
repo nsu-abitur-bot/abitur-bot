@@ -3,6 +3,7 @@
 import logging
 
 from abbrev.expander import get_abbrev_expander
+from api.services.document_update import calculate_content_hash, fetch_url_bytes
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.content_proposal import ContentProposalService
 from parser.url import process_url
@@ -28,12 +29,14 @@ async def parse_and_save_url(url: str, title: str) -> bool:
     source_id = title if title else url
 
     try:
+        source_hash = calculate_content_hash(await fetch_url_bytes(url))
         async with AsyncSessionLocal() as session:
             await ContentProposalService(session).create(
                 source="parser",
                 graph_id=DEFAULT_GRAPH_ID,
                 title=source_id,
                 source_url=url,
+                source_hash=source_hash,
                 text=prepared_text,
             )
         logger.info("Документ %s ожидает проверки редактором", url)

@@ -38,7 +38,7 @@ async def test_engine() -> AsyncGenerator[AsyncEngine, None]:
         TEST_DATABASE_URL,
         echo=False,
         pool_size=1,
-        max_overflow=0,
+        max_overflow=1,
         pool_pre_ping=True,
     )
 

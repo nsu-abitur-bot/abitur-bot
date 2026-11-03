@@ -84,6 +84,7 @@ async def index_document(
     session: Optional[AsyncSession] = None,
     document_service: Optional[DocumentService] = None,
     wait_timeout: Optional[float] = None,
+    source_proposal_id: Optional[str] = None,
 ) -> Optional[Document]:
     """Индексирует документ в RAG с безопасной заменой версии (add → switch → delete).
 
@@ -114,6 +115,7 @@ async def index_document(
                     graph_id=graph_id,
                     session=auto_session,
                     wait_timeout=wait_timeout,
+                    source_proposal_id=source_proposal_id,
                 )
 
     resolved_title = (
@@ -192,6 +194,7 @@ async def index_document(
         title=resolved_title,
         source_url=resolved_source_url,
         rag_doc_id=new_rag_doc_id,
+        source_proposal_id=source_proposal_id,
     )
 
     # 4. DELETE: удаляем старую версию документа из RAG, сохраняя общие чанки

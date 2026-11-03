@@ -370,6 +370,7 @@ class Document(Base):
     source_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
     graph_id: Mapped[str] = mapped_column(String(100), nullable=False)
     rag_doc_id: Mapped[str] = mapped_column(String(500), nullable=False)
+    source_proposal_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     content_length: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     status: Mapped[str] = mapped_column(
@@ -390,6 +391,7 @@ class Document(Base):
         Index("ix_document_source_url", "source_url"),
         Index("ix_document_content_hash", "content_hash"),
         Index("ix_document_status", "status"),
+        Index("ix_document_source_proposal_id", "source_proposal_id", unique=True),
     )
 
     def __repr__(self) -> str:
@@ -409,6 +411,7 @@ class ContentProposal(Base):
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     text: Mapped[str] = mapped_column(Text, nullable=False)
     source_url: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True)
+    source_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
     reviewer_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
     document_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)

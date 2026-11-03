@@ -1,3 +1,5 @@
+import hashlib
+
 import pytest
 
 from abbrev.expander import AbbrevExpander
@@ -31,6 +33,11 @@ async def test_parse_and_save_url_queues_expanded_text(monkeypatch):
             saved.update(kwargs)
 
     monkeypatch.setattr(url_to_rag, "process_url", fake_process_url)
+
+    async def fake_fetch_url_bytes(url: str) -> bytes:
+        return b"<html>original source</html>"
+
+    monkeypatch.setattr(url_to_rag, "fetch_url_bytes", fake_fetch_url_bytes)
     monkeypatch.setattr(url_to_rag, "AsyncSessionLocal", lambda: FakeSessionContext())
     monkeypatch.setattr(url_to_rag, "ContentProposalService", FakeProposalService)
 
@@ -40,6 +47,7 @@ async def test_parse_and_save_url_queues_expanded_text(monkeypatch):
         "graph_id": "abitur_kb",
         "title": "Документ",
         "source_url": "https://example.test/doc",
+        "source_hash": hashlib.sha256(b"<html>original source</html>").hexdigest(),
         "text": "Документы принимает НГУ (Новосибирский государственный университет).",
     }
 
