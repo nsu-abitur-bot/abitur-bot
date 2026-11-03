@@ -1,6 +1,7 @@
-from typing import Optional
+from datetime import datetime
+from typing import Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class FaqItem(BaseModel):
@@ -11,6 +12,25 @@ class FaqItem(BaseModel):
         description="Альтернативные формулировки (синонимы) вопроса",
     )
     answer: str = Field(..., description="Текст ответа")
+    verification_status: Literal["draft", "confirmed"] = Field(
+        "draft", description="Черновик или подтверждено человеком"
+    )
+    source_document: str | None = Field(None, description="Документ-источник")
+    source_location: str | None = Field(None, description="Место в документе")
+    confirmed_by: str | None = Field(None, description="Имя подтвердившего")
+    confirmed_at: datetime | None = Field(None, description="Дата подтверждения")
+
+    @model_validator(mode="after")
+    def validate_confirmation(self) -> "FaqItem":
+        if self.verification_status == "confirmed" and (
+            self.confirmed_at is None
+            or not (self.confirmed_by or (self.source_document and self.source_location))
+        ):
+            raise ValueError(
+                "Для подтверждения укажите дату и имя проверившего "
+                "либо документ и место в нём"
+            )
+        return self
 
 
 class FaqListResponse(BaseModel):
