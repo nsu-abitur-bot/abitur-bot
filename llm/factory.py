@@ -91,6 +91,9 @@ def get_faq_provider() -> BaseLLMProvider:
                 "OPENAI_SOCKS5_PROXY",
                 "GEMINI_API_KEY",
                 "GEMINI_BASE_URL",
+                "GIGACHAT_API_KEY",
+                "GIGACHAT_SCOPE",
+                "GIGACHAT_EMBEDDING_MODEL",
             )
         ),
     )
@@ -99,9 +102,15 @@ def get_faq_provider() -> BaseLLMProvider:
             from llm.providers.openai import OpenAIProvider
 
             _faq_provider = OpenAIProvider()
-        else:
+        elif name == "gigachat":
+            from llm.providers.gigachat import GigaChatProvider
+
+            _faq_provider = GigaChatProvider()
+        elif name == "gemini":
             from llm.providers.gemini import GeminiProvider
 
             _faq_provider = GeminiProvider()
+        else:
+            raise ValueError("Неизвестный провайдер эмбеддингов FAQ")
         _faq_signature = signature
     return _faq_provider

@@ -116,6 +116,7 @@ async def guard_embeddings(
         "GEMINI_EMBEDDING_MODEL",
         "OPENAI_GRAPH_EMBEDDING_MODEL",
         "GEMINI_GRAPH_EMBEDDING_MODEL",
+        "GIGACHAT_EMBEDDING_MODEL",
         "OPENAI_BASE_URL",
         "GEMINI_BASE_URL",
     }
@@ -165,6 +166,18 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
                 finally:
                     await bot_max.close_session()
             provider, purpose = target.split(":", 1)
+            if provider == "gigachat":
+                if purpose not in {"embedding", "graph_embedding"}:
+                    raise ConfigurationError("GigaChat доступен только для эмбеддингов")
+                from llm.providers.gigachat import GigaChatEmbedding
+
+                adapter = GigaChatEmbedding(
+                    auth_key=values["GIGACHAT_API_KEY"],
+                    model=values["GIGACHAT_EMBEDDING_MODEL"],
+                    scope=values["GIGACHAT_SCOPE"],
+                )
+                await adapter(["Проверка подключения"])
+                return "Подключение и доступ к модели проверены"
             prefix = provider.upper()
             model_key = {
                 "chat": "MODEL",
@@ -263,7 +276,7 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
 
 def required_checks(changes: dict[str, str | None], values: dict[str, str]) -> set[str]:
     targets = set()
-    for provider in ("openai", "gemini", "deepseek"):
+    for provider in ("openai", "gemini", "deepseek", "gigachat"):
         prefix = provider.upper() + "_"
         changed = any(k.startswith(prefix) for k in changes)
         active = (

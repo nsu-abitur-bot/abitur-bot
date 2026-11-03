@@ -13,6 +13,7 @@ import asyncio
 import logging
 import os
 import re
+import tempfile
 from pathlib import Path
 from typing import Callable, Optional, Protocol
 
@@ -20,6 +21,7 @@ import numpy as np
 import yaml
 from sqlalchemy import select
 
+from config.instance import get_setting
 from config.latency import stage
 from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
@@ -179,6 +181,7 @@ class FAQMatcher:
         faq_path: Optional[Path] = None,
         threshold: Optional[float] = None,
         embedder: Optional["EmbeddingClient"] = None,
+        cache_path: Optional[Path] = None,
     ):
         # None → env-дефолт; явное значение передают тесты и вызовы,
         # которым нужен детерминированный порог.
@@ -186,12 +189,19 @@ class FAQMatcher:
             default_similarity_threshold() if threshold is None else threshold
         )
         self._faq_path = faq_path or FAQ_DATA_PATH
+        self._cache_path = cache_path or Path(
+            os.getenv(
+                "FAQ_EMBEDDINGS_CACHE_PATH",
+                str(self._faq_path.with_name("faq_cache.pkl")),
+            )
+        )
         self._refresh_lock = asyncio.Lock()
         self._items_signature: Optional[tuple[tuple[str, tuple[str, ...], str], ...]] = (
             None
         )
 
         self._embedder = embedder or _LiveEmbeddingClient(self._create_embedder)
+        self._model_signature: tuple = ()
 
         # Загружаем FAQ
         self._index: tuple[list[str], list[str], Optional[np.ndarray]] = ([], [], None)
@@ -244,6 +254,17 @@ class FAQMatcher:
     def _process_items(self, faq_items: list[dict]) -> None:
         """Строит in-memory индекс из списка FAQ-элементов."""
         self._index = self._build_index(faq_items)
+        self._model_signature = self._embedding_configuration()
+
+    @staticmethod
+    def _embedding_configuration() -> tuple:
+        provider = get_setting("FAQ_EMBEDDING_PROVIDER", "gemini")
+        prefix = provider.upper()
+        return (
+            provider,
+            get_setting(prefix + "_EMBEDDING_MODEL"),
+            get_setting(prefix + "_BASE_URL"),
+        )
 
     def _build_index(
         self, faq_items: list[dict]
@@ -278,12 +299,18 @@ class FAQMatcher:
 
         import pickle
 
-        cache_path = self._faq_path.with_name("faq_cache.pkl")
+        cache_path = self._cache_path
+        model_signature = self._embedding_configuration()
         cache = {}
         if cache_path.exists():
             try:
                 with open(cache_path, "rb") as f:
-                    cache = pickle.load(f)
+                    stored = pickle.load(f)
+                    if (
+                        isinstance(stored, dict)
+                        and stored.get("model") == model_signature
+                    ):
+                        cache = stored.get("vectors", {})
             except Exception as e:
                 logger.warning(f"Failed to load FAQ embeddings cache: {e}")
 
@@ -298,12 +325,20 @@ class FAQMatcher:
                 logger.error(f"FAQ: Failed to embed new phrases: {e}")
                 raise
 
+            if len(new_embeddings) != len(to_embed_phrases):
+                raise RuntimeError("FAQ: получен неполный набор эмбеддингов")
+            if model_signature != self._embedding_configuration():
+                raise RuntimeError("FAQ: модель изменилась во время пересчёта")
             for phrase, emb in zip(to_embed_phrases, new_embeddings):
                 cache[phrase] = emb
 
             try:
-                with open(cache_path, "wb") as f:
-                    pickle.dump(cache, f)
+                with tempfile.NamedTemporaryFile(
+                    dir=cache_path.parent, delete=False
+                ) as f:
+                    pickle.dump({"model": model_signature, "vectors": cache}, f)
+                    temporary_path = Path(f.name)
+                os.replace(temporary_path, cache_path)
             except Exception as e:
                 logger.warning(f"Failed to save FAQ embeddings cache: {e}")
 
@@ -348,12 +383,16 @@ class FAQMatcher:
                     {"question": e.question, "aliases": e.aliases, "answer": e.answer}
                     for e in entries
                 ]
-            if self._items_fingerprint(items) != self._items_signature:
+            if (
+                self._items_fingerprint(items) != self._items_signature
+                or self._model_signature != self._embedding_configuration()
+            ):
                 # Отмена ожидания не останавливает поток. Публикует только
                 # владелец async-lock после успешного завершения построения.
                 index = await asyncio.to_thread(self._build_index, items)
                 self._index = index
                 self._items_signature = self._items_fingerprint(items)
+                self._model_signature = self._embedding_configuration()
 
     def _match(self, user_question: str) -> Optional[str]:
         """Единая реализация сопоставления (см. match / match_async)."""

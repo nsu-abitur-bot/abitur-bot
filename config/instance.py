@@ -99,6 +99,21 @@ for provider in ("OPENAI", "GEMINI"):
         )
 define("DEEPSEEK_API_KEY", "API-ключ", "DeepSeek", secret=True)
 define("DEEPSEEK_BASE_URL", "Адрес API (пусто — официальный)", "DeepSeek", kind="url")
+define("GIGACHAT_API_KEY", "Ключ авторизации", "GigaChat", secret=True)
+define(
+    "GIGACHAT_SCOPE",
+    "Тип доступа",
+    "GigaChat",
+    "GIGACHAT_API_PERS",
+    choices=("GIGACHAT_API_PERS", "GIGACHAT_API_B2B", "GIGACHAT_API_CORP"),
+)
+define(
+    "GIGACHAT_EMBEDDING_MODEL",
+    "Модель эмбеддингов",
+    "GigaChat",
+    "EmbeddingsGigaR",
+    choices=("Embeddings", "Embeddings-2", "EmbeddingsGigaR"),
+)
 for suffix, label, default, kind in (
     ("MODEL", "Ответы и обработка текста", "deepseek-flash", "text"),
     ("GRAPH_MODEL", "Построение графа", "deepseek-flash", "text"),
@@ -123,6 +138,8 @@ for name, label, default in (
         default,
         choices=("openai", "gemini", "deepseek")
         if name in {"LLM_PROVIDER", "LIGHTRAG_LLM_PROVIDER"}
+        else ("openai", "gemini", "gigachat")
+        if name in {"FAQ_EMBEDDING_PROVIDER", "LIGHTRAG_EMBEDDING_PROVIDER"}
         else ("openai", "gemini"),
     )
 for name, label, group in (

@@ -11,8 +11,8 @@
 |-----------|-----------|---------|
 | `LLM_PROVIDER` | Ответы бота | `openai`, `gemini`, `deepseek` |
 | `LIGHTRAG_LLM_PROVIDER` | LightRAG граф (независимо от бота) | `openai`, `gemini`, `deepseek` |
-| `FAQ_EMBEDDING_PROVIDER` | Эмбеддинги FAQ | `openai`, `gemini` |
-| `LIGHTRAG_EMBEDDING_PROVIDER` | Эмбеддинги графа | `openai`, `gemini` |
+| `FAQ_EMBEDDING_PROVIDER` | Эмбеддинги FAQ | `openai`, `gemini`, `gigachat` |
+| `LIGHTRAG_EMBEDDING_PROVIDER` | Эмбеддинги графа | `openai`, `gemini`, `gigachat` |
 | `PDF_PARSER_PROVIDER` | Парсинг PDF (vision) | `openai`, `gemini` |
 
 Новый провайдер: `providers/<name>.py` плюс
@@ -24,6 +24,11 @@
 Потребители читают `config.instance.get_setting`, снимок БД обновляется
 в каждом процессе. Порядок перехода с env и хранение секретов —
 [настройки экземпляра](../instance-settings.md).
+
+GigaChat подключён только для эмбеддингов. Один GIGACHAT_EMBEDDING_MODEL
+используется для FAQ и LightRAG. Настройки OAuth, TLS и пересчёт наполненного
+индекса описаны в [инструкции](../gigachat.md). Для перехода нужны новый индекс
+и пересчёт единого кеша FAQ; простая смена селектора блокируется.
 
 ## Профили параметров
 
