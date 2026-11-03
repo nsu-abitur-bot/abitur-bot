@@ -1,15 +1,19 @@
 """GigaChat embeddings with scoped TLS trust and renewable OAuth credentials."""
 
 import asyncio
+import hashlib
 import math
+import os
 import ssl
 import threading
 import time
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
+from typing import Any, Generator
 from uuid import uuid4
+from weakref import WeakValueDictionary
 
 import httpx
 
@@ -19,6 +23,64 @@ from llm.base import BaseLLMProvider, LLMResult
 MODEL_DIMENSIONS = {"Embeddings": 1024, "Embeddings-2": 1024, "EmbeddingsGigaR": 2560}
 OAUTH_URL = "https://ngw.devices.sberbank.ru:9443/api/v2/oauth"
 EMBEDDINGS_URL = "https://api.giga.chat/v1/embeddings"
+
+
+@dataclass
+class _RequestGate:
+    lock: threading.Lock = field(default_factory=threading.Lock)
+
+
+_gates: WeakValueDictionary[str, _RequestGate] = WeakValueDictionary()
+_gates_guard = threading.Lock()
+
+
+def _request_gate(identity: str) -> _RequestGate:
+    with _gates_guard:
+        gate = _gates.get(identity)
+        if gate is None:
+            gate = _RequestGate()
+            _gates[identity] = gate
+        return gate
+
+
+@contextmanager
+def _request_slot(identity: str) -> Generator[None]:
+    # One personal account has one stream, shared by API/bot and all demo instances.
+    deadline = time.monotonic() + 120
+    gate = _request_gate(identity)
+    if not gate.lock.acquire(timeout=120):
+        raise GigaChatError("Истекло ожидание очереди эмбеддингов GigaChat")
+    try:
+        directory = os.getenv("GIGACHAT_LOCK_DIRECTORY")
+        if not directory:
+            yield
+            return
+        if os.name != "posix":
+            raise GigaChatError("Общий каталог очереди GigaChat требует POSIX")
+        import fcntl
+
+        root = Path(directory)
+        root.mkdir(mode=0o700, parents=True, exist_ok=True)
+        descriptor = os.open(
+            root / (identity + ".lock"), os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600
+        )
+        with os.fdopen(descriptor, "w") as lock:
+            while True:
+                try:
+                    fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    break
+                except BlockingIOError:
+                    if time.monotonic() >= deadline:
+                        raise GigaChatError(
+                            "Истекло ожидание общей очереди эмбеддингов GigaChat"
+                        ) from None
+                    time.sleep(0.05)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
+    finally:
+        gate.lock.release()
 
 
 class GigaChatError(RuntimeError):
@@ -78,6 +140,9 @@ class GigaChatEmbedding:
         self.embedding_dim = MODEL_DIMENSIONS[self.model]
         self._transport = transport
         self._token = _Token() if transport else _token_state(self._key, self._scope)
+        self._identity = hashlib.sha256(
+            (self._key + "\0" + self._scope).encode()
+        ).hexdigest()
 
     def _access_token(self, client: httpx.Client) -> str:
         with self._token.lock:
@@ -107,7 +172,44 @@ class GigaChatEmbedding:
     @staticmethod
     def _check_status(response: httpx.Response) -> None:
         if not response.is_success:
-            raise GigaChatError("Запрос к GigaChat не выполнен", response.status_code)
+            raise GigaChatError(
+                f"Запрос к GigaChat не выполнен (HTTP {response.status_code})",
+                response.status_code,
+            )
+
+    def _embed_batch(self, client: httpx.Client, batch: list[str]) -> list[list[float]]:
+        with _request_slot(self._identity):
+            refreshed = False
+            transient_retries = 0
+            while True:
+                token = self._access_token(client)
+                response = client.post(
+                    EMBEDDINGS_URL,
+                    headers={"Authorization": "Bearer " + token},
+                    json={"model": self.model, "input": batch},
+                )
+                if response.status_code == 401 and not refreshed:
+                    with self._token.lock:
+                        if self._token.value == token:
+                            self._token.value = ""
+                    refreshed = True
+                    continue
+                if (
+                    response.status_code in {429, 500, 502, 503, 504}
+                    and transient_retries < 3
+                ):
+                    try:
+                        delay = float(response.headers.get("Retry-After", ""))
+                        if not math.isfinite(delay) or delay < 0:
+                            raise ValueError
+                    except ValueError:
+                        delay = float(2**transient_retries)
+                    transient_retries += 1
+                    # Keep the shared slot during cooldown, avoiding another burst.
+                    time.sleep(min(delay, 10))
+                    continue
+                self._check_status(response)
+                return self._vectors(response.json(), len(batch))
 
     def _vectors(self, data: Any, count: int) -> list[list[float]]:
         rows = data.get("data") if isinstance(data, dict) else None
@@ -147,20 +249,7 @@ class GigaChatEmbedding:
                 result: list[list[float]] = []
                 for start in range(0, len(texts), 16):
                     batch = texts[start : start + 16]
-                    for attempt in range(2):
-                        token = self._access_token(client)
-                        response = client.post(
-                            EMBEDDINGS_URL,
-                            headers={"Authorization": "Bearer " + token},
-                            json={"model": self.model, "input": batch},
-                        )
-                        if response.status_code != 401 or attempt:
-                            break
-                        with self._token.lock:
-                            if self._token.value == token:
-                                self._token.value = ""
-                    self._check_status(response)
-                    result.extend(self._vectors(response.json(), len(batch)))
+                    result.extend(self._embed_batch(client, batch))
                 return result
         except GigaChatError:
             raise
