@@ -1,6 +1,7 @@
 from typing import Sequence
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas.faculty import (
@@ -66,11 +67,17 @@ async def create_faculty(
     data: FacultyCreate,
     service: FacultyService = Depends(get_faculty_service),
 ) -> FacultyItem:
-    faculty = await service.create_faculty(
-        name=data.name,
-        aliases=data.aliases,
-        is_active=data.is_active,
-    )
+    try:
+        faculty = await service.create_faculty(
+            name=data.name,
+            aliases=data.aliases,
+            is_active=data.is_active,
+        )
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Факультет с таким названием уже существует",
+        ) from None
     programs = await service.get_programs_by_faculty(faculty.id, only_active=False)
     return _faculty_item(faculty, programs)
 
@@ -85,12 +92,18 @@ async def update_faculty(
     data: FacultyUpdate,
     service: FacultyService = Depends(get_faculty_service),
 ) -> FacultyItem:
-    faculty = await service.update_faculty(
-        faculty_id,
-        name=data.name,
-        aliases=data.aliases,
-        is_active=data.is_active,
-    )
+    try:
+        faculty = await service.update_faculty(
+            faculty_id,
+            name=data.name,
+            aliases=data.aliases,
+            is_active=data.is_active,
+        )
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Факультет с таким названием уже существует",
+        ) from None
     if faculty is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -103,7 +116,7 @@ async def update_faculty(
 @router.delete(
     "/{faculty_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Удалить факультет",
+    summary="Выключить факультет",
 )
 async def delete_faculty(
     faculty_id: str,

@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from typing import Iterable, Optional, Sequence
 
 from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -102,7 +103,11 @@ class FacultyService:
             is_active=is_active,
         )
         self.session.add(faculty)
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError:
+            await self.session.rollback()
+            raise
         await self.session.refresh(faculty)
         return faculty
 
@@ -186,15 +191,20 @@ class FacultyService:
             faculty.aliases = [a.strip() for a in aliases if a and a.strip()]
         if is_active is not None:
             faculty.is_active = is_active
-        await self.session.commit()
+        try:
+            await self.session.commit()
+        except IntegrityError:
+            await self.session.rollback()
+            raise
         await self.session.refresh(faculty)
         return faculty
 
     async def delete_faculty(self, faculty_id: str) -> bool:
+        """Деактивирует факультет, сохраняя направления и проходные баллы."""
         faculty = await self.get_faculty_by_id(faculty_id)
         if faculty is None:
             return False
-        await self.session.delete(faculty)
+        faculty.is_active = False
         await self.session.commit()
         return True
 
