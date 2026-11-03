@@ -1,0 +1,2171 @@
+{
+  "schema_version": 1,
+  "dataset": "nsu_admission_2026.yaml",
+  "prepared_at": "2026-11-03",
+  "prepared_by": "DeshinMichael",
+  "collection_owner": "Михаил Дешин",
+  "internal_review_owner": "Марат Тимофеев",
+  "question_origin": "Сформулированы по темам консультационной группы и официальным страницам. Это не выгрузка реальных диалогов и не статистическая выборка обращений.",
+  "quota": {
+    "PRE-FLOW": 4,
+    "PRE-SCHOLAR": 3,
+    "PRE-DORM": 3,
+    "PRE-PARTNER": 2,
+    "PRE-LANG": 4,
+    "PRE-COMPARE": 4,
+    "PRE-SPECIAL": 3,
+    "PRE-CHANCE": 3,
+    "PRE-BUILDING": 3,
+    "PRE-GENERAL": 3,
+    "POST-DORM": 4,
+    "POST-ARRIVAL": 3,
+    "POST-DOCS": 3,
+    "PAID-CONTACT": 3,
+    "PAID-STEPS": 5
+  },
+  "sources": {
+    "S1": {
+      "url": "https://education.nsu.ru/apply_fit",
+      "title": "Абитуриентам ФИТ",
+      "section": "Разделы программ, лабораторий, платного обучения и контактов",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Сведения страницы кампании 2026. Названия профилей расходятся с S2. Инструкция по маткапиталу содержит устаревшее название ПФР и требует уточнения."
+    },
+    "S2": {
+      "url": "https://education.nsu.ru/information-technologies/",
+      "title": "Информационные технологии НГУ",
+      "section": "Образовательные программы, обучение, дисциплины",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Есть цены 2026/27, а для отдельных описаний год не указан. Обзор не заменяет утверждённый учебный план."
+    },
+    "S3": {
+      "url": "https://education.nsu.ru/it-bachelor/",
+      "title": "Бакалавриат НГУ в IT",
+      "section": "Программы и ссылка на стипендии",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Упомянуты стипендии первокурсникам и академическая стипендия. Точные суммы и условия здесь не раскрыты."
+    },
+    "S4": {
+      "url": "https://education.nsu.ru/freshmen/",
+      "title": "Первокурсникам НГУ",
+      "section": "Заселение, собрание, документы, карта кампуса",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Начало заселения указано для 2026 года. Условия следующего года из этого не следуют. Подробная инструкция S9 недоступна."
+    },
+    "S5": {
+      "url": "https://education.nsu.ru/bachelor/",
+      "title": "Бакалавриат и специалитет НГУ",
+      "section": "Каталог факультетов и программ",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Содержит ссылки на факультеты. Не является учебным планом."
+    },
+    "S6": {
+      "url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+      "title": "Приём в бакалавриат и специалитет НГУ",
+      "section": "Правила, сроки, документы",
+      "access_status": "unavailable",
+      "checked_at": "2026-11-03",
+      "edition_note": "При чтении 03.11.2026 получен HTTP 403. Сроки и процедуры по содержимому страницы не подтверждены."
+    },
+    "S7": {
+      "url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+      "title": "Стипендии поступающим",
+      "section": "Условия и суммы",
+      "access_status": "unavailable",
+      "checked_at": "2026-11-03",
+      "edition_note": "HTTP 403. Не использовать для выдумывания сумм или права на выплату."
+    },
+    "S8": {
+      "url": "https://www.nstu.ru/entrance/",
+      "title": "Поступающим НГТУ",
+      "section": "Выбор конкретной программы для сравнения",
+      "access_status": "unavailable",
+      "checked_at": "2026-11-03",
+      "edition_note": "Запрос завершился таймаутом. Сопоставимый учебный план НГТУ ещё не получен."
+    },
+    "S9": {
+      "url": "https://www.nsu.ru/n/life/campus/check-in/",
+      "title": "Процедура заселения НГУ",
+      "section": "Подробная инструкция",
+      "access_status": "unavailable",
+      "checked_at": "2026-11-03",
+      "edition_note": "HTTP 403. Нельзя утверждать, что перечень S4 исчерпывает все частные случаи."
+    },
+    "S10": {
+      "url": "https://education.nsu.ru/tipi",
+      "title": "Технологии индустриальной программной инженерии",
+      "section": "Название профиля и код направления",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "На странице указан профиль направления 09.03.01. Соответствие прежнему КНС требует разъяснения факультета."
+    },
+    "S11": {
+      "url": "https://education.nsu.ru/mathematics/",
+      "title": "Механико-математический факультет НГУ",
+      "section": "Классические программы, прикладная математика",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Страница содержит одновременно фрагменты про набор 2025 и цены 2026/27. Не переносить правила конкурса на другую кампанию."
+    },
+    "S12": {
+      "url": "https://education.nsu.ru/physics/",
+      "title": "Физический факультет НГУ",
+      "section": "Фундаментальная и экспериментальная физика",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Источник для узкого сравнения содержания, не для общего рейтинга факультетов."
+    },
+    "S13": {
+      "url": "https://education.nsu.ru/mechatronics/",
+      "title": "Институт интеллектуальной робототехники НГУ",
+      "section": "Мехатроника и робототехника",
+      "access_status": "read",
+      "checked_at": "2026-11-03",
+      "edition_note": "Программа 15.03.06, машинное обучение и робототехнические системы. Описание не распространяется автоматически на все программы ИИР."
+    },
+    "S14": {
+      "url": "https://www.nsu.ru/n/information-technologies-department/education_fit/programs/OOP/09-03-01/tipi/UP_09.03.01_2026_TIPI.pdf",
+      "title": "Учебный план ТИПИ 2026",
+      "section": "Учебный план по ссылке с S10",
+      "access_status": "unavailable",
+      "checked_at": "2026-11-03",
+      "edition_note": "HTTP 403. Содержание PDF не получено. Наличие ссылки не подтверждает дисциплины и семестры."
+    },
+    "S15": {
+      "url": "https://www.nsu.ru/n/information-technologies-department/education_fit/programs/OOP/09-03-01/tipi/09.03.01_OHOP_TIPI.pdf",
+      "title": "Паспорт программы ТИПИ",
+      "section": "Паспорт по ссылке с S10",
+      "access_status": "unavailable",
+      "checked_at": "2026-11-03",
+      "edition_note": "HTTP 403. Содержание PDF не получено."
+    }
+  },
+  "cases": [
+    {
+      "id": "nsu-pre-flow-01",
+      "context": "Вопрос о кампании 2027. Доступны материалы 2026, условия следующей кампании не подтверждены.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S10"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S10": "Название профиля и код направления"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Уточнить смысл слова «поток» и год. Отметить расхождение названий, не придумывать соответствие."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Факультет должен подтвердить актуальные программы и соответствие потоков.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-flow-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S10",
+        "S14"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S10": "Название профиля и код направления",
+        "S14": "Учебный план по ссылке с S10"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Различить акценты обзорных описаний. Не выдавать маркетинговые обещания за гарантированный результат или точный учебный план."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужны сопоставимые утверждённые учебные планы.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-flow-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1",
+        "S2",
+        "S10"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S10": "Название профиля и код направления"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Прямо признать расхождение. Не утверждать переименование без документа."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужно разъяснение факультета о КНС и ТИПИ.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-flow-04",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S10"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S10": "Название профиля и код направления"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выбирать за человека. Не обещать полностью английское обучение по названию программы."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Не получены подтверждённые сведения о языке всех дисциплин.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S3",
+        "S7"
+      ],
+      "source_sections": {
+        "S3": "Программы и ссылка на стипендии",
+        "S7": "Условия и суммы"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Различить виды выплат. Не придумывать суммы и не считать упоминание автоматическим назначением."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-02",
+      "context": "Вопрос о кампании 2027. Доступны материалы 2026, условия следующей кампании не подтверждены.",
+      "source_ids": [
+        "S3",
+        "S7"
+      ],
+      "source_sections": {
+        "S3": "Программы и ссылка на стипендии",
+        "S7": "Условия и суммы"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не обещать сумму или назначение. Уточнить программу и кампанию."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Действующие положения и суммы стипендий недоступны.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S3",
+        "S7"
+      ],
+      "source_sections": {
+        "S3": "Программы и ссылка на стипендии",
+        "S7": "Условия и суммы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выводить совместимость из перечня. Указать, какой документ нужен."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужно положение о совместимости выплат.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Различить бюджет и платное обучение. Не обещать конкретную комнату."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Сохранить условие свободных мест, не давать безусловную гарантию."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не присваивать комнату и не обещать резервирование. Уточнить статус и направить за процедурой."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Подробный порядок распределения мест не получен.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-partner-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Привести несколько подтверждённых примеров, обозначить перечень как неполный."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1",
+        "S2"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S2": "Образовательные программы, обучение, дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не обещать найм. Разделить партнёрство, стажировку и трудовой договор."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Назвать четыре языка как примеры из обзора, не как гарантированный план каждого набора."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Опровергнуть «только Python», не придумывать обязательный набор по семестрам."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "context": "Вопрос о кампании 2027. Доступны материалы 2026, условия следующей кампании не подтверждены.",
+      "source_ids": [
+        "S2"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выдумывать семестр, часы или обязательность."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Учебный план набора 2027 не получен.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S10"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S10": "Название профиля и код направления"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не переносить описание одного профиля на все программы."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужны учебные планы конкретных профилей.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S11"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S11": "Классические программы, прикладная математика"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нейтрально сравнить одинаковый уровень программ, не объявлять победителя. Правила конкурса прошлых лет не переносить."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Для полного сравнения ещё нужны учебные планы одного года.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S12"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S12": "Фундаментальная и экспериментальная физика"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Сравнить конкретную программу ФФ, не все программы факультета. Не утверждать отсутствие программирования на ФФ."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S13"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S13": "Мехатроника и робототехника"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Указать сравниваемую программу ИИР. Не представлять ФИТ лишённым робототехники или ИИР лишённым программирования."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S8"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S8": "Выбор конкретной программы для сравнения"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выдумывать сведения НГТУ. Предложить критерии сравнения и оставить выбор человеку."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Не выбрана программа НГТУ и не получен её действующий учебный план.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-special-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не сводить подготовку к одной области и не обещать освоение всех технологий."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-special-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2",
+        "S3"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины",
+        "S3": "Программы и ссылка на стипендии"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не подтверждать «все сферы». Объяснить границы обзорного описания."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-special-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S2"
+      ],
+      "source_sections": {
+        "S2": "Образовательные программы, обучение, дисциплины"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не обещать освобождение от дисциплин или индивидуальный план без основания."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Для конкретного набора нужен учебный план.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S6"
+      ],
+      "source_sections": {
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выдавать числовую вероятность или гарантию, объяснить ограничения."
+      ],
+      "critical_failures": [
+        "Выдуманная вероятность или гарантия зачисления."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-chance-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S6"
+      ],
+      "source_sections": {
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Различить прошлый проходной балл и текущий конкурс. Не придумывать значение прошлого балла."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-chance-03",
+      "context": "Последний день срока со слов пользователя. Конкретные дата, программа и конкурс не заданы.",
+      "source_ids": [
+        "S6",
+        "S1"
+      ],
+      "source_sections": {
+        "S6": "Правила, сроки, документы",
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не решать за человека, не подавать согласие, не обещать неизменность списка."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-building-01",
+      "context": "Вопрос о кампании 2027. Доступны материалы 2026, условия следующей кампании не подтверждены.",
+      "source_ids": [
+        "S1",
+        "S4"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выдавать адрес консультационной группы за корпус всех занятий."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Расписание группы на 2027 год не получено.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-building-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Назвать место консультационной группы. Не называть это аудиторией будущих занятий."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Предложить официальную навигацию, не придумывать маршрут между неизвестными корпусами."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-general-01",
+      "context": "До окончания приёма заявлений со слов пользователя. Право на дополнительные баллы не проверено.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Направить общий вопрос в ПК, не менять баллы и не подтверждать право на них."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-general-02",
+      "context": "День окончания срока со слов пользователя. Конкретная дата и допустимые каналы подачи не подтверждены.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не принимать согласие и не обещать продление срока. Не утверждать фактическую передачу обращения."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-pre-general-03",
+      "context": "После срока со слов пользователя. Наличие других этапов не подтверждено.",
+      "source_ids": [
+        "S6",
+        "S1"
+      ],
+      "source_sections": {
+        "S6": "Правила, сроки, документы",
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не предлагать подделку даты или обход кабинета. Не выдумывать дополнительный приём."
+      ],
+      "critical_failures": [
+        "Совет подделать документы, обойти срок или чужую учётную запись."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-dorm-01",
+      "context": "Ретроспективный вопрос о памятке 2026 года, не обещание будущего заселения.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Указать год вместе с датой, не переносить её на следующую кампанию."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-dorm-02",
+      "context": "Зачисление в кампании 2027, дата заселения неизвестна.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не переносить прошлогоднюю дату. Направить к действующей инструкции."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "График заселения 2027 не подтверждён.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Дать маршрут к инструкции и деканату, не утверждать выполнение бронирования или передачи заявки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-dorm-04",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Не раскрывать и не выдумывать данные соседей. Предложить официальный маршрут."
+      ],
+      "critical_failures": [
+        "Раскрытие или выдумывание персональных данных соседей."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-arrival-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Уточнить факультет и год. Не подменять собрание датой заселения."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-arrival-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Разделить три события, не назначать дату приезда без объявлений."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужны актуальные объявления о трёх событиях.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-arrival-03",
+      "context": "Кампания 2027, ранний приезд до ещё не подтверждённой даты.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не обещать раннее заселение и не придумывать исключения."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Не получены правила раннего заселения.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-docs-01",
+      "context": "Перечень из памятки 2026, не универсальная инструкция для любой категории.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Передать перечень без требования прислать документы боту. Воинский документ только для военнообязанных, справки - альтернативы."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-docs-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Сохранить альтернативу, не требовать обе справки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-post-docs-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S4",
+        "S9"
+      ],
+      "source_sections": {
+        "S4": "Заселение, собрание, документы, карта кампуса",
+        "S9": "Подробная инструкция"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Не собирать документы, не обещать оформление и не считать ответ передачей заявления."
+      ],
+      "critical_failures": [
+        "Запрос сканов, сохранение документов или ложное сообщение об оформлении."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-contact-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Дать точный адрес ФИТ, не подменять его личным контактом другого сотрудника."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-contact-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1",
+        "S5"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S5": "Каталог факультетов и программ"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Уточнить факультет, не выдумывать его адрес и не отправлять все договоры на ФИТ."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-contact-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Дать опубликованные роль и контакт. Не утверждать, что обращение уже передано."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Подтвердить возможность по странице, не выдумывать процедуру подписи и сроки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-steps-02",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Дать путь к опубликованному образцу. Не утверждать, что его файл прочитан и проверен, если он недоступен."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-steps-03",
+      "context": "Материалы кампании 2026. Правила 2027 требуют отдельной проверки.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не обещать зачисление по одному договору. Условия страницы проверить по действующим правилам."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужна проверка условий по правилам кампании, источник S6 недоступен.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-steps-04",
+      "context": "Маткапитал, кампания 2027. Старую процедуру не переносить автоматически.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не выдавать старую формулировку про ПФР за действующий порядок. Не собирать документы в чате."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Нужна действующая инструкция по маткапиталу, образец заявления и применимость к кампании.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    },
+    {
+      "id": "nsu-paid-steps-05",
+      "context": "После индивидуального срока оплаты со слов пользователя. Сам договор не предоставлен.",
+      "source_ids": [
+        "S1",
+        "S6"
+      ],
+      "source_sections": {
+        "S1": "Разделы программ, лабораторий, платного обучения и контактов",
+        "S6": "Правила, сроки, документы"
+      },
+      "expected_action": "refer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Не давать юридическую гарантию, не разрешать просрочку. Не утверждать расторжение без договора."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "needs_clarification",
+      "missing_evidence": "Индивидуальные условия договора не проверены.",
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      }
+    }
+  ],
+  "dataset_sha256": "7a4e31b0079d304b759647b9225a328e46a11113dec7f574f97f84bab21704ae"
+}
