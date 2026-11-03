@@ -5,11 +5,12 @@ from maxapi import Bot, Dispatcher
 from maxapi.enums.parse_mode import ParseMode
 from maxapi.enums.sender_action import SenderAction
 from maxapi.types.message import Message
+from maxapi.types.updates.message_callback import MessageCallback
 from maxapi.types.updates.message_created import MessageCreated
 
 from bot.core import ERROR_REPLY_TEXT, BotCore
 from bot.splitting import split_message
-from bot.streaming import MaxStreamer
+from bot.streaming import MaxStreamer, max_feedback_keyboard
 from bot.utils import normalize_links_for_messaging
 from config.instance import get_setting as getenv
 
@@ -59,10 +60,20 @@ async def answer_max_message(
                 text=reply.text,
                 parse_mode=reply.parse_mode,
                 fallback_plain=reply.fallback_plain_on_format_error,
+                feedback_id=reply.feedback_id,
             )
         else:
-            for chunk in split_message(normalize_links_for_messaging(reply.text)):
-                await message.answer(text=chunk)
+            chunks = split_message(normalize_links_for_messaging(reply.text))
+            for index, chunk in enumerate(chunks):
+                if reply.feedback_id and index == len(chunks) - 1:
+                    await client.send_message(
+                        chat_id=chat_id,
+                        user_id=int(external_user_id) if chat_id is None else None,
+                        text=chunk,
+                        attachments=[max_feedback_keyboard(reply.feedback_id)],
+                    )
+                else:
+                    await message.answer(text=chunk)
     except Exception:
         logger.exception(
             "Не удалось ответить на сообщение в MAX: session_id=%s", session_id
@@ -99,6 +110,30 @@ async def run_max_bot() -> bool | None:
     core = BotCore()
 
     logger.info("MAX bot started (long polling)")
+
+    @dp.message_callback()
+    async def rate_answer(event: MessageCallback):
+        parts = (event.callback.payload or "").split(":", 2)
+        if (
+            len(parts) != 3
+            or parts[0] != "rate"
+            or parts[1] not in {"positive", "negative"}
+        ):
+            await event.answer(notification="Не удалось распознать оценку.")
+            return
+        try:
+            saved = await core.rate_answer(
+                "max", str(event.callback.user.user_id), parts[2], parts[1]
+            )
+        except Exception:
+            logger.exception("Не удалось сохранить оценку ответа в MAX")
+            await event.answer(notification="Не удалось сохранить оценку.")
+            return
+        await event.answer(
+            notification=(
+                "Спасибо за оценку!" if saved else "Ответ уже оценён или недоступен."
+            )
+        )
 
     @dp.message_created()
     async def on_message(event: MessageCreated):

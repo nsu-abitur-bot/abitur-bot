@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Any, cast
 
-from bot.streaming import TelegramStreamer
+from bot.streaming import MaxStreamer, TelegramStreamer
 
 
 async def test_slow_drafts_do_not_block_generation_or_final_delivery():
@@ -116,3 +116,44 @@ async def test_finalize_preserves_cancellation_during_draft_cleanup():
     assert final.cancelled()
     assert sent == []
     await streamer.close()
+
+
+async def test_telegram_rating_buttons_are_under_final_answer_chunk():
+    sent = []
+
+    class CaptureBot:
+        async def send_message(self, chat_id, text, **kwargs):
+            sent.append((text, kwargs.get("reply_markup")))
+
+    await TelegramStreamer(cast(Any, CaptureBot()), "100").finalize(
+        "Ответ. " * 1000, feedback_id="candidate-1"
+    )
+
+    assert len(sent) > 1
+    assert all(markup is None for _, markup in sent[:-1])
+    buttons = sent[-1][1].inline_keyboard[0]
+    assert [button.callback_data for button in buttons] == [
+        "rate:positive:candidate-1",
+        "rate:negative:candidate-1",
+    ]
+
+
+async def test_max_rating_buttons_are_under_final_answer_chunk():
+    sent = []
+
+    class CaptureClient:
+        async def send_message(self, **kwargs):
+            sent.append(kwargs)
+            return None
+
+    await MaxStreamer(cast(Any, CaptureClient()), 100).finalize(
+        "Ответ. " * 1000, feedback_id="candidate-2"
+    )
+
+    assert len(sent) > 1
+    assert all(message["attachments"] is None for message in sent[:-1])
+    buttons = sent[-1]["attachments"][0].payload.buttons[0]
+    assert [button.payload for button in buttons] == [
+        "rate:positive:candidate-2",
+        "rate:negative:candidate-2",
+    ]
