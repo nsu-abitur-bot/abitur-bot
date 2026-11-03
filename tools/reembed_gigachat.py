@@ -18,7 +18,6 @@ from api.services.instance_settings import merge_changes
 from config.instance import install
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document, FaqEntry, Settings
-from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from db.postgres.services.instance_settings import SETTINGS_KEY, InstanceSettingsService
 from faq.matcher import FAQMatcher
 from llm.providers.gigachat import GigaChatEmbedding
@@ -76,12 +75,13 @@ async def _migrate(changes: dict[str, str], root: Path) -> dict:
                 "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
             },
         )
-        if await session.scalar(
-            select(Document.id)
-            .where(Document.status.in_(ACTIVE_DOCUMENT_STATUSES))
-            .limit(1)
-        ):
-            raise ValueError("Сначала завершите обработку документов")
+        for status_file in root.glob("*/kv_store_doc_status.json"):
+            statuses = json.loads(status_file.read_text())
+            if any(
+                record.get("status") in {"pending", "processing", "preprocessed"}
+                for record in statuses.values()
+            ):
+                raise ValueError("Сначала завершите обработку документов в LightRAG")
         documents = (await session.scalars(select(Document))).all()
         for document in documents:
             if document.status != "проиндексирован":

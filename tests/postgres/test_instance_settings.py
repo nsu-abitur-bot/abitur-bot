@@ -507,8 +507,11 @@ async def test_gigachat_model_change_requires_full_reembedding(session, tmp_path
         await guard_embeddings(session, before, after)
 
 
+@pytest.mark.parametrize(
+    "pending_status", [None, "pending", "processing", "preprocessed"]
+)
 async def test_offline_gigachat_migration_rebuilds_index_before_switching_settings(
-    session, test_engine, monkeypatch, tmp_path
+    session, test_engine, monkeypatch, tmp_path, pending_status
 ):
     import numpy as np
     from nano_vectordb import NanoVectorDB
@@ -522,6 +525,20 @@ async def test_offline_gigachat_migration_rebuilds_index_before_switching_settin
     (workspace / "kv_store_text_chunks.json").write_text(
         json.dumps({"chunk": {"content": "Документ"}})
     )
+    (workspace / "kv_store_full_docs.json").write_text(
+        json.dumps({"document": {"content": "Документ"}})
+    )
+    from db.postgres.models import Document
+
+    session.add(
+        Document(
+            title="Документ",
+            graph_id="abitur_kb",
+            rag_doc_id="document",
+            status="проиндексирован",
+        )
+    )
+    await session.commit()
     from typing import cast
 
     from nano_vectordb.dbs import Data
@@ -559,6 +576,17 @@ async def test_offline_gigachat_migration_rebuilds_index_before_switching_settin
         },
         0,
     )
+    if pending_status:
+        (workspace / "kv_store_doc_status.json").write_text(
+            json.dumps({"document": {"status": pending_status}})
+        )
+        with pytest.raises(ValueError, match="LightRAG"):
+            await reembed_gigachat.migrate({"GIGACHAT_API_KEY": "migration-fixture"})
+        assert (await InstanceSettingsService(session).read()).revision == 1
+        assert (
+            json.loads((workspace / "vdb_chunks.json").read_text())["embedding_dim"] == 2
+        )
+        return
     result = await reembed_gigachat.migrate({"GIGACHAT_API_KEY": "migration-fixture"})
     assert result["revision"] == 2
     assert result["dimensions"] == 3
