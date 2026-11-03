@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "scope": "disposable local fixture, not production RTO/RPO",
+  "started_at": "2026-11-03T14:45:06.392237+00:00",
+  "finished_at": "2026-11-03T14:45:07.796631+00:00",
+  "postgres_version": "18.0",
+  "postgres_tables": 20,
+  "sql_restore_ms": 214.92810000199825,
+  "sql_and_copy_ms": 221.27809999801684,
+  "restore_and_verification_ms": 1404.3848000001162,
+  "sql_dump_bytes": 47169,
+  "kb_bytes": 6809,
+  "kb_files": 7,
+  "file_hashes_match": true,
+  "restored_sql_marker": true,
+  "restored_vector_retrieval": true,
+  "checkpoint_age_at_restore_start_seconds": 1.491422,
+  "source_pairs": 2,
+  "recovered_pairs": 1,
+  "post_checkpoint_pairs_not_restored": 1,
+  "provider_network_calls": 0,
+  "kb_checkpoint_hashes": {
+    "release390/graph_chunk_entity_relation.graphml": "72e7673de2c185370963629cc19dfd9e74511d69638dc5e5919affda5b497cd1",
+    "release390/kv_store_doc_status.json": "38c3f2823ca6ee2315829fb9bcd41be1958d15f7aa6bbe270e0966adae0370b0",
+    "release390/kv_store_full_docs.json": "5541cc956ce2e6cfc6074672eca4118f00394de7dcd308e854fd39b633952205",
+    "release390/kv_store_text_chunks.json": "b4db2f34394ccfbcfce42fff3350462359ecf6fed2a3814c5fac2cbf448e7840",
+    "release390/vdb_chunks.json": "0db96fc81b354ae55216ec05e380d53d9014c76cc2fe9c6207c9dfd1781f33df",
+    "release390/vdb_entities.json": "657930b8bb22fe732e960d6cc5bc887e0cffcd81efc765d543df95786761925c",
+    "release390/vdb_relationships.json": "657930b8bb22fe732e960d6cc5bc887e0cffcd81efc765d543df95786761925c"
+  }
+}
