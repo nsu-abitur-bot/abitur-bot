@@ -376,3 +376,31 @@ class TestFAQMatcherReload:
 
         m.reload()
         assert m.size == 13
+
+
+def test_model_change_recomputes_and_replaces_single_cache(tmp_path, monkeypatch):
+    from config import instance
+
+    monkeypatch.setattr(instance, "_values", None)
+    monkeypatch.setenv("FAQ_EMBEDDING_PROVIDER", "gigachat")
+    monkeypatch.setenv("GIGACHAT_EMBEDDING_MODEL", "Embeddings")
+
+    class CountingEmbeddings:
+        def __init__(self):
+            self.calls = 0
+
+        def embed_documents(self, texts):
+            self.calls += 1
+            return [[1.0, 0.1] for _ in texts]
+
+    embedder = CountingEmbeddings()
+    matcher = FAQMatcher(faq_path=tmp_path / "missing.yaml", embedder=embedder)
+    items = [{"question": "Вопрос", "answer": "Ответ", "aliases": ["Синоним"]}]
+    matcher.load_items(items)
+    assert embedder.calls == 1
+    matcher.load_items(items)
+    assert embedder.calls == 1
+    monkeypatch.setenv("GIGACHAT_EMBEDDING_MODEL", "EmbeddingsGigaR")
+    matcher.load_items(items)
+    assert embedder.calls == 2
+    assert [path.name for path in tmp_path.glob("*.pkl")] == ["faq_cache.pkl"]

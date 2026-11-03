@@ -457,3 +457,126 @@ async def test_deepseek_secret_is_encrypted_and_masked(session):
     assert (await InstanceSettingsService(session).read()).values[
         "DEEPSEEK_API_KEY"
     ] == "deepseek-private-fixture"
+
+
+async def test_gigachat_key_is_encrypted_and_both_embedding_selectors_supported(session):
+    from api.routes.instance_settings import describe
+    from api.services.instance_settings import required_checks
+
+    before = InstanceSnapshot(0, {})
+    values = merge_changes(
+        before,
+        {
+            "GIGACHAT_API_KEY": "gigachat-private-fixture",
+            "FAQ_EMBEDDING_PROVIDER": "gigachat",
+            "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+        },
+    )
+    await InstanceSettingsService(session).write(values, 0)
+    raw = await session.scalar(select(Settings.value).where(Settings.key == SETTINGS_KEY))
+    assert "gigachat-private-fixture" not in raw
+    key = next(
+        s for s in (await describe(session))["settings"] if s["key"] == "GIGACHAT_API_KEY"
+    )
+    assert key["secret"] and key["configured"] and key["value"] is None
+    # Only GigaChat selectors changed; existing unrelated providers need no recheck.
+    values["LLM_PROVIDER"] = "deepseek"
+    values["DEEPSEEK_API_KEY"] = "text-fixture"
+    values["LIGHTRAG_LLM_PROVIDER"] = "deepseek"
+    values["PDF_PARSER_PROVIDER"] = "gemini"
+    values["GEMINI_API_KEY"] = "vision-fixture"
+    assert required_checks({"GIGACHAT_API_KEY": "new-fixture"}, values) == {
+        "gigachat:embedding",
+        "gigachat:graph_embedding",
+    }
+    with pytest.raises(ConfigurationError):
+        merge_changes(before, {"LLM_PROVIDER": "gigachat"})
+
+
+async def test_gigachat_model_change_requires_full_reembedding(session, tmp_path):
+    from db.postgres.models import FaqEntry
+
+    session.add(FaqEntry(question="q", answer="a"))
+    await session.flush()
+    before = InstanceSnapshot(
+        1,
+        {"FAQ_EMBEDDING_PROVIDER": "gigachat", "GIGACHAT_EMBEDDING_MODEL": "Embeddings"},
+    )
+    after = merge_changes(before, {"GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR"})
+    with pytest.raises(ConfigurationError, match="переиндексации"):
+        await guard_embeddings(session, before, after)
+
+
+async def test_offline_gigachat_migration_rebuilds_index_before_switching_settings(
+    session, test_engine, monkeypatch, tmp_path
+):
+    import numpy as np
+    from nano_vectordb import NanoVectorDB
+    from sqlalchemy.ext.asyncio import async_sessionmaker
+
+    from tools import reembed_gigachat
+
+    root = tmp_path / "index"
+    workspace = root / "abitur_kb"
+    workspace.mkdir(parents=True)
+    (workspace / "kv_store_text_chunks.json").write_text(
+        json.dumps({"chunk": {"content": "Документ"}})
+    )
+    from typing import cast
+
+    from nano_vectordb.dbs import Data
+
+    database = NanoVectorDB(2, storage_file=str(workspace / "vdb_chunks.json"))
+    database.upsert([cast(Data, {"__id__": "chunk", "__vector__": np.array([1.0, 0.5])})])
+    database.save()
+    monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(root))
+    monkeypatch.setenv("FAQ_EMBEDDINGS_CACHE_PATH", str(tmp_path / "faq_cache.pkl"))
+    monkeypatch.setattr(
+        reembed_gigachat,
+        "AsyncSessionLocal",
+        async_sessionmaker(test_engine, expire_on_commit=False),
+    )
+
+    class Embeddings:
+        embedding_dim = 3
+        model = "EmbeddingsGigaR"
+
+        def __init__(self, **kwargs):
+            pass
+
+        def embed_documents(self, texts):
+            return [[1.0, 2.0, 3.0] for _ in texts]
+
+        async def __call__(self, texts):
+            return self.embed_documents(texts)
+
+    monkeypatch.setattr(reembed_gigachat, "GigaChatEmbedding", Embeddings)
+    await InstanceSettingsService(session).write(
+        {
+            "LLM_PROVIDER": "deepseek",
+            "DEEPSEEK_API_KEY": "preserved-text-key",
+            "FAQ_EMBEDDING_PROVIDER": "gemini",
+        },
+        0,
+    )
+    result = await reembed_gigachat.migrate({"GIGACHAT_API_KEY": "migration-fixture"})
+    assert result["revision"] == 2
+    assert result["dimensions"] == 3
+    values = (await InstanceSettingsService(session).read()).values
+    assert values["LLM_PROVIDER"] == "deepseek"
+    assert values["DEEPSEEK_API_KEY"] == "preserved-text-key"
+    assert (
+        values["FAQ_EMBEDDING_PROVIDER"]
+        == values["LIGHTRAG_EMBEDDING_PROVIDER"]
+        == "gigachat"
+    )
+    assert json.loads((workspace / "vdb_chunks.json").read_text())["embedding_dim"] == 3
+    from pathlib import Path
+
+    backup = Path(result["backup_directory"])
+    assert (
+        json.loads((backup / "old-index" / "abitur_kb" / "vdb_chunks.json").read_text())[
+            "embedding_dim"
+        ]
+        == 2
+    )

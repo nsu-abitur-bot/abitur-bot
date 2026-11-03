@@ -55,3 +55,20 @@ def test_singleton_behavior(monkeypatch):
     provider2 = factory.get_llm_provider()
 
     assert provider1 is provider2
+
+
+def test_gigachat_is_embedding_only_and_key_changes_refresh_factory(monkeypatch):
+    from config import instance
+    from llm.providers.gigachat import GigaChatProvider
+
+    monkeypatch.setattr(instance, "_values", None)
+    monkeypatch.setattr(factory, "_faq_provider", None)
+    monkeypatch.setenv("LLM_PROVIDER", "deepseek")
+    monkeypatch.setenv("FAQ_EMBEDDING_PROVIDER", "gigachat")
+    monkeypatch.setenv("GIGACHAT_API_KEY", "first-fixture")
+    provider = factory.get_faq_provider()
+    assert isinstance(provider, GigaChatProvider)
+    assert provider.get_embeddings_model().embedding_dim == 2560
+    assert factory.get_faq_provider() is provider
+    monkeypatch.setenv("GIGACHAT_API_KEY", "second-fixture")
+    assert factory.get_faq_provider() is not provider

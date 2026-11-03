@@ -28,6 +28,7 @@ from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from llm.providers.deepseek_graph_adapters import DeepSeekLLM
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
+from llm.providers.gigachat import GigaChatEmbedding
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
 from rag.crag import CragChunk, load_crag_config, run_crag
@@ -193,6 +194,7 @@ def graph_configuration() -> tuple:
             "LIGHTRAG_EMBEDDING_PROVIDER",
             "OPENAI_GRAPH_EMBEDDING_MODEL",
             "GEMINI_GRAPH_EMBEDDING_MODEL",
+            "GIGACHAT_EMBEDDING_MODEL",
             "LIGHTRAG_EMBEDDING_WORKERS",
             "LIGHTRAG_LLM_WORKERS",
         )
@@ -500,22 +502,28 @@ class GraphMemory:
                             "gemini-embedding-2-preview",
                         ),
                     )
+                elif graph_llm_provider == "gigachat":
+                    embedding_adapter = GigaChatEmbedding()
                 else:
                     raise RuntimeError(
                         f"LIGHTRAG_LLM_PROVIDER='{graph_llm_provider}' не поддерживается."
-                        "Допустимые значения: openai, gemini"
+                        "Допустимые значения: openai, gemini, gigachat"
                     )
 
                 await embedding_adapter.aclose()
 
                 embedding_provider = graph_llm_provider
-                embedding_model = get_setting(
-                    "OPENAI_GRAPH_EMBEDDING_MODEL"
-                    if embedding_provider == "openai"
-                    else "GEMINI_GRAPH_EMBEDDING_MODEL",
-                    "text-embedding-3-small"
-                    if embedding_provider == "openai"
-                    else "gemini-embedding-2-preview",
+                embedding_model = (
+                    embedding_adapter.model
+                    if graph_llm_provider == "gigachat"
+                    else get_setting(
+                        "OPENAI_GRAPH_EMBEDDING_MODEL"
+                        if embedding_provider == "openai"
+                        else "GEMINI_GRAPH_EMBEDDING_MODEL",
+                        "text-embedding-3-small"
+                        if embedding_provider == "openai"
+                        else "gemini-embedding-2-preview",
+                    )
                 )
 
                 @wrap_embedding_func_with_attrs(
@@ -529,6 +537,8 @@ class GraphMemory:
                             api_key=get_setting("OPENAI_API_KEY", ""),
                             model=embedding_model,
                         )
+                    elif provider == "gigachat":
+                        adapter = GigaChatEmbedding(model=embedding_model)
                     else:
                         adapter = GeminiEmbedding(
                             api_key=get_setting("GEMINI_API_KEY", ""),
