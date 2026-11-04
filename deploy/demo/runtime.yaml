@@ -4,12 +4,15 @@ x-provider-locks: &provider-locks
 
 services:
   api:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes: *provider-locks
     mem_limit: 640m
     memswap_limit: 1280m
     cpus: 1.5
     environment:
       GIGACHAT_LOCK_DIRECTORY: /app/provider-locks
+      SOURCE_HTTP_PROXY: ${SOURCE_HTTP_PROXY:-}
       HTTP_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       HTTPS_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       NO_PROXY: localhost,127.0.0.1,postgres,redis,api,web,${API_HOST:?Set API_HOST},${WEB_HOST:?Set WEB_HOST}
@@ -51,6 +54,8 @@ services:
       NODE_OPTIONS: --max-old-space-size=144
 
   bot:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes: *provider-locks
     extends:
       file: compose.yaml
@@ -63,6 +68,7 @@ services:
     cpus: 1.5
     environment:
       GIGACHAT_LOCK_DIRECTORY: /app/provider-locks
+      SOURCE_HTTP_PROXY: ${SOURCE_HTTP_PROXY:-}
       HTTP_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       HTTPS_PROXY: ${OUTBOUND_HTTP_PROXY:-}
       NO_PROXY: localhost,127.0.0.1,postgres,redis,api,web,${API_HOST:?Set API_HOST},${WEB_HOST:?Set WEB_HOST}

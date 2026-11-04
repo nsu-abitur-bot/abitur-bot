@@ -1,11 +1,63 @@
 """Outbound fetches use controlled DNS and transports, never the Internet."""
 
 import socket
+import ssl
 
 import httpx
 import pytest
 
 from parser import safe_fetch
+
+
+def test_proxy_tls_context_accepts_positional_hostname_from_async_transport():
+    context = safe_fetch._SourceTLSContext("example.org")
+    connection = context.wrap_bio(
+        ssl.MemoryBIO(), ssl.MemoryBIO(), False, "93.184.216.34"
+    )
+    assert connection.server_hostname == "example.org"
+    assert context.check_hostname is True
+    assert context.verify_mode == ssl.CERT_REQUIRED
+
+
+@pytest.mark.parametrize("async_mode", [False, True])
+async def test_explicit_source_proxy_preserves_pinned_destination(
+    monkeypatch, async_mode
+):
+    monkeypatch.setenv("SOURCE_HTTP_PROXY", "http://proxy.example:7890")
+    monkeypatch.setenv("HTTPS_PROXY", "http://ignored.example:9999")
+    monkeypatch.setattr(
+        socket,
+        "getaddrinfo",
+        lambda *a, **k: [
+            (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("93.184.216.34", 443))
+        ],
+    )
+    options = []
+    client_class = httpx.AsyncClient if async_mode else httpx.Client
+
+    def client(**kwargs):
+        options.append(dict(kwargs))
+        kwargs.pop("proxy", None)
+        return client_class(**kwargs)
+
+    def respond(request):
+        assert request.url.host == "93.184.216.34"
+        assert request.headers["host"] == "example.org"
+        return httpx.Response(200, content=b"source through configured proxy")
+
+    async def async_respond(self, request):
+        return respond(request)
+
+    monkeypatch.setattr(httpx.HTTPTransport, "handle_request", lambda self, r: respond(r))
+    monkeypatch.setattr(httpx.AsyncHTTPTransport, "handle_async_request", async_respond)
+    monkeypatch.setattr(httpx, "AsyncClient" if async_mode else "Client", client)
+    if async_mode:
+        response = await safe_fetch.fetch_url_async("https://example.org/")
+    else:
+        response = safe_fetch.fetch_url("https://example.org/")
+    assert response.text == "source through configured proxy"
+    assert options[0].get("proxy") == "http://proxy.example:7890"
+    assert options[0]["trust_env"] is False
 
 
 @pytest.mark.parametrize(
@@ -25,7 +77,9 @@ from parser import safe_fetch
         "http://user:password@example.org/",
     ],
 )
-def test_unsafe_urls_rejected(url, monkeypatch):
+@pytest.mark.parametrize("source_proxy", ["", "http://proxy.example:7890"])
+def test_unsafe_urls_rejected(url, monkeypatch, source_proxy):
+    monkeypatch.setenv("SOURCE_HTTP_PROXY", source_proxy)
     monkeypatch.setattr(
         socket,
         "getaddrinfo",
@@ -36,6 +90,7 @@ def test_unsafe_urls_rejected(url, monkeypatch):
 
 
 def test_mixed_dns_rejected(monkeypatch):
+    monkeypatch.setenv("SOURCE_HTTP_PROXY", "http://proxy.example:7890")
     monkeypatch.setattr(
         socket,
         "getaddrinfo",
@@ -189,8 +244,13 @@ async def test_all_download_entrypoints_reject_private_url():
         (True, "wrong.example"),
     ],
 )
-def test_real_tls_verification_and_hostname(tmp_path, monkeypatch, trusted, hostname):
+@pytest.mark.parametrize("proxy_mode", [False, True])
+def test_real_tls_verification_and_hostname(
+    tmp_path, monkeypatch, trusted, hostname, proxy_mode
+):
     import datetime
+    import select
+    import socketserver
     import ssl
     import threading
     from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -241,6 +301,43 @@ def test_real_tls_verification_and_hostname(tmp_path, monkeypatch, trusted, host
     server.socket = context.wrap_socket(server.socket, server_side=True)
     thread = threading.Thread(target=server.serve_forever, daemon=True)
     thread.start()
+    tunnels = []
+
+    class ProxyHandler(socketserver.BaseRequestHandler):
+        def handle(self) -> None:
+            headers = b""
+            while not headers.endswith(b"\r\n\r\n"):
+                part = self.request.recv(1)
+                if not part:
+                    return
+                headers += part
+            tunnels.append(headers.split(b"\r\n", 1)[0])
+            with socket.socket() as upstream:
+                upstream.connect(("127.0.0.1", server.server_port))
+                self.request.sendall(b"HTTP/1.1 200 Connection established\r\n\r\n")
+                while True:
+                    ready, _, _ = select.select([self.request, upstream], [], [], 3)
+                    if not ready:
+                        return
+                    for source in ready:
+                        chunk = source.recv(65536)
+                        if not chunk:
+                            return
+                        target = upstream if source is self.request else self.request
+                        target.sendall(chunk)
+
+    proxy = None
+    proxy_thread = None
+    if proxy_mode:
+        proxy = socketserver.ThreadingTCPServer(("127.0.0.1", 0), ProxyHandler)
+        proxy.daemon_threads = True
+        proxy_thread = threading.Thread(target=proxy.serve_forever, daemon=True)
+        proxy_thread.start()
+        monkeypatch.setenv(
+            "SOURCE_HTTP_PROXY", f"http://127.0.0.1:{proxy.server_address[1]}"
+        )
+        if trusted:
+            monkeypatch.setattr(safe_fetch.certifi, "where", lambda: str(cert_path))
     monkeypatch.setattr(
         socket,
         "getaddrinfo",
@@ -260,7 +357,12 @@ def test_real_tls_verification_and_hostname(tmp_path, monkeypatch, trusted, host
         destinations.append(address)
         connection = socket.socket()
         connection.settimeout(timeout)
-        connection.connect(("127.0.0.1", server.server_port))
+        destination = (
+            proxy.server_address
+            if proxy is not None
+            else ("127.0.0.1", server.server_port)
+        )
+        connection.connect(destination)
         return connection
 
     monkeypatch.setattr(socket, "create_connection", connect)
@@ -280,8 +382,19 @@ def test_real_tls_verification_and_hostname(tmp_path, monkeypatch, trusted, host
         else:
             with pytest.raises(httpx.ConnectError, match="CERTIFICATE_VERIFY_FAILED"):
                 safe_fetch.fetch_url(url)
-        assert destinations == [("93.184.216.34", server.server_port)]
+        if proxy is not None:
+            assert destinations == [proxy.server_address]
+            assert tunnels == [
+                f"CONNECT 93.184.216.34:{server.server_port} HTTP/1.1".encode()
+            ]
+        else:
+            assert destinations == [("93.184.216.34", server.server_port)]
     finally:
+        if proxy is not None:
+            proxy.shutdown()
+            proxy.server_close()
+            assert proxy_thread is not None
+            proxy_thread.join()
         server.shutdown()
         server.server_close()
         thread.join()
