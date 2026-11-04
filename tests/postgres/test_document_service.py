@@ -184,3 +184,24 @@ async def test_concurrent_create_for_same_url_reuses_document(test_engine: Async
             assert count == 1
     finally:
         await engine.dispose()
+
+
+@pytest.mark.asyncio
+async def test_update_metadata_clears_urls_of_two_documents(session: AsyncSession):
+    service = DocumentService(session)
+    documents = [
+        await service.create_or_update_for_source(
+            graph_id="graph", title=f"doc-{i}", source_url=f"https://example.com/{i}"
+        )
+        for i in range(2)
+    ]
+    for document in documents:
+        updated = await service.update_metadata(document.id, source_url="")
+        assert updated is not None
+        assert updated.source_url == ""
+        assert updated.status == "нет ссылки"
+
+    for document in documents:
+        await session.refresh(document)
+        assert document.source_url == ""
+        assert document.status == "нет ссылки"

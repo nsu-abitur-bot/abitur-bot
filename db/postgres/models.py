@@ -419,7 +419,8 @@ class Document(Base):
             "source_url",
             unique=True,
             postgresql_where=text(
-                "source_url IS NOT NULL AND status NOT IN ('deleted', 'удалён')"
+                "source_url IS NOT NULL AND source_url <> '' "
+                "AND status NOT IN ('deleted', 'удалён')"
             ),
         ),
         Index("ix_document_content_hash", "content_hash"),
