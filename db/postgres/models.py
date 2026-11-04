@@ -468,6 +468,13 @@ class FaqEntry(Base):
     question: Mapped[str] = mapped_column(Text, nullable=False)
     aliases: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     answer: Mapped[str] = mapped_column(Text, nullable=False)
+    verification_status: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="draft", server_default="draft"
+    )
+    source_document: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    source_location: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    confirmed_by: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    confirmed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=timestamp, onupdate=timestamp

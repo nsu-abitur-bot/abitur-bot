@@ -52,5 +52,8 @@ RUN uv sync --frozen
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
+# Catch provider import errors with the Python version used in production.
+RUN python -c "import llm.providers.gigachat"
+
 # Run the application
 CMD ["python", "main.py"]
