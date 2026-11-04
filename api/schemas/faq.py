@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal, Optional
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class FaqItem(BaseModel):
@@ -18,7 +18,23 @@ class FaqItem(BaseModel):
     source_document: str | None = Field(None, description="Документ-источник")
     source_location: str | None = Field(None, description="Место в документе")
     confirmed_by: str | None = Field(None, description="Имя подтвердившего")
-    confirmed_at: datetime | None = Field(None, description="Дата подтверждения")
+    confirmed_at: datetime | None = Field(
+        None,
+        description="Дата подтверждения в UTC; дата без часового пояса считается UTC",
+    )
+
+    @field_validator("source_document", "source_location", "confirmed_by")
+    @classmethod
+    def normalize_provenance(cls, value: str | None) -> str | None:
+        return value.strip() or None if value is not None else None
+
+    @field_validator("confirmed_at")
+    @classmethod
+    def normalize_confirmation_date(cls, value: datetime | None) -> datetime | None:
+        # PostgreSQL stores this field without a timezone; naive UI dates mean UTC.
+        if value is not None and value.tzinfo is not None:
+            return value.astimezone(UTC).replace(tzinfo=None)
+        return value
 
     @model_validator(mode="after")
     def validate_confirmation(self) -> "FaqItem":

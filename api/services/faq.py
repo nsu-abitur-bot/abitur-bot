@@ -35,7 +35,17 @@ class FaqService:
         return [FaqItem.model_validate(e, from_attributes=True) for e in entries]
 
     async def update(self, item_id: str, item: FaqItem) -> FaqItem:
-        metadata = item.model_dump(include=VERIFICATION_FIELDS & item.model_fields_set)
+        existing = await self._db.get(item_id)
+        if existing is None:
+            raise KeyError(item_id)
+        supplied = item.model_dump(include=VERIFICATION_FIELDS & item.model_fields_set)
+        effective = {
+            **{field: getattr(existing, field) for field in VERIFICATION_FIELDS},
+            **item.model_dump(exclude=VERIFICATION_FIELDS),
+            **supplied,
+        }
+        validated = FaqItem.model_validate(effective)
+        metadata = validated.model_dump(include=VERIFICATION_FIELDS)
         entry = await self._db.update(
             item_id, item.question, item.aliases, item.answer, metadata=metadata
         )

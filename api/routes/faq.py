@@ -2,6 +2,8 @@ import csv
 import io
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi.encoders import jsonable_encoder
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.schemas.faq import FaqItem, FaqListResponse
@@ -143,6 +145,10 @@ async def update_faq(
 ):
     try:
         return await service.update(item_id, item)
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=422, detail=jsonable_encoder(e.errors(include_context=False))
+        ) from e
     except KeyError:
         raise HTTPException(status_code=404, detail=f"FAQ item {item_id} not found")
     except Exception as e:
