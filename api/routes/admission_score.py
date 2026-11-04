@@ -125,10 +125,13 @@ async def get_scores(
     program: Optional[str] = Query(None, description="Фильтр по направлению"),
     year: Optional[int] = Query(None, description="Фильтр по году"),
     form: Optional[str] = Query(None, description="Форма: budget / paid"),
+    only_active: bool = Query(
+        False, description="Только активные факультеты и программы"
+    ),
     service: AdmissionScoreService = Depends(get_admission_score_service),
 ) -> list[ScoreItem]:
     rows = await service.query_scores(
-        faculty=faculty, program=program, year=year, form=form
+        faculty=faculty, program=program, year=year, form=form, only_active=only_active
     )
     return [ScoreItem(**row) for row in rows]
 

@@ -90,12 +90,10 @@ class FakeFacultyService:
         return faculty
 
     async def delete_faculty(self, faculty_id):
-        if faculty_id not in self.faculties:
+        faculty = self.faculties.get(faculty_id)
+        if faculty is None:
             return False
-        del self.faculties[faculty_id]
-        self.programs = {
-            pid: p for pid, p in self.programs.items() if p.faculty_id != faculty_id
-        }
+        faculty.is_active = False
         return True
 
     async def get_programs_by_faculty(self, faculty_id, level=None, only_active=True):
@@ -285,7 +283,10 @@ def test_delete_faculty(client: TestClient):
 
     response = client.delete(f"/api/v1/faculties/{faculty_id}")
     assert response.status_code == 204
-    assert client.get("/api/v1/faculties").json() == []
+    faculties = client.get("/api/v1/faculties").json()
+    assert len(faculties) == 1
+    assert faculties[0]["id"] == faculty_id
+    assert faculties[0]["is_active"] is False
 
 
 def test_delete_faculty_not_found(client: TestClient):
