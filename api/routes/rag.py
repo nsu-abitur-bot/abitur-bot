@@ -2,6 +2,8 @@ import asyncio
 import csv
 import io
 import logging
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from urllib.parse import unquote
 
 import httpx
@@ -19,7 +21,9 @@ from fastapi import (
 from fastapi.responses import Response
 from pydantic import HttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.datastructures import FormData
 from starlette.datastructures import UploadFile as StarletteUploadFile
+from starlette.formparsers import MultiPartException, MultiPartParser
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import (
@@ -79,6 +83,37 @@ def get_rag_upload_service() -> RagUploadService:
     return RagUploadService()
 
 
+class _UploadRequestTooLarge(MultiPartException):
+    pass
+
+
+@asynccontextmanager
+async def _upload_form(request: Request, max_size: int) -> AsyncGenerator[FormData]:
+    async def limited_stream() -> AsyncGenerator[bytes]:
+        received = 0
+        async for chunk in request.stream():
+            received += len(chunk)
+            if received > max_size:
+                # Starlette closes partial spool files for MultiPartException.
+                raise _UploadRequestTooLarge("Upload request is too large")
+            yield chunk
+
+    parser = MultiPartParser(
+        request.headers, limited_stream(), max_files=MAX_UPLOAD_FILES, max_fields=0
+    )
+    try:
+        form = await parser.parse()
+    except _UploadRequestTooLarge as exc:
+        raise HTTPException(status_code=413, detail=exc.message) from None
+    except MultiPartException as exc:
+        raise HTTPException(status_code=400, detail=exc.message) from None
+
+    try:
+        yield form
+    finally:
+        await form.close()
+
+
 @router.post(
     "/upload",
     response_model=RagUploadResponse,
@@ -107,20 +142,20 @@ async def upload_documents_to_rag(
     request: Request,
     service: RagUploadService = Depends(get_rag_upload_service),
 ) -> RagUploadResponse:
+    max_request_size = (
+        MAX_UPLOAD_FILES * max_document_size_bytes() + MAX_MULTIPART_OVERHEAD_BYTES
+    )
     declared_size = request.headers.get("content-length")
     if declared_size is not None:
         try:
-            if int(declared_size) > (
-                MAX_UPLOAD_FILES * max_document_size_bytes()
-                + MAX_MULTIPART_OVERHEAD_BYTES
-            ):
+            if int(declared_size) > max_request_size:
                 raise HTTPException(status_code=413, detail="Upload request is too large")
         except ValueError:
             raise HTTPException(
                 status_code=400, detail="Invalid Content-Length"
             ) from None
 
-    async with request.form(max_files=MAX_UPLOAD_FILES, max_fields=0) as form:
+    async with _upload_form(request, max_request_size) as form:
         items = form.getlist("files")
         if not items:
             raise HTTPException(status_code=400, detail="No files provided")

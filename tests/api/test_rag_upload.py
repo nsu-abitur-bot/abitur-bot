@@ -1,9 +1,12 @@
 import io
+import tempfile
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
 from fastapi import UploadFile
 from fastapi.testclient import TestClient
+from starlette import formparsers
 from starlette.datastructures import Headers
 
 from api.main import app
@@ -82,6 +85,55 @@ class TestRagUploadEndpoint:
         )
 
         assert response.status_code == 413
+        self.mock_service.ingest_files.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("declared_size", [None, "1"])
+    async def test_upload_stops_oversized_stream_and_closes_files(
+        self, monkeypatch, declared_size
+    ):
+        monkeypatch.setattr(rag, "max_document_size_bytes", lambda: 1024)
+        monkeypatch.setattr(formparsers.MultiPartParser, "spool_max_size", 1024)
+        temporary_files = []
+
+        def track_temporary_file(*args, **kwargs):
+            file = tempfile.SpooledTemporaryFile(*args, **kwargs)
+            temporary_files.append(file)
+            return file
+
+        monkeypatch.setattr(formparsers, "SpooledTemporaryFile", track_temporary_file)
+        chunks_received = 0
+        total_chunks = 34
+
+        async def stream():
+            nonlocal chunks_received
+            chunks_received += 1
+            yield (
+                b'--boundary\r\nContent-Disposition: form-data; name="files"; '
+                b'filename="large.txt"\r\nContent-Type: text/plain\r\n\r\n'
+            )
+            for _ in range(32):
+                chunks_received += 1
+                yield b"x" * (64 * 1024)
+            chunks_received += 1
+            yield b"\r\n--boundary--\r\n"
+
+        headers = {"content-type": "multipart/form-data; boundary=boundary"}
+        if declared_size is not None:
+            headers["content-length"] = declared_size
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://test"
+        ) as client:
+            response = await client.post(
+                "/api/v1/rag/upload", content=stream(), headers=headers
+            )
+
+        assert response.status_code == 413
+        assert response.json()["detail"] == "Upload request is too large"
+        assert chunks_received < total_chunks
+        assert temporary_files
+        assert any(file._rolled for file in temporary_files)
+        assert all(file.closed for file in temporary_files)
         self.mock_service.ingest_files.assert_not_awaited()
 
     def test_upload_is_described_as_multipart_in_openapi(self):
