@@ -250,7 +250,7 @@ class FacultyService:
         """Возвращает направления факультета, опционально фильтруя по уровню."""
         stmt = select(Program).where(Program.faculty_id == faculty_id)
         if only_active:
-            stmt = stmt.where(Program.is_active)
+            stmt = stmt.join(Faculty).where(Program.is_active, Faculty.is_active)
         canonical_level = normalize_level(level)
         if canonical_level is not None:
             stmt = stmt.where(Program.level == canonical_level)
@@ -263,7 +263,7 @@ class FacultyService:
     ) -> Sequence[Program]:
         stmt = select(Program)
         if only_active:
-            stmt = stmt.where(Program.is_active)
+            stmt = stmt.join(Faculty).where(Program.is_active, Faculty.is_active)
         canonical_level = normalize_level(level)
         if canonical_level is not None:
             stmt = stmt.where(Program.level == canonical_level)
@@ -284,8 +284,9 @@ class FacultyService:
             return None
         stmt = (
             select(Program)
+            .join(Faculty)
             .where(func.lower(Program.name) == normalized)
-            .where(Program.is_active)
+            .where(Program.is_active, Faculty.is_active)
         )
         canonical_level = normalize_level(level)
         if canonical_level is not None:

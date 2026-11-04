@@ -301,11 +301,12 @@ class AdmissionScoreService:
         return program.id if program is not None else None
 
     async def _find_faculty_loose(
-        self, query: str, inner: bool = True
+        self, query: str, inner: bool = True, only_active: bool = True
     ) -> Optional[Faculty]:
         """Факультет по формулировке из вопроса: «ФИТ», «ФИТ НГУ»,
         «ФИТ (Факультет информационных технологий)»."""
-        directory = await self._get_directory()
+        faculties = await self.faculty_service.get_all_faculties(only_active=only_active)
+        directory = FacultyDirectory(faculties=faculties)
         for variant in query_variants(query, inner=inner):
             for candidate in (variant, re.sub(r"\bнгу\b", " ", _fold(variant))):
                 faculty = directory.find_by_alias(candidate)
@@ -314,7 +315,11 @@ class AdmissionScoreService:
         return None
 
     async def _match_program_ids_loose(
-        self, query: str, faculty: Optional[Faculty], level: Optional[str]
+        self,
+        query: str,
+        faculty: Optional[Faculty],
+        level: Optional[str],
+        only_active: bool = True,
     ) -> list[str]:
         """program_id направлений под формулировку из вопроса.
 
@@ -336,13 +341,15 @@ class AdmissionScoreService:
         programs = [
             p
             for p in await self.faculty_service.get_all_programs(
-                level=normalize_level(level)
+                level=normalize_level(level), only_active=only_active
             )
             if p.id in scored
         ]
         # Скобки не смотрим: в «Прикладная математика ФИТ (Факультет
         # информационных технологий)» факультет — уточнение, а не запрос.
-        as_faculty = await self._find_faculty_loose(query, inner=False)
+        as_faculty = await self._find_faculty_loose(
+            query, inner=False, only_active=only_active
+        )
         if as_faculty is not None:
             return [p.id for p in programs if p.faculty_id == as_faculty.id]
 
@@ -441,6 +448,7 @@ class AdmissionScoreService:
         year: Optional[int] = None,
         form: Optional[str] = None,
         level: Optional[str] = None,
+        only_active: bool = True,
     ) -> list[dict]:
         """Выборка проходных баллов с разрешением строковых фильтров.
 
@@ -450,13 +458,16 @@ class AdmissionScoreService:
         означает любой уровень — так находятся и специалитетные программы
         (медицина), а не только бакалавриат. Возвращает список плоских словарей,
         отсортированный по (program_name, year, form). Пустой список, если
-        ничего не найдено.
+        ничего не найдено. ``only_active=False`` включает архивные записи
+        для административного просмотра.
         """
         stmt = (
             select(AdmissionScore, Program, Faculty)
             .join(Program, AdmissionScore.program_id == Program.id)
             .join(Faculty, Program.faculty_id == Faculty.id)
         )
+        if only_active:
+            stmt = stmt.where(Program.is_active, Faculty.is_active)
 
         canonical_level = normalize_level(level)
         if canonical_level is not None:
@@ -464,14 +475,18 @@ class AdmissionScoreService:
 
         resolved_faculty = None
         if faculty is not None:
-            resolved_faculty = await self._find_faculty_loose(faculty)
+            resolved_faculty = await self._find_faculty_loose(
+                faculty, only_active=only_active
+            )
             # Без направления фильтровать не по чему; с направлением —
             # нераспознанный факультет не повод терять ответ.
             if resolved_faculty is None and program is None:
                 return []
 
         if program is not None:
-            ids = await self._match_program_ids_loose(program, resolved_faculty, level)
+            ids = await self._match_program_ids_loose(
+                program, resolved_faculty, level, only_active=only_active
+            )
             if not ids:
                 return []
             stmt = stmt.where(AdmissionScore.program_id.in_(ids))
