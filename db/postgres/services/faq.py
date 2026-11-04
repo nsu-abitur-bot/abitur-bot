@@ -24,8 +24,16 @@ class FaqDbService:
             logger.error(f"Ошибка получения всех FAQ: {e}")
             return []
 
-    async def create(self, question: str, aliases: list[str], answer: str) -> FaqEntry:
-        entry = FaqEntry(question=question, aliases=aliases, answer=answer)
+    async def create(
+        self,
+        question: str,
+        aliases: list[str],
+        answer: str,
+        metadata: dict | None = None,
+    ) -> FaqEntry:
+        entry = FaqEntry(
+            question=question, aliases=aliases, answer=answer, **(metadata or {})
+        )
         self.session.add(entry)
         try:
             await self._notify_changed()
@@ -43,6 +51,11 @@ class FaqDbService:
                 question=item["question"],
                 aliases=item.get("aliases", []),
                 answer=item["answer"],
+                verification_status=item.get("verification_status", "draft"),
+                source_document=item.get("source_document"),
+                source_location=item.get("source_location"),
+                confirmed_by=item.get("confirmed_by"),
+                confirmed_at=item.get("confirmed_at"),
             )
             for item in items
         ]
@@ -65,7 +78,12 @@ class FaqDbService:
         return result.scalar_one_or_none()
 
     async def update(
-        self, item_id: str, question: str, aliases: list[str], answer: str
+        self,
+        item_id: str,
+        question: str,
+        aliases: list[str],
+        answer: str,
+        metadata: dict | None = None,
     ) -> Optional[FaqEntry]:
         entry = await self.get(item_id)
         if not entry:
@@ -73,6 +91,8 @@ class FaqDbService:
         entry.question = question
         entry.aliases = aliases
         entry.answer = answer
+        for key, value in (metadata or {}).items():
+            setattr(entry, key, value)
         try:
             await self._notify_changed()
             await self.session.commit()
