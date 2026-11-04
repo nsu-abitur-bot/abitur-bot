@@ -342,6 +342,29 @@ class FeedbackReport(Base):
         )
 
 
+class AnswerFeedback(Base):
+    """Ответ, доступный для оценки одним нажатием."""
+
+    __tablename__ = "answer_feedback"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    session_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    channel: Mapped[str] = mapped_column(String(50), nullable=False)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    bot_response: Mapped[str] = mapped_column(Text, nullable=False)
+    rating: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    rated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ix_answer_feedback_rating", "rating"),
+        Index("ix_answer_feedback_created_at", "created_at"),
+    )
+
+
 class Settings(Base):
     """Настройки приложения."""
 
