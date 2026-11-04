@@ -48,6 +48,7 @@ from db.postgres.services.document import (
     DOCUMENT_STATUS_CHANGED,
     DOCUMENT_STATUS_UPDATED,
     DocumentService,
+    DocumentSourceUrlConflict,
 )
 from parser.nsu import parse_page
 from parser.safe_fetch import UnsafeURLError, fetch_url_async
@@ -382,11 +383,14 @@ async def update_rag_document(
         raise HTTPException(status_code=400, detail="Nothing to update")
 
     document_service = DocumentService(session)
-    document = await document_service.update_metadata(
-        doc_id,
-        title=request.title,
-        source_url=request.source_url,
-    )
+    try:
+        document = await document_service.update_metadata(
+            doc_id,
+            title=request.title,
+            source_url=request.source_url,
+        )
+    except DocumentSourceUrlConflict as exc:
+        raise HTTPException(status_code=409, detail="Source URL already in use") from exc
     if document is None:
         raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
 
