@@ -1,6 +1,12 @@
 from typing import Optional
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import JsonDict
+
+from db.postgres.models import EDUCATION_LEVELS
+
+_LEVEL_SCHEMA: JsonDict = {"enum": [level for level in sorted(EDUCATION_LEVELS)]}
+_OPTIONAL_LEVEL_SCHEMA: JsonDict = {"enum": [*sorted(EDUCATION_LEVELS), None]}
 
 
 class ProgramItem(BaseModel):
@@ -10,7 +16,7 @@ class ProgramItem(BaseModel):
     faculty_id: str
     name: str
     code: Optional[str] = None
-    level: str
+    level: str = Field(json_schema_extra=_LEVEL_SCHEMA)
     is_active: bool
 
     class Config:
@@ -21,7 +27,11 @@ class ProgramCreate(BaseModel):
     """Данные для создания направления подготовки."""
 
     name: str = Field(..., min_length=1, description="Название направления")
-    level: str = Field(..., description="Уровень: bachelor / specialist / master")
+    level: str = Field(
+        ...,
+        description="Уровень: bachelor / specialist / master / spo (СПО)",
+        json_schema_extra=_LEVEL_SCHEMA,
+    )
     code: Optional[str] = Field(None, description="Код направления (ФГОС)")
     is_active: bool = Field(True, description="Активно ли направление")
 
@@ -30,7 +40,11 @@ class ProgramUpdate(BaseModel):
     """Данные для обновления направления подготовки."""
 
     name: Optional[str] = Field(None, min_length=1, description="Название направления")
-    level: Optional[str] = Field(None, description="Уровень образования")
+    level: Optional[str] = Field(
+        None,
+        description="Уровень: bachelor / specialist / master / spo (СПО)",
+        json_schema_extra=_OPTIONAL_LEVEL_SCHEMA,
+    )
     code: Optional[str] = Field(None, description="Код направления (ФГОС)")
     is_active: Optional[bool] = Field(None, description="Активно ли направление")
 

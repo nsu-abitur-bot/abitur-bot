@@ -29,7 +29,9 @@ class FakeAdmissionScoreService:
         self.upserted = list(rows)
         return {"created": len(self.upserted), "updated": 0, "skipped": 0}
 
-    async def query_scores(self, *, faculty=None, program=None, year=None, form=None):
+    async def query_scores(
+        self, *, faculty=None, program=None, year=None, form=None, only_active=True
+    ):
         return self.query_result
 
     async def get_available_years(self):
@@ -122,6 +124,7 @@ def test_get_scores(client: TestClient, service: FakeAdmissionScoreService):
             "faculty_name": "Факультет информационных технологий",
             "program_name": "Программная инженерия",
             "code": "09.03.01",
+            "level": "bachelor",
             "year": 2024,
             "form": "budget",
             "passing_score": 246,
@@ -133,6 +136,7 @@ def test_get_scores(client: TestClient, service: FakeAdmissionScoreService):
     data = resp.json()
     assert len(data) == 1
     assert data[0]["passing_score"] == 246
+    assert data[0]["level"] == "bachelor"
 
 
 def test_get_years(client: TestClient):

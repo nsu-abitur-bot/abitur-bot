@@ -6,12 +6,12 @@ from datetime import UTC, datetime
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.client.default import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.enums import ParseMode
 from aiogram.filters import Command
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 
 from bot.core import ERROR_REPLY_TEXT, BotCore
 from bot.streaming import TelegramStreamer
@@ -124,6 +124,7 @@ async def answer_message(bot: Bot, core: BotCore, message: Message) -> None:
             text=reply.text,
             parse_mode=reply.parse_mode,
             fallback_plain=reply.fallback_plain_on_format_error,
+            feedback_id=reply.feedback_id,
         )
     except Exception:
         await streamer.close()
@@ -268,6 +269,33 @@ async def run_telegram_bot() -> bool | None:
         await bot.send_message(
             str(message.chat.id), normalize_links_for_messaging(reply.text)
         )
+
+    @dp.callback_query(F.data.startswith("rate:"))
+    async def rate_answer(callback: CallbackQuery):
+        parts = (callback.data or "").split(":", 2)
+        if len(parts) != 3 or parts[1] not in {"positive", "negative"}:
+            await callback.answer("Не удалось распознать оценку.")
+            return
+        try:
+            saved = await core.rate_answer(
+                "telegram", str(callback.from_user.id), parts[2], parts[1]
+            )
+        except Exception:
+            logger.exception("Не удалось сохранить оценку ответа в Telegram")
+            await callback.answer("Не удалось сохранить оценку. Попробуйте позже.")
+            return
+        await callback.answer(
+            "Спасибо за оценку!" if saved else "Ответ уже оценён или недоступен."
+        )
+        if saved and callback.message:
+            try:
+                await bot.edit_message_reply_markup(
+                    chat_id=callback.message.chat.id,
+                    message_id=callback.message.message_id,
+                    reply_markup=None,
+                )
+            except Exception:
+                logger.debug("Не удалось убрать кнопки оценки", exc_info=True)
 
     @dp.message()
     async def handle_message(message: Message):

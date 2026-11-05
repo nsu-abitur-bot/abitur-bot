@@ -2,9 +2,12 @@
 
 import asyncio
 import ipaddress
+import os
 import socket
+import ssl
 from collections.abc import Mapping
 
+import certifi
 import httpx
 
 MAX_BYTES = 25 * 1024 * 1024
@@ -14,6 +17,49 @@ _REDIRECTS = {301, 302, 303, 307, 308}
 
 class UnsafeURLError(ValueError):
     """The source is not a public HTTP(S) resource."""
+
+
+class _SourceTLSContext(ssl.SSLContext):
+    def __new__(cls, hostname: str) -> "_SourceTLSContext":
+        return super().__new__(cls, ssl.PROTOCOL_TLS_CLIENT)
+
+    def __init__(self, hostname: str) -> None:
+        self.hostname = hostname
+        self.load_verify_locations(cafile=certifi.where())
+
+    def wrap_socket(
+        self,
+        sock: socket.socket,
+        server_side: bool = False,
+        do_handshake_on_connect: bool = True,
+        suppress_ragged_eofs: bool = True,
+        server_hostname: bytes | str | None = None,
+        session: ssl.SSLSession | None = None,
+    ) -> ssl.SSLSocket:
+        return super().wrap_socket(
+            sock,
+            server_side=server_side,
+            do_handshake_on_connect=do_handshake_on_connect,
+            suppress_ragged_eofs=suppress_ragged_eofs,
+            server_hostname=self.hostname,
+            session=session,
+        )
+
+    def wrap_bio(
+        self,
+        incoming: ssl.MemoryBIO,
+        outgoing: ssl.MemoryBIO,
+        server_side: bool = False,
+        server_hostname: bytes | str | None = None,
+        session: ssl.SSLSession | None = None,
+    ) -> ssl.SSLObject:
+        return super().wrap_bio(
+            incoming,
+            outgoing,
+            server_side=server_side,
+            server_hostname=self.hostname,
+            session=session,
+        )
 
 
 def _public_address(value: str) -> bool:
@@ -104,9 +150,15 @@ def fetch_url(
 ) -> httpx.Response:
     """Fetch at most 25 MiB through at most five validated redirects."""
     for hop in range(MAX_REDIRECTS + 1):
+        original, pinned = _pin_url(url)
+        proxy = os.environ.get("SOURCE_HTTP_PROXY", "").strip() or None
+        # CONNECT implementations may discard sni_hostname and verify the pinned IP.
+        # A per-hop context keeps both SNI and certificate checks on the real host.
+        verify = _SourceTLSContext(original.host) if proxy else True
         # The pool is keyed by pinned IP, so never reuse TLS across redirect hosts.
-        with httpx.Client(verify=True, trust_env=False, timeout=timeout) as client:
-            original, pinned = _pin_url(url)
+        with httpx.Client(
+            verify=verify, trust_env=False, timeout=timeout, proxy=proxy
+        ) as client:
             request = _request(client, method, original, pinned, headers)
             response = client.send(request, stream=True)
             try:
@@ -145,10 +197,12 @@ async def fetch_url_async(
 ) -> httpx.Response:
     """Async equivalent of :func:`fetch_url`, including DNS pinning."""
     for hop in range(MAX_REDIRECTS + 1):
+        original, pinned = await asyncio.to_thread(_pin_url, url)
+        proxy = os.environ.get("SOURCE_HTTP_PROXY", "").strip() or None
+        verify = _SourceTLSContext(original.host) if proxy else True
         async with httpx.AsyncClient(
-            verify=True, trust_env=False, timeout=timeout
+            verify=verify, trust_env=False, timeout=timeout, proxy=proxy
         ) as client:
-            original, pinned = await asyncio.to_thread(_pin_url, url)
             request = _request(client, method, original, pinned, headers)
             response = await client.send(request, stream=True)
             try:

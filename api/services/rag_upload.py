@@ -1,18 +1,17 @@
 import csv
 import io
 import json
+from collections.abc import Sequence
 from html.parser import HTMLParser
 from pathlib import Path
 
-from fastapi import UploadFile
-from sqlalchemy import select
+from starlette.datastructures import UploadFile
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import UploadedDocumentResult
 from api.services.document_update import first_http_url
 from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
-from db.postgres.models import Settings
 from db.postgres.services.content_proposal import ContentProposalService
 from parser.pdf import pdf_to_base64_images
 from parser.utils import extract_sources
@@ -29,6 +28,19 @@ SUPPORTED_EXTENSIONS = {
     ".htm",
     ".pdf",
 }
+DEFAULT_MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024
+MAX_UPLOAD_FILES = 10
+UPLOAD_CHUNK_SIZE = 1024 * 1024
+# Multipart headers and boundaries add bytes beyond the file payloads.
+MAX_MULTIPART_OVERHEAD_BYTES = 64 * 1024
+
+
+def max_document_size_bytes() -> int:
+    try:
+        size = int(get_setting("MAX_DOCUMENT_SIZE", str(DEFAULT_MAX_FILE_SIZE_BYTES)))
+    except ValueError:
+        return DEFAULT_MAX_FILE_SIZE_BYTES
+    return size if size > 0 else DEFAULT_MAX_FILE_SIZE_BYTES
 
 
 class _HTMLTextExtractor(HTMLParser):
@@ -50,40 +62,27 @@ class RagUploadService:
     def accepted_formats(self) -> list[str]:
         return sorted(SUPPORTED_EXTENSIONS)
 
-    async def _get_settings(self) -> dict[str, str]:
-        async with AsyncSessionLocal() as session:
-            stmt = select(Settings)
-            result = await session.execute(stmt)
-            return {s.key: s.value for s in result.scalars()}
-
     async def ingest_files(
         self,
-        files: list[UploadFile],
+        files: Sequence[UploadFile],
         graph_id: str,
     ) -> list[UploadedDocumentResult]:
-        settings = await self._get_settings()
-        try:
-            max_file_size = int(
-                get_setting(
-                    "MAX_DOCUMENT_SIZE",
-                    settings.get("max_document_size", str(50 * 1024 * 1024)),
-                )
-            )
-        except ValueError:
-            max_file_size = 50 * 1024 * 1024
+        max_file_size = max_document_size_bytes()
 
         try:
-            max_pages = int(
-                get_setting(
-                    "MAX_DOCUMENT_PAGES", settings.get("max_document_pages", "50")
-                )
-            )
+            max_pages = int(get_setting("MAX_DOCUMENT_PAGES", "50"))
         except ValueError:
+            max_pages = 50
+        if max_pages < 1:
             max_pages = 50
 
         results: list[UploadedDocumentResult] = []
 
         for file in files:
+            # Release the previous document's buffers before reading the next file.
+            raw = b""
+            text = ""
+            prepared = ""
             filename = file.filename or "unnamed"
             extension = Path(filename).suffix.lower()
 
@@ -100,8 +99,28 @@ class RagUploadService:
                 )
                 continue
 
-            raw = await file.read()
-            if len(raw) > max_file_size:
+            declared_size = file.headers.get("content-length")
+            try:
+                too_large = (
+                    declared_size is not None and int(declared_size) > max_file_size
+                )
+            except ValueError:
+                too_large = False
+
+            raw_buffer = bytearray()
+            while not too_large:
+                chunk = await file.read(
+                    min(UPLOAD_CHUNK_SIZE, max_file_size - len(raw_buffer) + 1)
+                )
+                if not chunk:
+                    break
+                if len(raw_buffer) + len(chunk) > max_file_size:
+                    too_large = True
+                    break
+                raw_buffer.extend(chunk)
+
+            if too_large:
+                del raw_buffer
                 results.append(
                     UploadedDocumentResult(
                         filename=filename,
@@ -112,6 +131,9 @@ class RagUploadService:
                     )
                 )
                 continue
+
+            raw = bytes(raw_buffer)
+            del raw_buffer
 
             try:
                 text = await self._extract_text(

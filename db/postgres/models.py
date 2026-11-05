@@ -14,6 +14,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from uuid6 import uuid7
@@ -31,6 +32,7 @@ class EducationLevel(str, enum.Enum):
     bachelor = "bachelor"
     specialist = "specialist"
     master = "master"
+    spo = "spo"
 
 
 # Допустимые значения уровня образования (для валидации сидов/API).
@@ -342,6 +344,29 @@ class FeedbackReport(Base):
         )
 
 
+class AnswerFeedback(Base):
+    """Ответ, доступный для оценки одним нажатием."""
+
+    __tablename__ = "answer_feedback"
+
+    id: Mapped[str] = mapped_column(
+        String(36), primary_key=True, default=lambda: str(uuid7())
+    )
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    session_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    channel: Mapped[str] = mapped_column(String(50), nullable=False)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    bot_response: Mapped[str] = mapped_column(Text, nullable=False)
+    rating: Mapped[Optional[str]] = mapped_column(String(16), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+    rated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    __table_args__ = (
+        Index("ix_answer_feedback_rating", "rating"),
+        Index("ix_answer_feedback_created_at", "created_at"),
+    )
+
+
 class Settings(Base):
     """Настройки приложения."""
 
@@ -389,6 +414,16 @@ class Document(Base):
         UniqueConstraint("graph_id", "rag_doc_id", name="uq_document_graph_rag_doc_id"),
         Index("ix_document_graph_id", "graph_id"),
         Index("ix_document_source_url", "source_url"),
+        Index(
+            "ix_document_graph_source_url_active",
+            "graph_id",
+            "source_url",
+            unique=True,
+            postgresql_where=text(
+                "source_url IS NOT NULL AND source_url <> '' "
+                "AND status NOT IN ('deleted', 'удалён')"
+            ),
+        ),
         Index("ix_document_content_hash", "content_hash"),
         Index("ix_document_status", "status"),
         Index("ix_document_source_proposal_id", "source_proposal_id", unique=True),
@@ -434,6 +469,13 @@ class FaqEntry(Base):
     question: Mapped[str] = mapped_column(Text, nullable=False)
     aliases: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     answer: Mapped[str] = mapped_column(Text, nullable=False)
+    verification_status: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="draft", server_default="draft"
+    )
+    source_document: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    source_location: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    confirmed_by: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    confirmed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, default=timestamp, onupdate=timestamp
@@ -586,7 +628,7 @@ class Program(Base):
     """Направление подготовки (образовательная программа).
 
     Одно и то же название может существовать на разных уровнях образования
-    (бакалавриат / специалитет / магистратура), поэтому уникальность задаётся
+    (бакалавриат / специалитет / магистратура / СПО), поэтому уникальность задаётся
     тройкой (faculty_id, name, level).
     """
 
@@ -601,7 +643,7 @@ class Program(Base):
     name: Mapped[str] = mapped_column(String(300), nullable=False)
     # Код направления (ФГОС), например "09.03.01". Необязателен.
     code: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    # Уровень образования: bachelor / specialist / master.
+    # Уровень образования: bachelor / specialist / master / spo.
     level: Mapped[str] = mapped_column(
         String(20), nullable=False, default=EducationLevel.bachelor.value
     )

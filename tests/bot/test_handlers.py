@@ -30,7 +30,7 @@ class FakeTelegramBot:
     async def send_message_draft(self, **kwargs) -> None:
         return None
 
-    async def send_message(self, chat_id, text, parse_mode=None) -> None:
+    async def send_message(self, chat_id, text, parse_mode=None, **kwargs) -> None:
         if len(text) > 4096:
             raise TelegramBadRequest(
                 method=SendMessage(chat_id=chat_id, text=text),
@@ -148,14 +148,14 @@ class FakeMaxClient:
     async def send_action(self, **kwargs) -> None:
         return None
 
-    async def send_message(self, chat_id, text, parse_mode=None):
+    async def send_message(self, chat_id, text, parse_mode=None, **kwargs):
         if len(text) >= 4000:
             raise ValueError("text должен быть меньше 4000 символов")
         self.sent.append(text)
         mid = f"mid-{len(self.sent)}"
         return SimpleNamespace(message=SimpleNamespace(body=SimpleNamespace(mid=mid)))
 
-    async def edit_message(self, message_id, text, parse_mode=None) -> None:
+    async def edit_message(self, message_id, text, parse_mode=None, **kwargs) -> None:
         if len(text) >= 4000:
             raise ValueError("text должен быть меньше 4000 символов")
         self.edits.append((message_id, text))

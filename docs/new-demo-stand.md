@@ -74,7 +74,14 @@ WEB_HOST=nstu.abitur.site
 API_ORIGIN=https://api.nstu.abitur.site
 WEB_ORIGIN=https://nstu.abitur.site
 OUTBOUND_HTTP_PROXY=
+SOURCE_HTTP_PROXY=
 ```
+
+Если сайт вуза недоступен с сервера, но доступен через уже настроенный прокси,
+задайте `SOURCE_HTTP_PROXY` отдельно для этого стенда. Например,
+`http://host.docker.internal:7890` для HTTP-прокси на Docker-хосте. Порт должен
+быть доступен из сети контейнера. Это прокси загрузки источников, включая CSV,
+HTML, PDF и проверку обновлений; `OUTBOUND_HTTP_PROXY` его не заменяет.
 
 Передать по SSH и установить root:root0600 в `/etc/abitur-instances/nstu.env`.
 Не копировать nsu.env и не менять существующие env. Сохранить новую конфигурацию

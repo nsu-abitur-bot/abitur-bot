@@ -162,7 +162,7 @@ class FacultyHint:
 # Маркеры уровня образования в тексте вопроса.
 _LEVEL_MARKERS: dict[str, tuple[str, ...]] = {
     "master": ("магистратур", "магистр", "магистерск"),
-    "specialist": ("специалитет", "специалист"),
+    "specialist": ("специалитет",),
     "bachelor": ("бакалавриат", "бакалавр", "бакалаврск"),
 }
 
@@ -170,6 +170,8 @@ _LEVEL_MARKERS: dict[str, tuple[str, ...]] = {
 def detect_level(question: str) -> Optional[str]:
     """Определяет уровень образования по тексту вопроса (или None)."""
     lowered = question.lower()
+    if re.search(r"\bспо\b|\bсредн\w*\s+профессиональн\w*\s+образовани\w*", lowered):
+        return "spo"
     for level, markers in _LEVEL_MARKERS.items():
         if any(marker in lowered for marker in markers):
             return level
@@ -270,7 +272,7 @@ def _split_segments(text: str) -> list[str]:
     формулировкам документа.
 
     Границы: пустые строки (абзацы), переносы строк и концы предложений
-    («.», «!», «?»), за которыми идёт пробел. Точки внутри кодов направлений
+    («.», «!», «?», «;»), за которыми идёт пробел. Точки внутри кодов направлений
     (09.03.01) концом предложения не считаются — за ними нет пробела. Названия в
     «ёлочках» защищаются от разбиения целиком: внутри бывают точки («…техника.
     Программная инженерия…»), которые не должны рвать название. Так фильтр не
@@ -289,7 +291,7 @@ def _split_segments(text: str) -> list[str]:
     for para in re.split(r"\n\s*\n", masked):
         if not para.strip():
             continue
-        for part in re.split(r"(?<=[.!?])\s+|\n+", para):
+        for part in re.split(r"(?<=[.!?;])\s+|\n+", para):
             if not part or not part.strip():
                 continue
             for key, value in protected.items():
@@ -303,22 +305,24 @@ async def _load_scrub_context(
 ) -> Optional[tuple[list[str], list[str]]]:
     """Готовит нормализованные названия направлений для сегментной вычистки.
 
-    Возвращает (own_names, foreign_names): направления запрошенного факультета и
-    направления ЧУЖИХ факультетов (на нужном уровне). Одноимённые с запрошенным
-    факультетом из foreign исключаются. Оба списка — по убыванию длины, чтобы
-    классификация по самому длинному совпадению работала корректно.
+    Возвращает (own_names, foreign_names): программы выбранного факультета и
+    уровня и программы, не соответствующие этим фильтрам. При отсутствии
+    факультета фильтруется только уровень. Одноимённые программы исключаются
+    из foreign: различить их можно по явной метке уровня в сегменте. Списки
+    упорядочены по убыванию длины для классификации по самому длинному имени.
     """
-    if hint.faculty is None:
+    if hint.faculty is None and hint.level is None:
         return None
     try:
         async with AsyncSessionLocal() as session:
             service = FacultyService(session)
-            own = await service.get_programs_by_faculty(
-                hint.faculty.id, level=hint.level, only_active=True
-            )
-            all_programs = await service.get_all_programs(
-                level=hint.level, only_active=True
-            )
+            all_programs = await service.get_all_programs(only_active=True)
+            own = [
+                p
+                for p in all_programs
+                if (hint.faculty is None or p.faculty_id == hint.faculty.id)
+                and (hint.level is None or p.level == hint.level)
+            ]
     except Exception as exc:
         logger.warning("CRAG: не удалось загрузить справочник для фильтрации: %s", exc)
         return None
@@ -327,7 +331,10 @@ async def _load_scrub_context(
     foreign_names = {
         n
         for p in all_programs
-        if p.faculty_id != hint.faculty.id
+        if (
+            (hint.faculty is not None and p.faculty_id != hint.faculty.id)
+            or (hint.level is not None and p.level != hint.level)
+        )
         and (n := normalize_name(p.name))
         and len(n) >= 4
         and n not in own_names
@@ -364,8 +371,38 @@ def _segment_is_foreign(
     return best_foreign
 
 
+def _segment_has_foreign_level(
+    segment: str, level: Optional[str], program_names: list[str]
+) -> bool:
+    if level is None:
+        return False
+    lowered = segment.lower()
+    levels = {
+        candidate
+        for candidate, markers in _LEVEL_MARKERS.items()
+        if any(marker in lowered for marker in markers)
+    }
+    if detect_level(segment) == "spo":
+        levels.add("spo")
+    # В тексте «специалист» может обозначать квалификацию выпускника (в т.ч. в СПО)
+    # или сотрудника (например, приёмной комиссии). Уровень образования подтверждает
+    # только явное упоминание специалитета.
+    if "специалитет" not in lowered:
+        levels.discard("specialist")
+    if len(levels) > 1:
+        # Общие сравнения уровней полезны; смешанные сведения о конкретных
+        # программах нельзя безопасно приписать одному уровню.
+        normalized = normalize_name(segment)
+        if not any(name in normalized for name in program_names):
+            return False
+    return bool(levels - {level})
+
+
 def _scrub_chunk(
-    chunk: CragChunk, own_names: list[str], foreign_names: list[str]
+    chunk: CragChunk,
+    own_names: list[str],
+    foreign_names: list[str],
+    level: Optional[str] = None,
 ) -> Optional[CragChunk]:
     """Вычищает из чанка сегменты про чужие направления.
 
@@ -376,7 +413,9 @@ def _scrub_chunk(
     kept: list[str] = []
     removed = False
     for segment in segments:
-        if _segment_is_foreign(segment, own_names, foreign_names):
+        if _segment_has_foreign_level(
+            segment, level, own_names + foreign_names
+        ) or _segment_is_foreign(segment, own_names, foreign_names):
             removed = True
             continue
         kept.append(segment)
@@ -413,6 +452,7 @@ def _build_grading_prompt(
             "bachelor": "бакалавриат",
             "specialist": "специалитет",
             "master": "магистратура",
+            "spo": "СПО (среднее профессиональное образование)",
         }
         level_clause = (
             f"\nУровень образования в вопросе: {level_map.get(hint.level, hint.level)}. "
@@ -520,14 +560,14 @@ async def filter_chunks(
     # вычищаем из чанков сегменты про чужие направления, а не режем чанк
     # целиком — иначе теряем данные нужного факультета в смешанных чанках.
     after_authority: list[CragChunk] = []
-    if config.use_faculty_table and hint.faculty is not None:
+    if config.use_faculty_table and (hint.faculty is not None or hint.level is not None):
         scrub = await _load_scrub_context(hint)
         if scrub is None:
             after_authority = list(chunks)
         else:
             own_names, foreign_names = scrub
             for chunk in chunks:
-                scrubbed = _scrub_chunk(chunk, own_names, foreign_names)
+                scrubbed = _scrub_chunk(chunk, own_names, foreign_names, hint.level)
                 if scrubbed is not None:
                     after_authority.append(scrubbed)
     else:

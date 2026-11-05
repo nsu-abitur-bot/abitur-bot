@@ -463,3 +463,188 @@ async def test_topic_switch_preserves_new_faculty_over_history(seeded, monkeypat
         "Сохрани упоминание факультета «Факультет информационных технологий»"
         not in rewriter_calls[0]
     )
+
+
+@pytest.mark.parametrize(
+    ("question", "expected"),
+    [
+        ("Какие программы СПО есть в колледже?", "spo"),
+        ("Программы среднего профессионального образования", "spo"),
+        ("Поступление на среднее профессиональное образование", "spo"),
+        ("Спортивные мероприятия", None),
+        ("Какие способности нужны?", None),
+        ("Какие программы специалитета есть в НГУ?", "specialist"),
+        ("Поступление на специалитет", "specialist"),
+        ("Для подачи документов обратитесь к специалисту приёмной комиссии", None),
+        ("Квалификация выпускника — специалист по защите информации", None),
+    ],
+)
+def test_detect_spo_level(question, expected):
+    from rag.crag import detect_level
+
+    assert detect_level(question) == expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("faculty_query", ["", "на ФИТ"])
+@pytest.mark.parametrize("level", ["spo", "bachelor"])
+async def test_scrub_separates_education_levels(
+    seeded, monkeypatch, faculty_query, level
+):
+    import rag.crag as crag_module
+    from rag.crag import CragChunk, CragConfig, filter_chunks
+
+    async with seeded() as session:
+        service = FacultyService(session)
+        faculty = await service.find_faculty_by_alias("ФИТ")
+        assert faculty is not None
+        await service.create_program(
+            faculty.id, "Информационные системы и программирование", level="spo"
+        )
+
+    async def always_keep(*args, **kwargs):
+        return True
+
+    monkeypatch.setattr(crag_module, "grade_chunk", always_keep)
+    chunk = CragChunk(
+        index=0,
+        content=(
+            "Обучение ведётся в университете.\n\n"
+            "Информационные системы и программирование — СПО.\n\n"
+            "Программная инженерия — бакалавриат."
+        ),
+        source_url=None,
+        file_path=None,
+    )
+    query_level = "СПО" if level == "spo" else "бакалавриата"
+    kept, hint = await filter_chunks(
+        f"Какие программы {query_level} {faculty_query}?",
+        [chunk],
+        CragConfig(enabled=True, use_faculty_table=True),
+    )
+    assert hint.level == level
+    assert len(kept) == 1
+    text = kept[0].content
+    assert "Обучение ведётся в университете" in text
+    assert ("Информационные системы" in text) == (level == "spo")
+    assert ("Программная инженерия" in text) == (level == "bachelor")
+
+
+@pytest.mark.parametrize("level", ["spo", "bachelor"])
+def test_scrub_splits_levels_separated_by_semicolon(level):
+    from rag.crag import CragChunk, _scrub_chunk
+
+    names = {"spo": "программа колледжа", "bachelor": "программа университета"}
+    other = "bachelor" if level == "spo" else "spo"
+    chunk = CragChunk(
+        index=0,
+        content="Программа колледжа — СПО; программа университета — бакалавриат.",
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, [names[level]], [names[other]], level)
+    assert result is not None
+    assert names[level] in result.content.lower()
+    assert names[other] not in result.content.lower()
+
+
+@pytest.mark.parametrize("level", ["spo", "bachelor"])
+def test_scrub_drops_indivisible_mixed_program_segment(level):
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content="Информатика представлена программами СПО и бакалавриата.",
+        source_url=None,
+        file_path=None,
+    )
+    assert _scrub_chunk(chunk, ["информатика"], [], level) is None
+
+
+@pytest.mark.parametrize("level", ["spo", "bachelor"])
+def test_scrub_preserves_general_comparison_of_levels(level):
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content="СПО и бакалавриат — разные уровни образования.",
+        source_url=None,
+        file_path=None,
+    )
+    assert _scrub_chunk(chunk, [], [], level) == chunk
+
+
+def test_scrub_preserves_spo_specialist_qualification():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content=(
+            "Программа СПО «Информационные системы и программирование» "
+            "присваивает квалификацию специалист по информационным системам."
+        ),
+        source_url=None,
+        file_path=None,
+    )
+    assert (
+        _scrub_chunk(chunk, ["информационные системы и программирование"], [], "spo")
+        == chunk
+    )
+
+
+def test_scrub_keeps_explicit_specialitet_as_foreign_to_spo():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content="Информатика представлена программами СПО и специалитета.",
+        source_url=None,
+        file_path=None,
+    )
+    assert _scrub_chunk(chunk, ["информатика"], [], "spo") is None
+
+
+def test_scrub_preserves_spo_specialist_qualification_on_separate_line():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content=(
+            "Информационные системы и программирование — СПО.\n"
+            "Квалификация выпускника — специалист по информационным системам."
+        ),
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, ["информационные системы и программирование"], [], "spo")
+    assert result is not None
+    assert "специалист по информационным системам" in result.content
+
+
+def test_scrub_preserves_specialist_contact_for_bachelor():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content="Для подачи документов обратитесь к специалисту приёмной комиссии.",
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, ["программная инженерия"], [], "bachelor")
+    assert result is not None
+    assert "специалисту приёмной комиссии" in result.content
+
+
+def test_scrub_drops_foreign_specialitet_keeps_bachelor():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content=("Программная инженерия — бакалавриат.\nЛечебное дело — специалитет."),
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, ["программная инженерия"], ["лечебное дело"], "bachelor")
+    assert result is not None
+    assert "Программная инженерия — бакалавриат." in result.content
+    assert "Лечебное дело" not in result.content

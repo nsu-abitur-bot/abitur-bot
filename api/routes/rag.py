@@ -2,14 +2,28 @@ import asyncio
 import csv
 import io
 import logging
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 from urllib.parse import unquote
 
 import httpx
 from bs4 import BeautifulSoup
-from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
+from fastapi import (
+    APIRouter,
+    Body,
+    Depends,
+    File,
+    HTTPException,
+    Query,
+    Request,
+    UploadFile,
+)
 from fastapi.responses import Response
 from pydantic import HttpUrl
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.datastructures import FormData
+from starlette.datastructures import UploadFile as StarletteUploadFile
+from starlette.formparsers import MultiPartException, MultiPartParser
 
 from abbrev.expander import get_abbrev_expander
 from api.schemas.rag import (
@@ -41,13 +55,19 @@ from api.services.document_update import (
     fetch_url_bytes,
     readable_fetch_error,
 )
-from api.services.rag_upload import RagUploadService
+from api.services.rag_upload import (
+    MAX_MULTIPART_OVERHEAD_BYTES,
+    MAX_UPLOAD_FILES,
+    RagUploadService,
+    max_document_size_bytes,
+)
 from api.services.url_to_rag import parse_and_save_url
 from db.postgres.db import get_async_session
 from db.postgres.services.document import (
     DOCUMENT_STATUS_CHANGED,
     DOCUMENT_STATUS_UPDATED,
     DocumentService,
+    DocumentSourceUrlConflict,
 )
 from parser.nsu import parse_page
 from parser.safe_fetch import UnsafeURLError, fetch_url_async
@@ -64,20 +84,92 @@ def get_rag_upload_service() -> RagUploadService:
     return RagUploadService()
 
 
-@router.post(
-    "/upload", response_model=RagUploadResponse, summary="Загрузить документы в RAG"
-)
-async def upload_documents_to_rag(
-    files: list[UploadFile] = File(..., description="Файлы для индексации в RAG"),
-    service: RagUploadService = Depends(get_rag_upload_service),
-) -> RagUploadResponse:
-    if not files:
-        raise HTTPException(status_code=400, detail="No files provided")
+class _UploadRequestTooLarge(MultiPartException):
+    pass
+
+
+@asynccontextmanager
+async def _upload_form(request: Request, max_size: int) -> AsyncGenerator[FormData]:
+    async def limited_stream() -> AsyncGenerator[bytes]:
+        received = 0
+        async for chunk in request.stream():
+            received += len(chunk)
+            if received > max_size:
+                # Starlette closes partial spool files for MultiPartException.
+                raise _UploadRequestTooLarge("Upload request is too large")
+            yield chunk
+
+    parser = MultiPartParser(
+        request.headers, limited_stream(), max_files=MAX_UPLOAD_FILES, max_fields=0
+    )
+    try:
+        form = await parser.parse()
+    except _UploadRequestTooLarge as exc:
+        raise HTTPException(status_code=413, detail=exc.message) from None
+    except MultiPartException as exc:
+        raise HTTPException(status_code=400, detail=exc.message) from None
 
     try:
-        results = await service.ingest_files(files=files, graph_id=DEFAULT_GRAPH_ID)
-    except Exception:
-        raise HTTPException(status_code=503, detail="RAG ingestion unavailable")
+        yield form
+    finally:
+        await form.close()
+
+
+@router.post(
+    "/upload",
+    response_model=RagUploadResponse,
+    summary="Загрузить документы в RAG",
+    openapi_extra={
+        "requestBody": {
+            "required": True,
+            "content": {
+                "multipart/form-data": {
+                    "schema": {
+                        "type": "object",
+                        "required": ["files"],
+                        "properties": {
+                            "files": {
+                                "type": "array",
+                                "items": {"type": "string", "format": "binary"},
+                            }
+                        },
+                    }
+                }
+            },
+        }
+    },
+)
+async def upload_documents_to_rag(
+    request: Request,
+    service: RagUploadService = Depends(get_rag_upload_service),
+) -> RagUploadResponse:
+    max_request_size = (
+        MAX_UPLOAD_FILES * max_document_size_bytes() + MAX_MULTIPART_OVERHEAD_BYTES
+    )
+    declared_size = request.headers.get("content-length")
+    if declared_size is not None:
+        try:
+            if int(declared_size) > max_request_size:
+                raise HTTPException(status_code=413, detail="Upload request is too large")
+        except ValueError:
+            raise HTTPException(
+                status_code=400, detail="Invalid Content-Length"
+            ) from None
+
+    async with _upload_form(request, max_request_size) as form:
+        items = form.getlist("files")
+        if not items:
+            raise HTTPException(status_code=400, detail="No files provided")
+        files = [item for item in items if isinstance(item, StarletteUploadFile)]
+        if len(files) != len(items):
+            raise HTTPException(status_code=400, detail="Invalid files")
+
+        try:
+            results = await service.ingest_files(files=files, graph_id=DEFAULT_GRAPH_ID)
+        except Exception:
+            raise HTTPException(
+                status_code=503, detail="RAG ingestion unavailable"
+            ) from None
 
     queued_count = sum(1 for result in results if result.status == "queued")
     skipped_count = len(results) - queued_count
@@ -382,11 +474,14 @@ async def update_rag_document(
         raise HTTPException(status_code=400, detail="Nothing to update")
 
     document_service = DocumentService(session)
-    document = await document_service.update_metadata(
-        doc_id,
-        title=request.title,
-        source_url=request.source_url,
-    )
+    try:
+        document = await document_service.update_metadata(
+            doc_id,
+            title=request.title,
+            source_url=request.source_url,
+        )
+    except DocumentSourceUrlConflict as exc:
+        raise HTTPException(status_code=409, detail="Source URL already in use") from exc
     if document is None:
         raise HTTPException(status_code=404, detail=f"Document '{doc_id}' not found")
 

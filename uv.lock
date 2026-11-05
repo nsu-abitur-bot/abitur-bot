@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -17,6 +17,7 @@ dependencies = [
     { name = "asyncpg" },
     { name = "bcrypt" },
     { name = "bs4" },
+    { name = "certifi" },
     { name = "chonkie" },
     { name = "chromadb" },
     { name = "cryptography" },
@@ -63,6 +64,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "bcrypt", specifier = ">=4.0.0" },
     { name = "bs4", specifier = ">=0.0.2" },
+    { name = "certifi", specifier = ">=2025.10.5" },
     { name = "chonkie", specifier = ">=1.4.2" },
     { name = "chromadb", specifier = ">=1.2.1" },
     { name = "cryptography", specifier = ">=50.0.2" },

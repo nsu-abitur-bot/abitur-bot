@@ -2,9 +2,13 @@
 Тесты для FaqDbService.
 """
 
+from datetime import datetime
+
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.schemas.faq import FaqItem
+from api.services.faq import FaqService
 from db.postgres.services.faq import FaqDbService
 
 
@@ -91,6 +95,34 @@ async def test_create_many_faq_entries(session: AsyncSession):
     all_entries = await service.get_all()
     assert len(entries) == 2
     assert len(all_entries) == 2
+
+
+@pytest.mark.asyncio
+async def test_faq_verification_metadata_survives_legacy_update(session: AsyncSession):
+    service = FaqService(session)
+    confirmed_at = datetime(2026, 11, 4, 12, 0)
+    created = await service.create(
+        FaqItem(
+            question="Когда подать документы?",
+            answer="До 20 июля.",
+            verification_status="confirmed",
+            source_document="Правила приёма 2026",
+            source_location="пункт 12",
+            confirmed_by="Иванова",
+            confirmed_at=confirmed_at,
+        )
+    )
+
+    updated = await service.update(
+        created.id or "", FaqItem(question="Когда подать?", answer="До 20 июля.")
+    )
+
+    assert updated.verification_status == "confirmed"
+    assert updated.source_document == "Правила приёма 2026"
+    assert updated.source_location == "пункт 12"
+    assert updated.confirmed_by == "Иванова"
+    assert updated.confirmed_at == confirmed_at
+    assert (await service.get_all())[0] == updated
 
 
 @pytest.mark.asyncio

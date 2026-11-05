@@ -1,4 +1,4 @@
-"""Тесты инструмента get_admission_scores против реальной тестовой БД.
+"""Тесты инструментов баллов и справочника против реальной тестовой БД.
 
 Проверяем, что для двух направлений ФИТ инструмент отдаёт РАЗНЫЕ проходные
 баллы, а также работу метрик (проходной/средний) и пустого результата.
@@ -230,3 +230,117 @@ async def test_custom_scores_use_own_university(sessionmaker_bound, expander):
     assert "НГУ" not in text
     assert "Северная инженерия — Факультет Севера" in text
     assert "2025, бюджет: проходной 210" in text
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("level", ["spo", "bachelor"])
+async def test_program_directory_tool_separates_levels(
+    sessionmaker_bound, monkeypatch, level
+):
+    from pipeline.tools import education_programs
+
+    monkeypatch.setattr(education_programs, "AsyncSessionLocal", sessionmaker_bound)
+    await _seed_fit(sessionmaker_bound)
+    async with sessionmaker_bound() as session:
+        service = FacultyService(session)
+        faculty = await service.find_faculty_by_alias("ФИТ")
+        assert faculty is not None
+        await service.create_program(
+            faculty.id,
+            "Информационные системы и программирование",
+            level="spo",
+            code="09.02.07",
+        )
+    text = await default_tool_executor("get_education_programs", {"level": level})
+    assert ("09.02.07" in text) == (level == "spo")
+    assert ("09.03.04" in text) == (level == "bachelor")
+    assert ("СПО" in text) == (level == "spo")
+
+
+@pytest.mark.asyncio
+async def test_scores_tool_retains_level_in_year_fallback(sessionmaker_bound, expander):
+    await _seed_fit(sessionmaker_bound)
+    text = await execute_admission_scores(
+        {"faculty": "ФИТ", "level": "spo", "year": 2026}
+    )
+    assert text == "По этому запросу данных о проходных баллах нет."
+
+
+def test_format_scores_distinguishes_same_names_at_different_levels():
+    from pipeline.tools.admission_scores import _format_scores
+
+    rows = [
+        {"program_name": "Информатика", "level": "bachelor", "year": 2024},
+        {"program_name": "Информатика", "level": "spo", "year": 2024},
+    ]
+    text = _format_scores(rows, "passing")
+    assert "бакалавриат" in text
+    assert "СПО" in text
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("level", ["spo", "bachelor"])
+async def test_scores_tool_separates_same_name_programs(
+    sessionmaker_bound, expander, level
+):
+    await _seed_fit(sessionmaker_bound)
+    name = "Программная инженерия и компьютерные науки"
+    async with sessionmaker_bound() as session:
+        service = FacultyService(session)
+        faculty = await service.find_faculty_by_alias("ФИТ")
+        assert faculty is not None
+        await service.create_program(faculty.id, name, level="spo", code="09.02.07")
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    faculty_name="ФИТ",
+                    program_name=name,
+                    code="09.02.07",
+                    level="spo",
+                    year=2024,
+                    form="budget",
+                    passing_score=5,
+                    average_score=None,
+                )
+            ]
+        )
+    text = await execute_admission_scores({"program": name, "level": level, "year": 2026})
+    assert "За 2026 год данных нет" in text
+    assert ("проходной 5" in text) == (level == "spo")
+    assert ("246" in text) == (level == "bachelor")
+    assert ("СПО" in text) == (level == "spo")
+
+
+@pytest.mark.asyncio
+async def test_unknown_level_does_not_broaden_tool_search():
+    text = await default_tool_executor("get_education_programs", {"level": "unknown"})
+    assert text == "Неизвестный уровень образования."
+    text = await execute_admission_scores({"level": "unknown"})
+    assert text == "Неизвестный уровень образования."
+
+
+@pytest.mark.asyncio
+async def test_program_tool_excludes_inactive_entries(sessionmaker_bound, monkeypatch):
+    from pipeline.tools import education_programs
+
+    monkeypatch.setattr(education_programs, "AsyncSessionLocal", sessionmaker_bound)
+    async with sessionmaker_bound() as session:
+        service = FacultyService(session)
+        active = await service.create_faculty("Колледж")
+        inactive = await service.create_faculty("Закрытое подразделение", is_active=False)
+        await service.create_program(active.id, "Доступная программа", level="spo")
+        await service.create_program(
+            active.id, "Архивная программа", level="spo", is_active=False
+        )
+        await service.create_program(inactive.id, "Скрытая программа", level="spo")
+    text = await default_tool_executor("get_education_programs", {"level": "spo"})
+    assert "Доступная программа" in text
+    assert "Архивная программа" not in text
+    assert "Скрытая программа" not in text
+    for faculty in ("Колледж", "Закрытое подразделение"):
+        text = await default_tool_executor(
+            "get_education_programs", {"level": "spo", "faculty": faculty}
+        )
+        assert "Архивная программа" not in text
+        assert "Скрытая программа" not in text
+        assert ("Доступная программа" in text) == (faculty == "Колледж")

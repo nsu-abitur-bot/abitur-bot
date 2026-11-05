@@ -11,8 +11,11 @@ from typing import Optional
 from abbrev.expander import get_abbrev_expander
 from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
+from db.postgres.models import EDUCATION_LEVELS
 from db.postgres.services.admission_score import AdmissionScoreService
+from db.postgres.services.faculty import normalize_level
 from llm.base import ToolSpec
+from pipeline.tools.education_programs import LEVEL_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +24,7 @@ ADMISSION_SCORES_TOOL = ToolSpec(
     name="get_admission_scores",
     description=(
         "Проходные и средние баллы прошлых лет по направлениям НГУ "
-        "(бакалавриат и специалитет). "
+        "с фильтрацией по уровню образования. "
         "Используй для любых вопросов про проходной/средний балл, чтобы не "
         "выдумывать числа."
     ),
@@ -42,6 +45,14 @@ ADMISSION_SCORES_TOOL = ToolSpec(
                     "полное название, его часть или сокращение (например, "
                     "«Компьютерные науки и системотехника», «ПИиКН», "
                     "«прикладная математика»). Необязательно."
+                ),
+            },
+            "level": {
+                "type": "string",
+                "enum": sorted(EDUCATION_LEVELS),
+                "description": (
+                    "Уровень из вопроса: spo — СПО, bachelor — бакалавриат, "
+                    "specialist — специалитет, master — магистратура."
                 ),
             },
             "year": {
@@ -111,18 +122,20 @@ def _format_scores(rows: list[dict], metric: str) -> str:
     )
     lines: list[str] = [header]
 
-    current_key: Optional[tuple[str, Optional[str]]] = None
+    current_key: Optional[tuple] = None
     for row in rows:
         program = row.get("program_name") or "—"
         code = row.get("code")
         faculty = row.get("faculty_name") or ""
-        key = (program, code)
+        level = row.get("level")
+        key = (program, code, faculty, level)
         if key != current_key:
             current_key = key
             code_suffix = f" ({code})" if code else ""
             faculty_suffix = f" — {faculty}" if faculty else ""
             lines.append("")
-            lines.append(f"{program}{code_suffix}{faculty_suffix}:")
+            level_suffix = f" [{LEVEL_LABELS.get(level, level)}]" if level else ""
+            lines.append(f"{program}{code_suffix}{faculty_suffix}{level_suffix}:")
 
         year = row.get("year")
         form_label = _FORM_LABELS.get(row.get("form", ""), row.get("form", ""))
@@ -159,6 +172,10 @@ async def execute_admission_scores(arguments: dict) -> str:
     Пустые/отсутствующие фильтры не передаются в сервис. Если данных нет —
     возвращает единый маркер, по которому модель понимает, что цифр нет.
     """
+    raw_level = arguments.get("level")
+    level = normalize_level(str(raw_level)) if raw_level is not None else None
+    if raw_level is not None and level is None:
+        return "Неизвестный уровень образования."
     metric = str(arguments.get("metric") or "passing").lower()
     if metric not in ("passing", "average", "both"):
         metric = "passing"
@@ -172,14 +189,18 @@ async def execute_admission_scores(arguments: dict) -> str:
         async with AsyncSessionLocal() as session:
             service = AdmissionScoreService(session)
             rows = await service.query_scores(
-                faculty=faculty, program=program, year=year, form=_str_or_none(form)
+                faculty=faculty,
+                program=program,
+                year=year,
+                form=_str_or_none(form),
+                level=level,
             )
             note = ""
             if not rows and year is not None:
                 # Модель подставляет текущий год, а итоги приёма за него ещё не
                 # опубликованы: лучше показать прошлые годы, чем «данных нет».
                 rows = await service.query_scores(
-                    faculty=faculty, program=program, form=_str_or_none(form)
+                    faculty=faculty, program=program, form=_str_or_none(form), level=level
                 )
                 if rows:
                     note = f"За {year} год данных нет, показаны доступные годы."

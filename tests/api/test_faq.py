@@ -73,6 +73,11 @@ def test_get_faq_list(client: TestClient):
     assert len(data["items"]) == 2
     assert data["items"][0]["question"] == "TEST_QUESTION_1"
     assert "ALIAS_1" in data["items"][0]["aliases"]
+    assert data["items"][0]["verification_status"] == "draft"
+    assert "source_document" in data["items"][0]
+    assert "source_location" in data["items"][0]
+    assert "confirmed_by" in data["items"][0]
+    assert "confirmed_at" in data["items"][0]
 
 
 def test_create_faq_item(client: TestClient):
@@ -93,6 +98,19 @@ def test_create_faq_item(client: TestClient):
     items = get_response.json()["items"]
     assert len(items) == 3
     assert items[-1]["question"] == "NEW_QUESTION"
+
+
+def test_confirmed_faq_requires_date_and_origin(client: TestClient):
+    response = client.post(
+        "/api/v1/faq",
+        json={
+            "question": "Когда подать документы?",
+            "answer": "До 20 июля.",
+            "verification_status": "confirmed",
+        },
+    )
+
+    assert response.status_code == 422
 
 
 def test_update_faq_item(client: TestClient):
