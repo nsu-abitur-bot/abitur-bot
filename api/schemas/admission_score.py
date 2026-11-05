@@ -2,6 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
+from db.postgres.models import EducationLevel
+
 
 class ScoreRowSchema(BaseModel):
     """Строка проходного балла (сырая, до/после разрешения в program_id)."""
@@ -13,7 +15,9 @@ class ScoreRowSchema(BaseModel):
     form: str = Field(..., description="Форма обучения: budget / paid")
     passing_score: Optional[int] = Field(None, description="Проходной балл")
     average_score: Optional[float] = Field(None, description="Средний балл")
-    level: str = Field("bachelor", description="Уровень: bachelor / specialist")
+    level: str = Field(
+        "bachelor", description="Уровень: bachelor / specialist / master / spo (СПО)"
+    )
 
 
 class UnmatchedSample(BaseModel):
@@ -69,6 +73,7 @@ class ScoreItem(BaseModel):
 
     faculty_name: str
     program_name: str
+    level: EducationLevel = Field(..., description="Уровень образования программы")
     code: Optional[str] = None
     year: int
     form: str

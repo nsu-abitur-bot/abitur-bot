@@ -508,6 +508,7 @@ class AdmissionScoreService:
                     "faculty_name": fac.name,
                     "program_name": prog.name,
                     "code": prog.code,
+                    "level": prog.level,
                     "year": score.year,
                     "form": score.form,
                     "passing_score": score.passing_score,

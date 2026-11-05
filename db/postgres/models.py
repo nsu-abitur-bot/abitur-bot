@@ -32,6 +32,7 @@ class EducationLevel(str, enum.Enum):
     bachelor = "bachelor"
     specialist = "specialist"
     master = "master"
+    spo = "spo"
 
 
 # Допустимые значения уровня образования (для валидации сидов/API).
@@ -627,7 +628,7 @@ class Program(Base):
     """Направление подготовки (образовательная программа).
 
     Одно и то же название может существовать на разных уровнях образования
-    (бакалавриат / специалитет / магистратура), поэтому уникальность задаётся
+    (бакалавриат / специалитет / магистратура / СПО), поэтому уникальность задаётся
     тройкой (faculty_id, name, level).
     """
 
@@ -642,7 +643,7 @@ class Program(Base):
     name: Mapped[str] = mapped_column(String(300), nullable=False)
     # Код направления (ФГОС), например "09.03.01". Необязателен.
     code: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    # Уровень образования: bachelor / specialist / master.
+    # Уровень образования: bachelor / specialist / master / spo.
     level: Mapped[str] = mapped_column(
         String(20), nullable=False, default=EducationLevel.bachelor.value
     )
