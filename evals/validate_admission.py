@@ -75,6 +75,21 @@ def validate_dataset(directory: Path = DATASETS) -> dict:
         if case["evaluation_group"] == "document":
             require(bool(case.get("mandatory_facts")), f"{scenario.id}: missing facts")
             require(
+                bool(case.get("behavior_constraints")),
+                f"{scenario.id}: missing separate behavior constraints",
+            )
+            selection = case.get("fact_selection", {})
+            require(
+                selection.get("mode") in {"all", "at_least"},
+                f"{scenario.id}: invalid fact selection",
+            )
+            if selection["mode"] == "at_least":
+                minimum = selection.get("minimum")
+                require(
+                    type(minimum) is int and 0 < minimum <= len(case["mandatory_facts"]),
+                    f"{scenario.id}: invalid fact minimum",
+                )
+            require(
                 case["expected_action"] == "answer", f"{scenario.id}: fallback target"
             )
             require(
