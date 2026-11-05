@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, List
 
 from aiogram import Bot
+from aiogram.exceptions import TelegramRetryAfter
 
 from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
@@ -15,10 +16,15 @@ from db.postgres.services.notification_outbox import NotificationOutboxService
 logger = logging.getLogger(__name__)
 
 # Пауза между отправками: очередь после долгого простоя может накопить сотни
-# сообщений, а Telegram режет примерно на 30 в секунду. Полноценный троттлинг
-# с обработкой flood wait — #292; здесь только чтобы не уйти в 429 залпом.
+# сообщений, а Telegram режет примерно на 30 в секунду. Если лимит всё же
+# пробили (429), отправка ждёт retry_after и повторяет попытку — см.
+# _send_telegram (#292).
 SEND_DELAY_SECONDS = float(get_setting("NOTIFY_SEND_DELAY", "0.035"))
 OUTBOX_BATCH_SIZE = 100
+# Всего попыток на одно сообщение при flood wait и запас к retry_after:
+# Telegram занижать не стоит, но короткая передышка не помешает.
+TELEGRAM_FLOOD_ATTEMPTS = 3
+FLOOD_WAIT_MARGIN_SECONDS = 1.0
 
 
 def format_notification_text(change: RatingChange) -> str | None:
@@ -75,6 +81,31 @@ class DeliveryResult:
     error: str | None = None
 
 
+async def _send_telegram(bot: Bot, chat_id: int, text: str) -> None:
+    """Отправка в Telegram с повтором при flood wait (429).
+
+    Telegram сам сообщает, сколько ждать (retry_after), — терять сообщение
+    не нужно: ждём с небольшим запасом и пробуем снова. Другие ошибки
+    (нет чата, блокировка бота) повтором не лечатся и падают дальше.
+    """
+    for attempt in range(1, TELEGRAM_FLOOD_ATTEMPTS + 1):
+        try:
+            await bot.send_message(chat_id=chat_id, text=text)
+            return
+        except TelegramRetryAfter as e:
+            if attempt == TELEGRAM_FLOOD_ATTEMPTS:
+                raise
+            wait = e.retry_after + FLOOD_WAIT_MARGIN_SECONDS
+            logger.warning(
+                "Flood wait в Telegram (chat_id=%s): пауза %.1f с, попытка %d/%d",
+                chat_id,
+                wait,
+                attempt + 1,
+                TELEGRAM_FLOOD_ATTEMPTS,
+            )
+            await asyncio.sleep(wait)
+
+
 async def send_to_user(
     bot: Bot | None,
     user: User,
@@ -93,7 +124,7 @@ async def send_to_user(
     if bot and user.telegram_id:
         attempted = True
         try:
-            await bot.send_message(chat_id=user.telegram_id, text=text)
+            await _send_telegram(bot, user.telegram_id, text)
             delivered = True
             logger.info(
                 "Уведомление отправлено в Telegram: internal user_id=%s telegram_id=%s",
