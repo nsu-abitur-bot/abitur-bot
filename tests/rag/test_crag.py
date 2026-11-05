@@ -473,6 +473,10 @@ async def test_topic_switch_preserves_new_faculty_over_history(seeded, monkeypat
         ("Поступление на среднее профессиональное образование", "spo"),
         ("Спортивные мероприятия", None),
         ("Какие способности нужны?", None),
+        ("Какие программы специалитета есть в НГУ?", "specialist"),
+        ("Поступление на специалитет", "specialist"),
+        ("Для подачи документов обратитесь к специалисту приёмной комиссии", None),
+        ("Квалификация выпускника — специалист по защите информации", None),
     ],
 )
 def test_detect_spo_level(question, expected):
@@ -598,3 +602,49 @@ def test_scrub_keeps_explicit_specialitet_as_foreign_to_spo():
         file_path=None,
     )
     assert _scrub_chunk(chunk, ["информатика"], [], "spo") is None
+
+
+def test_scrub_preserves_spo_specialist_qualification_on_separate_line():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content=(
+            "Информационные системы и программирование — СПО.\n"
+            "Квалификация выпускника — специалист по информационным системам."
+        ),
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, ["информационные системы и программирование"], [], "spo")
+    assert result is not None
+    assert "специалист по информационным системам" in result.content
+
+
+def test_scrub_preserves_specialist_contact_for_bachelor():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content="Для подачи документов обратитесь к специалисту приёмной комиссии.",
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, ["программная инженерия"], [], "bachelor")
+    assert result is not None
+    assert "специалисту приёмной комиссии" in result.content
+
+
+def test_scrub_drops_foreign_specialitet_keeps_bachelor():
+    from rag.crag import CragChunk, _scrub_chunk
+
+    chunk = CragChunk(
+        index=0,
+        content=("Программная инженерия — бакалавриат.\nЛечебное дело — специалитет."),
+        source_url=None,
+        file_path=None,
+    )
+    result = _scrub_chunk(chunk, ["программная инженерия"], ["лечебное дело"], "bachelor")
+    assert result is not None
+    assert "Программная инженерия — бакалавриат." in result.content
+    assert "Лечебное дело" not in result.content
