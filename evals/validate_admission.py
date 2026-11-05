@@ -59,6 +59,8 @@ def validate_dataset(directory: Path = DATASETS) -> dict:
     by_id = {case["id"]: case for case in cases}
     require(set(by_id) == {s.id for s in scenarios}, "Review IDs differ from dataset")
     sources = registry["sources"]
+    groups = Counter(c.get("evaluation_group") for c in cases)
+    require(groups == {"document": 45, "special": 5}, "Expected draft split 45/5")
     for source in sources.values():
         require(source["url"].startswith("https://"), "Expected HTTPS source")
         require(
@@ -70,6 +72,15 @@ def validate_dataset(directory: Path = DATASETS) -> dict:
     expert_reviewed = 0
     for scenario in scenarios:
         case = by_id[scenario.id]
+        if case["evaluation_group"] == "document":
+            require(bool(case.get("mandatory_facts")), f"{scenario.id}: missing facts")
+            require(
+                case["expected_action"] == "answer", f"{scenario.id}: fallback target"
+            )
+            require(
+                all(sources[s].get("snapshot_sha256") for s in case["source_ids"]),
+                f"{scenario.id}: missing source snapshot",
+            )
         require(bool(case["context"]), f"{scenario.id}: missing campaign context")
         require(
             case["expected_action"] in {"answer", "clarify", "refer"},
@@ -149,6 +160,7 @@ def validate_dataset(directory: Path = DATASETS) -> dict:
         expert_reviewed += int(expert)
     return {
         "total": len(scenarios),
+        "evaluation_groups": dict(groups),
         "topics": dict(Counter(s.topic for s in scenarios)),
         "internal_confirmed": reviewed,
         "expert_confirmed": expert_reviewed,
