@@ -37,6 +37,7 @@ from pipeline.prompts import (
 from pipeline.tools import (
     ADMISSION_SCORES_TOOL,
     CONTENT_PROPOSAL_TOOL,
+    EDUCATION_PROGRAMS_TOOL,
     default_tool_executor,
 )
 from rag.crag import load_crag_config
@@ -602,7 +603,11 @@ async def _run_tool_loop(
     if stream_callback is None:
         result = await provider.generate_with_tools(
             messages,
-            tools=[_university_scores_tool(), CONTENT_PROPOSAL_TOOL],
+            tools=[
+                _university_scores_tool(),
+                CONTENT_PROPOSAL_TOOL,
+                EDUCATION_PROGRAMS_TOOL,
+            ],
             tool_executor=tool_executor,
             profile=LLMProfiles.CHAT,
         )
@@ -625,7 +630,7 @@ async def _run_tool_loop(
 
     result = await provider.generate_with_tools(
         messages,
-        tools=[_university_scores_tool(), CONTENT_PROPOSAL_TOOL],
+        tools=[_university_scores_tool(), CONTENT_PROPOSAL_TOOL, EDUCATION_PROGRAMS_TOOL],
         tool_executor=tool_executor,
         profile=LLMProfiles.CHAT,
         on_delta=on_delta,

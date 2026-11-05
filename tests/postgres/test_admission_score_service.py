@@ -169,12 +169,53 @@ async def test_query_scores_distinguishes_programs(session: AsyncSession):
         "faculty_name",
         "program_name",
         "code",
+        "level",
         "year",
         "form",
         "passing_score",
         "average_score",
     }
     assert sample["faculty_name"] == "Факультет информационных технологий"
+    assert sample["level"] == "bachelor"
+
+
+@pytest.mark.asyncio
+async def test_query_scores_separates_spo_from_higher_education(session: AsyncSession):
+    faculty_service = FacultyService(session)
+    faculty = await faculty_service.create_faculty("Колледж и институт")
+    service = AdmissionScoreService(session)
+    for level in ("spo", "bachelor", "specialist", "master"):
+        await faculty_service.create_program(faculty.id, "Информатика", level=level)
+    await service.upsert_from_rows(
+        [
+            ScoreRow(
+                faculty_name=faculty.name,
+                program_name="Информатика",
+                code=None,
+                level=level,
+                year=2025,
+                form="budget",
+                passing_score=score,
+                average_score=None,
+            )
+            for level, score in (
+                ("spo", 5),
+                ("bachelor", 250),
+                ("specialist", 260),
+                ("master", 80),
+            )
+        ]
+    )
+    for level, score in (
+        ("spo", 5),
+        ("bachelor", 250),
+        ("specialist", 260),
+        ("master", 80),
+    ):
+        rows = await service.query_scores(program="Информатика", level=level)
+        assert len(rows) == 1
+        assert rows[0]["level"] == level
+        assert rows[0]["passing_score"] == score
 
 
 @pytest.mark.asyncio

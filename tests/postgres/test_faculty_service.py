@@ -10,6 +10,76 @@ from db.postgres.services.faculty import (
 )
 
 
+@pytest.mark.asyncio
+async def test_spo_level_persists_after_updates_and_reload(session: AsyncSession):
+    service = FacultyService(session)
+    faculty = await service.create_faculty("Колледж")
+    program = await service.create_program(
+        faculty.id, "Информационные системы", level="spo", code="09.02.07"
+    )
+    program_id = program.id
+
+    await service.update_program(
+        program_id, name="Информационные системы и программирование"
+    )
+    session.expunge_all()
+    reopened = await service.get_program_by_id(program_id)
+    assert reopened is not None
+    assert reopened.level == "spo"
+    assert reopened.code == "09.02.07"
+
+    await service.update_program(program_id, level="bachelor")
+    await service.update_program(program_id, level="spo")
+    session.expunge_all()
+    reopened = await service.get_program_by_id(program_id)
+    assert reopened is not None
+    assert reopened.level == "spo"
+
+
+@pytest.mark.asyncio
+async def test_spo_and_higher_education_are_separate(session: AsyncSession):
+    service = FacultyService(session)
+    faculty = await service.create_faculty("Институт")
+    for level in ("spo", "bachelor", "specialist", "master"):
+        await service.create_program(faculty.id, "Информатика", level=level)
+
+    directory = await service.load_directory()
+    for level in ("spo", "bachelor", "specialist", "master"):
+        by_faculty = await service.get_programs_by_faculty(faculty.id, level=level)
+        all_programs = await service.get_all_programs(level=level)
+        from_directory = directory.programs(faculty.id, level=level)
+        for programs in (by_faculty, all_programs, from_directory):
+            assert len(programs) == 1
+            assert programs[0].level == level
+
+
+@pytest.mark.asyncio
+async def test_soft_seed_keeps_spo_separate_from_existing_levels(session: AsyncSession):
+    service = FacultyService(session)
+    faculty = await service.create_faculty("Институт")
+    bachelor = await service.create_program(
+        faculty.id, "Информатика", level="bachelor", code="09.03.01"
+    )
+    bachelor_id = bachelor.id
+    seed = [
+        {
+            "name": "Институт",
+            "programs": [{"name": "Информатика", "level": "spo", "code": "09.02.07"}],
+        }
+    ]
+    await service.upsert_from_seed(seed, soft=True)
+    await service.upsert_from_seed(seed, soft=True)
+    session.expunge_all()
+    programs = await service.get_programs_by_faculty(faculty.id)
+    assert len(programs) == 2
+    assert {(p.level, p.code) for p in programs} == {
+        ("bachelor", "09.03.01"),
+        ("spo", "09.02.07"),
+    }
+    preserved = next(p for p in programs if p.level == "bachelor")
+    assert preserved.id == bachelor_id
+
+
 async def _seed_fit_and_econ(session: AsyncSession) -> FacultyService:
     """ФИТ → его направления; экономфак → бизнес-информатика (bachelor)."""
     service = FacultyService(session)
@@ -52,6 +122,7 @@ async def test_normalize_helpers():
     assert normalize_name("  ФИТ  ") == "фит"
     assert normalize_name("«Программная инженерия».") == "программная инженерия"
     assert normalize_level("Bachelor") == "bachelor"
+    assert normalize_level(" SPO ") == "spo"
     assert normalize_level("аспирантура") is None
     assert normalize_level(None) is None
 

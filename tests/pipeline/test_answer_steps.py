@@ -150,6 +150,7 @@ class TestRunToolLoop:
         assert [t.name for t in provider.tools_seen] == [
             "get_admission_scores",
             "propose_content",
+            "get_education_programs",
         ]
 
     @pytest.mark.asyncio

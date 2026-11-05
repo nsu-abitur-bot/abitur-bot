@@ -183,20 +183,59 @@ def test_create_faculty(client: TestClient):
     assert data["programs"] == []
 
 
-def test_create_program(client: TestClient):
+@pytest.mark.parametrize("level", ["bachelor", "specialist", "master", "spo"])
+def test_create_program(client: TestClient, level: str):
     faculty_id = _create_faculty(client).json()["id"]
 
     response = client.post(
         f"/api/v1/faculties/{faculty_id}/programs",
-        json={"name": "Программная инженерия", "code": "09.03.04", "level": "bachelor"},
+        json={"name": "Программная инженерия", "code": "09.03.04", "level": level},
     )
 
     assert response.status_code == 201
     data = response.json()
     assert data["name"] == "Программная инженерия"
     assert data["code"] == "09.03.04"
-    assert data["level"] == "bachelor"
+    assert data["level"] == level
     assert data["faculty_id"] == faculty_id
+
+
+def test_spo_program_update_and_reopen(client: TestClient):
+    faculty_id = _create_faculty(client, name="Колледж").json()["id"]
+    created = client.post(
+        f"/api/v1/faculties/{faculty_id}/programs",
+        json={"name": "Информационные системы", "level": "spo", "code": "09.02.07"},
+    )
+    assert created.status_code == 201
+    program_id = created.json()["id"]
+
+    response = client.put(
+        f"/api/v1/faculties/programs/{program_id}",
+        json={"name": "Информационные системы и программирование"},
+    )
+    assert response.status_code == 200
+    assert response.json()["level"] == "spo"
+
+    reopened = client.get("/api/v1/faculties").json()[0]["programs"][0]
+    assert reopened["id"] == program_id
+    assert reopened["level"] == "spo"
+    assert reopened["code"] == "09.02.07"
+    assert reopened["name"] == "Информационные системы и программирование"
+
+
+def test_program_can_change_to_spo(client: TestClient):
+    faculty_id = _create_faculty(client).json()["id"]
+    created = client.post(
+        f"/api/v1/faculties/{faculty_id}/programs",
+        json={"name": "Информационные системы", "level": "bachelor"},
+    )
+    response = client.put(
+        f"/api/v1/faculties/programs/{created.json()['id']}",
+        json={"level": "spo"},
+    )
+    assert response.status_code == 200
+    assert response.json()["level"] == "spo"
+    assert client.get("/api/v1/faculties").json()[0]["programs"][0]["level"] == "spo"
 
 
 def test_list_faculties_with_programs(client: TestClient):
