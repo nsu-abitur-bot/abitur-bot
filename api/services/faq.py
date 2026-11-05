@@ -29,10 +29,14 @@ class FaqService:
         )
         return FaqItem.model_validate(entry, from_attributes=True)
 
-    async def create_many(self, items: list[FaqItem]) -> list[FaqItem]:
+    async def upsert_many(self, items: list[FaqItem]) -> tuple[list[FaqItem], int, int]:
         raw = [i.model_dump(exclude={"id"}) for i in items]
-        entries = await self._db.create_many(raw)
-        return [FaqItem.model_validate(e, from_attributes=True) for e in entries]
+        entries, created, updated = await self._db.upsert_many(raw)
+        return (
+            [FaqItem.model_validate(e, from_attributes=True) for e in entries],
+            created,
+            updated,
+        )
 
     async def update(self, item_id: str, item: FaqItem) -> FaqItem:
         existing = await self._db.get(item_id)
