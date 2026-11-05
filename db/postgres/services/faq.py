@@ -2,9 +2,11 @@ import logging
 from typing import Optional
 
 from sqlalchemy import select, text
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ..models import FaqEntry
+from ..models import FaqEntry, normalize_question, timestamp
 
 logger = logging.getLogger(__name__)
 FAQ_CHANGE_CHANNEL = "abitur_faq_changed"
@@ -40,36 +42,78 @@ class FaqDbService:
             await self.session.commit()
             await self.session.refresh(entry)
             return entry
+        except IntegrityError:
+            await self.session.rollback()
+            raise ValueError(f"FAQ с вопросом '{question}' уже существует")
         except Exception as e:
             await self.session.rollback()
             logger.error(f"Ошибка создания FAQ: {e}")
             raise
 
-    async def create_many(self, items: list[dict]) -> list[FaqEntry]:
-        entries = [
-            FaqEntry(
-                question=item["question"],
-                aliases=item.get("aliases", []),
-                answer=item["answer"],
-                verification_status=item.get("verification_status", "draft"),
-                source_document=item.get("source_document"),
-                source_location=item.get("source_location"),
-                confirmed_by=item.get("confirmed_by"),
-                confirmed_at=item.get("confirmed_at"),
+    async def upsert_many(self, items: list[dict]) -> tuple[list[FaqEntry], int, int]:
+        """Массовый импорт FAQ с UPSERT по нормализованному вопросу (#295).
+
+        Повторная загрузка файла обновляет существующие записи, а не дублирует их.
+        Верификационные поля (verification_status и provenance) не сбрасываются.
+        Возвращает (записи, сколько создано, сколько обновлено).
+        """
+        # Дедуп внутри файла: побеждает последнее значение.
+        deduped: dict[str, dict] = {}
+        for item in items:
+            deduped[normalize_question(item["question"])] = item
+        if not deduped:
+            return [], 0, 0
+
+        keys = list(deduped.keys())
+        result = await self.session.execute(
+            select(FaqEntry.normalized_question).where(
+                FaqEntry.normalized_question.in_(keys)
             )
-            for item in items
+        )
+        existing_keys = set(result.scalars())
+        updated = len(existing_keys)
+        created = len(deduped) - updated
+
+        values = [
+            {
+                "question": item["question"],
+                "normalized_question": key,
+                "aliases": item.get("aliases", []),
+                "answer": item["answer"],
+                "verification_status": item.get("verification_status", "draft"),
+                "source_document": item.get("source_document"),
+                "source_location": item.get("source_location"),
+                "confirmed_by": item.get("confirmed_by"),
+                "confirmed_at": item.get("confirmed_at"),
+            }
+            for key, item in deduped.items()
         ]
-        self.session.add_all(entries)
+        stmt = pg_insert(FaqEntry).values(values)
+        stmt = stmt.on_conflict_do_update(
+            index_elements=[FaqEntry.normalized_question],
+            set_={
+                "question": stmt.excluded.question,
+                "aliases": stmt.excluded.aliases,
+                "answer": stmt.excluded.answer,
+                "updated_at": timestamp(),
+            },
+        )
         try:
+            await self.session.execute(stmt)
             await self._notify_changed()
             await self.session.commit()
-            for entry in entries:
-                await self.session.refresh(entry)
         except Exception:
             await self.session.rollback()
-            logger.exception("Ошибка массового создания FAQ")
+            logger.exception("Ошибка массового импорта FAQ")
             raise
-        return entries
+
+        result = await self.session.execute(
+            select(FaqEntry)
+            .where(FaqEntry.normalized_question.in_(keys))
+            .order_by(FaqEntry.created_at)
+            .execution_options(populate_existing=True)
+        )
+        return list(result.scalars().all()), created, updated
 
     async def get(self, item_id: str) -> Optional[FaqEntry]:
         result = await self.session.execute(
@@ -97,6 +141,9 @@ class FaqDbService:
             await self._notify_changed()
             await self.session.commit()
             await self.session.refresh(entry)
+        except IntegrityError:
+            await self.session.rollback()
+            raise ValueError(f"FAQ с вопросом '{question}' уже существует")
         except Exception:
             await self.session.rollback()
             raise

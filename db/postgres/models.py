@@ -1,4 +1,5 @@
 import enum
+import re
 from datetime import UTC, datetime
 from typing import List, Optional
 
@@ -14,6 +15,7 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
+    event,
     text,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -457,6 +459,11 @@ class ContentProposal(Base):
     )
 
 
+def normalize_question(question: str) -> str:
+    """Ключ дедупликации FAQ: регистр и пробелы не должны создавать дубли."""
+    return re.sub(r"\s+", " ", question.strip().lower())
+
+
 class FaqEntry(Base):
     """FAQ вопросы и ответы."""
 
@@ -466,6 +473,7 @@ class FaqEntry(Base):
         String(36), primary_key=True, default=lambda: str(uuid7())
     )
     question: Mapped[str] = mapped_column(Text, nullable=False)
+    normalized_question: Mapped[str] = mapped_column(Text, nullable=False, unique=True)
     aliases: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     answer: Mapped[str] = mapped_column(Text, nullable=False)
     verification_status: Mapped[str] = mapped_column(
@@ -482,6 +490,14 @@ class FaqEntry(Base):
 
     def __repr__(self) -> str:
         return f"<FaqEntry(id='{self.id}', question='{self.question[:50]}')>"
+
+
+@event.listens_for(FaqEntry, "before_insert")
+@event.listens_for(FaqEntry, "before_update")
+def _set_normalized_question(mapper, connection, target) -> None:
+    value = normalize_question(target.question)
+    if target.normalized_question != value:
+        target.normalized_question = value
 
 
 class Abbreviation(Base):
