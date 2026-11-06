@@ -80,9 +80,21 @@ def _fixture_pipeline() -> Iterator[Runner]:
 
     class FixtureProvider:
         async def generate_with_tools(
-            self, messages, tools, tool_executor, profile=None, on_delta=None
+            self,
+            messages,
+            tools,
+            tool_executor,
+            profile=None,
+            on_delta=None,
+            required_tool=None,
         ) -> LLMResult:
             question = str(messages[-1].content)
+            if required_tool == "get_admission_scores":
+                value = await tool_executor(
+                    required_tool,
+                    {"faculty": "Факультет Изучения Магии", "metric": "passing"},
+                )
+                return LLMResult(text=str(value))
             if "проходной балл" in question.casefold() and "2024" in question:
                 if not any(tool.name == "get_admission_scores" for tool in tools):
                     raise AssertionError("Admission tool was not offered to provider")
@@ -154,7 +166,13 @@ def _fixture_pipeline() -> Iterator[Runner]:
     async def executor(name: str, args: dict) -> str:
         if name != "get_admission_scores":
             raise AssertionError("Unexpected tool")
-        return "246 (тестовая фикстура, 2024)"
+        from pipeline.tools.admission_scores import AdmissionScoresResult
+
+        if args.get("faculty") == "Факультет Изучения Магии":
+            return AdmissionScoresResult(
+                "По этому запросу данных о проходных баллах нет.", status="empty"
+            )
+        return AdmissionScoresResult("246 (тестовая фикстура, 2024)", status="ok")
 
     def forbidden_db():
         raise AssertionError("Offline evaluation must not access PostgreSQL")

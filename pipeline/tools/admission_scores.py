@@ -6,7 +6,7 @@
 """
 
 import logging
-from typing import Optional
+from typing import Literal, Optional
 
 from abbrev.expander import get_abbrev_expander
 from config.university import is_nsu
@@ -18,6 +18,25 @@ from llm.base import ToolSpec
 from pipeline.tools.education_programs import LEVEL_LABELS
 
 logger = logging.getLogger(__name__)
+
+
+class AdmissionScoresResult(str):
+    """Текст для провайдера и проверяемый статус для пайплайна."""
+
+    status: Literal["ok", "empty", "error"]
+    scope: dict
+
+    def __new__(
+        cls,
+        text: str,
+        *,
+        status: Literal["ok", "empty", "error"],
+        scope: dict | None = None,
+    ) -> "AdmissionScoresResult":
+        instance = super().__new__(cls, text)
+        instance.status = status
+        instance.scope = dict(scope or {})
+        return instance
 
 
 ADMISSION_SCORES_TOOL = ToolSpec(
@@ -175,7 +194,7 @@ async def execute_admission_scores(arguments: dict) -> str:
     raw_level = arguments.get("level")
     level = normalize_level(str(raw_level)) if raw_level is not None else None
     if raw_level is not None and level is None:
-        return "Неизвестный уровень образования."
+        return AdmissionScoresResult("Неизвестный уровень образования.", status="error")
     metric = str(arguments.get("metric") or "passing").lower()
     if metric not in ("passing", "average", "both"):
         metric = "passing"
@@ -206,10 +225,36 @@ async def execute_admission_scores(arguments: dict) -> str:
                     note = f"За {year} год данных нет, показаны доступные годы."
     except Exception:
         logger.exception("Ошибка выполнения инструмента get_admission_scores")
-        return "Не удалось получить данные о проходных баллах."
+        return AdmissionScoresResult(
+            "Не удалось получить данные о проходных баллах.", status="error"
+        )
 
     if not rows:
-        return "По этому запросу данных о проходных баллах нет."
+        return AdmissionScoresResult(
+            "По этому запросу данных о проходных баллах нет.", status="empty"
+        )
 
+    scope = {
+        key: arguments[key]
+        for key in ("program", "faculty", "level", "year", "form")
+        if arguments.get(key) is not None
+    }
+    scope["metric"] = metric
+    # Один фактически найденный вариант сохраняем для следующего уточнения.
+    # Несколько лет/форм не превращаем в случайно выбранный последний вариант.
+    for key, column in (
+        ("program", "code"),
+        ("faculty", "faculty_name"),
+        ("level", "level"),
+        ("year", "year"),
+        ("form", "form"),
+    ):
+        values = {row.get(column) for row in rows}
+        if len(values) == 1 and None not in values:
+            scope[key] = next(iter(values))
+        elif key in ("year", "form"):
+            scope.pop(key, None)
     text = _format_scores(rows, metric)
-    return f"{note}\n\n{text}" if note else text
+    return AdmissionScoresResult(
+        f"{note}\n\n{text}" if note else text, status="ok", scope=scope
+    )

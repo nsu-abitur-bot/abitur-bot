@@ -34,12 +34,19 @@ from pipeline.prompts import (
     SOURCES_HINT,
     SYSTEM_PROMPT_BASE,
 )
+from pipeline.score_guard import (
+    SCORES_CLARIFY,
+    SCORES_TOOL,
+    SCORES_UNAVAILABLE,
+    ScoreGuard,
+)
 from pipeline.tools import (
     ADMISSION_SCORES_TOOL,
     CONTENT_PROPOSAL_TOOL,
     EDUCATION_PROGRAMS_TOOL,
     default_tool_executor,
 )
+from pipeline.tools.admission_scores import AdmissionScoresResult
 from rag.crag import load_crag_config
 from rag.retriever import (
     RetrievalError,
@@ -308,11 +315,15 @@ class _Ctx:
     log_entry_id: Optional[int] = None
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
+    score_query: dict | None = None
 
     @timed("tool_execution")
     async def execute_tool(self, name: str, args: dict) -> str:
         self.trace.tools_called.append(name)
-        return await default_tool_executor(name, args)
+        output = await default_tool_executor(name, args)
+        if isinstance(output, AdmissionScoresResult) and output.status in ("ok", "empty"):
+            self.score_query = output.scope or dict(args)
+        return output
 
     async def emit_status(self, text: str) -> None:
         """Промежуточный статус пользователю. Сбой колбэка не ломает ответ."""
@@ -563,7 +574,15 @@ def _build_messages(
         elif role == "assistant":
             entry_clean = _SOURCES_BLOCK_RE.sub("", entry_content)
             entry_clean = _ANCHOR_RE.sub("", entry_clean).strip()
-            messages.append(AIMessage(content=entry_clean))
+            metadata = entry.get("admission_scores")
+            messages.append(
+                AIMessage(
+                    content=entry_clean,
+                    additional_kwargs={"admission_scores": metadata}
+                    if isinstance(metadata, dict)
+                    else {},
+                )
+            )
 
     messages.append(HumanMessage(content=question))
     return messages
@@ -599,6 +618,72 @@ async def _run_tool_loop(
     provider = get_llm_provider()
     provider_name = provider.__class__.__name__
     logger.info(f"[{session_id}] Sending payload to LLM ({provider_name}).")
+
+    guard = ScoreGuard.from_messages(messages)
+    if guard is not None:
+        if guard.clarify:
+            return SCORES_CLARIFY, LLMUsage(), provider_name
+        executor = tool_executor
+
+        async def checked_executor(name: str, args: dict) -> str:
+            if name == SCORES_TOOL:
+                if not guard.accepts(args, check_names=False):
+                    guard.verified = False
+                    return "Параметры запроса не соответствуют вопросу пользователя."
+                try:
+                    output = await executor(name, args)
+                except Exception:
+                    logger.exception("[%s] Admission scores query failed", session_id)
+                    guard.verified = False
+                    guard.attempted = True
+                    return SCORES_UNAVAILABLE
+                resolved_args = dict(args)
+                if isinstance(output, AdmissionScoresResult):
+                    for key in ("program", "faculty"):
+                        if args.get(key) and output.scope.get(key):
+                            resolved_args[key] = output.scope[key]
+                if not guard.accepts(resolved_args):
+                    guard.verified = False
+                    return "Запрошены баллы другого направления или факультета."
+                guard.record(output)
+                return output
+            return await executor(name, args)
+
+        # Черновик нельзя отправлять в транспорт: после проверки его может
+        # понадобиться целиком заменить, включая уверенное «данных нет».
+        result = await provider.generate_with_tools(
+            messages,
+            tools=[
+                _university_scores_tool(),
+                CONTENT_PROPOSAL_TOOL,
+                EDUCATION_PROGRAMS_TOOL,
+            ],
+            tool_executor=checked_executor,
+            profile=LLMProfiles.CHAT,
+        )
+        usage = result.usage
+        if not guard.verified and not guard.attempted:
+            logger.info("[%s] Recovering missing admission scores query", session_id)
+            result = await provider.generate_with_tools(
+                messages,
+                tools=[guard.recovery_tool(_university_scores_tool())],
+                tool_executor=checked_executor,
+                profile=LLMProfiles.CHAT,
+                required_tool=SCORES_TOOL,
+            )
+            usage = LLMUsage(
+                prompt_tokens=usage.prompt_tokens + result.usage.prompt_tokens,
+                completion_tokens=usage.completion_tokens
+                + result.usage.completion_tokens,
+                total_tokens=usage.total_tokens + result.usage.total_tokens,
+            )
+        content = result.text if guard.verified else SCORES_UNAVAILABLE
+        if stream_callback is not None:
+            try:
+                await stream_callback(content)
+            except Exception as cb_exc:
+                logger.warning(f"[{session_id}] stream_callback error: {cb_exc}")
+        return content, usage, provider_name
 
     if stream_callback is None:
         result = await provider.generate_with_tools(
@@ -715,6 +800,8 @@ async def _answer_without_kb(
         logger.warning(f"[{session_id}] Provider generation error: {e}")
         return RAG_UNAVAILABLE_ANSWER, []
 
+    if not used_tool and content in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
+        return content, []
     if not used_tool:
         logger.info(
             f"[{session_id}] Knowledge base unavailable and no tool used: "
@@ -791,11 +878,10 @@ def _store_answer(
     В историю кладём текст без тегов: её читает модель, а не человек.
     """
     stored_text = _strip_markup(content)
-    _spawn_bg(
-        _remember_message(
-            redis_client, ctx.session_id, {"role": "assistant", "content": stored_text}
-        )
-    )
+    entry: dict = {"role": "assistant", "content": stored_text}
+    if ctx.score_query is not None:
+        entry["admission_scores"] = ctx.score_query
+    _spawn_bg(_remember_message(redis_client, ctx.session_id, entry))
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, ctx.session_id, message, stored_text))
 

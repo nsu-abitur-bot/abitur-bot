@@ -91,6 +91,52 @@ async def connect(provider, handler):
     )
 
 
+async def test_required_tool_is_forced_only_before_its_result(provider):
+    requests = []
+
+    def handler(request):
+        body = json.loads(request.content)
+        requests.append(body)
+        if len(requests) == 1:
+            assert body["tool_choice"] == {
+                "type": "function",
+                "function": {"name": "scores"},
+            }
+            return sse(
+                [
+                    {
+                        "tool_calls": [
+                            {
+                                "index": 0,
+                                "id": "forced-call",
+                                "type": "function",
+                                "function": {"name": "scores", "arguments": "{}"},
+                            }
+                        ]
+                    }
+                ],
+                finish="tool_calls",
+            )
+        assert body["tool_choice"] == "auto"
+        return sse([{"content": "Средний балл: 63.27"}])
+
+    async def execute(name, args):
+        return "Средний балл: 63.27"
+
+    await connect(provider, handler)
+    try:
+        result = await provider.generate_with_tools(
+            [HumanMessage(content="А средний?")],
+            tools=[ToolSpec("scores", "Баллы", {"type": "object", "properties": {}})],
+            tool_executor=execute,
+            required_tool="scores",
+        )
+        assert result.text == "Средний балл: 63.27"
+        assert len(requests) == 2
+    finally:
+        await provider.aclose()
+
+
 async def test_chat_history_profile_and_usage(provider):
     def handler(request):
         assert request.url.path == "/v1/chat/completions"
@@ -347,7 +393,9 @@ async def test_product_tool_loop_contract(provider, monkeypatch):
 
     async def execute(name, arguments):
         executed.append((name, arguments))
-        return "synthetic score: 246"
+        from pipeline.tools.admission_scores import AdmissionScoresResult
+
+        return AdmissionScoresResult("synthetic score: 246", status="ok")
 
     async def update(text):
         updates.append(text)

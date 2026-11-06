@@ -134,7 +134,9 @@ async def test_ask_local_llm_passes_admission_tool(monkeypatch):
     async def fake_executor(name: str, args: dict) -> str:
         # Заменяем реальный исполнитель (с БД) на канонический ответ.
         assert name == "get_admission_scores"
-        return "246 (бюджет, 2024)"
+        from pipeline.tools.admission_scores import AdmissionScoresResult
+
+        return AdmissionScoresResult("246 (бюджет, 2024)", status="ok")
 
     monkeypatch.setattr(llm_client, "get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())

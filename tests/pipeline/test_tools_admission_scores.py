@@ -20,7 +20,10 @@ from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from db.postgres.services.faculty import FacultyService
 from pipeline.tools import admission_scores as tool_mod
 from pipeline.tools import default_tool_executor
-from pipeline.tools.admission_scores import execute_admission_scores
+from pipeline.tools.admission_scores import (
+    AdmissionScoresResult,
+    execute_admission_scores,
+)
 
 TEST_DB_NAME = os.getenv("TEST_DB_NAME", "abitur_test")
 _DB_HOST = os.getenv("DB_HOST", "localhost")
@@ -116,6 +119,7 @@ async def test_execute_returns_distinct_passing_scores(sessionmaker_bound):
     # По умолчанию — только проходной, без среднего.
     assert "84.2" not in text
     assert "88.1" not in text
+    assert isinstance(text, AdmissionScoresResult) and text.status == "ok"
 
 
 @pytest.mark.asyncio
@@ -131,11 +135,95 @@ async def test_execute_includes_average_when_requested(sessionmaker_bound):
 
 
 @pytest.mark.asyncio
+async def test_followup_guard_recovers_from_false_absence_using_sql(
+    sessionmaker_bound, expander, monkeypatch
+):
+    from langchain_core.messages import AIMessage, HumanMessage
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    await _seed_fit(sessionmaker_bound)
+    attempts = []
+    published = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            attempts.append(kwargs)
+            if len(attempts) == 1:
+                return LLMResult("Среднего балла в базе нет.")
+            assert kwargs["required_tool"] == "get_admission_scores"
+            output = await kwargs["tool_executor"](
+                "get_admission_scores", {"program": "09.03.04", "metric": "average"}
+            )
+            assert isinstance(output, AdmissionScoresResult)
+            assert output.status == "ok"
+            return LLMResult(str(output))
+
+    async def publish(text):
+        published.append(text)
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    text, _, _ = await llm_client._run_tool_loop(
+        [
+            HumanMessage(content="Какой проходной балл на 09.03.04?"),
+            AIMessage(content="2024, бюджет: проходной балл — 246."),
+            HumanMessage(content="А средний балл?"),
+        ],
+        "sql-guard-regression",
+        stream_callback=publish,
+    )
+    assert "84.2" in text and "88.1" not in text
+    assert published == [text]
+    assert len(attempts) == 2
+
+
+@pytest.mark.asyncio
+async def test_sql_scope_survives_storing_and_rebuilding_history(
+    sessionmaker_bound, expander, monkeypatch
+):
+    from fakeredis.aioredis import FakeRedis
+
+    from pipeline import llm_client
+    from pipeline.score_guard import ScoreGuard
+
+    await _seed_fit(sessionmaker_bound)
+    ctx = llm_client._Ctx(session_id="scope-roundtrip", user_id=0)
+    text = await ctx.execute_tool(
+        "get_admission_scores", {"program": "ПИиКН", "metric": "passing"}
+    )
+    assert ctx.score_query == {
+        "program": "09.03.04",
+        "faculty": "Факультет информационных технологий",
+        "level": "bachelor",
+        "year": 2024,
+        "form": "budget",
+        "metric": "passing",
+    }
+    tasks = []
+    history = object.__new__(llm_client.RedisClient)
+    history.client = FakeRedis(decode_responses=True)
+    monkeypatch.setattr(llm_client, "_spawn_bg", tasks.append)
+    llm_client._store_answer(text, "Проходной балл на ПИиКН?", history, ctx)
+    for task in tasks:
+        await task
+    entries = await history.get_history(ctx.session_id)
+    await history.client.aclose()
+    guard = ScoreGuard.from_messages(
+        llm_client._build_messages("", entries, "а средний?")
+    )
+    assert guard is not None
+    assert ctx.score_query is not None
+    assert guard.filters == {**ctx.score_query, "metric": "average"}
+
+
+@pytest.mark.asyncio
 async def test_execute_empty_returns_marker(sessionmaker_bound):
     await _seed_fit(sessionmaker_bound)
 
     text = await execute_admission_scores({"faculty": "Несуществующий"})
     assert text == "По этому запросу данных о проходных баллах нет."
+    assert isinstance(text, AdmissionScoresResult) and text.status == "empty"
 
 
 @pytest.fixture
