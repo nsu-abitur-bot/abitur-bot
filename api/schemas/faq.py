@@ -53,6 +53,13 @@ class FaqListResponse(BaseModel):
     items: list[FaqItem] = Field(..., description="Список вопросов-ответов")
 
 
+class FaqUploadResponse(FaqListResponse):
+    created: int = Field(..., description="Сколько записей создано")
+    updated: int = Field(
+        ..., description="Сколько записей обновлено при повторной загрузке"
+    )
+
+
 class FaqSettings(BaseModel):
     """Настройки FAQ-матчера."""
 

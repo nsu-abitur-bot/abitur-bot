@@ -6,7 +6,7 @@ from fastapi.encoders import jsonable_encoder
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.schemas.faq import FaqItem, FaqListResponse
+from api.schemas.faq import FaqItem, FaqListResponse, FaqUploadResponse
 from api.services.faq import FaqService
 from db.postgres.db import get_async_session
 
@@ -27,13 +27,15 @@ async def get_all_faqs(service: FaqService = Depends(get_faq_service)):
 async def create_faq(item: FaqItem, service: FaqService = Depends(get_faq_service)):
     try:
         return await service.create(item)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post(
     "/upload",
-    response_model=FaqListResponse,
+    response_model=FaqUploadResponse,
     status_code=201,
     summary="Загрузить FAQ из CSV",
 )
@@ -133,8 +135,8 @@ async def upload_faq_csv(
         )
 
     try:
-        created = await service.create_many(items_to_create)
-        return FaqListResponse(items=created)
+        items, created, updated = await service.upsert_many(items_to_create)
+        return FaqUploadResponse(items=items, created=created, updated=updated)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Ошибка сохранения: {str(e)}")
 
@@ -151,6 +153,8 @@ async def update_faq(
         ) from e
     except KeyError:
         raise HTTPException(status_code=404, detail=f"FAQ item {item_id} not found")
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
