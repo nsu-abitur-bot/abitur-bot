@@ -1,0 +1,12 @@
+{
+  "scope": "local API/SQL/independent caches/BotCore/formatters; fake Redis and embeddings; no messenger transport; classification disabled",
+  "properties": {
+    "http_edit_to_both_caches_ms": "79.4058000028599",
+    "synthetic_unique_channel_users": "2",
+    "synthetic_questions": "2",
+    "synthetic_feedback_reports": "2"
+  },
+  "passed": 1,
+  "pg_version": "18.0",
+  "started_at": "2026-11-03T21:47:40.102419+07:00"
+}

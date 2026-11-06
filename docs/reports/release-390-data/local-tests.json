@@ -1,0 +1,9 @@
+{
+  "tests": "57",
+  "errors": "0",
+  "failures": "0",
+  "skipped": "0",
+  "time": "20.139",
+  "timestamp": "2026-11-03T21:52:17.504961+07:00",
+  "scope": "57 local tests; real disposable SQL, synthetic user data; no external providers"
+}

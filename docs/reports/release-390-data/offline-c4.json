@@ -1,0 +1,1176 @@
+{
+  "schema_version": 1,
+  "scope": "controlled_offline; fake retrieval/providers/transport, memory history",
+  "started_at": "2026-11-03T14:46:01.034501+00:00",
+  "finished_at": "2026-11-03T14:46:03.328182+00:00",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.2",
+  "concurrency": 4,
+  "repeats": 20,
+  "elapsed_seconds": 0.07092620000184979,
+  "completed_per_second": 2255.8659563860338,
+  "summary": {
+    "total": 160,
+    "failed": 0,
+    "error_rate": 0.0,
+    "p50_ms": 38.707700005033985,
+    "p95_ms": 67.63570000475738,
+    "over_30_seconds": 0,
+    "percentile_method": "p50 median; p95 nearest rank; all terminal outcomes"
+  },
+  "by_path": {
+    "faq": {
+      "total": 60,
+      "failed": 0,
+      "error_rate": 0.0,
+      "p50_ms": 37.910550003289245,
+      "p95_ms": 65.76259998837486,
+      "over_30_seconds": 0,
+      "percentile_method": "p50 median; p95 nearest rank; all terminal outcomes"
+    },
+    "rag": {
+      "total": 80,
+      "failed": 0,
+      "error_rate": 0.0,
+      "p50_ms": 39.39764999813633,
+      "p95_ms": 67.63570000475738,
+      "over_30_seconds": 0,
+      "percentile_method": "p50 median; p95 nearest rank; all terminal outcomes"
+    },
+    "tools": {
+      "total": 20,
+      "failed": 0,
+      "error_rate": 0.0,
+      "p50_ms": 38.79440000309842,
+      "p95_ms": 65.73590000334661,
+      "over_30_seconds": 0,
+      "percentile_method": "p50 median; p95 nearest rank; all terminal outcomes"
+    }
+  },
+  "provider_attempts": null,
+  "tokens": null,
+  "cost": null,
+  "limitation": "Not production throughput, delivery, model cost or admission quality",
+  "samples": [
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 3.415099999983795,
+      "service_ms": 2.682300008018501
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 3.4364000021014363,
+      "service_ms": 2.58390000090003
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 3.6694000009447336,
+      "service_ms": 2.701100005651824
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 4.530799997155555,
+      "service_ms": 3.6122000019531697
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 5.739500003983267,
+      "service_ms": 2.2327999904518947
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 5.960400012554601,
+      "service_ms": 2.3840999929234385
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 6.652600000961684,
+      "service_ms": 2.909000002546236
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 8.229400002164766,
+      "service_ms": 3.1318999972427264
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 8.258100002421997,
+      "service_ms": 1.5879999991739169
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 8.62879998749122,
+      "service_ms": 1.827100000809878
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 10.383200002252124,
+      "service_ms": 3.642800002126023
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 10.65559999551624,
+      "service_ms": 1.9625999993877485
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 10.871899998164736,
+      "service_ms": 2.5024999922607094
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 10.901300003752112,
+      "service_ms": 2.6025000115623698
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 12.754499999573454,
+      "service_ms": 1.840299999457784
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 13.017799996305257,
+      "service_ms": 2.0275999995647
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 13.046300009591505,
+      "service_ms": 1.8623000069055706
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 13.068700005533174,
+      "service_ms": 2.0385999960126355
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 14.46109999960754,
+      "service_ms": 1.2215999886393547
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 14.498799995635636,
+      "service_ms": 1.3387999933911487
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 14.716200006660074,
+      "service_ms": 1.508900008047931
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 14.910400001099333,
+      "service_ms": 1.8318000074941665
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 16.31910000287462,
+      "service_ms": 1.3973999884910882
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 16.333600011421368,
+      "service_ms": 1.3124000106472522
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 16.349500001524575,
+      "service_ms": 1.2920999870402738
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 16.775500000221655,
+      "service_ms": 1.784599997336045
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 17.66440000210423,
+      "service_ms": 1.214500007336028
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 17.891999988933094,
+      "service_ms": 1.4059999957680702
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 18.081100002746098,
+      "service_ms": 1.6936000029090792
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 18.454100005328655,
+      "service_ms": 1.6204999992623925
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 19.233300001360476,
+      "service_ms": 1.0134000040125102
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 19.482200004858896,
+      "service_ms": 1.297299997531809
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 19.864200003212318,
+      "service_ms": 1.7443999968236312
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 19.884900000761263,
+      "service_ms": 1.3632000045618042
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 20.9958000050392,
+      "service_ms": 1.0986999986926094
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 21.02079999167472,
+      "service_ms": 1.0586999997030944
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 21.213300002273172,
+      "service_ms": 1.2093999976059422
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 21.394100011093542,
+      "service_ms": 1.3614000054076314
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 22.731999997631647,
+      "service_ms": 1.3255000085337088
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 22.981300004175864,
+      "service_ms": 1.5137000009417534
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 23.195800007670186,
+      "service_ms": 1.6921000060392544
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 23.4488000132842,
+      "service_ms": 1.9108999986201525
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 24.43679999851156,
+      "service_ms": 1.0926999966613948
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 24.46590000181459,
+      "service_ms": 1.3405000063357875
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 24.804699991364032,
+      "service_ms": 1.3287999900057912
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 24.994699997478165,
+      "service_ms": 1.9439000025158748
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 26.111400002264418,
+      "service_ms": 1.5477999986615032
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 26.57780000299681,
+      "service_ms": 2.074700008961372
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 26.772899989737198,
+      "service_ms": 1.7248999938601628
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 26.790599993546493,
+      "service_ms": 1.687099997070618
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 27.713999996194616,
+      "service_ms": 1.011500004096888
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 27.953500000876375,
+      "service_ms": 1.3206000003265217
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 28.150199999799952,
+      "service_ms": 1.3061000063316897
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 28.327400010311976,
+      "service_ms": 1.4379999920492992
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 29.73159999237396,
+      "service_ms": 1.3909999979659915
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 29.75739999965299,
+      "service_ms": 1.3092000008327886
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 29.976599995279685,
+      "service_ms": 1.5665999962948263
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 29.996799989021383,
+      "service_ms": 1.5112999972188845
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 31.19470000092406,
+      "service_ms": 1.0800000018207356
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 31.22309999889694,
+      "service_ms": 1.1509000032674521
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 31.40690000145696,
+      "service_ms": 1.2420999992173165
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 31.58790001180023,
+      "service_ms": 1.5811000048415735
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 32.45700000843499,
+      "service_ms": 0.7239999977173284
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 32.47869999904651,
+      "service_ms": 0.7809999951859936
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 32.730099992477335,
+      "service_ms": 1.0691999923437834
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 33.07249999488704,
+      "service_ms": 1.4762000064365566
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 34.21200001321267,
+      "service_ms": 1.1287999950582162
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 34.23570000450127,
+      "service_ms": 1.087800003006123
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 34.43580000021029,
+      "service_ms": 1.24379999761004
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 34.614599993801676,
+      "service_ms": 1.3918000040575862
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 35.81659999326803,
+      "service_ms": 1.1900999961653724
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 35.83700000308454,
+      "service_ms": 1.0780000011436641
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 35.857100010616705,
+      "service_ms": 1.1318999895593151
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 36.08409999287687,
+      "service_ms": 1.3967999984743074
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 37.19230000569951,
+      "service_ms": 0.9658999915700406
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 37.222400002065115,
+      "service_ms": 1.0641999979270622
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 37.41220000665635,
+      "service_ms": 1.2137000012444332
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 37.5940000085393,
+      "service_ms": 1.4999000122770667
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 38.57479999714997,
+      "service_ms": 1.2159000034444034
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 38.598700004513375,
+      "service_ms": 1.141000000643544
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 38.816700005554594,
+      "service_ms": 1.3956000038888305
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 38.8356999901589,
+      "service_ms": 1.3421000039670616
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 39.97859999071807,
+      "service_ms": 1.130899996496737
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 40.176599999540485,
+      "service_ms": 1.221999991685152
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 40.20390000368934,
+      "service_ms": 1.292100001592189
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 40.375899989157915,
+      "service_ms": 1.3932000001659617
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 41.242099992814474,
+      "service_ms": 0.7130000012693927
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 41.26399999950081,
+      "service_ms": 0.7711000071140006
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 41.51589999673888,
+      "service_ms": 1.0612999903969467
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 41.86959999788087,
+      "service_ms": 1.4805999962845817
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 43.14470000099391,
+      "service_ms": 1.2626999960048124
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 43.169600001419894,
+      "service_ms": 1.2208999978611246
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 43.36749999492895,
+      "service_ms": 1.376100000925362
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 43.554499992751516,
+      "service_ms": 1.533899994683452
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 44.79929999797605,
+      "service_ms": 1.2310000020079315
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 45.02249999495689,
+      "service_ms": 1.392699996358715
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 45.04610000003595,
+      "service_ms": 1.3811999961035326
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 45.06069999479223,
+      "service_ms": 1.36009999550879
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 46.3168999995105,
+      "service_ms": 1.2450999929569662
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 46.34339999756776,
+      "service_ms": 1.2025000032735988
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 46.53530000359751,
+      "service_ms": 1.349300000583753
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 46.71310000412632,
+      "service_ms": 1.4961999986553565
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 48.270100000081584,
+      "service_ms": 1.5429999912157655
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 48.51819999748841,
+      "service_ms": 1.720300002489239
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 48.544900011620484,
+      "service_ms": 1.7083999991882592
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 48.56429999927059,
+      "service_ms": 1.6909000114537776
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 49.89399999612942,
+      "service_ms": 1.3149000005796552
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 50.10259999835398,
+      "service_ms": 1.3901000056648627
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 50.293199994484894,
+      "service_ms": 1.5481000009458512
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 50.32480000227224,
+      "service_ms": 1.6611000028206035
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 51.64780000632163,
+      "service_ms": 1.3143999967724085
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 51.67260000598617,
+      "service_ms": 1.2246000114828348
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 51.89519999839831,
+      "service_ms": 1.4860999945085496
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 51.91670000203885,
+      "service_ms": 1.4310999977169558
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 53.07280000124592,
+      "service_ms": 1.1442000104580075
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 53.099299999303184,
+      "service_ms": 1.101699992432259
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 53.29699999128934,
+      "service_ms": 1.2571999977808446
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 53.471899998839945,
+      "service_ms": 1.4026999997440726
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 54.59580000024289,
+      "service_ms": 1.0439999896334484
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 54.964599999948405,
+      "service_ms": 1.4808999985689297
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 54.988799995044246,
+      "service_ms": 1.3995999906910583
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 55.00680000113789,
+      "service_ms": 1.379199995426461
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 56.138799991458654,
+      "service_ms": 1.1202000023331493
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 56.16290000034496,
+      "service_ms": 1.077699998859316
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 56.35120000806637,
+      "service_ms": 1.2241000076755881
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 56.53249999159016,
+      "service_ms": 1.3756999978795648
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 57.613600001786835,
+      "service_ms": 1.0055000020656735
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 57.959800004027784,
+      "service_ms": 1.413899997714907
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 57.981699996162206,
+      "service_ms": 1.3373000110732391
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 57.99750000005588,
+      "service_ms": 1.3174000050639734
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 59.143399994354695,
+      "service_ms": 1.1346999963279814
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 59.1677000047639,
+      "service_ms": 1.0937000042758882
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 59.3586999893887,
+      "service_ms": 1.2433999945642427
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 59.530300000915304,
+      "service_ms": 1.385600000503473
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 60.9993999969447,
+      "service_ms": 1.4570999919669703
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 61.02629999804776,
+      "service_ms": 1.3838000013493001
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 61.04400000185706,
+      "service_ms": 1.3667000021087006
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 61.26980000408366,
+      "service_ms": 1.6637999942759052
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 62.431199999991804,
+      "service_ms": 1.150600000983104
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 62.459799999487586,
+      "service_ms": 1.1101999989477918
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 62.66710000636522,
+      "service_ms": 1.2757000076817349
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 63.04339999041986,
+      "service_ms": 1.622499999939464
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 64.17640000290703,
+      "service_ms": 1.4710000104969367
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 64.19869999808725,
+      "service_ms": 1.3873999996576458
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 64.42090000200551,
+      "service_ms": 1.6481999919051304
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 64.44099999498576,
+      "service_ms": 1.326599987805821
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 65.52889999875333,
+      "service_ms": 1.0753999958978966
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 65.73590000334661,
+      "service_ms": 1.176400008262135
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 65.76259998837486,
+      "service_ms": 1.2447999906726182
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 65.93840000277851,
+      "service_ms": 1.349600002868101
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 67.41740000143182,
+      "service_ms": 1.4605000033043325
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 67.63570000475738,
+      "service_ms": 1.6109999996842816
+    },
+    {
+      "case_id": "faq_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 67.65769999765325,
+      "service_ms": 1.5924999897833914
+    },
+    {
+      "case_id": "faq_2",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 67.67370000306983,
+      "service_ms": 1.5720999945187941
+    },
+    {
+      "case_id": "faq_negative_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 68.83479999669362,
+      "service_ms": 1.1498999956529588
+    },
+    {
+      "case_id": "abbrev_1",
+      "path": "faq",
+      "status": "ok",
+      "duration_ms": 68.86179999855813,
+      "service_ms": 1.1109000042779371
+    },
+    {
+      "case_id": "tool_1",
+      "path": "tools",
+      "status": "ok",
+      "duration_ms": 69.0621999965515,
+      "service_ms": 1.2706999987130985
+    },
+    {
+      "case_id": "rag_1",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 69.23799999640323,
+      "service_ms": 1.4166000037221238
+    },
+    {
+      "case_id": "crag_topic_switch_mmf",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 69.99599999107886,
+      "service_ms": 0.675899995258078
+    },
+    {
+      "case_id": "rag_rerank_failure",
+      "path": "rag",
+      "status": "ok",
+      "duration_ms": 70.33800000499468,
+      "service_ms": 1.0862000053748488
+    }
+  ]
+}

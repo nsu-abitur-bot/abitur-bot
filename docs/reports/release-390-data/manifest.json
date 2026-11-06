@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "source_sha": "855eddef3686a480ec3bff3f7a699bcfc7641545",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.2",
+  "files": {
+    "functional.json": "51018c6b7a5ace08579965787dfad53edfe0724c0b52473fd587a47ff538bbcd",
+    "local-tests.json": "caf30620af84b51c0b51d4b20d5d1bca95b1240833cc117db4271925020ebdd3",
+    "offline-c1.json": "88bc965147a019dae1e94dd734bfeb080d0217d44a8fb519198e89fee7a12c3d",
+    "offline-c4.json": "f10936427ced07830fbdd7c98fe1522aa0c3a0bdab79c1208537306400828c53",
+    "restore.json": "6fbcee209497eda912834a0368233230e9c7565c32ce13316d0e8585151a187f"
+  },
+  "provider_configuration": "not inspected at runtime; no live model calls",
+  "quality_dataset": "#388 not consumed; confirmation pending",
+  "probe_files_sha256": {
+    "tools/release_metrics.py": "32ae9becee0217422799a45d32b241b6589953640e29d09e9da124eec221dd74",
+    "tools/release_offline_probe.py": "69e43a6ab479b767e7e9bdb252839cb7df63c273e0149aafc4a7ac48ffe865ae",
+    "tools/release_restore_probe.py": "01cd398f201cc5c44bc2e2281d8d94993ac9f6016d54569b3474e4574199668f",
+    "tests/postgres/test_release_readiness.py": "4a2927177f7f97424bef7071a9b529845876d5a454dde46b1bc4a080e8c947da"
+  },
+  "annotation": "Percentile labels clarified after execution; observations and computed numbers unchanged",
+  "hash_basis": "UTF-8 text with LF line endings (Git canonical form)"
+}
