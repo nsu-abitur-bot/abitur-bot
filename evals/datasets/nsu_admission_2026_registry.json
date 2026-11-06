@@ -1,0 +1,3120 @@
+{
+  "schema_version": 1,
+  "dataset": "nsu_admission_2026.yaml",
+  "prepared_at": "2026-11-05",
+  "prepared_by": "DeshinMichael",
+  "collection_owner": "Михаил Дешин",
+  "internal_review_owner": "Марат Тимофеев",
+  "question_origin": "Сформулированы по темам консультационной группы и официальным страницам. Это не выгрузка реальных диалогов и не статистическая выборка обращений.",
+  "quota": {
+    "PRE-FLOW": 4,
+    "PRE-SCHOLAR": 3,
+    "PRE-DORM": 3,
+    "PRE-PARTNER": 2,
+    "PRE-LANG": 4,
+    "PRE-COMPARE": 4,
+    "PRE-SPECIAL": 3,
+    "PRE-CHANCE": 3,
+    "PRE-BUILDING": 3,
+    "PRE-GENERAL": 3,
+    "POST-DORM": 4,
+    "POST-ARRIVAL": 3,
+    "POST-DOCS": 3,
+    "PAID-CONTACT": 3,
+    "PAID-STEPS": 5
+  },
+  "sources": {
+    "DOC-de8ef06e37fe496b": {
+      "url": "https://education.nsu.ru/information-technologies/",
+      "title": "information-technologies/",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+      "from_user_csv": true
+    },
+    "DOC-2338f0807b9bc328": {
+      "url": "https://education.nsu.ru/tipi",
+      "title": "education.nsu.ru/tipi",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+      "from_user_csv": false
+    },
+    "DOC-3d63df62af354868": {
+      "url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+      "title": "scholarship/",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+      "from_user_csv": true
+    },
+    "DOC-03ae446000cfbc45": {
+      "url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+      "title": "campus.php",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+      "from_user_csv": true
+    },
+    "DOC-770b0c6ebb172dbe": {
+      "url": "https://education.nsu.ru/mathematics/",
+      "title": "mathematics/",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+      "from_user_csv": false
+    },
+    "DOC-317c53d5b5ae2baf": {
+      "url": "https://education.nsu.ru/mechatronics/",
+      "title": "mechatronics/",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+      "from_user_csv": false
+    },
+    "DOC-be8ca7262223f1f8": {
+      "url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+      "title": "bakalavriat-cpetsialitet",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+      "from_user_csv": true
+    },
+    "DOC-83001f87d00915c7": {
+      "url": "https://www.nsu.ru/n/life/campus/check-in/",
+      "title": "check-in/",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+      "from_user_csv": true
+    },
+    "DOC-6674be71e05b972c": {
+      "url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+      "title": "stoimost1/",
+      "section": "Сохранённая страница, контекст и опорные термины указаны у вопроса",
+      "access_status": "read",
+      "checked_at": "2026-11-05",
+      "edition_note": "Снимок 05.11.2026. Условия относятся только к явно указанному в вопросе периоду.",
+      "snapshot_sha256": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+      "from_user_csv": true
+    }
+  },
+  "cases": [
+    {
+      "id": "nsu-pre-flow-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Образовательные программы"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Компьютерные науки и системотехника, Программная инженерия и компьютерные науки"
+      ],
+      "source_anchor_terms": [
+        "КОМПЬЮТЕРНЫЕ НАУКИ И СИСТЕМОТЕХНИКА",
+        "ПРОГРАММНАЯ ИНЖЕНЕРИЯ И КОМПЬЮТЕРНЫЕ НАУКИ"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-flow-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "source_sections": {
+        "DOC-2338f0807b9bc328": "Образовательная программа"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "09.03.01, Информатика и вычислительная техника"
+      ],
+      "source_anchor_terms": [
+        "09.03.01",
+        "Информатика и вычислительная техника"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-flow-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "source_sections": {
+        "DOC-2338f0807b9bc328": "Основная профессиональная роль"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Разработка системного программного обеспечения и бизнес-приложений"
+      ],
+      "source_anchor_terms": [
+        "системного программного обеспечения",
+        "бизнес-приложений"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-flow-04",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Компьютерные науки и системотехника"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Сочетание российской фундаментальной подготовки и британского подхода с практикой и постепенным усложнением материала"
+      ],
+      "source_anchor_terms": [
+        "российской и британской",
+        "спиральной"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-3d63df62af354868"
+      ],
+      "source_sections": {
+        "DOC-3d63df62af354868": "Важно, пункт 1"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "NSU+ не назначается обучающимся по договорам целевого обучения"
+      ],
+      "source_anchor_terms": [
+        "не назначаются",
+        "целевом"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-scholar-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-3d63df62af354868"
+      ],
+      "source_sections": {
+        "DOC-3d63df62af354868": "Важно, пункт 2"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Первая сессия сдана на 4 и 5, задолженностей нет"
+      ],
+      "source_anchor_terms": [
+        "весеннего семестра",
+        "отсутствия задолженностей"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-scholar-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-3d63df62af354868"
+      ],
+      "source_sections": {
+        "DOC-3d63df62af354868": "Важно, пункт 3"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "ЕГЭ, индивидуальные достижения и олимпиады, засчитываемые за 100 баллов по предмету"
+      ],
+      "source_anchor_terms": [
+        "индивидуальные достижения",
+        "100 баллов"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-dorm-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 1"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "кабинет 1112",
+        "учебный корпус №1",
+        "Пирогова, 1",
+        "вход №1 из внутреннего дворика"
+      ],
+      "source_anchor_terms": [
+        "1112",
+        "внутреннего дворика"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-dorm-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 2"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "договор найма заключают с заведующим общежитием"
+      ],
+      "source_anchor_terms": [
+        "заведующего общежитием",
+        "Договор найма"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-dorm-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Оплата"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "чек или скриншот об оплате"
+      ],
+      "source_anchor_terms": [
+        "чеки",
+        "скриншоты"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-partner-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Обучение"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "СберЛаб-НГУ, ШИФТ НГУ-ЦФТ и PGLab НГУ-Postgres Professional"
+      ],
+      "source_anchor_terms": [
+        "СберЛаб",
+        "ШИФТ",
+        "PGLab"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "source_sections": {
+        "DOC-2338f0807b9bc328": "Введение, разработчики программы"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Допустим один или несколько корректных примеров, полный перечень не обязателен."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "ЦФТ",
+        "СКБ Контур",
+        "ДубльГИС",
+        "Постгрес Профессиональный",
+        "YADRO",
+        "Т1"
+      ],
+      "source_anchor_terms": [
+        "ЦФТ",
+        "СКБ Контур",
+        "ДубльГИС"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "at_least",
+        "minimum": 1
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не выдавать список разработчиков программы за список мест стажировки."
+      ],
+      "accepted_variants": {},
+      "coverage_note": "Один или несколько корректных примеров достаточны, полнота перечня не требуется."
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Программная инженерия и компьютерные науки"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "C++, Java, C# и Python"
+      ],
+      "source_anchor_terms": [
+        "C++",
+        "Java",
+        "C#",
+        "Python"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "язык C#",
+        "платформа .NET"
+      ],
+      "source_anchor_terms": [
+        ".NET"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "есть курс оптимизации производительности программ",
+        "язык Java"
+      ],
+      "source_anchor_terms": [
+        "производительности Java"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Дисциплины"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "есть курс мобильной разработки",
+        "Android"
+      ],
+      "source_anchor_terms": [
+        "Android"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не утверждать, что Android - единственная изучаемая платформа, если источник этого не устанавливает."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-770b0c6ebb172dbe"
+      ],
+      "source_sections": {
+        "DOC-770b0c6ebb172dbe": "Прикладная математика и информатика"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "математические и вычислительные методы",
+        "применение к научным и индустриальным задачам",
+        "важность предметной области"
+      ],
+      "source_anchor_terms": [
+        "предметная область",
+        "статистические"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не объявлять факультет лучшим и не выбирать за человека."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-317c53d5b5ae2baf"
+      ],
+      "source_sections": {
+        "DOC-317c53d5b5ae2baf": "Описание программы"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "15.03.06",
+        "Мехатроника и робототехника"
+      ],
+      "source_anchor_terms": [
+        "15.03.06",
+        "машинного обучения"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не объявлять факультет лучшим и не выбирать за человека."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Нейтральность выбора"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Оценивать только специальный случай отдельно от ответов по документам. Уточнить программы и критерии сравнения. Не выбирать за человека и не приписывать всем программам факультета одинаковое содержание."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "special",
+      "mandatory_facts": [],
+      "source_anchor_terms": [],
+      "revision_note": "Вопрос и эталон пересоставлены после ревью; прежняя версия ID не сопоставима по качеству."
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "context": "Выбор между ПИиКН и КНиС внутри ФИТ НГУ. Сравнение разных вузов не поддерживается.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Нейтральность выбора"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Полезная помощь при выборе между программами ФИТ НГУ без решения за человека и без выдуманных характеристик."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "special",
+      "mandatory_facts": [],
+      "source_anchor_terms": [],
+      "revision_note": "Редакция 5: внутривузовский специальный сценарий по ревью Марата. Подтверждение фактов и приёмка набора отдельно."
+    },
+    {
+      "id": "nsu-pre-special-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "ПИиКН, области подготовки"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Допустим один или несколько корректных примеров, полный перечень не обязателен."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "компьютерное зрение",
+        "биоинформатика",
+        "искусственный интеллект",
+        "машинное обучение",
+        "анализ больших данных",
+        "высокопроизводительные вычисления",
+        "биомедицинская инженерия",
+        "блокчейн"
+      ],
+      "source_anchor_terms": [
+        "компьютерное зрение",
+        "биоинформатика"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "at_least",
+        "minimum": 1
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {},
+      "coverage_note": "Один или несколько корректных примеров достаточны, полнота перечня не требуется."
+    },
+    {
+      "id": "nsu-pre-special-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "source_sections": {
+        "DOC-2338f0807b9bc328": "Преимущества обучения"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Со второго семестра, уже на первом курсе"
+      ],
+      "source_anchor_terms": [
+        "2 семестре"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-special-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "source_sections": {
+        "DOC-2338f0807b9bc328": "Преимущества обучения"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "С третьего курса"
+      ],
+      "source_anchor_terms": [
+        "с 3 курса"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "source_sections": {
+        "DOC-be8ca7262223f1f8": "Ограничения прогнозов и выбора"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Предлагает полезные следующие шаги и сравнение вариантов, а не только отказывается решать. Не выдумывает прогноз и не выбирает за человека."
+      ],
+      "critical_failures": [
+        "Выдуманная вероятность или гарантия зачисления."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "special",
+      "mandatory_facts": [],
+      "source_anchor_terms": [],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено."
+    },
+    {
+      "id": "nsu-pre-chance-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "source_sections": {
+        "DOC-be8ca7262223f1f8": "Ограничения прогнозов и выбора"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Оценивать только специальный случай отдельно от ответов по документам. Нет. Прошлогодний результат не гарантирует исход текущего конкурса."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "special",
+      "mandatory_facts": [],
+      "source_anchor_terms": [],
+      "revision_note": "Вопрос и эталон пересоставлены после ревью; прежняя версия ID не сопоставима по качеству."
+    },
+    {
+      "id": "nsu-pre-chance-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "source_sections": {
+        "DOC-be8ca7262223f1f8": "Ограничения прогнозов и выбора"
+      },
+      "expected_action": "clarify",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Предлагает полезные следующие шаги и сравнение вариантов, а не только отказывается решать. Не выдумывает прогноз и не выбирает за человека."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "special",
+      "mandatory_facts": [],
+      "source_anchor_terms": [],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено."
+    },
+    {
+      "id": "nsu-pre-building-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, граждане РФ"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "ММЦИММТ НГУ, улица Ляпунова, 6"
+      ],
+      "source_anchor_terms": [
+        "Ляпунова,6"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-building-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 4"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Пирогова, 2, кабинет 119"
+      ],
+      "source_anchor_terms": [
+        "Пирогова, 2",
+        "119"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-83001f87d00915c7"
+      ],
+      "source_sections": {
+        "DOC-83001f87d00915c7": "Шаг 6, контакты паспортного стола"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Пирогова, 4/1, общежитие №3"
+      ],
+      "source_anchor_terms": [
+        "Пирогова, 4/1"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-general-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "Экзамены, после школы"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Математика, русский язык и информатика либо физика"
+      ],
+      "source_anchor_terms": [
+        "Математика",
+        "Русский язык",
+        "Информатика / Физика"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-general-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "source_sections": {
+        "DOC-be8ca7262223f1f8": "Информация для поступающих"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "образец договора об оказании платных образовательных услуг",
+        "страница приёма в бакалавриат НГУ"
+      ],
+      "source_anchor_terms": [
+        "Образец договора"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не утверждать, что договор пользователя уже заключён."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-pre-general-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "source_sections": {
+        "DOC-be8ca7262223f1f8": "Информация для поступающих"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Совет подделать документы, обойти срок или чужую учётную запись."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "перечень вступительных испытаний",
+        "расписание с местом проведения",
+        "страница приёма в бакалавриат НГУ"
+      ],
+      "source_anchor_terms": [
+        "Перечень вступительных испытаний",
+        "места проведения"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не придумывать конкретные даты без расписания."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-post-dorm-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 2"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "заведующий общежитием"
+      ],
+      "source_anchor_terms": [
+        "направление на проживание"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-post-dorm-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 7"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "направление с двумя печатями",
+        "чек об оплате"
+      ],
+      "source_anchor_terms": [
+        "2 печатями",
+        "чек об оплате"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 7"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "обратиться к заведующему общежитием",
+        "передать направление с двумя печатями и чек об оплате",
+        "получить пропуск после передачи документов"
+      ],
+      "source_anchor_terms": [
+        "Получить пропуск."
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-post-dorm-04",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 3, сроки оплаты"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Раскрытие или выдумывание персональных данных соседей."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "первый семестр: до 10 сентября",
+        "второй семестр: до 10 февраля",
+        "лето: до 30 июня"
+      ],
+      "source_anchor_terms": [
+        "10 сентября",
+        "10 февраля",
+        "30 июня"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {},
+      "period_proposal": "Общий график из инструкции кампании 2026, не календарный набор трёх платежей и не обещание условий 2026/27. Требует согласования Марата."
+    },
+    {
+      "id": "nsu-post-arrival-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, график первокурсников"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "один или несколько подходящих полных интервалов из acceptable_intervals, с правильным временем"
+      ],
+      "source_anchor_terms": [
+        "28 августа 2026",
+        "08:00 до 20:00"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не ограничивать правильный ответ только первым днём. Не подменять медицинское разрешение другой процедурой.",
+        "Условие резервного дня проверять только если выбран резервный день. Не требовать отдельного предупреждения при обычной подходящей дате."
+      ],
+      "accepted_variants": {},
+      "acceptable_intervals": [
+        {
+          "date": "2026-08-28",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "День для указанного общежития"
+        },
+        {
+          "date": "2026-09-05",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "День для указанного общежития"
+        },
+        {
+          "date": "2026-09-10",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-11",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-12",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-13",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-14",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-15",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        }
+      ]
+    },
+    {
+      "id": "nsu-post-arrival-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, график первокурсников"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "один или несколько подходящих полных интервалов из acceptable_intervals, с правильным временем"
+      ],
+      "source_anchor_terms": [
+        "29 августа 2026",
+        "10:00 до 14:00"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не ограничивать правильный ответ только первым днём. Не подменять медицинское разрешение другой процедурой.",
+        "Условие резервного дня проверять только если выбран резервный день. Не требовать отдельного предупреждения при обычной подходящей дате."
+      ],
+      "accepted_variants": {},
+      "acceptable_intervals": [
+        {
+          "date": "2026-08-29",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "День для указанного общежития"
+        },
+        {
+          "date": "2026-09-07",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "День для указанного общежития"
+        },
+        {
+          "date": "2026-09-10",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-11",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-12",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-13",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-14",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-15",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        }
+      ]
+    },
+    {
+      "id": "nsu-post-arrival-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, график первокурсников"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "один или несколько подходящих полных интервалов из acceptable_intervals, с правильным временем"
+      ],
+      "source_anchor_terms": [
+        "30 августа 2026",
+        "10:00 до 14:00"
+      ],
+      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не ограничивать правильный ответ только первым днём. Не подменять медицинское разрешение другой процедурой.",
+        "Условие резервного дня проверять только если выбран резервный день. Не требовать отдельного предупреждения при обычной подходящей дате."
+      ],
+      "accepted_variants": {},
+      "acceptable_intervals": [
+        {
+          "date": "2026-08-30",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "День для указанного общежития"
+        },
+        {
+          "date": "2026-09-07",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "День для указанного общежития"
+        },
+        {
+          "date": "2026-09-10",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-11",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-12",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-13",
+          "start": "10:00",
+          "end": "14:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-14",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        },
+        {
+          "date": "2026-09-15",
+          "start": "08:00",
+          "end": "20:00",
+          "condition": "Резервные дни для ещё не оформивших разрешение"
+        }
+      ]
+    },
+    {
+      "id": "nsu-post-docs-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, документы граждан РФ"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Страницы 2-3 и 5"
+      ],
+      "source_anchor_terms": [
+        "стр-2-3, 5"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-post-docs-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, документы граждан РФ"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Выпиской о прививках из амбулаторной карты"
+      ],
+      "source_anchor_terms": [
+        "выписку о прививках"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-post-docs-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "source_sections": {
+        "DOC-03ae446000cfbc45": "Шаг 6, иностранные граждане"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3",
+        "NFR-7"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Запрос сканов, сохранение документов или ложное сообщение об оформлении."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "паспорт",
+        "сведения о прививках",
+        "флюорография или рентгенография не старше года",
+        "направление на проживание"
+      ],
+      "source_anchor_terms": [
+        "паспорт;",
+        "сведения о профилактических прививках;",
+        "направление на проживание"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-contact-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Оплата обучения"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "официальная страница онлайн-оплаты услуг НГУ"
+      ],
+      "source_anchor_terms": [
+        "без комиссии",
+        "сайте НГУ"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не предлагать отправлять деньги или реквизиты через чат."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-contact-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Образовательный кредит"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Сбербанк"
+      ],
+      "source_anchor_terms": [
+        "ПАО Сбербанк"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением.",
+        "Не навязывать оформление кредита или выбор банка."
+      ],
+      "accepted_variants": {
+        "Сбербанк": [
+          "Сбербанк",
+          "ПАО Сбербанк",
+          "Сбер"
+        ]
+      }
+    },
+    {
+      "id": "nsu-paid-contact-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Приказы и образцы"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "раздел приказов о стоимости и образцов договоров на странице стоимости обучения НГУ"
+      ],
+      "source_anchor_terms": [
+        "Приказы о стоимости обучения и образцы договоров"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Таблица стоимости 2026/27"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "300 000 рублей за год"
+      ],
+      "source_anchor_terms": [
+        "09.03.01",
+        "300 000",
+        "руб./год"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-steps-02",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "source_sections": {
+        "DOC-de8ef06e37fe496b": "ПИиКН, стоимость"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "150 000 рублей в семестр"
+      ],
+      "source_anchor_terms": [
+        "150 000",
+        "рублей в семестр",
+        "2026-27"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-steps-03",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Таблица стоимости 2026/27"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "205 000 рублей за год"
+      ],
+      "source_anchor_terms": [
+        "15.03.06",
+        "205 000"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-steps-04",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Образовательный кредит"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "образовательный кредит с господдержкой допускает полную или частичную оплату"
+      ],
+      "source_anchor_terms": [
+        "полной или частичной"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    },
+    {
+      "id": "nsu-paid-steps-05",
+      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "source_sections": {
+        "DOC-6674be71e05b972c": "Онлайн-оплата"
+      },
+      "expected_action": "answer",
+      "requirements": [
+        "FR-1",
+        "FR-5",
+        "FR-8",
+        "NFR-3"
+      ],
+      "required_checks": [
+        "Нужны все обязательные факты, допустимы эквивалентные краткие формулировки."
+      ],
+      "critical_failures": [
+        "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
+      ],
+      "content_status": "draft",
+      "missing_evidence": null,
+      "internal_review": {
+        "status": "pending",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "expert_review": {
+        "status": "not_requested",
+        "reviewer": null,
+        "reviewed_at": null,
+        "basis": null,
+        "dataset_sha256": null
+      },
+      "evaluation_group": "document",
+      "mandatory_facts": [
+        "Visa",
+        "Mastercard",
+        "Мир"
+      ],
+      "source_anchor_terms": [
+        "Visa, Mastercard и Мир"
+      ],
+      "revision_note": "Редакция 3: естественный вопрос, факты отдельно от ограничений поведения. Новая проверка обязательна.",
+      "fact_selection": {
+        "mode": "all"
+      },
+      "behavior_constraints": [
+        "Не выдумывать сведения или гарантии.",
+        "Не переносить условия на другой год, программу или категорию.",
+        "Не заменять доступный фактический ответ общим перенаправлением."
+      ],
+      "accepted_variants": {}
+    }
+  ],
+  "dataset_sha256": "addb1ac42b7aeae1f8701147b814b1117035c9130875a5fe52969d50955d6d48",
+  "revision": "5-draft",
+  "group_proposal": {
+    "document": 45,
+    "special": 5,
+    "status": "pending_Marat_agreement"
+  },
+  "source_collection": {
+    "checked_at": "2026-11-05",
+    "csv_unique_links": 46,
+    "raw_materials_location": "outside repositories",
+    "supplemental_sources_need_agreement": false,
+    "source_selection_review": "https://github.com/nsu-abitur-bot/abitur-bot/pull/407#pullrequestreview-5797772194"
+  }
+}
