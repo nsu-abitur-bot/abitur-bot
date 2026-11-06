@@ -879,7 +879,12 @@ def _store_answer(
     """
     stored_text = _strip_markup(content)
     entry: dict = {"role": "assistant", "content": stored_text}
-    if ctx.score_query is not None:
+    if ctx.score_query is not None and stored_text not in (
+        SCORES_UNAVAILABLE,
+        SCORES_CLARIFY,
+        RAG_UNAVAILABLE_ANSWER,
+        "LLM временно недоступна.",
+    ):
         entry["admission_scores"] = ctx.score_query
     _spawn_bg(_remember_message(redis_client, ctx.session_id, entry))
     if ctx.user_id:

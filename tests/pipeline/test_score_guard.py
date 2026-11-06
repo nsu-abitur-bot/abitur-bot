@@ -286,6 +286,24 @@ def test_free_education_does_not_mean_paid():
     assert guard is not None and guard.filters["form"] == "budget"
 
 
+@pytest.mark.asyncio
+async def test_failed_validation_does_not_store_rejected_query_as_context(monkeypatch):
+    from fakeredis.aioredis import FakeRedis
+
+    history = object.__new__(llm_client.RedisClient)
+    history.client = FakeRedis(decode_responses=True)
+    ctx = llm_client._Ctx(session_id="rejected-scope", user_id=0)
+    ctx.score_query = {"program": "09.03.04", "metric": "average"}
+    tasks = []
+    monkeypatch.setattr(llm_client, "_spawn_bg", tasks.append)
+    llm_client._store_answer(SCORES_UNAVAILABLE, "А средний?", history, ctx)
+    for task in tasks:
+        await task
+    entries = await history.get_history(ctx.session_id)
+    await history.client.aclose()
+    assert "admission_scores" not in entries[-1]
+
+
 @pytest.mark.parametrize(
     "arguments",
     [
