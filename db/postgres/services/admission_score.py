@@ -9,6 +9,7 @@
 import logging
 import re
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 from typing import Iterable, Optional, Sequence
 
 from sqlalchemy import select
@@ -81,6 +82,7 @@ _NOISE_WORDS = frozenset(
     }
 )
 _CONJUNCTION = "и"
+_FUZZY_WORD_THRESHOLD = 0.80
 
 
 def _fold(value: str) -> str:
@@ -95,6 +97,21 @@ def _words(value: str) -> list[str]:
 def _stem(word: str) -> str:
     """Грубая основа: отрезаем окончание, чтобы «прикладная» ~ «прикладной»."""
     return word[: max(4, len(word) - 2)]
+
+
+def _fuzzy_words_match(words: Sequence[str], name: str) -> bool:
+    name_words = _words(name)
+    return all(
+        any(
+            SequenceMatcher(None, word, candidate).ratio() >= _FUZZY_WORD_THRESHOLD
+            # Опечатки могут сочетаться со склонением: «программную инженерию»
+            # против «Програмная инженирия» не проходит порог по полным словам.
+            or SequenceMatcher(None, _stem(word), _stem(candidate)).ratio()
+            >= _FUZZY_WORD_THRESHOLD
+            for candidate in name_words
+        )
+        for word in words
+    )
 
 
 def _acronyms(name: str) -> set[str]:
@@ -144,6 +161,8 @@ def match_programs(programs: Sequence[Program], query: str) -> list[Program]:
     3) код ФГОС («09.03.01»);
     4) значимые слова запроса есть в названии — подряд, вразброс, затем по
        основам («прикладная математика», «программная инженерия»).
+    5) каждое значимое слово похоже на слово названия или его основу
+       с коэффициентом не ниже 0.80 (опечатки в вопросе или справочнике).
     """
     target = _fold(query)
     if not target:
@@ -184,7 +203,10 @@ def match_programs(programs: Sequence[Program], query: str) -> list[Program]:
         if found:
             return found
     stems = {_stem(w) for w in words}
-    return [p for p in candidates if stems <= {_stem(w) for w in _words(p.name)}]
+    found = [p for p in candidates if stems <= {_stem(w) for w in _words(p.name)}]
+    if found:
+        return found
+    return [p for p in candidates if _fuzzy_words_match(words, p.name)]
 
 
 @dataclass
