@@ -1,7 +1,7 @@
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.postgres.models import AnswerFeedback, timestamp
+from ..models import AnswerFeedback, FeedbackReport, timestamp
 
 RATINGS = {"positive", "negative"}
 
@@ -41,7 +41,23 @@ class AnswerFeedbackService:
                 AnswerFeedback.rating.is_(None),
             )
             .values(rating=rating, rated_at=timestamp())
-            .returning(AnswerFeedback.id)
+            .returning(AnswerFeedback)
+        )
+        candidate = result.scalar_one_or_none()
+        if candidate is None:
+            return False
+
+        # Снимок оцениваемого ответа важен: переписка могла уже продолжиться.
+        self.session.add(
+            FeedbackReport(
+                user_id=candidate.user_id,
+                session_id=candidate.session_id,
+                channel=candidate.channel,
+                comment="👍 Полезно" if rating == "positive" else "👎 Неверно",
+                question=candidate.question,
+                bot_response=candidate.bot_response,
+                status="open",
+            )
         )
         await self.session.commit()
-        return result.scalar_one_or_none() is not None
+        return True
