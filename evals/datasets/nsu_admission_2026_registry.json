@@ -1208,7 +1208,7 @@
     },
     {
       "id": "nsu-pre-compare-04",
-      "context": "Снимок 05.11.2026, период и категория заданы в вопросе. Не переносить на следующую кампанию.",
+      "context": "Выбор между ПИиКН и КНиС внутри ФИТ НГУ. Сравнение разных вузов не поддерживается.",
       "source_ids": [
         "DOC-de8ef06e37fe496b"
       ],
@@ -1223,7 +1223,7 @@
         "NFR-3"
       ],
       "required_checks": [
-        "Предлагает полезные следующие шаги и сравнение вариантов, а не только отказывается решать. Не выдумывает прогноз и не выбирает за человека."
+        "Полезная помощь при выборе между программами ФИТ НГУ без решения за человека и без выдуманных характеристик."
       ],
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
@@ -1247,7 +1247,7 @@
       "evaluation_group": "special",
       "mandatory_facts": [],
       "source_anchor_terms": [],
-      "revision_note": "Редакция 4: вопрос, эталон и критерии согласованы между собой по разбору Марата. Человеческое подтверждение ещё не получено."
+      "revision_note": "Редакция 5: внутривузовский специальный сценарий по ревью Марата. Подтверждение фактов и приёмка набора отдельно."
     },
     {
       "id": "nsu-pre-special-01",
@@ -3103,8 +3103,8 @@
       "accepted_variants": {}
     }
   ],
-  "dataset_sha256": "6b9cfeee519858e2ff1bbc5c79d5790bd6a79dd388f80c5ed08d8b957385c409",
-  "revision": "4-draft",
+  "dataset_sha256": "addb1ac42b7aeae1f8701147b814b1117035c9130875a5fe52969d50955d6d48",
+  "revision": "5-draft",
   "group_proposal": {
     "document": 45,
     "special": 5,
@@ -3114,6 +3114,7 @@
     "checked_at": "2026-11-05",
     "csv_unique_links": 46,
     "raw_materials_location": "outside repositories",
-    "supplemental_sources_need_agreement": true
+    "supplemental_sources_need_agreement": false,
+    "source_selection_review": "https://github.com/nsu-abitur-bot/abitur-bot/pull/407#pullrequestreview-5797772194"
   }
 }
