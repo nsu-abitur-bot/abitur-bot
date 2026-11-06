@@ -1,6 +1,8 @@
 import logging
+from functools import lru_cache
 
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
+from lightrag.utils import TiktokenTokenizer
 
 from abbrev.expander import get_abbrev_expander
 from llm.factory import get_llm_provider
@@ -8,6 +10,11 @@ from llm.profiles import LLMProfiles
 from parser.prompts import CONTEXT_ENRICHMENT_PROMPT
 
 logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=1)
+def _cleanup_tokenizer() -> TiktokenTokenizer:
+    return TiktokenTokenizer()
 
 SYSTEM_PROMPT = f"""Ты - эксперт по очистке и структурированию текстовых данных.
 Твоя задача — получить «грязный» текст, спаршенный с веб-страницы или PDF-документа,
@@ -36,9 +43,26 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
     if not raw_text or not raw_text.strip():
         return ""
 
-    llm = get_llm_provider()
-
     expanded_text = get_abbrev_expander().expand(raw_text)
+    profile = LLMProfiles.PARSER
+    input_budget = min(max_chunk_tokens, (profile.max_tokens or 4000) // 2)
+    try:
+        input_tokens = len(_cleanup_tokenizer().encode(expanded_text))
+    except Exception:
+        logger.warning(
+            "Не удалось оценить бюджет очистки; сохранён полный исходный текст"
+        )
+        return expanded_text
+    if input_tokens > input_budget:
+        # Keeping every fact can require at least as many output tokens as input.
+        # Avoid a paid request that will truncate, without increasing token limits.
+        logger.info(
+            "LLM-очистка пропущена: %s входных токенов, бюджет %s; "
+            "сохранён полный исходный текст",
+            input_tokens,
+            input_budget,
+        )
+        return expanded_text
 
     messages: list[BaseMessage] = [
         SystemMessage(content=SYSTEM_PROMPT),
@@ -48,7 +72,8 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
     ]
 
     try:
-        response_text = await llm.generate(messages, profile=LLMProfiles.PARSER)
+        llm = get_llm_provider()
+        response_text = await llm.generate(messages, profile=profile)
         return get_abbrev_expander().expand(response_text)
     except Exception as e:
         logger.error(f"Ошибка при очистке текста через LLM: {e}")

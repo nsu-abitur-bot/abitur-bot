@@ -62,7 +62,12 @@ class DeepSeekProvider(BaseLLMProvider):
         )
         choice = response.choices[0]
         if choice.finish_reason != "stop":
-            raise RuntimeError("DeepSeek не завершил текстовый ответ")
+            raise RuntimeError(
+                "DeepSeek не завершил текстовый ответ: "
+                f"finish_reason={choice.finish_reason}, "
+                f"completion_tokens={_usage(response.usage).completion_tokens}, "
+                f"max_tokens={self._params(profile)['max_tokens']}"
+            )
         return LLMResult(choice.message.content or "", _usage(response.usage))
 
     async def generate_stream_with_usage(
