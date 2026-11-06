@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "issue": 247,
+  "recorded_at": "2026-09-03",
+  "reviewed_at": "2026-11-06",
+  "origin": {
+    "kind": "consultation_notes_recalled_by_author",
+    "provided_by": "Marat-nsu",
+    "description": "Реальные летние обращения, записанные и дополненные по памяти; список повторно предоставлен 06.11.2026. Не стенограмма и не статистическая выборка.",
+    "privacy": "Персональное имя сотрудника в вопросе о заселении заменено ролью; частная переписка и локальные пути не публикуются."
+  },
+  "dataset": "nsu_summer_2026.yaml",
+  "dataset_sha256": "0d04e35ff4027a3e61cb6237d29cb0b9fbba6e6bffea7497caefc6020edbf001",
+  "sources": [
+    {
+      "url": "https://education.nsu.ru/information-technologies/",
+      "final_url": "https://education.nsu.ru/information-technologies/",
+      "sha256": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+      "bytes": 803901,
+      "retrieved_at": "2026-11-06",
+      "id": "fit"
+    },
+    {
+      "url": "https://education.nsu.ru/apply_fit",
+      "final_url": "https://education.nsu.ru/apply_fit",
+      "sha256": "abc55007fcfd7a1b5162378a82fe872f846aff3e0823f426f539b3ef1a4c102e",
+      "bytes": 172823,
+      "retrieved_at": "2026-11-06",
+      "id": "apply_fit"
+    },
+    {
+      "url": "https://education.nsu.ru/freshmen/",
+      "final_url": "https://education.nsu.ru/freshmen/",
+      "sha256": "aeb07c54f1744df508b439af3042ebe742b94cb36a651945c7c591f6c506fcdc",
+      "bytes": 738793,
+      "retrieved_at": "2026-11-06",
+      "id": "freshmen"
+    }
+  ],
+  "cases": [
+    {
+      "id": "nsu-summer-bachelor-01",
+      "original_position": 1,
+      "level": "bachelor",
+      "question": "Есть две программы с одинаковым кодом. Это разные программы или одна?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [
+        "nsu-pre-flow-01",
+        "nsu-pre-flow-02",
+        "nsu-pre-flow-04"
+      ],
+      "coverage": "source_checked_subcase",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "source_checked",
+      "reference_answer": "Это два разных профиля одного направления 09.03.01 «Информатика и вычислительная техника»: «Программная инженерия и компьютерные науки» (ПИиКН) и «Компьютерные науки и системотехника» (КНиС). Одинаковый код не делает их одной программой.",
+      "evidence": {
+        "source_id": "fit",
+        "section": "Образовательные программы",
+        "basis": "Проверка опубликованной страницы агентом 06.11.2026; не человеческое или экспертное подтверждение."
+      },
+      "follow_up": null,
+      "history": [
+        {
+          "role": "user",
+          "content": "Я выбираю между ПИиКН и КНиС на ФИТ НГУ."
+        }
+      ],
+      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках."
+    },
+    {
+      "id": "nsu-summer-bachelor-02",
+      "original_position": 2,
+      "level": "bachelor",
+      "question": "Конкурс на ПИиКН и КНиС общий или отдельный?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: приёмная комиссия",
+        "needed": "Нужен прямой документ или подтверждение: единая или отдельные конкурсные группы ПИиКН/КНиС в выбранную кампанию. Разные квоты на странице не доказывают порядок конкурса."
+      }
+    },
+    {
+      "id": "nsu-summer-bachelor-03",
+      "original_position": 3,
+      "level": "bachelor",
+      "question": "Как заключить договор на платное обучение?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [
+        "nsu-pre-general-02",
+        "nsu-paid-contact-03"
+      ],
+      "coverage": "source_checked_subcase",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "source_checked",
+      "reference_answer": "Договор на платное обучение ФИТ можно оформить дистанционно: напишите в приёмную комиссию ФИТ на fit_prkom@nsu.ru по вопросу заключения договора. Для очного оформления на странице ФИТ указан кабинет 1132 учебного корпуса №1, Пирогова, 1. Дальнейшие документы и порядок подписания нужно согласовать с комиссией; на странице нет полного дистанционного регламента.",
+      "evidence": {
+        "source_id": "apply_fit",
+        "section": "Платное обучение / Заключение договоров",
+        "basis": "Проверка опубликованной страницы агентом 06.11.2026; не человеческое или экспертное подтверждение."
+      },
+      "follow_up": null,
+      "history": [
+        {
+          "role": "user",
+          "content": "Я поступаю на бакалавриат ФИТ НГУ и хочу оформить договор дистанционно."
+        }
+      ],
+      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках."
+    },
+    {
+      "id": "nsu-summer-bachelor-04",
+      "original_position": 4,
+      "level": "bachelor",
+      "question": "Как происходит заселение: сначала к ответственному сотруднику факультета или к заведующему общежитием?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [
+        "nsu-post-dorm-01",
+        "nsu-post-dorm-02",
+        "nsu-post-dorm-03"
+      ],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: ответственный за заселение",
+        "needed": "Нужна начальная последовательность действий и выдачи направления. Нынешние три сценария #388 начинаются с уже оформленных документов и не отвечают, к кому идти сначала. Страница инструкции ФИТ вернула 403 при повторной проверке."
+      }
+    },
+    {
+      "id": "nsu-summer-bachelor-05",
+      "original_position": 5,
+      "level": "bachelor",
+      "question": "Как организованы занятия, есть лекции и семинары?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [
+        "nsu-pre-lang-01"
+      ],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: учебная часть",
+        "needed": "Нужен актуальный учебный план/инструкция ФИТ с формами занятий и организацией учебного процесса. Общая страница описывает пары, но не подтверждает весь ответ о лекциях/семинарах; старую аннотацию 2020 года не переносим на нынешний набор."
+      }
+    },
+    {
+      "id": "nsu-summer-bachelor-06",
+      "original_position": 6,
+      "level": "bachelor",
+      "question": "Есть ли в группе организатор, к которому можно обратиться за помощью, например если заболел?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: кураторы и учебная часть",
+        "needed": "Наличие кураторов групп подтверждено, но кто помогает при болезни, кого уведомлять и какие документы требуются, в проверенном источнике не описано."
+      }
+    },
+    {
+      "id": "nsu-summer-bachelor-07",
+      "original_position": 7,
+      "level": "bachelor",
+      "question": "Что надо взять из военкомата?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [
+        "nsu-pre-building-02"
+      ],
+      "coverage": "source_checked_subcase",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "source_checked",
+      "reference_answer": "Для военнообязанного в перечне документов на заселение НГУ указан документ воинского учёта: приписное свидетельство или военный билет. Это альтернативы по вашей категории, а не требование принести оба документа.",
+      "evidence": {
+        "source_id": "freshmen",
+        "section": "Для заселения в общежитие первокурснику нужно иметь",
+        "basis": "Проверка опубликованной страницы агентом 06.11.2026; не человеческое или экспертное подтверждение."
+      },
+      "follow_up": null,
+      "history": [
+        {
+          "role": "user",
+          "content": "Я военнообязанный первокурсник НГУ. Собираю документы для заселения в общежитие."
+        }
+      ],
+      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках."
+    },
+    {
+      "id": "nsu-summer-bachelor-08",
+      "original_position": 8,
+      "level": "bachelor",
+      "question": "Как проходят занятия физкультурой?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "НГУ: кафедра физического воспитания",
+        "needed": "Нужна текущая инструкция для первого курса: запись/распределение по занятиям, расписание, зачёт, медицинские ограничения. Наличие физкультуры в перечне дисциплин не раскрывает порядок занятий."
+      }
+    },
+    {
+      "id": "nsu-summer-master-09",
+      "original_position": 9,
+      "level": "master",
+      "question": "Какие документы надо принести в приёмную комиссию кроме паспорта и СНИЛС?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: приёмная комиссия магистратуры",
+        "needed": "Нужен перечень для выбранной программы, категории и кампании. Центральная страница вернула 403; перечень ПИШ/другого факультета и старые документы не переносим на ФИТ."
+      }
+    },
+    {
+      "id": "nsu-summer-master-10",
+      "original_position": 10,
+      "level": "master",
+      "question": "До какого числа принимают документы?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: приёмная комиссия магистратуры",
+        "needed": "Нужны программа, кампания/год, бюджет или договор и официальный срок соответствующей категории. Не подставлять одну дату для всех вариантов."
+      }
+    },
+    {
+      "id": "nsu-summer-master-11",
+      "original_position": 11,
+      "level": "master",
+      "question": "Когда придёт ссылка на консультацию?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: организатор консультации в магистратуру",
+        "needed": "Нужны название программы/консультации и кампания, опубликованное расписание и порядок рассылки ссылки. Не обещать срок отправки без источника."
+      }
+    },
+    {
+      "id": "nsu-summer-phd-12",
+      "original_position": 12,
+      "level": "phd",
+      "question": "Какие документы нужны для поступления?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: приёмная комиссия аспирантуры",
+        "needed": "Нужен полный перечень документов и условия выбранной кампании/категории. Обзорная страница подтверждает согласие научного руководителя, но не полный пакет; центральная страница вернула 403."
+      }
+    },
+    {
+      "id": "nsu-summer-phd-13",
+      "original_position": 13,
+      "level": "phd",
+      "question": "В магистратуре была Google-форма. Для аспирантуры её тоже надо заполнить?",
+      "origin": "summer_consultation_notes",
+      "related_admission_ids": [],
+      "coverage": "gap",
+      "approval": {
+        "internal": null,
+        "expert": null
+      },
+      "status": "needs_source",
+      "reference_answer": null,
+      "evidence": null,
+      "follow_up": {
+        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
+        "responsible_role": "ФИТ: приёмная комиссия аспирантуры",
+        "needed": "Нужны назначение/URL конкретной формы, научная специальность и кампания. Форма магистратуры не доказывает ни обязательность, ни отсутствие отдельной формы для аспирантуры."
+      }
+    }
+  ],
+  "excluded_sources": [
+    {
+      "url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+      "reason": "HTTP 403 06.11.2026; соответствующие старые эталоны #388 не переподтверждены."
+    },
+    {
+      "url": "https://www.nsu.ru/n/education/apply/master-s-degree/",
+      "reason": "HTTP 403 06.11.2026; списки других факультетов не подходят для общего ответа ФИТ."
+    },
+    {
+      "url": "https://www.nsu.ru/n/education/apply/phd/",
+      "reason": "HTTP 403 06.11.2026; обзорная education.nsu.ru/phd не даёт полного перечня документов."
+    }
+  ]
+}
