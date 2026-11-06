@@ -10,6 +10,110 @@ from pipeline.tools.admission_scores import AdmissionScoresResult
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("question", "changes"),
+    [
+        ("Какой средний балл?", {"metric": "average"}),
+        ("А на 09.03.04?", {"program": "09.03.04"}),
+        ("А по платному?", {"form": "paid"}),
+    ],
+)
+async def test_review_followups_require_matching_query_before_publication(
+    monkeypatch, question, changes
+):
+    scope = {"program": "09.03.01", "year": 2024, "form": "budget", "metric": "passing"}
+    expected = {**scope, **changes}
+    calls, queries, published = [], [], []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                if question.startswith("Какой"):
+                    await kwargs["tool_executor"](
+                        "get_admission_scores",
+                        {
+                            "program": "38.03.01",
+                            "year": 2025,
+                            "form": "paid",
+                            "metric": "average",
+                        },
+                    )
+                if kwargs.get("on_delta"):
+                    await kwargs["on_delta"]("Данных нет.")
+                return LLMResult("Данных нет.")
+            assert kwargs["required_tool"] == "get_admission_scores"
+            properties = kwargs["tools"][0].parameters["properties"]
+            for key, value in expected.items():
+                assert properties[key]["enum"] == [value]
+            await kwargs["tool_executor"]("get_admission_scores", expected)
+            return LLMResult("Проверенный ответ")
+
+    async def execute(name, args):
+        queries.append(args)
+        return AdmissionScoresResult("Баллы", status="ok", scope=dict(args))
+
+    async def publish(text):
+        published.append(text)
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    result, _, _ = await llm_client._run_tool_loop(
+        [
+            HumanMessage(content="Какой проходной балл на 09.03.01?"),
+            AIMessage(
+                content="Проходной 141", additional_kwargs={"admission_scores": scope}
+            ),
+            HumanMessage(content=question),
+        ],
+        "review-regressions",
+        stream_callback=publish,
+        tool_executor=execute,
+    )
+    assert result == "Проверенный ответ"
+    assert queries == [expected]
+    assert published == [result]
+    assert len(calls) == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("question", ["А средний балл?", "Какой средний балл?"])
+async def test_generic_score_without_context_clarifies_without_llm(monkeypatch, question):
+    def forbidden_provider():
+        raise AssertionError("Уточнение направления не требует LLM")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", forbidden_provider)
+    result, _, _ = await llm_client._run_tool_loop(
+        [HumanMessage(content=question)], "missing-score-context"
+    )
+    assert result == llm_client.SCORES_CLARIFY
+
+
+def test_repeated_generic_questions_do_not_create_a_program_context():
+    guard = ScoreGuard.from_messages(
+        [
+            HumanMessage(content="Какой средний балл?"),
+            AIMessage(content=llm_client.SCORES_CLARIFY),
+            HumanMessage(content="А средний балл?"),
+        ]
+    )
+    assert guard is not None and guard.clarify
+
+
+@pytest.mark.parametrize("question", ["А на 09.03.04?", "А по платному?"])
+def test_score_shaped_followups_after_unrelated_topic_do_not_force_scores(question):
+    assert (
+        ScoreGuard.from_messages(
+            [
+                HumanMessage(content="Сколько стоит общежитие?"),
+                AIMessage(content="1000 рублей"),
+                HumanMessage(content=question),
+            ]
+        )
+        is None
+    )
+
+
+@pytest.mark.asyncio
 async def test_average_followup_does_not_publish_unchecked_absence(monkeypatch):
     published = []
     calls = []

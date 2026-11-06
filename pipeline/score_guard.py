@@ -19,9 +19,23 @@ _SHORT = re.compile(
     r"^(?:а\s+)?(?:(?:средн\w*|проходн\w*)"
     r"(?=\s*(?:$|[?!.,]|бал|како|на\b|по\b|в\b|за\b))|"
     r"в\s+20\d{2}|за\s+20\d{2}|"
-    r"на\s+(?:плат\w*|бюджет\w*|магистр\w*|бакалавр\w*|спо))\b",
+    r"(?:на|по)\s+(?:плат\w*|бюджет\w*|магистр\w*|бакалавр\w*|спо|"
+    r"\d{2}\.\d{2}\.\d{2}))\b",
     re.I,
 )
+_GENERIC_SCORE = re.compile(
+    r"(?:(?:а|ну|тогда|какой|какие|каков|каковы)\s+)*"
+    r"(?:средн\w*|проходн\w*)(?:\s+бал\w*)?"
+    r"(?:\s+(?:какой|какие|там|же))?"
+    r"(?:\s+(?:в|за)\s+20\d{2}(?:\s+году)?)?[?!.]*",
+    re.I,
+)
+
+
+def _is_followup(question: str) -> bool:
+    return bool(
+        _SHORT.search(question.strip()) or _GENERIC_SCORE.fullmatch(question.strip())
+    )
 
 
 @dataclass
@@ -43,7 +57,7 @@ class ScoreGuard:
         if re.search(r"аттестат|диплом|мой средн", current) and "проходн" not in current:
             return None
         direct = bool(_SCORE.search(current))
-        short = bool(_SHORT.search(current))
+        short = _is_followup(current)
         if not direct and not short:
             return None
 
@@ -52,10 +66,10 @@ class ScoreGuard:
         for question in reversed(previous):
             if _SCORE.search(question):
                 chain.insert(0, question)
-                if not _SHORT.search(question.strip()) or _CODE.search(question):
+                if not _is_followup(question) or _CODE.search(question):
                     break
                 continue
-            if _SHORT.search(question.strip()):
+            if _is_followup(question):
                 chain.insert(0, question)
             else:
                 break
@@ -74,10 +88,15 @@ class ScoreGuard:
                     break
                 if message.type == "human":
                     question = str(message.content).lower().strip()
-                    if not _SHORT.search(question):
+                    if not _is_followup(question):
                         break
                     scope_updates.insert(0, question)
-        anchored = bool(saved_scope) or any(_SCORE.search(q) for q in chain[:-1])
+        anchored = bool(saved_scope) or any(
+            _SCORE.search(q) and not _GENERIC_SCORE.fullmatch(q.strip())
+            for q in chain[:-1]
+        )
+        if not anchored and _GENERIC_SCORE.fullmatch(current):
+            return cls(clarify=True)
         if short and not direct and not anchored:
             # «А в 2024?» после вопроса об общежитии не является запросом баллов.
             if not re.search(r"средн|проходн", current):

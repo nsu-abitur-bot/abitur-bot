@@ -615,14 +615,14 @@ async def _run_tool_loop(
     колбэка не должен ломать сам ответ.
     """
     tool_executor = tool_executor or default_tool_executor
+    guard = ScoreGuard.from_messages(messages)
+    if guard is not None and guard.clarify:
+        return SCORES_CLARIFY, LLMUsage(), "none"
     provider = get_llm_provider()
     provider_name = provider.__class__.__name__
     logger.info(f"[{session_id}] Sending payload to LLM ({provider_name}).")
 
-    guard = ScoreGuard.from_messages(messages)
     if guard is not None:
-        if guard.clarify:
-            return SCORES_CLARIFY, LLMUsage(), provider_name
         executor = tool_executor
 
         async def checked_executor(name: str, args: dict) -> str:
