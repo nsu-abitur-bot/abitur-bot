@@ -258,6 +258,34 @@ def test_failed_followup_parameters_are_not_lost_before_next_question():
     }
 
 
+def test_new_named_program_does_not_force_previous_program_code():
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="Проходной 141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "faculty": "ФИТ",
+                        "year": 2024,
+                        "metric": "passing",
+                    }
+                },
+            ),
+            HumanMessage(content="А средний балл на прикладную математику?"),
+        ]
+    )
+    assert guard is not None
+    assert guard.filters == {"year": 2024, "metric": "average"}
+
+
+def test_free_education_does_not_mean_paid():
+    guard = ScoreGuard.from_messages(
+        [HumanMessage(content="Какой проходной балл на бесплатное обучение?")]
+    )
+    assert guard is not None and guard.filters["form"] == "budget"
+
+
 @pytest.mark.parametrize(
     "arguments",
     [

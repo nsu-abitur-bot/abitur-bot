@@ -86,6 +86,18 @@ class ScoreGuard:
 
         filters: dict = {"metric": "passing", **saved_scope}
         for question in scope_updates if saved_scope else chain:
+            subject = re.search(r"\b(?:на|по|для)\s+(.+)", question)
+            if subject:
+                value = subject.group(1)
+                if not _CODE.search(value) and not re.match(
+                    r"плат|бюджет|бесплат|договор|магистр|бакалавр|спо\b|"
+                    r"специалитет|эт\w*\b|том\w*\b|нем\b|ней\b|20\d{2}\b",
+                    value,
+                ):
+                    # Новое название разрешает SQL-инструмент; прежний код
+                    # нельзя закреплять в восстановительной схеме вместо него.
+                    filters.pop("program", None)
+                    filters.pop("faculty", None)
             codes = _CODE.findall(question)
             if len(set(codes)) == 1:
                 if codes[0] != filters.get("program"):
@@ -102,10 +114,10 @@ class ScoreGuard:
                 filters["metric"] = "average"
             if "проходн" in question:
                 filters["metric"] = "both" if "средн" in question else "passing"
-            if re.search(r"плат|договор", question):
-                filters["form"] = "paid"
-            elif "бюджет" in question:
+            if "бюджет" in question or "бесплат" in question:
                 filters["form"] = "budget"
+            elif re.search(r"плат|договор", question):
+                filters["form"] = "paid"
             for pattern, level in (
                 (r"магистр", "master"),
                 (r"бакалавр", "bachelor"),
