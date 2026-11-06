@@ -33,6 +33,9 @@ _GENERIC_SCORE = re.compile(
 
 
 def _is_followup(question: str) -> bool:
+    question = re.sub(
+        r"^(?:(?:а|какой|какие|каков|каковы)\s+)+", "", question.strip(), flags=re.I
+    )
     return bool(
         _SHORT.search(question.strip()) or _GENERIC_SCORE.fullmatch(question.strip())
     )
@@ -46,6 +49,7 @@ class ScoreGuard:
     verified: bool = False
     attempted: bool = False
     clarify: bool = False
+    comparisons: dict[str, list] = field(default_factory=dict)
 
     @classmethod
     def from_messages(cls, messages: list[BaseMessage]) -> "ScoreGuard | None":
@@ -74,11 +78,20 @@ class ScoreGuard:
             else:
                 break
         saved_scope: dict = {}
+        saved_comparisons: dict[str, list] = {}
         scope_updates = [current]
         if short:
             for message in reversed(messages[:-1]):
                 metadata = message.additional_kwargs.get("admission_scores")
                 if message.type == "ai" and isinstance(metadata, dict):
+                    raw = metadata.get("_comparisons", {})
+                    if isinstance(raw, dict):
+                        saved_comparisons = {
+                            key: list(values)
+                            for key, values in raw.items()
+                            if key in ("program", "year", "form")
+                            and isinstance(values, list)
+                        }
                     saved_scope = {
                         key: value
                         for key, value in metadata.items()
@@ -104,6 +117,10 @@ class ScoreGuard:
             return cls(clarify=True)
 
         filters: dict = {"metric": "passing", **saved_scope}
+        comparisons = saved_comparisons
+        needs_program = False
+        for key in comparisons:
+            filters.pop(key, None)
         for question in scope_updates if saved_scope else chain:
             subject = re.search(r"\b(?:на|по|для)\s+(.+)", question)
             if subject:
@@ -117,26 +134,44 @@ class ScoreGuard:
                     # нельзя закреплять в восстановительной схеме вместо него.
                     filters.pop("program", None)
                     filters.pop("faculty", None)
+                    comparisons.pop("program", None)
             codes = _CODE.findall(question)
             if len(set(codes)) == 1:
                 if codes[0] != filters.get("program"):
                     filters.pop("faculty", None)
+                    if filters.get("program"):
+                        filters.pop("level", None)
                 filters["program"] = codes[0]
+                comparisons.pop("program", None)
+                needs_program = False
             elif codes:
                 filters.pop("program", None)
+                filters.pop("faculty", None)
+                filters.pop("level", None)
+                comparisons["program"] = sorted(set(codes))
+                needs_program = False
             years = _YEAR.findall(question)
             if len(set(years)) == 1:
                 filters["year"] = int(years[0])
+                comparisons.pop("year", None)
             elif years:
                 filters.pop("year", None)
+                comparisons["year"] = sorted({int(year) for year in years})
             if "средн" in question:
                 filters["metric"] = "average"
             if "проходн" in question:
                 filters["metric"] = "both" if "средн" in question else "passing"
-            if "бюджет" in question or "бесплат" in question:
+            budget = "бюджет" in question or "бесплат" in question
+            paid = bool(re.search(r"\bплат|договор", question))
+            if budget and paid:
+                filters.pop("form", None)
+                comparisons["form"] = ["budget", "paid"]
+            elif budget:
                 filters["form"] = "budget"
-            elif re.search(r"плат|договор", question):
+                comparisons.pop("form", None)
+            elif paid:
                 filters["form"] = "paid"
+                comparisons.pop("form", None)
             for pattern, level in (
                 (r"магистр", "master"),
                 (r"бакалавр", "bachelor"),
@@ -144,12 +179,31 @@ class ScoreGuard:
                 (r"\bспо\b", "spo"),
             ):
                 if re.search(pattern, question):
+                    if (
+                        filters.get("level") != level
+                        and filters.get("program")
+                        and not codes
+                    ):
+                        filters.pop("program", None)
+                        comparisons.pop("program", None)
+                        needs_program = True
                     filters["level"] = level
-        return cls(filters=filters)
+        return cls(filters=filters, comparisons=comparisons, clarify=needs_program)
+
+    def history_scope(self, resolved_scope: dict) -> dict:
+        """Сравнение сохраняется как запрос, даже если SQL нашёл один вариант."""
+        scope = dict(resolved_scope)
+        if self.comparisons:
+            scope["_comparisons"] = deepcopy(self.comparisons)
+            for key in self.comparisons:
+                scope.pop(key, None)
+        return scope
 
     def recovery_tool(self, tool: ToolSpec) -> ToolSpec:
         """Одна восстановительная попытка с обязательными известными фильтрами."""
         parameters = deepcopy(tool.parameters)
+        for name in self.comparisons:
+            parameters["properties"].pop(name, None)
         for name, value in self.filters.items():
             parameters["properties"][name]["enum"] = [value]
         parameters["required"] = list(self.filters)
@@ -160,6 +214,8 @@ class ScoreGuard:
     def accepts(self, arguments: dict, *, check_names: bool = True) -> bool:
         """Полная выборка покрывает фильтр, противоположный фильтр — нет."""
         metric = arguments.get("metric", "passing")
+        if any(arguments.get(key) not in (None, "") for key in self.comparisons):
+            return False
         if metric not in (self.filters.get("metric"), "both"):
             return False
         if (

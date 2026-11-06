@@ -317,6 +317,9 @@ class _Ctx:
     trace: AnswerTrace = field(default_factory=AnswerTrace)
     score_query: dict | None = None
 
+    def remember_score_scope(self, scope: dict) -> None:
+        self.score_query = scope
+
     @timed("tool_execution")
     async def execute_tool(self, name: str, args: dict) -> str:
         self.trace.tools_called.append(name)
@@ -608,6 +611,7 @@ async def _run_tool_loop(
     session_id: str,
     stream_callback: Optional[StreamCallback] = None,
     tool_executor: Optional[ToolExecutor] = None,
+    score_scope_callback: Callable[[dict], None] | None = None,
 ) -> tuple[str, LLMUsage, str]:
     """Генерация ответа с доступом к инструментам. Возвращает текст, расход, провайдера.
 
@@ -624,8 +628,10 @@ async def _run_tool_loop(
 
     if guard is not None:
         executor = tool_executor
+        resolved_scope: dict = {}
 
         async def checked_executor(name: str, args: dict) -> str:
+            nonlocal resolved_scope
             if name == SCORES_TOOL:
                 if not guard.accepts(args, check_names=False):
                     guard.verified = False
@@ -646,6 +652,8 @@ async def _run_tool_loop(
                     guard.verified = False
                     return "Запрошены баллы другого направления или факультета."
                 guard.record(output)
+                if guard.verified and isinstance(output, AdmissionScoresResult):
+                    resolved_scope = output.scope or dict(args)
                 return output
             return await executor(name, args)
 
@@ -678,6 +686,8 @@ async def _run_tool_loop(
                 total_tokens=usage.total_tokens + result.usage.total_tokens,
             )
         content = result.text if guard.verified else SCORES_UNAVAILABLE
+        if guard.verified and score_scope_callback is not None:
+            score_scope_callback(guard.history_scope(resolved_scope))
         if stream_callback is not None:
             try:
                 await stream_callback(content)
@@ -794,7 +804,10 @@ async def _answer_without_kb(
         messages = _build_messages(RAG_CONTEXT_UNAVAILABLE, history_entries, question)
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
-            messages, session_id, tool_executor=tracking_executor
+            messages,
+            session_id,
+            tool_executor=tracking_executor,
+            score_scope_callback=ctx.remember_score_scope,
         )
     except Exception as e:
         logger.warning(f"[{session_id}] Provider generation error: {e}")
@@ -840,7 +853,11 @@ async def _generate_answer(
 
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
-            messages, session_id, stream_callback, tool_executor=ctx.execute_tool
+            messages,
+            session_id,
+            stream_callback,
+            tool_executor=ctx.execute_tool,
+            score_scope_callback=ctx.remember_score_scope,
         )
 
         processed = _postprocess(content, rag.sources)

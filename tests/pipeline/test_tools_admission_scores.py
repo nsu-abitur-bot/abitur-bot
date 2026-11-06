@@ -105,6 +105,198 @@ async def _seed_fit(maker) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("question", "key", "bad_value", "broad_args", "values"),
+    [
+        (
+            "А средний балл за 2023 и 2024 годы?",
+            "year",
+            2025,
+            {"form": "budget"},
+            [2023, 2024],
+        ),
+        (
+            "А средний балл на бюджет и платное?",
+            "form",
+            "budget",
+            {"year": 2024},
+            ["budget", "paid"],
+        ),
+    ],
+)
+async def test_comparison_recovers_full_sql_query_and_preserves_context(
+    sessionmaker_bound,
+    expander,
+    monkeypatch,
+    question,
+    key,
+    bad_value,
+    broad_args,
+    values,
+):
+    from fakeredis.aioredis import FakeRedis
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+    from pipeline.score_guard import ScoreGuard
+
+    await _seed_fit(sessionmaker_bound)
+    async with sessionmaker_bound() as session:
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    "ФИТ",
+                    "Программная инженерия и компьютерные науки",
+                    "09.03.04",
+                    2024,
+                    "paid",
+                    120,
+                    40,
+                ),
+            ]
+        )
+    args = {"program": "09.03.04", "metric": "average", **broad_args}
+    calls = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            calls.append(kwargs)
+            if len(calls) == 1:
+                await kwargs["tool_executor"](
+                    "get_admission_scores", {**args, key: bad_value}
+                )
+                return LLMResult("Непроверенный ответ")
+            assert key not in kwargs["tools"][0].parameters["properties"]
+            output = await kwargs["tool_executor"]("get_admission_scores", args)
+            assert isinstance(output, AdmissionScoresResult) and output.status == "ok"
+            assert "84.2" in output
+            if key == "year":
+                assert output.scope["year"] == 2024
+            else:
+                assert "40" in output
+            return LLMResult(str(output))
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    monkeypatch.setattr(llm_client, "_spawn_bg", lambda task: task.close())
+    ctx = llm_client._Ctx(session_id="comparison-sql", user_id=0)
+    text, _ = await llm_client._generate_answer(
+        llm_client._RagResult(context="Контекст"),
+        [
+            {
+                "role": "assistant",
+                "content": "Проходной 246",
+                "admission_scores": {
+                    "program": "09.03.04",
+                    "year": 2024,
+                    "form": "budget",
+                    "metric": "passing",
+                },
+            }
+        ],
+        question,
+        ctx,
+    )
+    assert len(calls) == 2
+    assert ctx.trace.tools_called == ["get_admission_scores"]
+    assert ctx.score_query is not None
+    assert ctx.score_query["_comparisons"] == {key: values}
+    tasks = []
+    history = object.__new__(llm_client.RedisClient)
+    history.client = FakeRedis(decode_responses=True)
+    monkeypatch.setattr(llm_client, "_spawn_bg", tasks.append)
+    llm_client._store_answer(text, question, history, ctx)
+    for task in tasks:
+        await task
+    entries = await history.get_history(ctx.session_id)
+    await history.client.aclose()
+    guard = ScoreGuard.from_messages(
+        llm_client._build_messages("", entries, "Какой средний балл?")
+    )
+    assert guard is not None and guard.comparisons == {key: values}
+    assert not guard.accepts({**args, key: bad_value})
+    assert guard.accepts(args)
+    followup = "А в 2024?" if key == "year" else "А по платному?"
+    single = ScoreGuard.from_messages(llm_client._build_messages("", entries, followup))
+    assert single is not None and key not in single.comparisons
+    assert single.accepts({**args, key: 2024 if key == "year" else "paid"})
+
+
+@pytest.mark.asyncio
+async def test_master_program_after_clarification_uses_new_code(
+    sessionmaker_bound, expander, monkeypatch
+):
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    async with sessionmaker_bound() as session:
+        await FacultyService(session).upsert_from_seed(
+            [
+                {
+                    "name": "Тестовый факультет",
+                    "programs": [
+                        {
+                            "name": "Тестовая магистратура",
+                            "code": "09.04.01",
+                            "level": "master",
+                        }
+                    ],
+                }
+            ]
+        )
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    "Тестовый факультет",
+                    "Тестовая магистратура",
+                    "09.04.01",
+                    2024,
+                    "budget",
+                    80,
+                    85,
+                    level="master",
+                )
+            ]
+        )
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            output = await kwargs["tool_executor"](
+                "get_admission_scores",
+                {
+                    "program": "09.04.01",
+                    "level": "master",
+                    "year": 2024,
+                    "form": "budget",
+                },
+            )
+            assert isinstance(output, AdmissionScoresResult) and output.status == "ok"
+            return LLMResult(str(output))
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    from langchain_core.messages import AIMessage, HumanMessage
+
+    text, _, _ = await llm_client._run_tool_loop(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "level": "bachelor",
+                        "metric": "passing",
+                    }
+                },
+            ),
+            HumanMessage(content="А на магистратуру?"),
+            AIMessage(content=llm_client.SCORES_CLARIFY),
+            HumanMessage(content="А на 09.04.01?"),
+        ],
+        "master-program-sql",
+    )
+    assert "проходной 80" in text and "09.04.01" in text
+
+
+@pytest.mark.asyncio
 async def test_execute_returns_distinct_passing_scores(sessionmaker_bound):
     await _seed_fit(sessionmaker_bound)
 

@@ -167,7 +167,7 @@ async def test_average_followup_does_not_publish_unchecked_absence(monkeypatch):
         ),
         (
             ["а на магистратуру?"],
-            {"program": "09.03.01", "metric": "passing", "level": "master"},
+            {"metric": "passing", "level": "master"},
         ),
         (
             ["Какой проходной балл на 09.03.04?"],
@@ -184,6 +184,112 @@ def test_followup_scope(followups, expected):
     guard = ScoreGuard.from_messages(messages)
     assert guard is not None
     assert guard.filters == expected
+
+
+def test_level_change_requires_new_program_instead_of_false_empty_query():
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "level": "bachelor",
+                        "metric": "passing",
+                    }
+                },
+            ),
+            HumanMessage(content="А на магистратуру?"),
+        ]
+    )
+    assert guard is not None and guard.clarify
+    assert "program" not in guard.filters
+
+
+def test_explicit_program_after_level_clarification_is_accepted():
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "level": "bachelor",
+                        "metric": "passing",
+                    }
+                },
+            ),
+            HumanMessage(content="А на магистратуру?"),
+            AIMessage(content=llm_client.SCORES_CLARIFY),
+            HumanMessage(content="А на 09.04.01?"),
+        ]
+    )
+    assert guard is not None and not guard.clarify
+    assert guard.accepts({"program": "09.04.01", "level": "master"})
+
+
+@pytest.mark.parametrize(
+    ("question", "key", "value"),
+    [
+        ("А средний балл за 2023 и 2024 годы?", "year", 2025),
+        ("А средний балл за 2023 и 2024 годы?", "year", 2023),
+        ("А средний балл на бюджет и платное?", "form", "budget"),
+        ("А средний балл на бюджет и платное?", "form", "paid"),
+    ],
+)
+def test_comparison_requires_complete_query(question, key, value):
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "year": 2024,
+                        "form": "budget",
+                        "metric": "passing",
+                    }
+                },
+            ),
+            HumanMessage(content=question),
+        ]
+    )
+    assert guard is not None
+    assert not guard.accepts({"program": "09.03.01", "metric": "average", key: value})
+    assert guard.accepts({"program": "09.03.01", "metric": "average"})
+    from pipeline.tools import ADMISSION_SCORES_TOOL
+
+    schema = guard.recovery_tool(ADMISSION_SCORES_TOOL).parameters
+    assert key not in schema["properties"]
+    assert key not in schema["required"]
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Какой средний балл за 2023 и 2024 годы?",
+        "Какой средний балл на бюджет и платное?",
+    ],
+)
+def test_full_comparison_question_retains_program_context(question):
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "level": "bachelor",
+                        "metric": "passing",
+                    }
+                },
+            ),
+            HumanMessage(content=question),
+        ]
+    )
+    assert guard is not None
+    assert guard.filters["program"] == "09.03.01"
+    assert not guard.accepts({"program": "38.03.01", "metric": "average"})
 
 
 @pytest.mark.parametrize(
