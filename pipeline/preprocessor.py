@@ -49,7 +49,9 @@ async def clean_and_structure_text(raw_text: str, max_chunk_tokens: int = 10000)
     try:
         input_tokens = len(_cleanup_tokenizer().encode(expanded_text))
     except Exception:
-        logger.warning("Не удалось оценить бюджет очистки; сохранён полный исходный текст")
+        logger.warning(
+            "Не удалось оценить бюджет очистки; сохранён полный исходный текст"
+        )
         return expanded_text
     if input_tokens > input_budget:
         # Keeping every fact can require at least as many output tokens as input.
