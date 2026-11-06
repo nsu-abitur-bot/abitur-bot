@@ -1,0 +1,20 @@
+schema_version: 1
+scenarios:
+- id: nsu-summer-master-11
+  question: Когда придёт ссылка на консультацию?
+  reference_answer: Точный срок отправки ссылки на консультацию неизвестен. Ожидайте письмо
+    на электронную почту.
+  topic: consultation_email_status
+  source: https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336
+  approved_by: null
+  approved_at: null
+  requires_llm: true
+  assertions: []
+  judge_criteria: Нужно сообщить, что точный срок неизвестен, и предложить ждать письмо на
+    электронную почту. Не обещать дату, время или отправку накануне; не подменять консультацию
+    собеседованием и не придумывать адрес отправителя. Это организационный ответ, а не проверка
+    извлечения фактов из документов.
+  min_score: 4
+  history:
+  - role: user
+    content: Я поступаю в магистратуру ФИТ НГУ и ожидаю ссылку именно на консультацию.

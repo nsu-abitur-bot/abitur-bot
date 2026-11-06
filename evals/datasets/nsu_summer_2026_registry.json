@@ -10,7 +10,7 @@
     "privacy": "Персональное имя сотрудника в вопросе о заселении заменено ролью; частная переписка и локальные пути не публикуются."
   },
   "dataset": "nsu_summer_2026.yaml",
-  "dataset_sha256": "f91cde20eaad6f98453bc5d841db04403df8547700225f45206729207920e3a1",
+  "dataset_sha256": "d31c417963fbf657730b629aeb91c72ef4258c0173acff29c4482250d0d6e281",
   "sources": [
     {
       "url": "https://education.nsu.ru/information-technologies/",
@@ -27,14 +27,6 @@
       "bytes": 172823,
       "retrieved_at": "2026-11-06",
       "id": "apply_fit"
-    },
-    {
-      "url": "https://education.nsu.ru/freshmen/",
-      "final_url": "https://education.nsu.ru/freshmen/",
-      "sha256": "aeb07c54f1744df508b439af3042ebe742b94cb36a651945c7c591f6c506fcdc",
-      "bytes": 738793,
-      "retrieved_at": "2026-11-06",
-      "id": "freshmen"
     },
     {
       "id": "fit_campus_archive",
@@ -91,36 +83,12 @@
       "capture": "HTTP response via browser fetch"
     },
     {
-      "id": "phd_rules",
-      "url": "https://www.nsu.ru/upload/iblock/15a/ivca4h90y5m9zo4ne3ccfyaz2bscye7g/Правила приема 2026_аспирантура (1).pdf",
-      "final_url": "https://www.nsu.ru/upload/iblock/15a/ivca4h90y5m9zo4ne3ccfyaz2bscye7g/%D0%9F%D1%80%D0%B0%D0%B2%D0%B8%D0%BB%D0%B0%20%D0%BF%D1%80%D0%B8%D0%B5%D0%BC%D0%B0%202026_%D0%B0%D1%81%D0%BF%D0%B8%D1%80%D0%B0%D0%BD%D1%82%D1%83%D1%80%D0%B0%20(1).pdf",
-      "sha256": "befa7efea2435d39d6cd20d19c4590ad04b9e663ce6b62446e96d1d85e081967",
-      "bytes": 783262,
+      "id": "owner_decision_20261106",
+      "kind": "owner_decision",
+      "url": "https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336",
+      "sha256": "37b1007138458b3c59ec0ee88d69887e82297aa7b6a754a2e67add20fd9b6cdc",
       "retrieved_at": "2026-11-06",
-      "capture": "HTTP response via browser fetch"
-    },
-    {
-      "id": "phd_apply",
-      "url": "https://www.nsu.ru/n/education/apply/phd/",
-      "sha256": "2362ef8bd9c6c721ed314fabd0b7494b6f8f42adadb4a677f4d599241915145b",
-      "retrieved_at": "2026-11-06",
-      "capture": "browser DOM, not HTTP response bytes"
-    },
-    {
-      "id": "fit_master_interview",
-      "url": "https://www.nsu.ru/upload/iblock/e6a/xaoibuca95w21e1vtp1f1mkeis6q7hkg/Порядок проведения собеседования в дистанционном формате для поступающих в магистратуру ФИТ 2026.pdf",
-      "final_url": "https://www.nsu.ru/upload/iblock/e6a/xaoibuca95w21e1vtp1f1mkeis6q7hkg/%D0%9F%D0%BE%D1%80%D1%8F%D0%B4%D0%BE%D0%BA%20%D0%BF%D1%80%D0%BE%D0%B2%D0%B5%D0%B4%D0%B5%D0%BD%D0%B8%D1%8F%20%D1%81%D0%BE%D0%B1%D0%B5%D1%81%D0%B5%D0%B4%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B2%20%D0%B4%D0%B8%D1%81%D1%82%D0%B0%D0%BD%D1%86%D0%B8%D0%BE%D0%BD%D0%BD%D0%BE%D0%BC%20%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82%D0%B5%20%D0%B4%D0%BB%D1%8F%20%D0%BF%D0%BE%D1%81%D1%82%D1%83%D0%BF%D0%B0%D1%8E%D1%89%D0%B8%D1%85%20%D0%B2%20%D0%BC%D0%B0%D0%B3%D0%B8%D1%81%D1%82%D1%80%D0%B0%D1%82%D1%83%D1%80%D1%83%20%D0%A4%D0%98%D0%A2%202026.pdf",
-      "sha256": "762c241f9ec1eadb7401e8d7c54c280f29e4ee2009cf81a041176576b63b9a9b",
-      "bytes": 60611,
-      "retrieved_at": "2026-11-06",
-      "capture": "HTTP response via browser fetch"
-    },
-    {
-      "id": "fit_competition_directions",
-      "url": "https://abiturient.nsu.ru/direction/index?degree=bachelor&faculty=8",
-      "sha256": "6be5a59a5a54149d5d3ec7b5c900308b2c4e269dd4a804a2e5eb22664937bea6",
-      "retrieved_at": "2026-11-06",
-      "capture": "Official program-selection API response, does not alone establish competition rules"
+      "capture": "Body комментария GitHub с решениями Марата из текущего диалога; внутреннее подтверждение, не экспертиза приёмной комиссии."
     }
   ],
   "cases": [
@@ -154,7 +122,8 @@
           "content": "Я выбираю между ПИиКН и КНиС на ФИТ НГУ."
         }
       ],
-      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-bachelor-02",
@@ -163,23 +132,33 @@
       "question": "Конкурс на ПИиКН и КНиС общий или отдельный?",
       "origin": "summer_consultation_notes",
       "related_admission_ids": [],
-      "coverage": "gap",
+      "coverage": "owner_confirmed_subcase",
       "approval": {
-        "internal": null,
+        "internal": {
+          "reviewer": "Marat-nsu",
+          "reviewed_at": "2026-11-06",
+          "basis": "https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336",
+          "confirmed_claim": "Конкурс на ПИиКН и КНиС отдельный. Одинаковый код направления не означает общий конкурс.",
+          "reference_sha256": "c45994694c455061a62e773c3b3ea52cfa336f009fe71ef90a9d3df168987b37"
+        },
         "expert": null
       },
-      "status": "needs_source",
-      "reference_answer": null,
-      "evidence": null,
-      "follow_up": {
-        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
-        "responsible_role": "ФИТ: приёмная комиссия",
-        "needed": "Нужен прямой документ или подтверждение: единая или отдельные конкурсные группы ПИиКН/КНиС в выбранную кампанию. Разные квоты на странице не доказывают порядок конкурса."
+      "status": "owner_confirmed",
+      "reference_answer": "Конкурс на ПИиКН и КНиС отдельный. Одинаковый код направления не означает общий конкурс.",
+      "evidence": {
+        "source_id": "owner_decision_20261106",
+        "section": "Отдельный конкурс ПИиКН/КНиС",
+        "basis": "Прямой ответ Марата в текущем диалоге, зафиксированный в задаче."
       },
-      "evidence_note": {
-        "url": "https://abiturient.nsu.ru/bachelor",
-        "conclusion": "Сервис показывает отдельные направления ПИиКН (id=6) и КНиС (id=7), но одних разных элементов выбора недостаточно для заявления о правилах конкурса."
-      }
+      "follow_up": null,
+      "evaluation_group": "factual",
+      "history": [
+        {
+          "role": "user",
+          "content": "Я выбираю между ПИиКН и КНиС на ФИТ НГУ при поступлении в 2026 году."
+        }
+      ],
+      "context_origin": "Контекст подкейса задан агентом для однозначности; фактический ответ подтверждён Маратом 06.11.2026."
     },
     {
       "id": "nsu-summer-bachelor-03",
@@ -210,7 +189,8 @@
           "content": "Я поступаю на бакалавриат ФИТ НГУ и хочу оформить договор дистанционно."
         }
       ],
-      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-bachelor-04",
@@ -242,7 +222,8 @@
           "content": "Я первокурсник бакалавриата ФИТ НГУ, заселяюсь по инструкции 2026/2027 учебного года. Документы на проживание ещё не оформлял."
         }
       ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-bachelor-05",
@@ -272,7 +253,8 @@
           "content": "Я поступил на ПИиКН ФИТ НГУ в 2026 году."
         }
       ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-bachelor-06",
@@ -300,7 +282,8 @@
           "content": "Я первокурсник бакалавриата ФИТ НГУ в 2026 году."
         }
       ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-bachelor-07",
@@ -330,7 +313,8 @@
           "content": "Я военнообязанный первокурсник ФИТ НГУ, заселяюсь в общежитие в 2026 году. Собираю документы до приезда."
         }
       ],
-      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Ситуация подкейса задана агентом для однозначности; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-bachelor-08",
@@ -358,7 +342,8 @@
           "content": "Я первокурсник НГУ. Спрашиваю об организации обязательных занятий физкультурой."
         }
       ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-master-09",
@@ -386,7 +371,8 @@
           "content": "Я гражданин РФ, поступаю в магистратуру НГУ в 2026 году и подаю документы лично. Паспорт и СНИЛС у меня есть."
         }
       ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-master-10",
@@ -414,7 +400,8 @@
           "content": "Я поступаю в магистратуру НГУ в 2026 году на бюджет. Речь об основном приёме, а не дополнительном наборе."
         }
       ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках.",
+      "evaluation_group": "factual"
     },
     {
       "id": "nsu-summer-master-11",
@@ -423,24 +410,33 @@
       "question": "Когда придёт ссылка на консультацию?",
       "origin": "summer_consultation_notes",
       "related_admission_ids": [],
-      "coverage": "gap",
+      "coverage": "owner_confirmed_subcase",
       "approval": {
-        "internal": null,
+        "internal": {
+          "reviewer": "Marat-nsu",
+          "reviewed_at": "2026-11-06",
+          "basis": "https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336",
+          "confirmed_claim": "Точный срок отправки ссылки на консультацию неизвестен. Ожидайте письмо на электронную почту.",
+          "reference_sha256": "9612ae8b25d4fd3fda71b849e026fa6efcf1958a642008bcd93d2daa56072971"
+        },
         "expert": null
       },
-      "status": "needs_source",
-      "reference_answer": null,
-      "evidence": null,
-      "follow_up": {
-        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
-        "responsible_role": "ФИТ: организатор консультации в магистратуру",
-        "needed": "Регламент собеседования ФИТ 2026, п. 5, говорит о высылке ссылки на конференцию собеседования накануне собеседования, но не о сроке рассылки ссылки на консультацию. Не подменять два события. В календарной части PDF также расходятся даты и дни недели. Нужны срок/канал рассылки ссылки именно консультации и подтверждение у организатора."
+      "status": "owner_confirmed",
+      "reference_answer": "Точный срок отправки ссылки на консультацию неизвестен. Ожидайте письмо на электронную почту.",
+      "evidence": {
+        "source_id": "owner_decision_20261106",
+        "section": "Неизвестный срок ссылки на консультацию, ожидать письмо",
+        "basis": "Прямой ответ Марата в текущем диалоге, зафиксированный в задаче."
       },
-      "evidence_note": {
-        "url": "https://www.nsu.ru/upload/iblock/e6a/xaoibuca95w21e1vtp1f1mkeis6q7hkg/Порядок проведения собеседования в дистанционном формате для поступающих в магистратуру ФИТ 2026.pdf",
-        "section": "пп. 1, 2, 5",
-        "conclusion": "Есть сведения о другом событии, полного ответа исходному вопросу нет."
-      }
+      "follow_up": null,
+      "evaluation_group": "operational",
+      "history": [
+        {
+          "role": "user",
+          "content": "Я поступаю в магистратуру ФИТ НГУ и ожидаю ссылку именно на консультацию."
+        }
+      ],
+      "context_origin": "Контекст подкейса задан агентом для однозначности; фактический ответ подтверждён Маратом 06.11.2026."
     },
     {
       "id": "nsu-summer-phd-12",
@@ -449,30 +445,19 @@
       "question": "Какие документы нужны для поступления?",
       "origin": "summer_consultation_notes",
       "related_admission_ids": [],
-      "coverage": "source_checked_subcase",
+      "coverage": "excluded_by_owner",
       "approval": {
         "internal": null,
         "expert": null
       },
-      "status": "source_checked",
-      "reference_answer": "По Правилам приёма в аспирантуру НГУ 2026 нужны заявление, документ о личности и гражданстве, диплом специалиста или магистра, СНИЛС при наличии, согласие на обработку персональных данных, портфолио научных достижений, согласие научного руководителя и три фотографии 3×4. Подтверждения дополнительных индивидуальных достижений — по усмотрению поступающего; документ об ОВЗ — при необходимости специальных условий. На обзорной странице есть расхождение по числу фотографий: там указаны шесть, тогда как п. 23 Правил 2026 требует три; при практической подаче стоит сверить это с приёмной комиссией.",
-      "evidence": {
-        "source_id": "phd_rules",
-        "section": "Правила приема в аспирантуру 2026, пп. 21–24, стр. 6; условия образования — п. 5",
-        "basis": "Прочитан полный релевантный раздел, для PDF проверены страницы/слайды. Агентская проверка 06.11.2026, не подтверждение сотрудником.",
-        "source_conflict": "В п. 23 Правил 2026 указаны три фотографии; на центральной обзорной странице шесть. Эталон явно ограничен Правилами и не скрывает конфликт.",
-        "corroborating_sources": [
-          "https://www.nsu.ru/n/education/apply/phd/"
-        ]
-      },
+      "status": "out_of_scope",
+      "reference_answer": null,
+      "evidence": null,
       "follow_up": null,
-      "history": [
-        {
-          "role": "user",
-          "content": "Я гражданин РФ, поступаю в аспирантуру НГУ в 2026 году по общему конкурсу. Хочу знать перечень по Правилам приёма."
-        }
-      ],
-      "context_origin": "Контекст подкейса задан агентом для однозначности и применения документа; этих дополнительных реплик нет в исходных заметках."
+      "exclusion": {
+        "reason": "Аспирантура исключена Маратом из активного объёма этой задачи 06.11.2026.",
+        "decision_url": "https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336"
+      }
     },
     {
       "id": "nsu-summer-phd-13",
@@ -481,21 +466,29 @@
       "question": "В магистратуре была Google-форма. Для аспирантуры её тоже надо заполнить?",
       "origin": "summer_consultation_notes",
       "related_admission_ids": [],
-      "coverage": "gap",
+      "coverage": "excluded_by_owner",
       "approval": {
         "internal": null,
         "expert": null
       },
-      "status": "needs_source",
+      "status": "out_of_scope",
       "reference_answer": null,
       "evidence": null,
-      "follow_up": {
-        "issue": "https://github.com/nsu-abitur-bot/abitur-bot/issues/260",
-        "responsible_role": "ФИТ: приёмная комиссия аспирантуры",
-        "needed": "В официальных правилах есть способы подачи документов и обязательное согласие научного руководителя, но нет ответа о дополнительной факультетской Google-форме. Требуется назначение конкретной формы и подтверждение её обязательности/необязательности от ФИТ. Отсутствие упоминания формы не доказывает, что её нет."
+      "follow_up": null,
+      "exclusion": {
+        "reason": "Аспирантура исключена Маратом из активного объёма этой задачи 06.11.2026.",
+        "decision_url": "https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336"
       }
     }
   ],
   "excluded_sources": [],
-  "source_access_note": "После HTTP 403 найдены сохранённые официальные страницы от 04.11.2026; актуальные PDF и страницы дополнительно открыты через браузер 06.11.2026. 403 загрузчика не считается отсутствием источника."
+  "source_access_note": "После HTTP 403 найдены сохранённые официальные страницы от 04.11.2026; актуальные PDF и страницы дополнительно открыты через браузер 06.11.2026. 403 загрузчика не считается отсутствием источника.",
+  "owner_decisions": {
+    "recorded_at": "2026-11-06",
+    "url": "https://github.com/nsu-abitur-bot/abitur-bot/issues/247#issuecomment-6683864336",
+    "scope": "Бакалавриат и магистратура; оба вопроса аспирантуры исключены.",
+    "quality_accounting": "10 factual и 1 operational в активном корпусе; организационный ответ об ожидании письма не подтверждает качество RAG. Основной набор #388 и его метрики не меняются."
+  },
+  "operational_dataset": "nsu_summer_operational_2026.yaml",
+  "operational_dataset_sha256": "d6cd4704d000dd55731f8d0a310fb6ae2a5b15810ecebcc2c5d90dcf299f32b6"
 }
