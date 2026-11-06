@@ -644,11 +644,22 @@ async def _run_tool_loop(
                     guard.attempted = True
                     return SCORES_UNAVAILABLE
                 resolved_args = dict(args)
+                if isinstance(output, AdmissionScoresResult) and output.status == "error":
+                    guard.record(output)
+                    return output
+                if guard.program_ids and (
+                    not isinstance(output, AdmissionScoresResult)
+                    or not guard.program_ids.issubset(output.program_ids)
+                ):
+                    guard.verified = False
+                    return "Запрошены баллы других программ подготовки."
                 if isinstance(output, AdmissionScoresResult):
                     for key in ("program", "faculty"):
                         if args.get(key) and output.scope.get(key):
                             resolved_args[key] = output.scope[key]
-                if not guard.accepts(resolved_args):
+                if not guard.accepts(
+                    resolved_args, check_names=not bool(guard.program_ids)
+                ):
                     guard.verified = False
                     return "Запрошены баллы другого направления или факультета."
                 guard.record(output)

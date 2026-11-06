@@ -10,6 +10,125 @@ from pipeline.tools.admission_scores import AdmissionScoresResult
 
 
 @pytest.mark.asyncio
+async def test_database_error_with_known_program_identity_does_not_retry(monkeypatch):
+    calls = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            calls.append(1)
+            await kwargs["tool_executor"]("get_admission_scores", {"metric": "average"})
+            return LLMResult("Данных нет.")
+
+    async def execute(name, args):
+        return AdmissionScoresResult("Ошибка SQL", status="error")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    text, _, _ = await llm_client._run_tool_loop(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "metric": "passing",
+                        "_program_ids": ["profile-a"],
+                    }
+                },
+            ),
+            HumanMessage(content="А средний?"),
+        ],
+        "known-profile-error",
+        tool_executor=execute,
+    )
+    assert text == SCORES_UNAVAILABLE
+    assert calls == [1]
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Какой средний балл на Анализ данных?",
+        "А на 09.04.01?",
+        "А на магистратуру?",
+    ],
+)
+def test_program_change_clears_previous_row_identity(question):
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "level": "bachelor",
+                        "metric": "passing",
+                        "_program_ids": ["profile-a"],
+                    }
+                },
+            ),
+            HumanMessage(content=question),
+        ]
+    )
+    assert guard is not None and not guard.program_ids
+    if "магистратуру" not in question:
+        assert "level" not in guard.filters
+
+
+def test_identity_recovery_requires_all_previously_selected_profiles():
+    from pipeline.tools import ADMISSION_SCORES_TOOL
+
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "metric": "passing",
+                        "_program_ids": ["profile-a", "profile-b"],
+                    }
+                },
+            ),
+            HumanMessage(content="А средний?"),
+        ]
+    )
+    assert guard is not None
+    assert not guard.accepts({"metric": "average", "program_ids": ["profile-b"]})
+    assert not guard.accepts({"metric": "average", "program_ids": ["profile-c"]})
+    schema = guard.recovery_tool(ADMISSION_SCORES_TOOL).parameters
+    assert schema["properties"]["program_ids"]["items"]["enum"] == [
+        "profile-a",
+        "profile-b",
+    ]
+    assert schema["properties"]["program_ids"]["minItems"] == 2
+    assert "program_ids" in schema["required"]
+    assert "program_ids" not in ADMISSION_SCORES_TOOL.parameters["properties"]
+
+
+def test_broader_sql_result_does_not_expand_known_profile_or_requested_filters():
+    guard = ScoreGuard(
+        filters={
+            "program": "09.03.01",
+            "year": 2024,
+            "form": "budget",
+            "metric": "average",
+        },
+        program_ids=frozenset({"profile-a"}),
+    )
+    scope = guard.history_scope(
+        {
+            "program": "09.03.01",
+            "year": 2023,
+            "form": "paid",
+            "metric": "both",
+            "_program_ids": ["profile-a", "profile-b"],
+        }
+    )
+    assert scope["_program_ids"] == ["profile-a"]
+    assert (scope["year"], scope["form"], scope["metric"]) == (2024, "budget", "average")
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("question", "changes"),
     [

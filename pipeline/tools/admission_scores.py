@@ -26,6 +26,10 @@ class AdmissionScoresResult(str):
     status: Literal["ok", "empty", "error"]
     scope: dict
 
+    @property
+    def program_ids(self) -> frozenset[str]:
+        return frozenset(self.scope.get("_program_ids", []))
+
     def __new__(
         cls,
         text: str,
@@ -191,6 +195,13 @@ async def execute_admission_scores(arguments: dict) -> str:
     Пустые/отсутствующие фильтры не передаются в сервис. Если данных нет —
     возвращает единый маркер, по которому модель понимает, что цифр нет.
     """
+    program_ids = arguments.get("program_ids")
+    if program_ids is not None and (
+        not isinstance(program_ids, list)
+        or not program_ids
+        or any(not isinstance(value, str) or not value for value in program_ids)
+    ):
+        return AdmissionScoresResult("Некорректные ID программ.", status="error")
     raw_level = arguments.get("level")
     level = normalize_level(str(raw_level)) if raw_level is not None else None
     if raw_level is not None and level is None:
@@ -213,13 +224,20 @@ async def execute_admission_scores(arguments: dict) -> str:
                 year=year,
                 form=_str_or_none(form),
                 level=level,
+                program_ids=program_ids,
+                include_identity=True,
             )
             note = ""
             if not rows and year is not None:
                 # Модель подставляет текущий год, а итоги приёма за него ещё не
                 # опубликованы: лучше показать прошлые годы, чем «данных нет».
                 rows = await service.query_scores(
-                    faculty=faculty, program=program, form=_str_or_none(form), level=level
+                    faculty=faculty,
+                    program=program,
+                    form=_str_or_none(form),
+                    level=level,
+                    program_ids=program_ids,
+                    include_identity=True,
                 )
                 if rows:
                     note = f"За {year} год данных нет, показаны доступные годы."
@@ -231,7 +249,11 @@ async def execute_admission_scores(arguments: dict) -> str:
 
     if not rows:
         return AdmissionScoresResult(
-            "По этому запросу данных о проходных баллах нет.", status="empty"
+            "По этому запросу данных о проходных баллах нет.",
+            status="empty",
+            scope={"_program_ids": sorted(set(program_ids))}
+            if program_ids is not None
+            else {},
         )
 
     scope = {
@@ -240,6 +262,11 @@ async def execute_admission_scores(arguments: dict) -> str:
         if arguments.get(key) is not None
     }
     scope["metric"] = metric
+    scope["_program_ids"] = sorted(
+        set(program_ids)
+        if program_ids is not None
+        else {row["program_id"] for row in rows}
+    )
     # Один фактически найденный вариант сохраняем для следующего уточнения.
     # Несколько лет/форм не превращаем в случайно выбранный последний вариант.
     for key, column in (

@@ -105,6 +105,181 @@ async def _seed_fit(maker) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("mode", ["profile", "code_group", "empty_paid", "renamed"])
+async def test_shared_code_cannot_substitute_a_different_profile(
+    sessionmaker_bound, expander, monkeypatch, mode
+):
+    from langchain_core.messages import AIMessage, HumanMessage
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    faculty = "Тестовый факультет"
+    first = "Информатика. Программная инженерия"
+    second = "Информатика. Компьютерные науки"
+    async with sessionmaker_bound() as session:
+        await FacultyService(session).upsert_from_seed(
+            [
+                {
+                    "name": faculty,
+                    "programs": [
+                        {"name": first, "code": "09.03.01", "level": "bachelor"},
+                        {"name": second, "code": "09.03.01", "level": "bachelor"},
+                    ],
+                }
+            ]
+        )
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(faculty, first, "09.03.01", 2024, "budget", 141, 63.27),
+                ScoreRow(faculty, second, "09.03.01", 2024, "budget", 260, 88.1),
+                ScoreRow(faculty, second, "09.03.01", 2024, "paid", 200, 99),
+            ]
+        )
+    initial_program = "09.03.01" if mode == "code_group" else first
+    initial = await execute_admission_scores(
+        {
+            "faculty": faculty,
+            "program": initial_program,
+            "year": 2024,
+            "form": "budget",
+        }
+    )
+    assert isinstance(initial, AdmissionScoresResult)
+    if mode == "renamed":
+        from db.postgres.models import Program
+
+        async with sessionmaker_bound() as session:
+            program = await session.get(Program, initial.scope["_program_ids"][0])
+            assert program is not None
+            program.name = "Новое название первой программы"
+            program.code = "09.03.02"
+            await session.commit()
+    calls, published = [], []
+    form = "paid" if mode == "empty_paid" else "budget"
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            calls.append(kwargs)
+            args = {
+                "faculty": faculty,
+                "program": second,
+                "year": 2024,
+                "form": form,
+                "metric": "average",
+                "level": "bachelor",
+            }
+            if len(calls) > 1:
+                ids = kwargs["tools"][0].parameters["properties"]["program_ids"]["items"][
+                    "enum"
+                ]
+                assert set(ids) == set(initial.scope["_program_ids"])
+                args = {
+                    "program_ids": ids,
+                    "year": 2024,
+                    "form": form,
+                    "metric": "average",
+                    "level": "bachelor",
+                }
+            output = await kwargs["tool_executor"]("get_admission_scores", args)
+            return LLMResult(str(output))
+
+    async def publish(text):
+        published.append(text)
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    text, _, _ = await llm_client._run_tool_loop(
+        [
+            HumanMessage(content=f"Какой проходной балл на {initial_program}?"),
+            AIMessage(
+                content=str(initial),
+                additional_kwargs={"admission_scores": initial.scope},
+            ),
+            HumanMessage(
+                content="А средний балл на платное?"
+                if mode == "empty_paid"
+                else "А средний?"
+            ),
+        ],
+        "shared-code-regression",
+        stream_callback=publish,
+    )
+    if mode == "empty_paid":
+        assert text == "По этому запросу данных о проходных баллах нет."
+        assert "99" not in text
+    else:
+        assert "63.27" in text
+        assert ("88.1" in text) == (mode == "code_group")
+    assert len(calls) == 2
+    assert published == [text]
+
+
+@pytest.mark.asyncio
+async def test_program_name_resolves_master_clarification(
+    sessionmaker_bound, expander, monkeypatch
+):
+    from langchain_core.messages import AIMessage, HumanMessage
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    await _seed_fit(sessionmaker_bound)
+    initial = await execute_admission_scores({"program": "09.03.01"})
+    assert isinstance(initial, AdmissionScoresResult)
+    async with sessionmaker_bound() as session:
+        await FacultyService(session).upsert_from_seed(
+            [
+                {
+                    "name": "Магистерский факультет",
+                    "programs": [
+                        {"name": "Анализ данных", "code": "09.04.01", "level": "master"}
+                    ],
+                }
+            ]
+        )
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    "Магистерский факультет",
+                    "Анализ данных",
+                    "09.04.01",
+                    2024,
+                    "budget",
+                    80,
+                    85,
+                    level="master",
+                )
+            ]
+        )
+    calls = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            calls.append(1)
+            result = await kwargs["tool_executor"](
+                "get_admission_scores",
+                {"program": "Анализ данных", "level": "master", "metric": "average"},
+            )
+            return LLMResult(str(result))
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    text, _, _ = await llm_client._run_tool_loop(
+        [
+            AIMessage(
+                content=str(initial),
+                additional_kwargs={"admission_scores": initial.scope},
+            ),
+            HumanMessage(content="А на магистратуру?"),
+            AIMessage(content=llm_client.SCORES_CLARIFY),
+            HumanMessage(content="Какой средний балл на Анализ данных?"),
+        ],
+        "named-master-regression",
+    )
+    assert "Анализ данных" in text and "средний 85" in text
+    assert len(calls) == 1
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("question", "key", "bad_value", "broad_args", "values"),
     [
@@ -384,7 +559,11 @@ async def test_sql_scope_survives_storing_and_rebuilding_history(
     text = await ctx.execute_tool(
         "get_admission_scores", {"program": "ПИиКН", "metric": "passing"}
     )
-    assert ctx.score_query == {
+    assert ctx.score_query is not None
+    assert ctx.score_query["_program_ids"]
+    assert {
+        key: value for key, value in ctx.score_query.items() if key != "_program_ids"
+    } == {
         "program": "09.03.04",
         "faculty": "Факультет информационных технологий",
         "level": "bachelor",
@@ -406,7 +585,11 @@ async def test_sql_scope_survives_storing_and_rebuilding_history(
     )
     assert guard is not None
     assert ctx.score_query is not None
-    assert guard.filters == {**ctx.score_query, "metric": "average"}
+    assert guard.program_ids == frozenset(ctx.score_query["_program_ids"])
+    assert guard.filters == {
+        **{key: value for key, value in ctx.score_query.items() if key != "_program_ids"},
+        "metric": "average",
+    }
 
 
 @pytest.mark.asyncio

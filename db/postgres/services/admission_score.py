@@ -449,6 +449,8 @@ class AdmissionScoreService:
         form: Optional[str] = None,
         level: Optional[str] = None,
         only_active: bool = True,
+        program_ids: Optional[Sequence[str]] = None,
+        include_identity: bool = False,
     ) -> list[dict]:
         """Выборка проходных баллов с разрешением строковых фильтров.
 
@@ -460,6 +462,11 @@ class AdmissionScoreService:
         отсортированный по (program_name, year, form). Пустой список, если
         ничего не найдено. ``only_active=False`` включает архивные записи
         для административного просмотра.
+
+        ``program_ids`` привязывает запрос к точным программам вместо строковых
+        program/faculty: общий код ФГОС не различает профили. ``include_identity``
+        добавляет program_id в строки для внутренней проверки пайплайна;
+        по умолчанию форма результата остаётся прежней.
         """
         stmt = (
             select(AdmissionScore, Program, Faculty)
@@ -474,7 +481,7 @@ class AdmissionScoreService:
             stmt = stmt.where(Program.level == canonical_level)
 
         resolved_faculty = None
-        if faculty is not None:
+        if faculty is not None and program_ids is None:
             resolved_faculty = await self._find_faculty_loose(
                 faculty, only_active=only_active
             )
@@ -483,7 +490,9 @@ class AdmissionScoreService:
             if resolved_faculty is None and program is None:
                 return []
 
-        if program is not None:
+        if program_ids is not None:
+            stmt = stmt.where(Program.id.in_(program_ids))
+        elif program is not None:
             ids = await self._match_program_ids_loose(
                 program, resolved_faculty, level, only_active=only_active
             )
@@ -503,18 +512,19 @@ class AdmissionScoreService:
         result = await self.session.execute(stmt)
         rows: list[dict] = []
         for score, prog, fac in result.all():
-            rows.append(
-                {
-                    "faculty_name": fac.name,
-                    "program_name": prog.name,
-                    "code": prog.code,
-                    "level": prog.level,
-                    "year": score.year,
-                    "form": score.form,
-                    "passing_score": score.passing_score,
-                    "average_score": score.average_score,
-                }
-            )
+            row = {
+                "faculty_name": fac.name,
+                "program_name": prog.name,
+                "code": prog.code,
+                "level": prog.level,
+                "year": score.year,
+                "form": score.form,
+                "passing_score": score.passing_score,
+                "average_score": score.average_score,
+            }
+            if include_identity:
+                row["program_id"] = prog.id
+            rows.append(row)
 
         rows.sort(key=lambda r: (r["program_name"], r["year"], r["form"]))
         return rows

@@ -50,6 +50,7 @@ class ScoreGuard:
     attempted: bool = False
     clarify: bool = False
     comparisons: dict[str, list] = field(default_factory=dict)
+    program_ids: frozenset[str] = frozenset()
 
     @classmethod
     def from_messages(cls, messages: list[BaseMessage]) -> "ScoreGuard | None":
@@ -79,11 +80,13 @@ class ScoreGuard:
                 break
         saved_scope: dict = {}
         saved_comparisons: dict[str, list] = {}
+        program_ids: frozenset[str] = frozenset()
         scope_updates = [current]
         if short:
             for message in reversed(messages[:-1]):
                 metadata = message.additional_kwargs.get("admission_scores")
                 if message.type == "ai" and isinstance(metadata, dict):
+                    program_ids = frozenset(metadata.get("_program_ids", []))
                     raw = metadata.get("_comparisons", {})
                     if isinstance(raw, dict):
                         saved_comparisons = {
@@ -132,23 +135,29 @@ class ScoreGuard:
                 ):
                     # Новое название разрешает SQL-инструмент; прежний код
                     # нельзя закреплять в восстановительной схеме вместо него.
+                    if filters.get("program") or program_ids:
+                        filters.pop("level", None)
                     filters.pop("program", None)
                     filters.pop("faculty", None)
                     comparisons.pop("program", None)
+                    program_ids = frozenset()
+                    needs_program = False
             codes = _CODE.findall(question)
             if len(set(codes)) == 1:
                 if codes[0] != filters.get("program"):
                     filters.pop("faculty", None)
-                    if filters.get("program"):
+                    if filters.get("program") or program_ids:
                         filters.pop("level", None)
                 filters["program"] = codes[0]
                 comparisons.pop("program", None)
+                program_ids = frozenset()
                 needs_program = False
             elif codes:
                 filters.pop("program", None)
                 filters.pop("faculty", None)
                 filters.pop("level", None)
                 comparisons["program"] = sorted(set(codes))
+                program_ids = frozenset()
                 needs_program = False
             years = _YEAR.findall(question)
             if len(set(years)) == 1:
@@ -181,18 +190,29 @@ class ScoreGuard:
                 if re.search(pattern, question):
                     if (
                         filters.get("level") != level
-                        and filters.get("program")
+                        and (filters.get("program") or program_ids)
                         and not codes
                     ):
                         filters.pop("program", None)
                         comparisons.pop("program", None)
+                        program_ids = frozenset()
                         needs_program = True
                     filters["level"] = level
-        return cls(filters=filters, comparisons=comparisons, clarify=needs_program)
+        return cls(
+            filters=filters,
+            comparisons=comparisons,
+            clarify=needs_program,
+            program_ids=program_ids,
+        )
 
     def history_scope(self, resolved_scope: dict) -> dict:
         """Сравнение сохраняется как запрос, даже если SQL нашёл один вариант."""
         scope = dict(resolved_scope)
+        for key in ("year", "form", "level", "metric"):
+            if key in self.filters:
+                scope[key] = self.filters[key]
+        if self.program_ids:
+            scope["_program_ids"] = sorted(self.program_ids)
         if self.comparisons:
             scope["_comparisons"] = deepcopy(self.comparisons)
             for key in self.comparisons:
@@ -207,6 +227,16 @@ class ScoreGuard:
         for name, value in self.filters.items():
             parameters["properties"][name]["enum"] = [value]
         parameters["required"] = list(self.filters)
+        if self.program_ids:
+            ids = sorted(self.program_ids)
+            parameters["properties"]["program_ids"] = {
+                "type": "array",
+                "items": {"type": "string", "enum": ids},
+                "minItems": len(ids),
+                "maxItems": len(ids),
+                "description": "Передай все перечисленные ID выбранных программ.",
+            }
+            parameters["required"].append("program_ids")
         if self.filters.get("program") and not self.filters.get("faculty"):
             parameters["properties"].pop("faculty", None)
         return ToolSpec(tool.name, tool.description, parameters)
@@ -214,6 +244,14 @@ class ScoreGuard:
     def accepts(self, arguments: dict, *, check_names: bool = True) -> bool:
         """Полная выборка покрывает фильтр, противоположный фильтр — нет."""
         metric = arguments.get("metric", "passing")
+        ids = arguments.get("program_ids")
+        if ids is not None and (
+            not self.program_ids
+            or not isinstance(ids, list)
+            or any(not isinstance(value, str) for value in ids)
+            or not self.program_ids.issubset(ids)
+        ):
+            return False
         if any(arguments.get(key) not in (None, "") for key in self.comparisons):
             return False
         if metric not in (self.filters.get("metric"), "both"):
