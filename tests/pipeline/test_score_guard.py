@@ -9,6 +9,87 @@ from pipeline.score_guard import SCORES_UNAVAILABLE, ScoreGuard
 from pipeline.tools.admission_scores import AdmissionScoresResult
 
 
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "на 09.03.01",
+        "по нему",
+        "для него",
+        "на нём",
+        "по ней",
+        "для неё",
+        "по ним",
+        "для них",
+        "для этой программы",
+        "по тому же направлению",
+        "на направлении 09.03.01 в 2024 году",
+        "на 09.03.01 на бюджет",
+    ],
+)
+def test_reference_to_same_program_preserves_identity(reference):
+    scope = {
+        "program": "09.03.01",
+        "faculty": "ФИТ",
+        "level": "bachelor",
+        "year": 2024,
+        "form": "budget",
+        "metric": "passing",
+        "_program_ids": ["profile-a"],
+    }
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(content="141", additional_kwargs={"admission_scores": scope}),
+            HumanMessage(content=f"А средний балл {reference}?"),
+        ]
+    )
+    assert guard is not None
+    assert guard.program_ids == frozenset({"profile-a"})
+    assert guard.filters["program"] == "09.03.01"
+    assert guard.filters["level"] == "bachelor"
+    assert guard.filters["metric"] == "average"
+
+
+@pytest.mark.parametrize("name", ["Этнологию", "Томографию"])
+def test_real_program_name_is_not_a_reference_prefix(name):
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "level": "bachelor",
+                        "metric": "passing",
+                        "_program_ids": ["profile-a"],
+                    }
+                },
+            ),
+            HumanMessage(content=f"А средний балл на {name}?"),
+        ]
+    )
+    assert guard is not None and not guard.program_ids
+
+
+def test_explicit_request_for_all_profiles_can_expand_same_code():
+    guard = ScoreGuard.from_messages(
+        [
+            AIMessage(
+                content="141",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "metric": "passing",
+                        "_program_ids": ["profile-a"],
+                    }
+                },
+            ),
+            HumanMessage(content="А средний балл по всем профилям 09.03.01?"),
+        ]
+    )
+    assert guard is not None and not guard.program_ids
+    assert guard.filters["program"] == "09.03.01"
+
+
 @pytest.mark.asyncio
 async def test_database_error_with_known_program_identity_does_not_retry(monkeypatch):
     calls = []

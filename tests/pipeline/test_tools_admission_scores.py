@@ -105,7 +105,21 @@ async def _seed_fit(maker) -> None:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("mode", ["profile", "code_group", "empty_paid", "renamed"])
+@pytest.mark.parametrize(
+    "mode",
+    [
+        "profile",
+        "code_group",
+        "empty_paid",
+        "renamed",
+        "same_code",
+        "reference",
+        "named_same_code",
+        "same_named_code",
+        "same_named",
+        "narrow_group_name",
+    ],
+)
 async def test_shared_code_cannot_substitute_a_different_profile(
     sessionmaker_bound, expander, monkeypatch, mode
 ):
@@ -136,7 +150,7 @@ async def test_shared_code_cannot_substitute_a_different_profile(
                 ScoreRow(faculty, second, "09.03.01", 2024, "paid", 200, 99),
             ]
         )
-    initial_program = "09.03.01" if mode == "code_group" else first
+    initial_program = "09.03.01" if mode in ("code_group", "narrow_group_name") else first
     initial = await execute_admission_scores(
         {
             "faculty": faculty,
@@ -173,7 +187,14 @@ async def test_shared_code_cannot_substitute_a_different_profile(
                 ids = kwargs["tools"][0].parameters["properties"]["program_ids"]["items"][
                     "enum"
                 ]
-                assert set(ids) == set(initial.scope["_program_ids"])
+                expected_ids = set(initial.scope["_program_ids"])
+                if mode == "narrow_group_name":
+                    expected_ids = {
+                        key
+                        for key, names in initial.scope["_program_names"].items()
+                        if first in names
+                    }
+                assert set(ids) == expected_ids
                 args = {
                     "program_ids": ids,
                     "year": 2024,
@@ -188,6 +209,15 @@ async def test_shared_code_cannot_substitute_a_different_profile(
         published.append(text)
 
     monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    question = {
+        "empty_paid": "А средний балл на платное?",
+        "same_code": "А средний балл на 09.03.01?",
+        "reference": "А средний балл по нему?",
+        "named_same_code": f"А средний балл на {second} (09.03.01)?",
+        "same_named_code": f"А средний балл на {first} (09.03.01)?",
+        "same_named": f"А средний балл на {first}?",
+        "narrow_group_name": f"А средний балл на {first} (09.03.01)?",
+    }.get(mode, "А средний?")
     text, _, _ = await llm_client._run_tool_loop(
         [
             HumanMessage(content=f"Какой проходной балл на {initial_program}?"),
@@ -195,15 +225,16 @@ async def test_shared_code_cannot_substitute_a_different_profile(
                 content=str(initial),
                 additional_kwargs={"admission_scores": initial.scope},
             ),
-            HumanMessage(
-                content="А средний балл на платное?"
-                if mode == "empty_paid"
-                else "А средний?"
-            ),
+            HumanMessage(content=question),
         ],
         "shared-code-regression",
         stream_callback=publish,
     )
+    if mode == "named_same_code":
+        assert "88.1" in text and "63.27" not in text
+        assert len(calls) == 1
+        assert published == [text]
+        return
     if mode == "empty_paid":
         assert text == "По этому запросу данных о проходных баллах нет."
         assert "99" not in text
@@ -562,7 +593,7 @@ async def test_sql_scope_survives_storing_and_rebuilding_history(
     assert ctx.score_query is not None
     assert ctx.score_query["_program_ids"]
     assert {
-        key: value for key, value in ctx.score_query.items() if key != "_program_ids"
+        key: value for key, value in ctx.score_query.items() if not key.startswith("_")
     } == {
         "program": "09.03.04",
         "faculty": "Факультет информационных технологий",
@@ -586,8 +617,13 @@ async def test_sql_scope_survives_storing_and_rebuilding_history(
     assert guard is not None
     assert ctx.score_query is not None
     assert guard.program_ids == frozenset(ctx.score_query["_program_ids"])
+    assert guard.program_names == ctx.score_query["_program_names"]
     assert guard.filters == {
-        **{key: value for key, value in ctx.score_query.items() if key != "_program_ids"},
+        **{
+            key: value
+            for key, value in ctx.score_query.items()
+            if not key.startswith("_")
+        },
         "metric": "average",
     }
 

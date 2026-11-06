@@ -267,6 +267,7 @@ async def execute_admission_scores(arguments: dict) -> str:
         if program_ids is not None
         else {row["program_id"] for row in rows}
     )
+    scope["_program_names"] = {row["program_id"]: [row["program_name"]] for row in rows}
     # Один фактически найденный вариант сохраняем для следующего уточнения.
     # Несколько лет/форм не превращаем в случайно выбранный последний вариант.
     for key, column in (
