@@ -122,62 +122,6 @@ def get_csrf_token(session: requests.Session, headers: dict) -> str | None:
         return None
 
 
-def parse_rating_page(url: str) -> tuple[list[RatingEntry], str, str]:
-    """
-    Получает данные рейтингового списка через Form Data POST запрос.
-
-    Returns:
-        (список записей рейтинга, хэш ответа, название направления)
-    """
-    config = get_rating_config()
-    headers = config.get("headers", {})
-
-    try:
-        params = extract_params_from_url(url)
-    except ValueError as e:
-        logger.error(f"Некорректные параметры в URL {url}: {e}")
-        return [], "", ""
-
-    with requests.Session() as session:
-        csrf_token = get_csrf_token(session, headers)
-        if not csrf_token:
-            return [], "", ""
-
-        form_data = {
-            "_csrf-frontend": csrf_token,
-            "degree": "bachelor",
-            "faculty": str(params["faculty"]),
-            "direction": str(params["direction"]),
-            "condition": str(params["condition"]),
-            "type": str(params["type"]),
-        }
-
-        try:
-            response = session.post(
-                API_ENDPOINT,
-                headers={**headers, "Accept": "application/json"},
-                data=form_data,  # Form Data
-                timeout=10,
-            )
-            response.raise_for_status()
-
-            data = response.json()
-            page_hash = calculate_page_hash(response.text)
-            entries = extract_entries(data)
-
-            direction_name = extract_direction_name(data)
-
-            logger.info(f"Получено {len(entries)} записей из {url}")
-            return entries, page_hash, direction_name
-
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Ошибка при запросе {url}: {e}")
-            return [], "", ""
-        except Exception as e:
-            logger.error(f"Ошибка при парсинге {url}: {e}")
-            return [], "", ""
-
-
 def parse_mock_rating_page(url: str) -> ListFetchResult:
     """Получает данные рейтингового списка с мок-сайта (напрямую GET-запросом)."""
     config = get_rating_config()

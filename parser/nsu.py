@@ -1,7 +1,6 @@
 import httpx
 from bs4 import BeautifulSoup
 
-from parser.config.load_config import get_parser_config
 from parser.safe_fetch import fetch_url
 from parser.utils import (
     calculate_page_hash,
@@ -75,26 +74,4 @@ def parse_page(
         return {}
     except Exception as e:
         print(f"Произошла ошибка: {e}")
-        return {}
-
-
-def parse_nsu_faculty(faculty) -> dict:
-    """Парсит страницу факультета НГУ на основе конфигурации."""
-    try:
-        PARSER_CONFIG = get_parser_config()
-
-        base_url = PARSER_CONFIG.get("url", "")
-        headers = PARSER_CONFIG.get("headers", {})
-        selectors = PARSER_CONFIG.get("selectors", [])
-
-        if not base_url:
-            print("Базовый URL не найден в конфигурации!")
-            return {}
-
-        full_page_url = f"{base_url}{faculty}"
-
-        return parse_page(full_page_url, selectors, headers)
-
-    except Exception as e:
-        print(f"Ошибка при получении конфигурации или парсинге факультета: {e}")
         return {}

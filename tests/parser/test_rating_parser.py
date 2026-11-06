@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -9,7 +9,6 @@ from parser.rating import (
     extract_params_from_url,
     find_entry_by_identifier,
     get_csrf_token,
-    parse_rating_page,
 )
 
 # ─── build_leaderboard_url ────────────────────────────────────────────────────
@@ -210,74 +209,3 @@ class TestGetCsrfToken:
 
         token = get_csrf_token(session, {})
         assert token is None
-
-
-# ─── parse_rating_page ────────────────────────────────────────────────────────
-
-
-class TestParseRatingPage:
-    URL = "https://abiturient.nsu.ru/bachelor?faculty=8&direction=7&condition=10&type=0"
-
-    @patch("parser.rating.requests.Session")
-    def test_returns_entries_on_success(
-        self, mock_session_cls, mock_json_response, mock_html_with_csrf
-    ):
-        mock_session = MagicMock()
-        mock_session_cls.return_value.__enter__ = MagicMock(return_value=mock_session)
-        mock_session_cls.return_value.__exit__ = MagicMock(return_value=False)
-
-        # GET для CSRF
-        get_response = MagicMock()
-        get_response.text = mock_html_with_csrf
-        get_response.raise_for_status = MagicMock()
-
-        # POST для данных
-        post_response = MagicMock()
-        post_response.json.return_value = mock_json_response
-        post_response.text = '{"items": []}'
-        post_response.raise_for_status = MagicMock()
-
-        mock_session.get.return_value = get_response
-        mock_session.post.return_value = post_response
-
-        entries, page_hash, direction_name = parse_rating_page(self.URL)
-
-        assert len(entries) == 5
-        assert page_hash != ""
-
-    @patch("parser.rating.requests.Session")
-    def test_returns_empty_when_no_csrf(self, mock_session_cls, mock_html_without_csrf):
-        mock_session = MagicMock()
-        mock_session_cls.return_value.__enter__ = MagicMock(return_value=mock_session)
-        mock_session_cls.return_value.__exit__ = MagicMock(return_value=False)
-
-        get_response = MagicMock()
-        get_response.text = mock_html_without_csrf
-        get_response.raise_for_status = MagicMock()
-        mock_session.get.return_value = get_response
-
-        entries, page_hash, direction_name = parse_rating_page(self.URL)
-
-        assert entries == []
-        assert page_hash == ""
-        assert direction_name == ""
-
-    @patch("parser.rating.requests.Session")
-    def test_returns_empty_on_post_error(self, mock_session_cls, mock_html_with_csrf):
-        import requests
-
-        mock_session = MagicMock()
-        mock_session_cls.return_value.__enter__ = MagicMock(return_value=mock_session)
-        mock_session_cls.return_value.__exit__ = MagicMock(return_value=False)
-
-        get_response = MagicMock()
-        get_response.text = mock_html_with_csrf
-        get_response.raise_for_status = MagicMock()
-        mock_session.get.return_value = get_response
-        mock_session.post.side_effect = requests.exceptions.ConnectionError()
-
-        entries, page_hash, direction_name = parse_rating_page(self.URL)
-
-        assert entries == []
-        assert page_hash == ""
-        assert direction_name == ""
