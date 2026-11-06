@@ -120,7 +120,14 @@ class DeepSeekProvider(BaseLLMProvider):
                     }
                     for tool in tools
                 ]
-                params["tool_choice"] = "none" if iteration == 3 else "auto"
+                required = kwargs.get("required_tool") if iteration == 0 else None
+                params["tool_choice"] = (
+                    {"type": "function", "function": {"name": required}}
+                    if required
+                    else "none"
+                    if iteration == 3
+                    else "auto"
+                )
             stream = await self.client.chat.completions.create(
                 messages=cast(Any, history),
                 stream=True,

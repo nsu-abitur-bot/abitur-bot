@@ -34,12 +34,19 @@ from pipeline.prompts import (
     SOURCES_HINT,
     SYSTEM_PROMPT_BASE,
 )
+from pipeline.score_guard import (
+    SCORES_CLARIFY,
+    SCORES_TOOL,
+    SCORES_UNAVAILABLE,
+    ScoreGuard,
+)
 from pipeline.tools import (
     ADMISSION_SCORES_TOOL,
     CONTENT_PROPOSAL_TOOL,
     EDUCATION_PROGRAMS_TOOL,
     default_tool_executor,
 )
+from pipeline.tools.admission_scores import AdmissionScoresResult
 from rag.crag import load_crag_config
 from rag.retriever import (
     RetrievalError,
@@ -308,11 +315,18 @@ class _Ctx:
     log_entry_id: Optional[int] = None
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
+    score_query: dict | None = None
+
+    def remember_score_scope(self, scope: dict) -> None:
+        self.score_query = scope
 
     @timed("tool_execution")
     async def execute_tool(self, name: str, args: dict) -> str:
         self.trace.tools_called.append(name)
-        return await default_tool_executor(name, args)
+        output = await default_tool_executor(name, args)
+        if isinstance(output, AdmissionScoresResult) and output.status in ("ok", "empty"):
+            self.score_query = output.scope or dict(args)
+        return output
 
     async def emit_status(self, text: str) -> None:
         """Промежуточный статус пользователю. Сбой колбэка не ломает ответ."""
@@ -563,7 +577,15 @@ def _build_messages(
         elif role == "assistant":
             entry_clean = _SOURCES_BLOCK_RE.sub("", entry_content)
             entry_clean = _ANCHOR_RE.sub("", entry_clean).strip()
-            messages.append(AIMessage(content=entry_clean))
+            metadata = entry.get("admission_scores")
+            messages.append(
+                AIMessage(
+                    content=entry_clean,
+                    additional_kwargs={"admission_scores": metadata}
+                    if isinstance(metadata, dict)
+                    else {},
+                )
+            )
 
     messages.append(HumanMessage(content=question))
     return messages
@@ -589,6 +611,7 @@ async def _run_tool_loop(
     session_id: str,
     stream_callback: Optional[StreamCallback] = None,
     tool_executor: Optional[ToolExecutor] = None,
+    score_scope_callback: Callable[[dict], None] | None = None,
 ) -> tuple[str, LLMUsage, str]:
     """Генерация ответа с доступом к инструментам. Возвращает текст, расход, провайдера.
 
@@ -596,9 +619,92 @@ async def _run_tool_loop(
     колбэка не должен ломать сам ответ.
     """
     tool_executor = tool_executor or default_tool_executor
+    guard = ScoreGuard.from_messages(messages)
+    if guard is not None and guard.clarify:
+        return SCORES_CLARIFY, LLMUsage(), "none"
     provider = get_llm_provider()
     provider_name = provider.__class__.__name__
     logger.info(f"[{session_id}] Sending payload to LLM ({provider_name}).")
+
+    if guard is not None:
+        executor = tool_executor
+        resolved_scope: dict = {}
+
+        async def checked_executor(name: str, args: dict) -> str:
+            nonlocal resolved_scope
+            if name == SCORES_TOOL:
+                if not guard.accepts(args, check_names=False):
+                    guard.verified = False
+                    return "Параметры запроса не соответствуют вопросу пользователя."
+                try:
+                    output = await executor(name, args)
+                except Exception:
+                    logger.exception("[%s] Admission scores query failed", session_id)
+                    guard.verified = False
+                    guard.attempted = True
+                    return SCORES_UNAVAILABLE
+                resolved_args = dict(args)
+                if isinstance(output, AdmissionScoresResult) and output.status == "error":
+                    guard.record(output)
+                    return output
+                if guard.program_ids and (
+                    not isinstance(output, AdmissionScoresResult)
+                    or not guard.program_ids.issubset(output.program_ids)
+                ):
+                    guard.verified = False
+                    return "Запрошены баллы других программ подготовки."
+                if isinstance(output, AdmissionScoresResult):
+                    for key in ("program", "faculty"):
+                        if args.get(key) and output.scope.get(key):
+                            resolved_args[key] = output.scope[key]
+                if not guard.accepts(
+                    resolved_args, check_names=not bool(guard.program_ids)
+                ):
+                    guard.verified = False
+                    return "Запрошены баллы другого направления или факультета."
+                guard.record(output)
+                if guard.verified and isinstance(output, AdmissionScoresResult):
+                    resolved_scope = output.scope or dict(args)
+                return output
+            return await executor(name, args)
+
+        # Черновик нельзя отправлять в транспорт: после проверки его может
+        # понадобиться целиком заменить, включая уверенное «данных нет».
+        result = await provider.generate_with_tools(
+            messages,
+            tools=[
+                _university_scores_tool(),
+                CONTENT_PROPOSAL_TOOL,
+                EDUCATION_PROGRAMS_TOOL,
+            ],
+            tool_executor=checked_executor,
+            profile=LLMProfiles.CHAT,
+        )
+        usage = result.usage
+        if not guard.verified and not guard.attempted:
+            logger.info("[%s] Recovering missing admission scores query", session_id)
+            result = await provider.generate_with_tools(
+                messages,
+                tools=[guard.recovery_tool(_university_scores_tool())],
+                tool_executor=checked_executor,
+                profile=LLMProfiles.CHAT,
+                required_tool=SCORES_TOOL,
+            )
+            usage = LLMUsage(
+                prompt_tokens=usage.prompt_tokens + result.usage.prompt_tokens,
+                completion_tokens=usage.completion_tokens
+                + result.usage.completion_tokens,
+                total_tokens=usage.total_tokens + result.usage.total_tokens,
+            )
+        content = result.text if guard.verified else SCORES_UNAVAILABLE
+        if guard.verified and score_scope_callback is not None:
+            score_scope_callback(guard.history_scope(resolved_scope))
+        if stream_callback is not None:
+            try:
+                await stream_callback(content)
+            except Exception as cb_exc:
+                logger.warning(f"[{session_id}] stream_callback error: {cb_exc}")
+        return content, usage, provider_name
 
     if stream_callback is None:
         result = await provider.generate_with_tools(
@@ -709,12 +815,17 @@ async def _answer_without_kb(
         messages = _build_messages(RAG_CONTEXT_UNAVAILABLE, history_entries, question)
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
-            messages, session_id, tool_executor=tracking_executor
+            messages,
+            session_id,
+            tool_executor=tracking_executor,
+            score_scope_callback=ctx.remember_score_scope,
         )
     except Exception as e:
         logger.warning(f"[{session_id}] Provider generation error: {e}")
         return RAG_UNAVAILABLE_ANSWER, []
 
+    if not used_tool and content in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
+        return content, []
     if not used_tool:
         logger.info(
             f"[{session_id}] Knowledge base unavailable and no tool used: "
@@ -753,7 +864,11 @@ async def _generate_answer(
 
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
-            messages, session_id, stream_callback, tool_executor=ctx.execute_tool
+            messages,
+            session_id,
+            stream_callback,
+            tool_executor=ctx.execute_tool,
+            score_scope_callback=ctx.remember_score_scope,
         )
 
         processed = _postprocess(content, rag.sources)
@@ -791,11 +906,15 @@ def _store_answer(
     В историю кладём текст без тегов: её читает модель, а не человек.
     """
     stored_text = _strip_markup(content)
-    _spawn_bg(
-        _remember_message(
-            redis_client, ctx.session_id, {"role": "assistant", "content": stored_text}
-        )
-    )
+    entry: dict = {"role": "assistant", "content": stored_text}
+    if ctx.score_query is not None and stored_text not in (
+        SCORES_UNAVAILABLE,
+        SCORES_CLARIFY,
+        RAG_UNAVAILABLE_ANSWER,
+        "LLM временно недоступна.",
+    ):
+        entry["admission_scores"] = ctx.score_query
+    _spawn_bg(_remember_message(redis_client, ctx.session_id, entry))
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, ctx.session_id, message, stored_text))
 

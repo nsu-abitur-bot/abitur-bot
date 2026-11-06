@@ -217,7 +217,17 @@ class GeminiProvider(BaseLLMProvider):
         contents: list[Any] = list(gemini_messages)
         usage = LLMUsage()
 
-        for _ in range(_MAX_TOOL_ITERATIONS):
+        for iteration in range(_MAX_TOOL_ITERATIONS):
+            required = kwargs.get("required_tool") if iteration == 0 else None
+            config.tool_config = (
+                types.ToolConfig(
+                    function_calling_config=types.FunctionCallingConfig(
+                        mode="ANY", allowed_function_names=[required]
+                    )
+                )
+                if required
+                else None
+            )
             text, function_calls, model_parts, usage = await self._run_gemini_stream(
                 contents, config, on_delta
             )

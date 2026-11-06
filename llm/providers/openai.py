@@ -212,6 +212,7 @@ class OpenAIProvider(BaseLLMProvider):
         max_tokens: int,
         timeout: float,
         on_delta: Callable[[str], Awaitable[None]] | None,
+        required_tool: str | None = None,
     ) -> tuple[str, list[Any], LLMUsage]:
         """Один раунд стриминга Responses API.
 
@@ -230,6 +231,8 @@ class OpenAIProvider(BaseLLMProvider):
         }
         if openai_tools:
             stream_kwargs["tools"] = openai_tools
+            if required_tool:
+                stream_kwargs["tool_choice"] = {"type": "function", "name": required_tool}
 
         try:
             async with self.client.responses.stream(**stream_kwargs) as stream:
@@ -274,9 +277,17 @@ class OpenAIProvider(BaseLLMProvider):
         temperature, max_tokens, timeout = self._resolve_params(profile)
         usage = LLMUsage()
 
-        for _ in range(_MAX_TOOL_ITERATIONS):
+        for iteration in range(_MAX_TOOL_ITERATIONS):
+            required = kwargs.get("required_tool") if iteration == 0 else None
+            extra = {"required_tool": required} if required else {}
             text, function_calls, usage = await self._run_responses_stream(
-                input_list, openai_tools, temperature, max_tokens, timeout, on_delta
+                input_list,
+                openai_tools,
+                temperature,
+                max_tokens,
+                timeout,
+                on_delta,
+                **extra,
             )
             if not function_calls:
                 return LLMResult(text=text, usage=usage)
