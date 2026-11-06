@@ -13,7 +13,7 @@ class ScoreRowSchema(BaseModel):
     code: Optional[str] = Field(None, description="Код направления (ФГОС)")
     year: int = Field(..., description="Год приёма")
     form: str = Field(..., description="Форма обучения: budget / paid")
-    passing_score: Optional[int] = Field(None, description="Проходной балл")
+    passing_score: Optional[float] = Field(None, description="Проходной балл")
     average_score: Optional[float] = Field(None, description="Средний балл")
     level: str = Field(
         "bachelor", description="Уровень: bachelor / specialist / master / spo (СПО)"
@@ -77,5 +77,5 @@ class ScoreItem(BaseModel):
     code: Optional[str] = None
     year: int
     form: str
-    passing_score: Optional[int] = None
+    passing_score: Optional[float] = None
     average_score: Optional[float] = None

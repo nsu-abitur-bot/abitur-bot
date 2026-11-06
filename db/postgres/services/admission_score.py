@@ -218,7 +218,7 @@ class ScoreRow:
     code: Optional[str]
     year: int
     form: str
-    passing_score: Optional[int]
+    passing_score: Optional[float]
     average_score: Optional[float]
     level: str = "bachelor"
 
