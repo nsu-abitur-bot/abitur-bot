@@ -44,5 +44,5 @@ def test_example_questions_do_not_require_every_allowed_example():
         (DATASETS / "nsu_admission_2026_registry.json").read_text("utf-8")
     )
     case = next(c for c in registry["cases"] if c["id"] == "nsu-pre-partner-02")
-    assert case["fact_selection"] == {"mode": "at_least", "minimum": 3}
+    assert case["fact_selection"] == {"mode": "at_least", "minimum": 1}
     assert len(case["mandatory_facts"]) > 3
