@@ -108,13 +108,18 @@ async def replay() -> dict:
     memory = get_graph_memory()
     async with memory._use_graph("abitur_kb") as rag:
         record = await rag.doc_status.get_by_id(identifier)
+        if record is None:
+            raise SafetyCheckFailed("Math graph record missing")
         require(record["status"] == "processed", "Math status changed concurrently")
         await rag.doc_status.upsert({identifier: {**record, "status": "pending"}})
         await rag.doc_status.index_done_callback()
         await rag.apipeline_process_enqueue_documents()
         completed = await rag.doc_status.get_by_id(identifier)
+        if completed is None:
+            raise SafetyCheckFailed("Replayed graph record missing")
         require(completed["status"] == "processed", "Math replay did not complete")
     await memory.cleanup("abitur_kb")
+    del rag
     gc.collect()
     integrity = graph_integrity(root, sources, Path("/evaluation/inputs"))
     require(integrity["documents"] == 6, "Replay changed source count")
@@ -136,6 +141,7 @@ async def main() -> int:
     claim_reports(report, usage)
     ledger = UsageLedger(usage, max_attempts=8720, batch=True)
     prior = carry_usage(ledger)
+    result: dict
     try:
         with ledger.capture(), atomic_vector_writes():
             async with asyncio.timeout(1800):
