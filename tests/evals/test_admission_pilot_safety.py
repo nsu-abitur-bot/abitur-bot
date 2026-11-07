@@ -42,6 +42,9 @@ def test_safety_checks_remain_active_under_python_optimization():
 def test_run_marker_survives_and_prevents_retry(tmp_path):
     report, usage = tmp_path / "result.json", tmp_path / "usage.jsonl"
     claim_reports(report, usage)
+    if os.name == "posix":
+        assert report.stat().st_mode & 0o777 == 0o640
+        assert usage.stat().st_mode & 0o777 == 0o640
     assert json.loads(report.read_text()) == {"status": "started"}
     with pytest.raises(RuntimeError):
         claim_reports(report, usage)

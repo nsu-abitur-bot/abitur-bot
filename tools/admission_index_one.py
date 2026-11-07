@@ -29,10 +29,12 @@ def claim_reports(report: Path, usage_path: Path) -> None:
     """Create permanent run markers before any login or provider call."""
     require(not usage_path.exists(), "Inspect prior usage before retry")
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
-    descriptor = os.open(report, flags, 0o600)
+    # Preserve the administrator's inherited read ACL for the host report owner.
+    # These files contain only sanitized result/usage, never credentials.
+    descriptor = os.open(report, flags, 0o640)
     with os.fdopen(descriptor, "w", encoding="utf-8") as output:
         output.write('{"status": "started"}\n')
-    descriptor = os.open(usage_path, flags, 0o600)
+    descriptor = os.open(usage_path, flags, 0o640)
     os.close(descriptor)
 
 
