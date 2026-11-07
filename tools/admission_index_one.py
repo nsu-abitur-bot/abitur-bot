@@ -20,38 +20,70 @@ from sqlalchemy import text  # noqa: E402
 from tools.admission_usage import UsageLedger  # noqa: E402
 
 
+class SafetyCheckFailed(RuntimeError):
+    """The pilot cannot establish its required isolation or initial state."""
+
+
+def require(condition: object, message: str) -> None:
+    """Keep safety checks active even when Python is run with optimization."""
+    if not condition:
+        raise SafetyCheckFailed(message)
+
+
+def claim_reports(report: Path, usage_path: Path) -> None:
+    """Create permanent run markers before any login or provider call."""
+    require(not usage_path.exists(), "Inspect prior usage before retry")
+    flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
+    descriptor = os.open(report, flags, 0o600)
+    with os.fdopen(descriptor, "w", encoding="utf-8") as output:
+        output.write('{"status": "started"}\n')
+    descriptor = os.open(usage_path, flags, 0o600)
+    os.close(descriptor)
+
+
 async def index_one(account: dict, ledger: UsageLedger) -> dict:
     """Run the API upload/approval with real authentication and real providers."""
     from api.main import app
     from config.instance import get_setting
     from db.postgres.db import engine
 
-    assert engine.url.host == "postgres" and engine.url.database == "eval388"
+    require(
+        engine.url.host == "postgres" and engine.url.database == "eval388",
+        "Unexpected database",
+    )
     mounts = Path("/proc/self/mountinfo").read_text()
-    assert "/abitur-eval388-with-kb_files/_data /app/data " in mounts
+    require(
+        "/abitur-eval388-with-kb_files/_data /app/data " in mounts,
+        "Unexpected data mount",
+    )
     source_path = Path("/evaluation/inputs/nsu-plus.txt")
     source_bytes = source_path.read_bytes()
     manifest = json.loads(Path("/evaluation/manifest.json").read_text())
-    assert (
+    require(
         hashlib.sha256(source_bytes).hexdigest()
-        == manifest["source"]["extracted_utf8_sha256"]
+        == manifest["source"]["extracted_utf8_sha256"],
+        "Source digest mismatch",
     )
     async with app.router.lifespan_context(app):
-        assert get_setting("LIGHTRAG_LLM_PROVIDER") == "deepseek"
-        assert get_setting("DEEPSEEK_GRAPH_MODEL") == "deepseek-flash"
-        assert get_setting("LIGHTRAG_EMBEDDING_PROVIDER") == "gigachat"
-        assert get_setting("GIGACHAT_LOCK_DIRECTORY") == "/app/provider-locks"
+        for name, expected in {
+            "LIGHTRAG_LLM_PROVIDER": "deepseek",
+            "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+            "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+            "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks",
+        }.items():
+            require(get_setting(name) == expected, "Unexpected indexing configuration")
         async with engine.connect() as connection:
             for table in ("document", "faq_entry", "content_proposal"):
-                assert (
-                    await connection.scalar(text(f'SELECT count(*) FROM "{table}"')) == 0
+                require(
+                    await connection.scalar(text(f'SELECT count(*) FROM "{table}"')) == 0,
+                    "Pilot requires empty document, proposal and FAQ tables",
                 )
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(
             transport=transport, base_url="http://eval388"
         ) as client:
             response = await client.post("/api/v1/auth/login", json=account)
-            assert response.status_code == 200, "Test API authentication failed"
+            require(response.status_code == 200, "Test API authentication failed")
             token = response.json()["access_token"]
             client.headers["Authorization"] = "Bearer " + token
             del token
@@ -69,7 +101,7 @@ async def index_one(account: dict, ledger: UsageLedger) -> dict:
                     "graph_id": "abitur_kb",
                 },
             )
-            assert response.status_code == 201, "Test API upload failed"
+            require(response.status_code == 201, "Test API upload failed")
             proposal_id = response.json()["id"]
             started = time.monotonic()
             response = await client.post(
@@ -94,9 +126,7 @@ async def index_one(account: dict, ledger: UsageLedger) -> dict:
 async def main() -> int:
     report = Path("/reports/index-one-result.json")
     usage_path = Path("/reports/index-one-usage.jsonl")
-    assert not report.exists() and not usage_path.exists(), (
-        "Inspect prior run before retry"
-    )
+    claim_reports(report, usage_path)
     # Authentication data is supplied via stdin, never from an environment dump
     # or a model key. The caller must separately authorize the test account file.
     account = json.loads(sys.stdin.read())

@@ -106,3 +106,127 @@ def test_limit_refuses_before_request_is_sent(tmp_path):
                 json={"model": "deepseek-flash", "max_tokens": 128},
             )
     assert not received and not ledger.path.exists()
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://unapproved.invalid/chat/completions",
+        "http://api.deepseek.com/chat/completions",
+        "https://api.deepseek.com:444/chat/completions",
+        "https://api.deepseek.com/other/chat/completions",
+        "https://user:secret@api.deepseek.com/chat/completions",
+        "http://eval388/api/v1/auth/login",
+    ],
+)
+def test_unapproved_destination_never_reaches_transport(tmp_path, url):
+    received = []
+
+    def reply(request):
+        received.append(request)
+        return httpx.Response(200, json={})
+
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    with ledger.capture(), httpx.Client(transport=httpx.MockTransport(reply)) as client:
+        with pytest.raises(IndexingLimit):
+            client.post(url, json={"model": "deepseek-flash", "max_tokens": 128})
+    assert not received
+
+
+@pytest.mark.parametrize(
+    "usage",
+    [
+        {"prompt_tokens": 17},
+        {"prompt_tokens": 17, "completion_tokens": 3, "total_tokens": 21},
+        {
+            "prompt_tokens": 17,
+            "completion_tokens": 3,
+            "total_tokens": 20,
+            "prompt_cache_hit_tokens": 30,
+            "prompt_cache_miss_tokens": 0,
+        },
+    ],
+)
+def test_incomplete_or_inconsistent_usage_stops_spending(tmp_path, usage):
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    transport = httpx.MockTransport(
+        lambda req: httpx.Response(200, json={"usage": usage})
+    )
+    with ledger.capture(), httpx.Client(transport=transport) as client:
+        client.post(
+            "https://api.deepseek.com/chat/completions",
+            json={"model": "deepseek-flash", "max_tokens": 128},
+        )
+        assert ledger.uncertain_failure
+        with pytest.raises(IndexingLimit):
+            client.post(
+                "https://api.deepseek.com/chat/completions",
+                json={"model": "deepseek-flash", "max_tokens": 128},
+            )
+
+
+def test_provider_redirect_is_not_followed(tmp_path):
+    received = []
+
+    def reply(request):
+        received.append(request.url.host)
+        return httpx.Response(302, headers={"Location": "https://unapproved.invalid/"})
+
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    with (
+        ledger.capture(),
+        httpx.Client(
+            transport=httpx.MockTransport(reply), follow_redirects=True
+        ) as client,
+    ):
+        response = client.post(
+            "https://api.deepseek.com/chat/completions",
+            json={"model": "deepseek-flash", "max_tokens": 128},
+        )
+    assert response.status_code == 302
+    assert received == ["api.deepseek.com"]
+
+
+@pytest.mark.asyncio
+async def test_local_api_is_allowed_only_with_asgi_transport(tmp_path):
+    async def application(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b"{}"})
+
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    with ledger.capture():
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=application)
+        ) as client:
+            response = await client.post("http://eval388/api/v1/auth/login", json={})
+    assert response.status_code == 200 and ledger.sequence == 0
+
+
+@pytest.mark.asyncio
+async def test_asgi_transport_does_not_allow_unapproved_route(tmp_path):
+    received = []
+
+    async def application(scope, receive, send):
+        received.append(scope)
+
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    with ledger.capture():
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=application)
+        ) as client:
+            with pytest.raises(IndexingLimit):
+                await client.post("http://eval388/api/v1/other-action", json={})
+    assert not received
+
+
+def test_incomplete_embedding_batch_cannot_appear_fully_accounted(tmp_path):
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    transport = httpx.MockTransport(
+        lambda req: httpx.Response(200, json={"data": [{"usage": {"prompt_tokens": 10}}]})
+    )
+    with ledger.capture(), httpx.Client(transport=transport) as client:
+        client.post(
+            "https://api.giga.chat/v1/embeddings",
+            json={"model": "EmbeddingsGigaR", "input": ["first", "second"]},
+        )
+    assert ledger.uncertain_failure
