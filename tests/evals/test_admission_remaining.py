@@ -135,16 +135,28 @@ def test_resume_carries_all_prior_spending_and_refuses_partial_source(tmp_path):
         "status": "recovered",
         "prior_usage_sha256": hashlib.sha256(payload).hexdigest(),
         "completed_source_ids": [str(n) for n in range(6)],
+        "vector_repair_usage_sha256": hashlib.sha256(b"").hexdigest(),
     }
     recovery_path = tmp_path / "recovery.json"
     recovery_path.write_text(json.dumps(recovery))
+    (tmp_path / "vector-repair-01-result.json").write_text(
+        json.dumps(
+            {
+                "status": "completed",
+                "uncertain_failure": False,
+                "attempts": 0,
+                "embedding_input_bytes": 2000,
+            }
+        )
+    )
+    (tmp_path / "vector-repair-01-usage.jsonl").write_bytes(b"")
     ledger = UsageLedger(tmp_path / "next.jsonl", batch=True)
     assert restore_after_disconnect(ledger, tmp_path, recovery_path) == set(
         recovery["completed_source_ids"]
     )
     assert ledger.sequence == 1 and ledger.operation_counts["generation"] == 5
     assert ledger.reserved_deepseek_micro_cny == 5000600
-    assert ledger.reserved_embedding_bytes == 5000000
+    assert ledger.reserved_embedding_bytes == 5002000
     for change in (
         {"status": "started"},
         {"prior_usage_sha256": "different"},

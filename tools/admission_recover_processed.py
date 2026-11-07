@@ -11,7 +11,8 @@ from pathlib import Path
 import httpx
 from sqlalchemy import text
 
-from tools.admission_index_one import claim_reports, require
+from tools.admission_graph_integrity import graph_integrity
+from tools.admission_index_one import SafetyCheckFailed, claim_reports, require
 from tools.admission_index_remaining import read_sources, ready_sources
 from tools.admission_usage import UsageLedger
 
@@ -41,6 +42,8 @@ async def recover(account: dict) -> dict:
     source = next(s for s in sources if s["id"] == source_id)
     expected = (Path("/evaluation/inputs") / source["filename"]).read_text().strip()
     root = Path("/app/data/lightrag/abitur_kb")
+    integrity = graph_integrity(root, sources, Path("/evaluation/inputs"))
+    require(integrity["documents"] == 6, "Unexpected graph integrity state")
     graph = json.loads((root / "kv_store_doc_status.json").read_text())
     docs = json.loads((root / "kv_store_full_docs.json").read_text())
     chunks = json.loads((root / "kv_store_text_chunks.json").read_text())
@@ -150,6 +153,9 @@ async def recover(account: dict) -> dict:
             if s["url"] in {row["source_url"] for row in rows} | {source["url"]}
         ],
         "prior_usage_sha256": hashlib.sha256(prior.read_bytes()).hexdigest(),
+        "vector_repair_usage_sha256": hashlib.sha256(
+            Path("/reports/vector-repair-01-usage.jsonl").read_bytes()
+        ).hexdigest(),
         "interruption_tail_uncertain": True,
         "note": (
             "Processed text, URL, chunks and vectors matched. SQL metadata was "
@@ -161,8 +167,8 @@ async def recover(account: dict) -> dict:
 
 async def main() -> int:
     report, usage = (
-        Path("/reports/recovery-math.json"),
-        Path("/reports/recovery-math-usage.jsonl"),
+        Path("/reports/recovery-math-02.json"),
+        Path("/reports/recovery-math-02-usage.jsonl"),
     )
     claim_reports(report, usage)
     account = json.loads(sys.stdin.read())
@@ -170,7 +176,11 @@ async def main() -> int:
         with UsageLedger(usage, max_attempts=0).capture():
             result = await recover(account)
     except Exception as exc:
-        result = {"status": "failed", "error_type": type(exc).__name__}
+        result = {
+            "status": "failed",
+            "error_type": type(exc).__name__,
+            "check": str(exc) if isinstance(exc, SafetyCheckFailed) else None,
+        }
     finally:
         account.clear()
     report.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n")

@@ -2,6 +2,7 @@
 
 import argparse
 import asyncio
+import gc
 import hashlib
 import json
 import logging
@@ -14,6 +15,7 @@ from pathlib import Path
 import httpx
 from sqlalchemy import text
 
+from tools.admission_graph_integrity import atomic_vector_writes, graph_integrity
 from tools.admission_index_one import claim_reports, require
 from tools.admission_usage import UsageLedger
 
@@ -43,6 +45,26 @@ def restore_after_disconnect(
         and len(recovery["completed_source_ids"]) == 6,
         "Prior batch requires manual recovery",
     )
+    repair = json.loads(
+        (recovery_path.parent / "vector-repair-01-result.json").read_text()
+    )
+    repair_payload = (recovery_path.parent / "vector-repair-01-usage.jsonl").read_bytes()
+    repair_rows = [json.loads(line) for line in repair_payload.decode().splitlines()]
+    require(
+        repair["status"] == "completed"
+        and not repair["uncertain_failure"]
+        and len(repair_rows) == repair["attempts"]
+        and hashlib.sha256(repair_payload).hexdigest()
+        == recovery["vector_repair_usage_sha256"]
+        and all(
+            row["http_status"] == 200
+            and row["usage_complete"]
+            and row["operation"] != "generation"
+            for row in repair_rows
+        ),
+        "Vector repair accounting requires review",
+    )
+    rows += repair_rows
     ledger.sequence = len(rows)
     ledger.operation_counts = dict(Counter(row["operation"] for row in rows))
     # Preserve a separate reserve for the unobserved interruption tail. This is
@@ -52,7 +74,7 @@ def restore_after_disconnect(
         for row in rows
         if row["operation"] == "generation"
     )
-    ledger.reserved_embedding_bytes = 5_000_000
+    ledger.reserved_embedding_bytes = 5_000_000 + repair["embedding_input_bytes"]
     ledger.operation_counts["generation"] = (
         ledger.operation_counts.get("generation", 0) + 4
     )
@@ -116,6 +138,7 @@ async def index_remaining(
     from api.main import app
     from config.instance import get_setting
     from db.postgres.db import engine
+    from rag.graph_memory import get_graph_memory
 
     require(
         engine.url.host == "postgres" and engine.url.database == "eval388",
@@ -173,6 +196,9 @@ async def index_remaining(
             set(graph) == {row["rag_doc_id"] for row in rows}
             and all(record["status"] == "processed" for record in graph.values()),
             "Graph and SQL differ",
+        )
+        result["integrity"] = graph_integrity(
+            Path("/app/data/lightrag/abitur_kb"), sources, Path("/evaluation/inputs")
         )
         return ready_sources([dict(row) for row in rows], sources)
 
@@ -243,6 +269,8 @@ async def index_remaining(
                         response.status_code == 200 and not ledger.uncertain_failure,
                         "Indexing failed; inspect before retry",
                     )
+                    await get_graph_memory().cleanup("abitur_kb")
+                    gc.collect()
                     ready = await inspect()
                     require(source["url"] in ready, "Document not indexed")
                     row.update(
@@ -279,12 +307,12 @@ async def main() -> int:
             restore_after_disconnect(
                 ledger,
                 Path("/reports/remaining-eight-01"),
-                Path("/reports/recovery-math.json"),
+                Path("/reports/recovery-math-02.json"),
             )
             if args.continue_after_disconnect
             else None
         )
-        with ledger.capture():
+        with ledger.capture(), atomic_vector_writes():
             result = await index_remaining(account, ledger, report, expected)
     except Exception as exc:
         account.clear()
