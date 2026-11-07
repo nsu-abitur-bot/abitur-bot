@@ -159,6 +159,11 @@ class FacultyHint:
     level: Optional[str] = None
 
 
+def _allowed_levels(level: str) -> set[str]:
+    # Неуказанный уровень охватывает обе программы первого высшего образования.
+    return {"bachelor", "specialist"} if level == "undergraduate" else {level}
+
+
 # Маркеры уровня образования в тексте вопроса.
 _LEVEL_MARKERS: dict[str, tuple[str, ...]] = {
     "master": ("магистратур", "магистр", "магистерск"),
@@ -231,7 +236,7 @@ async def detect_faculty_hint(
             level = detect_level(conversation_history)
 
     if level is None:
-        level = "bachelor"
+        level = "undergraduate"
 
     try:
         async with AsyncSessionLocal() as session:
@@ -324,7 +329,7 @@ async def _load_scrub_context(
                 p
                 for p in all_programs
                 if (hint.faculty is None or p.faculty_id == hint.faculty.id)
-                and (hint.level is None or p.level == hint.level)
+                and (hint.level is None or p.level in _allowed_levels(hint.level))
             ]
     except Exception as exc:
         logger.warning("CRAG: не удалось загрузить справочник для фильтрации: %s", exc)
@@ -336,7 +341,7 @@ async def _load_scrub_context(
         for p in all_programs
         if (
             (hint.faculty is not None and p.faculty_id != hint.faculty.id)
-            or (hint.level is not None and p.level != hint.level)
+            or (hint.level is not None and p.level not in _allowed_levels(hint.level))
         )
         and (n := normalize_name(p.name))
         and len(n) >= 4
@@ -398,7 +403,7 @@ def _segment_has_foreign_level(
         normalized = normalize_name(segment)
         if not any(name in normalized for name in program_names):
             return False
-    return bool(levels - {level})
+    return bool(levels - _allowed_levels(level))
 
 
 def _scrub_chunk(
@@ -452,6 +457,7 @@ def _build_grading_prompt(
     level_clause = ""
     if hint.level is not None:
         level_map = {
+            "undergraduate": "бакалавриат или специалитет",
             "bachelor": "бакалавриат",
             "specialist": "специалитет",
             "master": "магистратура",
