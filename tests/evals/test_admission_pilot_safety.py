@@ -63,11 +63,14 @@ def test_resume_rejects_a_changed_or_completed_source():
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX lifecycle verified in Linux CI")
 @pytest.mark.parametrize("failure", ["none", "start", "run", "stop", "existing"])
-def test_launcher_stops_only_its_project_on_success_and_failure(tmp_path, failure):
+@pytest.mark.parametrize("launcher", ["run-one.sh", "run-remaining.sh"])
+def test_launcher_stops_only_its_project_on_success_and_failure(
+    tmp_path, failure, launcher
+):
     shell = shutil.which("sh")
     assert shell
     root = Path(__file__).resolve().parents[2]
-    source = (root / "deploy/evals/388/run-one.sh").read_text()
+    source = (root / "deploy/evals/388" / launcher).read_text()
     # Test-only path substitutions keep this lifecycle test outside /home and sudo.
     source = source.replace("/home/mihail/abitur-evals/388-20261107", str(tmp_path))
     source = source.replace(

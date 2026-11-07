@@ -105,7 +105,9 @@ def local_api_call(client: httpx.AsyncClient, request: httpx.Request) -> bool:
 
 
 class UsageLedger:
-    def __init__(self, path: Path, max_attempts: int = 292) -> None:
+    def __init__(
+        self, path: Path, max_attempts: int = 292, *, batch: bool = False
+    ) -> None:
         self.path = path
         self.max_attempts = max_attempts
         self.lock = threading.Lock()
@@ -114,6 +116,7 @@ class UsageLedger:
         self.reserved_deepseek_micro_cny = 0
         self.reserved_embedding_bytes = 0
         self.uncertain_failure = False
+        self.batch = batch
 
     def begin(self, request: httpx.Request) -> dict:
         host, endpoint = request.url.host, request.url.path
@@ -163,9 +166,14 @@ class UsageLedger:
                 raise IndexingLimit("Inspect the failed attempt before spending again")
             if self.sequence >= self.max_attempts:
                 raise IndexingLimit("Pilot HTTP attempt limit reached")
-            limits = {"generation": 32, "embedding": 256, "oauth": 4}
+            limits = (
+                {"generation": 512, "embedding": 8192, "oauth": 16}
+                if self.batch
+                else {"generation": 32, "embedding": 256, "oauth": 4}
+            )
             if self.operation_counts.get(operation, 0) >= limits[operation]:
                 raise IndexingLimit("Pilot operation attempt limit reached")
+            reserve = 0
             if provider == "deepseek":
                 maximum = integer(payload.get("max_tokens"))
                 if maximum is None or maximum > 8192:
@@ -173,12 +181,14 @@ class UsageLedger:
                 # Conservative Flash peak rate, cache treated as a miss. JSON bytes
                 # plus framing are a planning bound, not a provider token count.
                 reserve = (len(request.content) + 512) * 2 + maximum * 8
-                if self.reserved_deepseek_micro_cny + reserve > 5_000_000:
-                    raise IndexingLimit("Pilot planning reserve exceeds 5 CNY")
+                ceiling = 20_000_000 if self.batch else 5_000_000
+                if self.reserved_deepseek_micro_cny + reserve > ceiling:
+                    raise IndexingLimit("Indexing planning reserve exceeded")
                 self.reserved_deepseek_micro_cny += reserve
             if operation == "embedding":
                 size = len(request.content)
-                if self.reserved_embedding_bytes + size > 200_000:
+                ceiling = 5_000_000 if self.batch else 200_000
+                if self.reserved_embedding_bytes + size > ceiling:
                     raise IndexingLimit("Pilot embedding input byte limit reached")
                 self.reserved_embedding_bytes += size
             self.sequence += 1
@@ -193,6 +203,11 @@ class UsageLedger:
                 else None,
                 "started_at": datetime.now(UTC).isoformat(),
                 "started_monotonic": time.monotonic(),
+                **(
+                    {"reserved_micro_cny": reserve}
+                    if self.batch and provider == "deepseek"
+                    else {}
+                ),
             }
 
     def finish(
@@ -236,6 +251,16 @@ class UsageLedger:
             failed = error is not None or response is None or not response.is_success
             if failed or not row["usage_complete"]:
                 self.uncertain_failure = True
+            elif self.batch and row["provider"] == "deepseek":
+                # Settle completed requests at the conservative peak, no-cache
+                # rate. Outstanding requests retain their full reservation.
+                settled = (
+                    row["usage"]["prompt_tokens"] * 2
+                    + row["usage"]["completion_tokens"] * 8
+                )
+                self.reserved_deepseek_micro_cny += settled - row["reserved_micro_cny"]
+                if self.reserved_deepseek_micro_cny > 20_000_000:
+                    self.uncertain_failure = True
             with self.path.open("a", encoding="utf-8") as output:
                 output.write(json.dumps(row, ensure_ascii=False) + "\n")
                 output.flush()
