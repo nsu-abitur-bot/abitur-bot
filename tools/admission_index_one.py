@@ -9,15 +9,10 @@ import sys
 import time
 from pathlib import Path
 
-os.environ["PYTHON_DOTENV_DISABLED"] = "1"
-sys.path.insert(0, "/app")
-sys.path.insert(0, "/evaluation")
-logging.disable(logging.CRITICAL)
+import httpx
+from sqlalchemy import text
 
-import httpx  # noqa: E402
-from sqlalchemy import text  # noqa: E402
-
-from tools.admission_usage import UsageLedger  # noqa: E402
+from tools.admission_usage import UsageLedger
 
 
 class SafetyCheckFailed(RuntimeError):
@@ -43,6 +38,10 @@ def claim_reports(report: Path, usage_path: Path) -> None:
 
 async def index_one(account: dict, ledger: UsageLedger) -> dict:
     """Run the API upload/approval with real authentication and real providers."""
+    os.environ["PYTHON_DOTENV_DISABLED"] = "1"
+    sys.path.insert(0, "/app")
+    sys.path.insert(0, "/evaluation")
+    logging.disable(logging.CRITICAL)
     from api.main import app
     from config.instance import get_setting
     from db.postgres.db import engine

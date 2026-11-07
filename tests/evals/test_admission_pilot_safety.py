@@ -10,6 +10,20 @@ import pytest
 from tools.admission_index_one import claim_reports
 
 
+def test_import_does_not_disable_process_logging():
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import logging; before=logging.root.manager.disable; "
+            "import tools.admission_index_one; "
+            "raise SystemExit(logging.root.manager.disable != before)",
+        ],
+        capture_output=True,
+    )
+    assert result.returncode == 0
+
+
 def test_safety_checks_remain_active_under_python_optimization():
     result = subprocess.run(
         [
