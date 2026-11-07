@@ -187,7 +187,7 @@ class UsageLedger:
                 self.reserved_deepseek_micro_cny += reserve
             if operation == "embedding":
                 size = len(request.content)
-                ceiling = 5_000_000 if self.batch else 200_000
+                ceiling = 10_000_000 if self.batch else 200_000
                 if self.reserved_embedding_bytes + size > ceiling:
                     raise IndexingLimit("Pilot embedding input byte limit reached")
                 self.reserved_embedding_bytes += size

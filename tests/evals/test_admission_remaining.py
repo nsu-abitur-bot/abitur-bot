@@ -1,11 +1,18 @@
 import hashlib
 import json
+import os
+import subprocess
+import sys
 
 import httpx
 import pytest
 
 from tools.admission_index_one import SafetyCheckFailed
-from tools.admission_index_remaining import read_sources, ready_sources
+from tools.admission_index_remaining import (
+    read_sources,
+    ready_sources,
+    restore_after_disconnect,
+)
 from tools.admission_usage import IndexingLimit, UsageLedger
 
 
@@ -101,3 +108,48 @@ def test_batch_unknown_usage_keeps_reservation_and_blocks_spending(tmp_path):
     assert ledger.reserved_deepseek_micro_cny == row["reserved_micro_cny"]
     with pytest.raises(IndexingLimit):
         ledger.begin(request)
+
+
+@pytest.mark.skipif(os.name == "nt", reason="POSIX closed pipe")
+def test_lost_output_does_not_interrupt_indexing():
+    command = (
+        "import os; from tools.admission_index_remaining import progress; "
+        "r,w=os.pipe(); os.close(r); os.dup2(w,1); os.close(w); "
+        "progress({'status':'indexed'}); progress({'status':'continued'})"
+    )
+    result = subprocess.run([sys.executable, "-c", command], capture_output=True)
+    assert result.returncode == 0, result.stderr
+
+
+def test_resume_carries_all_prior_spending_and_refuses_partial_source(tmp_path):
+    row = {
+        "attempt": 1,
+        "operation": "generation",
+        "http_status": 200,
+        "usage_complete": True,
+        "usage": {"prompt_tokens": 100, "completion_tokens": 50},
+    }
+    payload = (json.dumps(row) + "\n").encode()
+    (tmp_path / "usage.jsonl").write_bytes(payload)
+    recovery = {
+        "status": "recovered",
+        "prior_usage_sha256": hashlib.sha256(payload).hexdigest(),
+        "completed_source_ids": [str(n) for n in range(6)],
+    }
+    recovery_path = tmp_path / "recovery.json"
+    recovery_path.write_text(json.dumps(recovery))
+    ledger = UsageLedger(tmp_path / "next.jsonl", batch=True)
+    assert restore_after_disconnect(ledger, tmp_path, recovery_path) == set(
+        recovery["completed_source_ids"]
+    )
+    assert ledger.sequence == 1 and ledger.operation_counts["generation"] == 5
+    assert ledger.reserved_deepseek_micro_cny == 5000600
+    assert ledger.reserved_embedding_bytes == 5000000
+    for change in (
+        {"status": "started"},
+        {"prior_usage_sha256": "different"},
+        {"completed_source_ids": []},
+    ):
+        recovery_path.write_text(json.dumps({**recovery, **change}))
+        with pytest.raises(SafetyCheckFailed):
+            restore_after_disconnect(ledger, tmp_path, recovery_path)

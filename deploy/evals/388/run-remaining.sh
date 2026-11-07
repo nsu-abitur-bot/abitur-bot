@@ -4,9 +4,15 @@
 set +x
 set -eu
 umask 077
-if [ "$#" -ne 1 ] || [ "$1" != --execute ]; then
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ] || [ "$1" != --execute ]; then
     printf '%s\n' 'Expected --execute. No services were started.' >&2
     exit 2
+fi
+shift
+report_directory=remaining-eight-01
+if [ "$#" -eq 1 ]; then
+    if [ "$1" != --continue-after-disconnect ]; then exit 2; fi
+    report_directory=remaining-eight-02
 fi
 base=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 if [ "$base" != /home/mihail/abitur-evals/388-20261107 ]; then
@@ -19,7 +25,7 @@ if ! flock -n 9; then
     printf '%s\n' 'Another pilot owns the lock.' >&2
     exit 1
 fi
-if [ -e /home/mihail/abitur-evals/388-reports/with-kb/remaining-eight-01 ]; then
+if [ -e "/home/mihail/abitur-evals/388-reports/with-kb/$report_directory" ]; then
     printf '%s\n' 'Prior batch exists. Inspect before retry.' >&2
     exit 1
 fi
@@ -49,4 +55,4 @@ started=1
 sudo -n /usr/local/sbin/abitur-eval388 with-kb start </dev/null
 timeout --signal=TERM --kill-after=30s 15000s \
     sudo -n /usr/local/sbin/abitur-eval388 with-kb run \
-    uv run --no-sync python /evaluation/admission_index_remaining.py
+    uv run --no-sync python /evaluation/admission_index_remaining.py "$@"

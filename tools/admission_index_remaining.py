@@ -1,5 +1,6 @@
 """Sequentially index the remaining pinned #388 snapshots in with-kb only."""
 
+import argparse
 import asyncio
 import hashlib
 import json
@@ -7,6 +8,7 @@ import logging
 import os
 import sys
 import time
+from collections import Counter
 from pathlib import Path
 
 import httpx
@@ -14,6 +16,49 @@ from sqlalchemy import text
 
 from tools.admission_index_one import claim_reports, require
 from tools.admission_usage import UsageLedger
+
+
+def progress(value: dict) -> None:
+    """A lost SSH output channel must not interrupt a completed document."""
+    try:
+        print(json.dumps(value, ensure_ascii=False), flush=True)
+    except BrokenPipeError:
+        with open(os.devnull, "w") as sink:
+            os.dup2(sink.fileno(), sys.stdout.fileno())
+
+
+def restore_after_disconnect(
+    ledger: UsageLedger, directory: Path, recovery_path: Path
+) -> set[str]:
+    recovery = json.loads(recovery_path.read_text())
+    payload = (directory / "usage.jsonl").read_bytes()
+    rows = [
+        json.loads(line) for line in (directory / "usage.jsonl").read_text().splitlines()
+    ]
+    require(
+        recovery["status"] == "recovered"
+        and recovery["prior_usage_sha256"] == hashlib.sha256(payload).hexdigest()
+        and [row["attempt"] for row in rows] == list(range(1, len(rows) + 1))
+        and all(row["http_status"] == 200 and row["usage_complete"] for row in rows)
+        and len(recovery["completed_source_ids"]) == 6,
+        "Prior batch requires manual recovery",
+    )
+    ledger.sequence = len(rows)
+    ledger.operation_counts = dict(Counter(row["operation"] for row in rows))
+    # Preserve a separate reserve for the unobserved interruption tail. This is
+    # a spending guard, not a claim about provider billing or complete usage.
+    ledger.reserved_deepseek_micro_cny = 5_000_000 + sum(
+        row["usage"]["prompt_tokens"] * 2 + row["usage"]["completion_tokens"] * 8
+        for row in rows
+        if row["operation"] == "generation"
+    )
+    ledger.reserved_embedding_bytes = 5_000_000
+    ledger.operation_counts["generation"] = (
+        ledger.operation_counts.get("generation", 0) + 4
+    )
+    ledger.operation_counts["embedding"] = ledger.operation_counts.get("embedding", 0) + 1
+    ledger.operation_counts["oauth"] = ledger.operation_counts.get("oauth", 0) + 1
+    return set(recovery["completed_source_ids"])
 
 
 def ready_sources(rows: list[dict], sources: list[dict]) -> set[str]:
@@ -59,7 +104,12 @@ def read_sources(base: Path) -> list[dict]:
     return sources
 
 
-async def index_remaining(account: dict, ledger: UsageLedger, report: Path) -> dict:
+async def index_remaining(
+    account: dict,
+    ledger: UsageLedger,
+    report: Path,
+    expected_ready: set[str] | None = None,
+) -> dict:
     os.environ["PYTHON_DOTENV_DISABLED"] = "1"
     sys.path.insert(0, "/app")
     logging.disable(logging.CRITICAL)
@@ -137,7 +187,14 @@ async def index_remaining(account: dict, ledger: UsageLedger, report: Path) -> d
             }.items():
                 require(get_setting(name) == expected, "Unexpected indexing settings")
             ready = await inspect()
-            require(len(ready) == 1, "Expected only the completed pilot source")
+            if expected_ready is None:
+                require(len(ready) == 1, "Expected only the completed pilot source")
+            else:
+                require(
+                    {source["id"] for source in sources if source["url"] in ready}
+                    == expected_ready,
+                    "SQL differs from completed sources in prior batch",
+                )
             require(sources[0]["url"] in ready, "Completed pilot source differs")
             async with httpx.AsyncClient(
                 transport=httpx.ASGITransport(app=app), base_url="http://eval388"
@@ -158,7 +215,7 @@ async def index_remaining(account: dict, ledger: UsageLedger, report: Path) -> d
                     row = {"id": source["id"], "url": source["url"], "status": "started"}
                     result["sources"].append(row)
                     save()
-                    print(json.dumps(row), flush=True)
+                    progress(row)
                     item = {
                         "source": "parser",
                         "title": source["title"],
@@ -192,7 +249,7 @@ async def index_remaining(account: dict, ledger: UsageLedger, report: Path) -> d
                         status="indexed", document_id=response.json()["document_id"]
                     )
                     save()
-                    print(json.dumps(row), flush=True)
+                    progress(row)
                 require(len(ready) == 9, "Expected nine indexed documents")
                 result["status"] = "completed"
     except Exception as exc:
@@ -204,20 +261,36 @@ async def index_remaining(account: dict, ledger: UsageLedger, report: Path) -> d
 
 
 async def main() -> int:
-    directory = Path("/reports/remaining-eight-01")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--continue-after-disconnect", action="store_true")
+    args = parser.parse_args()
+    directory = Path(
+        "/reports/remaining-eight-02"
+        if args.continue_after_disconnect
+        else "/reports/remaining-eight-01"
+    )
     directory.mkdir(mode=0o750)
     report, usage = directory / "result.json", directory / "usage.jsonl"
     claim_reports(report, usage)
     account = json.loads(sys.stdin.read())
     ledger = UsageLedger(usage, max_attempts=8720, batch=True)
     try:
+        expected = (
+            restore_after_disconnect(
+                ledger,
+                Path("/reports/remaining-eight-01"),
+                Path("/reports/recovery-math.json"),
+            )
+            if args.continue_after_disconnect
+            else None
+        )
         with ledger.capture():
-            result = await index_remaining(account, ledger, report)
+            result = await index_remaining(account, ledger, report, expected)
     except Exception as exc:
         account.clear()
         result = {"status": "failed", "error_type": type(exc).__name__}
         report.write_text(json.dumps(result) + "\n")
-    print(json.dumps(result, ensure_ascii=False), flush=True)
+    progress(result)
     return 0 if result["status"] == "completed" else 1
 
 
