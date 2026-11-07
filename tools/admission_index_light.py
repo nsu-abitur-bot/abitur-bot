@@ -30,6 +30,44 @@ PREVIOUS = (
     "DOC-6674be71e05b972c",
     "DOC-770b0c6ebb172dbe",
 )
+GRAPH_FILES = (
+    "kv_store_doc_status.json",
+    "kv_store_full_docs.json",
+    "kv_store_text_chunks.json",
+    "kv_store_full_entities.json",
+    "kv_store_full_relations.json",
+    "kv_store_entity_chunks.json",
+    "kv_store_relation_chunks.json",
+    "kv_store_llm_response_cache.json",
+    "vdb_chunks.json",
+    "vdb_entities.json",
+    "vdb_relationships.json",
+    "graph_chunk_entity_relation.graphml",
+)
+
+
+def backup_graph(root: Path, destination: Path) -> list[str]:
+    copied = []
+    for name in GRAPH_FILES:
+        path = root / name
+        require(not path.is_symlink(), "Unexpected graph backup symlink")
+        if name == "kv_store_llm_response_cache.json" and not path.exists():
+            continue
+        shutil.copyfile(path, destination / name)
+        copied.append(name)
+    return copied
+
+
+def proposal_layout_valid(
+    documents: int, proposals: int, orphans: list[dict], url: str
+) -> bool:
+    return (
+        proposals == documents + len(orphans)
+        and len(orphans) <= 1
+        and all(
+            row["source_url"] == url and row["status"] == "pending" for row in orphans
+        )
+    )
 
 
 def carry_previous(
@@ -138,7 +176,25 @@ async def index_source(
             )
             values = [dict(row) for row in result.mappings()]
             count = await conn.scalar(text("SELECT count(*) FROM content_proposal"))
-            require(count == len(values), "Unexpected proposal count")
+            missing = (
+                (
+                    await conn.execute(
+                        text(
+                            "SELECT p.source_url,p.status FROM content_proposal p "
+                            "LEFT JOIN document d ON d.source_proposal_id=p.id "
+                            "WHERE d.id IS NULL"
+                        )
+                    )
+                )
+                .mappings()
+                .all()
+            )
+            require(
+                proposal_layout_valid(
+                    len(values), count, [dict(row) for row in missing], source["url"]
+                ),
+                "Unexpected proposal count",
+            )
             return values
 
     existing = await rows()
@@ -275,21 +331,7 @@ async def index_source(
                     if not complete:
                         backup = Path("/app/data/recovery388-light") / source_id
                         backup.mkdir(parents=True, mode=0o750)
-                        for name in (
-                            "kv_store_doc_status.json",
-                            "kv_store_full_docs.json",
-                            "kv_store_text_chunks.json",
-                            "kv_store_full_entities.json",
-                            "kv_store_full_relations.json",
-                            "kv_store_entity_chunks.json",
-                            "kv_store_relation_chunks.json",
-                            "kv_store_llm_response_cache.json",
-                            "vdb_chunks.json",
-                            "vdb_entities.json",
-                            "vdb_relationships.json",
-                            "graph_chunk_entity_relation.graphml",
-                        ):
-                            shutil.copyfile(root / name, backup / name)
+                        backup_graph(root, backup)
                         await process_graph(rag_id, bool(matching))
                     require(
                         not ledger.uncertain_failure,

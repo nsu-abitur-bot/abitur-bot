@@ -2,7 +2,14 @@ import json
 
 import pytest
 
-from tools.admission_index_light import REMAINING, approval_ready, carry_previous
+from tools.admission_index_light import (
+    GRAPH_FILES,
+    REMAINING,
+    approval_ready,
+    backup_graph,
+    carry_previous,
+    proposal_layout_valid,
+)
 from tools.admission_index_one import SafetyCheckFailed
 from tools.admission_usage import UsageLedger
 
@@ -60,3 +67,28 @@ def test_light_profile_carries_both_interruption_reserves_and_all_recorded_cost(
     )
     with pytest.raises(SafetyCheckFailed):
         carry_previous(ledger, REMAINING[0], tmp_path)
+
+
+def test_backup_allows_the_application_to_have_cleared_its_optional_cache(tmp_path):
+    root = tmp_path / "graph"
+    destination = tmp_path / "backup"
+    root.mkdir()
+    destination.mkdir()
+    expected = set(GRAPH_FILES) - {"kv_store_llm_response_cache.json"}
+    for name in expected:
+        (root / name).write_text("{}")
+    assert set(backup_graph(root, destination)) == expected
+    (root / "kv_store_full_docs.json").unlink()
+    with pytest.raises(FileNotFoundError):
+        backup_graph(root, destination)
+
+
+def test_only_the_current_pending_proposal_may_lack_a_document():
+    orphan = {"source_url": "https://example.org/current", "status": "pending"}
+    assert proposal_layout_valid(7, 8, [orphan], orphan["source_url"])
+    assert proposal_layout_valid(7, 7, [], orphan["source_url"])
+    assert not proposal_layout_valid(7, 8, [orphan], "https://example.org/other")
+    assert not proposal_layout_valid(
+        7, 8, [{**orphan, "status": "rejected"}], orphan["source_url"]
+    )
+    assert not proposal_layout_valid(7, 9, [orphan, orphan], orphan["source_url"])
