@@ -34,6 +34,7 @@ async def inspect_runtime(variant: str) -> dict:
         "LIGHTRAG_EMBEDDING_PROVIDER",
         "FAQ_EMBEDDING_PROVIDER",
         "GIGACHAT_EMBEDDING_MODEL",
+        "GIGACHAT_SCOPE",
         "PDF_PARSER_PROVIDER",
         "TELEGRAM_ENABLED",
         "MAX_ENABLED",
@@ -66,6 +67,14 @@ async def inspect_runtime(variant: str) -> dict:
                 text("SELECT inet_server_addr()::text, current_database()")
             )
         ).one()
+        documents = (
+            await conn.execute(
+                text(
+                    "SELECT id, rag_doc_id, source_proposal_id, status, last_indexed_at "
+                    "FROM document ORDER BY id"
+                )
+            )
+        ).all()
     targets = {
         "/app/data",
         "/app/logs",
@@ -93,6 +102,13 @@ async def inspect_runtime(variant: str) -> dict:
         for name in ("memory.max", "memory.current", "memory.swap.max", "cpu.max")
         if (cgroup / name).is_file()
     }
+    graph_status = {}
+    for file in root.glob("lightrag/*/kv_store_doc_status.json"):
+        records = json.loads(file.read_text())
+        for record in records.values():
+            if isinstance(record, dict) and isinstance(record.get("status"), str):
+                status = record["status"]
+                graph_status[status] = graph_status.get(status, 0) + 1
     cache = RedisClient()
     try:
         redis_keys = await cache.client.dbsize()
@@ -114,6 +130,17 @@ async def inspect_runtime(variant: str) -> dict:
         "row_counts": counts,
         "mounts": mounts,
         "data_files": data_files,
+        "graph_document_status_counts": graph_status,
+        "documents": [
+            {
+                "id": row[0],
+                "rag_doc_id": row[1],
+                "source_proposal_id": row[2],
+                "status": row[3],
+                "last_indexed_at": row[4].isoformat() if row[4] else None,
+            }
+            for row in documents
+        ],
         "redis_keys": redis_keys,
         "redis_run_id": redis_run_id,
         "resources": resources,

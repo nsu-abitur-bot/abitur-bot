@@ -1,0 +1,90 @@
+{
+  "measured_at": "2026-11-07",
+  "application_revision": "0ec0f788cf590b364e9e7a65f2f0c53de4d5bf40",
+  "executed_tools_revision": "c8f682db559a1e7654c23a3549badab9ff17c674",
+  "source_chars": 5087,
+  "processed_documents": 1,
+  "attempts": [
+    {
+      "attempt": 1,
+      "result": {
+        "proposal_id": "01a1b547-0f93-7a25-bf39-81f076b77a9e",
+        "approval_http_status": 503,
+        "elapsed_seconds": 89.43,
+        "source_chars": 5087,
+        "source_sha256": "94568796179ed9a81fdf36878fe902f8d734992fbda5fde6c9bf36647d9dacb2",
+        "attempts": 64,
+        "uncertain_failure": false,
+        "planning_reserve_deepseek_cny": 1.074024
+      },
+      "provider_operations": {
+        "gigachat:oauth": 1,
+        "gigachat:embedding": 53,
+        "deepseek:generation": 10
+      },
+      "executed_tools_revision": "d57e4be13b14fd85937df608e1f17f096e7b326d"
+    },
+    {
+      "attempt": 2,
+      "result": {
+        "proposal_id": "01a1b547-0f93-7a25-bf39-81f076b77a9e",
+        "approval_http_status": 200,
+        "elapsed_seconds": 114.147,
+        "source_chars": 5087,
+        "source_sha256": "94568796179ed9a81fdf36878fe902f8d734992fbda5fde6c9bf36647d9dacb2",
+        "attempts": 229,
+        "uncertain_failure": false,
+        "planning_reserve_deepseek_cny": 2.154642,
+        "status": "approved",
+        "document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      "provider_operations": {
+        "gigachat:oauth": 1,
+        "gigachat:embedding": 218,
+        "deepseek:generation": 10
+      },
+      "executed_tools_revision": "c8f682db559a1e7654c23a3549badab9ff17c674"
+    }
+  ],
+  "total_http_attempts": 293,
+  "provider_http_errors": 0,
+  "incomplete_usage_responses": 0,
+  "application_approval_failures": 1,
+  "deepseek": {
+    "prompt_tokens": 95598,
+    "completion_tokens": 25292,
+    "total_tokens": 120890,
+    "prompt_cache_hit_tokens": 81919,
+    "prompt_cache_miss_tokens": 13679,
+    "requests": 20,
+    "request_model": "deepseek-flash",
+    "response_models": [
+      "deepseek-flash"
+    ],
+    "calculated_cost_cny": 0.11648538,
+    "same_usage_peak_cny": 0.23297076,
+    "peak_without_cache_cny": 0.393532,
+    "price_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+    "price_date": "2026-11-07",
+    "tariff_period": "off-peak weekend",
+    "wallet_debit_verified": false
+  },
+  "gigachat": {
+    "model": "EmbeddingsGigaR",
+    "scope": "GIGACHAT_API_PERS",
+    "requests": 271,
+    "input_tokens": 13606,
+    "package_unit_equivalent_rub": 0.190484,
+    "price_source": "https://developers.sber.ru/docs/ru/gigachat/tariffs/individual-tariffs",
+    "note": "Эквивалент по пакету 700 RUB / 50M tokens. Пакет не покупался, фактическое списание и остаток не проверялись."
+  },
+  "gemini_requests": 0,
+  "total_indexing_seconds": 203.577,
+  "timing_note": "Только принятие/индексация через API, без старта контейнеров и импорта приложения.",
+  "evidence_sha256": {
+    "index-attempt-01-result.json": "6b664dd574d54aaff27921b390f7951a2fe688bb848901b0a51bf8eabe332330",
+    "index-attempt-01-usage.jsonl": "e0057217658cb888783c0e1f73a4fb2edc09ec4fac897b15396422c75808da9e",
+    "index-attempt-02-result.json": "ec5c7f328ee72078fa61abe089fac5880975f12019409fbb67f96accdbf8bbd1",
+    "index-attempt-02-usage.jsonl": "be8b7ed5a1beace9b3426eca1ed9f029f47375f747d4151a0ae76cac10394a5a"
+  }
+}
