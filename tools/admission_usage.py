@@ -106,7 +106,12 @@ def local_api_call(client: httpx.AsyncClient, request: httpx.Request) -> bool:
 
 class UsageLedger:
     def __init__(
-        self, path: Path, max_attempts: int = 292, *, batch: bool = False
+        self,
+        path: Path,
+        max_attempts: int = 292,
+        *,
+        batch: bool = False,
+        embedding_byte_limit: int | None = None,
     ) -> None:
         self.path = path
         self.max_attempts = max_attempts
@@ -117,6 +122,13 @@ class UsageLedger:
         self.reserved_embedding_bytes = 0
         self.uncertain_failure = False
         self.batch = batch
+        self.embedding_byte_limit = (
+            embedding_byte_limit
+            if embedding_byte_limit is not None
+            else (10_000_000 if batch else 200_000)
+        )
+        if not 0 <= self.embedding_byte_limit <= 20_000_000:
+            raise ValueError("Embedding byte limit must be between 0 and 20 MB")
 
     def begin(self, request: httpx.Request) -> dict:
         host, endpoint = request.url.host, request.url.path
@@ -187,7 +199,7 @@ class UsageLedger:
                 self.reserved_deepseek_micro_cny += reserve
             if operation == "embedding":
                 size = len(request.content)
-                ceiling = 10_000_000 if self.batch else 200_000
+                ceiling = self.embedding_byte_limit
                 if self.reserved_embedding_bytes + size > ceiling:
                     raise IndexingLimit("Pilot embedding input byte limit reached")
                 self.reserved_embedding_bytes += size

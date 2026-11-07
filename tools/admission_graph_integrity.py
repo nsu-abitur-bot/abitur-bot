@@ -90,7 +90,9 @@ def matrix_valid(record: dict) -> bool:
         return False
 
 
-def graph_integrity(root: Path, sources: list[dict], inputs: Path) -> dict:
+def graph_integrity(
+    root: Path, sources: list[dict], inputs: Path, only_sources: set[str] | None = None
+) -> dict:
     status = json.loads((root / "kv_store_doc_status.json").read_text())
     docs = json.loads((root / "kv_store_full_docs.json").read_text())
     chunks = json.loads((root / "kv_store_text_chunks.json").read_text())
@@ -112,8 +114,10 @@ def graph_integrity(root: Path, sources: list[dict], inputs: Path) -> dict:
     by_url = {source["url"]: source for source in sources}
     completed = []
     for identifier, record in status.items():
-        require(record["status"] == "processed", "Unfinished graph document")
         source = by_url[record["file_path"]]
+        if only_sources is not None and source["id"] not in only_sources:
+            continue
+        require(record["status"] == "processed", "Unfinished graph document")
         require(
             docs[identifier]["content"]
             == (inputs / source["filename"]).read_text().strip(),
@@ -149,7 +153,7 @@ def graph_integrity(root: Path, sources: list[dict], inputs: Path) -> dict:
     require(len(set(completed)) == len(completed), "Duplicate graph sources")
     return {
         "processed_source_ids": completed,
-        "documents": len(status),
+        "documents": len(completed),
         "vector_counts": {name: len(ids) for name, ids in vectors.items()},
         "graph_nodes": len(nodes),
         "graph_edges": len(edges),
