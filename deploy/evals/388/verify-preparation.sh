@@ -14,7 +14,8 @@ for variant in with-kb empty-kb; do
         test -z "$(find "$dir" -mindepth 1 -print -quit)"
     done
 done
-printf '\nBoth storage trees are empty. No runtime is provisioned yet.\n'
+printf '\nStaging storage directories are empty. Actual runtime uses separate Docker volumes.\n'
+printf 'See /home/mihail/abitur-evals/388-reports for runtime evidence.\n'
 find with-kb empty-kb -maxdepth 1 -type d -print
 printf '\nDirectory owner and mode:\n'
 stat -c '%U %a %n' . with-kb empty-kb

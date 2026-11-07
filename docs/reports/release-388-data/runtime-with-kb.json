@@ -1,0 +1,94 @@
+{
+  "variant": "with-kb",
+  "container_hostname": "b84b150ee616",
+  "database_host": "postgres",
+  "database_server": "172.30.88.3/32",
+  "database_name": "eval388",
+  "settings": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_LLM_MODEL": null,
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "FAQ_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "PDF_PARSER_PROVIDER": "openai",
+    "TELEGRAM_ENABLED": "false",
+    "MAX_ENABLED": "false",
+    "LIGHTRAG_STORAGE": "json",
+    "LIGHTRAG_WORKSPACE_BASE": "/app/data/lightrag",
+    "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks"
+  },
+  "settings_revision": 2,
+  "credential_configured": {
+    "DEEPSEEK_API_KEY": true,
+    "GIGACHAT_API_KEY": true
+  },
+  "environment_nonsecret_settings": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-chat",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-chat",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_LLM_MODEL": null,
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "FAQ_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "PDF_PARSER_PROVIDER": null,
+    "TELEGRAM_ENABLED": "false",
+    "MAX_ENABLED": "false",
+    "LIGHTRAG_STORAGE": "json",
+    "LIGHTRAG_WORKSPACE_BASE": "/app/data/lightrag",
+    "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks"
+  },
+  "row_counts": {
+    "document": 0,
+    "content_proposal": 0,
+    "faq_entry": 0,
+    "user": 0,
+    "message": 0,
+    "message_logs": 0,
+    "admins": 1
+  },
+  "mounts": [
+    {
+      "root": "/home/mihail/abitur-evals/388-reports/with-kb",
+      "target": "/reports",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/home/mihail/abitur-evals/388-20261107",
+      "target": "/evaluation",
+      "options": "ro,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_files/_data",
+      "target": "/app/data",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_logs/_data",
+      "target": "/app/logs",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_branding/_data",
+      "target": "/app/branding-media",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-provider-locks/_data",
+      "target": "/app/provider-locks",
+      "options": "rw,relatime"
+    }
+  ],
+  "data_files": [],
+  "redis_keys": 0,
+  "redis_run_id": "ee661645fad21d37bd9d65f1ccce55e178e5f2ba",
+  "resources": {
+    "memory.max": "671088640",
+    "memory.current": "167682048",
+    "memory.swap.max": "268435456",
+    "cpu.max": "75000 100000"
+  }
+}
