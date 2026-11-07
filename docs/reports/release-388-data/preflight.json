@@ -1,0 +1,57 @@
+{
+  "sources": [
+    {
+      "id": "DOC-de8ef06e37fe496b",
+      "url": "https://education.nsu.ru/information-technologies/",
+      "status": 200
+    },
+    {
+      "id": "DOC-2338f0807b9bc328",
+      "url": "https://education.nsu.ru/tipi",
+      "status": 200
+    },
+    {
+      "id": "DOC-3d63df62af354868",
+      "url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+      "error_type": "HTTPStatusError",
+      "status": 403
+    },
+    {
+      "id": "DOC-03ae446000cfbc45",
+      "url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+      "error_type": "HTTPStatusError",
+      "status": 403
+    },
+    {
+      "id": "DOC-770b0c6ebb172dbe",
+      "url": "https://education.nsu.ru/mathematics/",
+      "status": 200
+    },
+    {
+      "id": "DOC-317c53d5b5ae2baf",
+      "url": "https://education.nsu.ru/mechatronics/",
+      "status": 200
+    },
+    {
+      "id": "DOC-be8ca7262223f1f8",
+      "url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+      "error_type": "HTTPStatusError",
+      "status": 403
+    },
+    {
+      "id": "DOC-83001f87d00915c7",
+      "url": "https://www.nsu.ru/n/life/campus/check-in/",
+      "error_type": "HTTPStatusError",
+      "status": 403
+    },
+    {
+      "id": "DOC-6674be71e05b972c",
+      "url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+      "error_type": "HTTPStatusError",
+      "status": 403
+    }
+  ],
+  "generation_calls": 0,
+  "embedding_calls": 0,
+  "deepseek_flash_listed": true
+}
