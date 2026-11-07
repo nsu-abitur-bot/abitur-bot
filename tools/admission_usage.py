@@ -82,7 +82,13 @@ def local_api_call(client: httpx.AsyncClient, request: httpx.Request) -> bool:
     """The only unmetered calls are these in-process authenticated API routes."""
     return (
         isinstance(client._transport, httpx.ASGITransport)
-        and request.method == "POST"
+        and (
+            request.method == "POST"
+            or (
+                request.method == "GET"
+                and request.url.path == "/api/v1/content-proposals"
+            )
+        )
         and request.url.scheme == "http"
         and request.url.host == "eval388"
         and request.url.port in (None, 80)
@@ -99,11 +105,12 @@ def local_api_call(client: httpx.AsyncClient, request: httpx.Request) -> bool:
 
 
 class UsageLedger:
-    def __init__(self, path: Path, max_attempts: int = 64) -> None:
+    def __init__(self, path: Path, max_attempts: int = 292) -> None:
         self.path = path
         self.max_attempts = max_attempts
         self.lock = threading.Lock()
         self.sequence = 0
+        self.operation_counts: dict[str, int] = {}
         self.reserved_deepseek_micro_cny = 0
         self.reserved_embedding_bytes = 0
         self.uncertain_failure = False
@@ -156,6 +163,9 @@ class UsageLedger:
                 raise IndexingLimit("Inspect the failed attempt before spending again")
             if self.sequence >= self.max_attempts:
                 raise IndexingLimit("Pilot HTTP attempt limit reached")
+            limits = {"generation": 32, "embedding": 256, "oauth": 4}
+            if self.operation_counts.get(operation, 0) >= limits[operation]:
+                raise IndexingLimit("Pilot operation attempt limit reached")
             if provider == "deepseek":
                 maximum = integer(payload.get("max_tokens"))
                 if maximum is None or maximum > 8192:
@@ -172,6 +182,7 @@ class UsageLedger:
                     raise IndexingLimit("Pilot embedding input byte limit reached")
                 self.reserved_embedding_bytes += size
             self.sequence += 1
+            self.operation_counts[operation] = self.operation_counts.get(operation, 0) + 1
             return {
                 "attempt": self.sequence,
                 "provider": provider,

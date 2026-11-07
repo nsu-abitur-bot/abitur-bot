@@ -4,9 +4,19 @@
 set +x
 set -eu
 umask 077
-if [ "$#" -ne 1 ] || [ "$1" != --execute ]; then
+if [ "$#" -ne 1 ] && [ "$#" -ne 3 ]; then
+    printf '%s\n' 'Expected --execute and optional --resume-proposal UUID.' >&2
+    exit 2
+fi
+if [ "$1" != --execute ]; then
     printf '%s\n' 'Explicit --execute is required. No services were started.' >&2
     exit 2
+fi
+if [ "$#" -eq 3 ]; then
+    if [ "$2" != --resume-proposal ]; then exit 2; fi
+    shift
+else
+    set --
 fi
 base=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 if [ "$base" != /home/mihail/abitur-evals/388-20261107 ]; then
@@ -51,4 +61,4 @@ started=1
 sudo -n /usr/local/sbin/abitur-eval388 with-kb start </dev/null
 timeout --signal=TERM --kill-after=30s 1000s \
     sudo -n /usr/local/sbin/abitur-eval388 with-kb run \
-    uv run --no-sync python /evaluation/admission_index_one.py
+    uv run --no-sync python /evaluation/admission_index_one.py "$@"

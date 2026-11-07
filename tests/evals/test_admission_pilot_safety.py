@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from tools.admission_index_one import claim_reports
+from tools.admission_index_one import claim_reports, pending_resume
 
 
 def test_import_does_not_disable_process_logging():
@@ -49,6 +49,16 @@ def test_run_marker_survives_and_prevents_retry(tmp_path):
     with pytest.raises(RuntimeError):
         claim_reports(report, usage)
     assert json.loads(report.read_text()) == {"status": "started"}
+
+
+def test_resume_rejects_a_changed_or_completed_source():
+    item = {"text": "pinned source", "source_hash": "a" * 64, "graph_id": "abitur_kb"}
+    record = dict(item, id="same-proposal", status="pending")
+    assert pending_resume([record], item, "same-proposal") == "same-proposal"
+    with pytest.raises(RuntimeError):
+        pending_resume([dict(record, text="other source")], item, "same-proposal")
+    with pytest.raises(RuntimeError):
+        pending_resume([dict(record, status="approved")], item, "same-proposal")
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX lifecycle verified in Linux CI")

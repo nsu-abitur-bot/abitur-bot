@@ -230,3 +230,30 @@ def test_incomplete_embedding_batch_cannot_appear_fully_accounted(tmp_path):
             json={"model": "EmbeddingsGigaR", "input": ["first", "second"]},
         )
     assert ledger.uncertain_failure
+
+
+def test_embedding_count_does_not_exhaust_generation_budget(tmp_path):
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    for _ in range(65):
+        ledger.begin(
+            httpx.Request(
+                "POST",
+                "https://api.giga.chat/v1/embeddings",
+                json={"model": "EmbeddingsGigaR", "input": ["text"]},
+            )
+        )
+    assert ledger.operation_counts["embedding"] == 65
+    assert ledger.operation_counts.get("generation", 0) == 0
+
+
+def test_generation_remains_bounded_separately(tmp_path):
+    ledger = UsageLedger(tmp_path / "usage.jsonl")
+    request = httpx.Request(
+        "POST",
+        "https://api.deepseek.com/chat/completions",
+        json={"model": "deepseek-flash", "max_tokens": 128},
+    )
+    for _ in range(32):
+        ledger.begin(request)
+    with pytest.raises(IndexingLimit):
+        ledger.begin(request)
