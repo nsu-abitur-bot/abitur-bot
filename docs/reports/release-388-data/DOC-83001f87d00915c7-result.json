@@ -1,0 +1,35 @@
+{
+  "status": "completed",
+  "source_id": "DOC-83001f87d00915c7",
+  "document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+  "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+  "proposal_id": "01a1b667-f47f-76fa-b18f-f735e309af67",
+  "mode": "link_persisted_graph",
+  "integrity": {
+    "processed_source_ids": [
+      "DOC-3d63df62af354868",
+      "DOC-03ae446000cfbc45",
+      "DOC-2338f0807b9bc328",
+      "DOC-317c53d5b5ae2baf",
+      "DOC-6674be71e05b972c",
+      "DOC-770b0c6ebb172dbe",
+      "DOC-83001f87d00915c7"
+    ],
+    "documents": 7,
+    "vector_counts": {
+      "chunks": 80,
+      "entities": 1399,
+      "relationships": 1542
+    },
+    "graph_nodes": 1399,
+    "graph_edges": 1542
+  },
+  "admin_approval_http_status": 200,
+  "prior_attempts": 4229,
+  "attempts": 4229,
+  "uncertain_failure": false,
+  "embedding_input_bytes": 10000000,
+  "peak_no_cache_reserve_cny": 12.699338,
+  "elapsed_seconds": 5.202,
+  "peak_process_rss_kib": 233560
+}

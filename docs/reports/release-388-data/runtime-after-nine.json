@@ -1,0 +1,397 @@
+{
+  "variant": "with-kb",
+  "container_hostname": "354d5b0b4d66",
+  "database_host": "postgres",
+  "database_server": "172.30.88.3/32",
+  "database_name": "eval388",
+  "settings": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_LLM_MODEL": null,
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "FAQ_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS",
+    "PDF_PARSER_PROVIDER": "openai",
+    "TELEGRAM_ENABLED": "false",
+    "MAX_ENABLED": "false",
+    "LIGHTRAG_STORAGE": "json",
+    "LIGHTRAG_WORKSPACE_BASE": "/app/data/lightrag",
+    "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks"
+  },
+  "settings_revision": 2,
+  "credential_configured": {
+    "DEEPSEEK_API_KEY": true,
+    "GIGACHAT_API_KEY": true
+  },
+  "environment_nonsecret_settings": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-chat",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-chat",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_LLM_MODEL": null,
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "FAQ_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS",
+    "PDF_PARSER_PROVIDER": null,
+    "TELEGRAM_ENABLED": "false",
+    "MAX_ENABLED": "false",
+    "LIGHTRAG_STORAGE": "json",
+    "LIGHTRAG_WORKSPACE_BASE": "/app/data/lightrag",
+    "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks"
+  },
+  "row_counts": {
+    "document": 9,
+    "content_proposal": 9,
+    "faq_entry": 0,
+    "user": 0,
+    "message": 0,
+    "message_logs": 0,
+    "admins": 1
+  },
+  "mounts": [
+    {
+      "root": "/home/mihail/abitur-evals/388-20261107",
+      "target": "/evaluation",
+      "options": "ro,relatime"
+    },
+    {
+      "root": "/home/mihail/abitur-evals/388-reports/with-kb",
+      "target": "/reports",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_files/_data",
+      "target": "/app/data",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_logs/_data",
+      "target": "/app/logs",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_branding/_data",
+      "target": "/app/branding-media",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-provider-locks/_data",
+      "target": "/app/provider-locks",
+      "options": "rw,relatime"
+    }
+  ],
+  "data_files": [
+    {
+      "path": "recovery388-graph-replay-01/vdb_chunks.json",
+      "bytes": 1514927
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_doc_status.json",
+      "bytes": 9159
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_full_entities.json",
+      "bytes": 56886
+    },
+    {
+      "path": "recovery388-graph-replay-01/vdb_entities.json",
+      "bytes": 24376995
+    },
+    {
+      "path": "recovery388-graph-replay-01/vdb_relationships.json",
+      "bytes": 16336408
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_text_chunks.json",
+      "bytes": 206247
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_relation_chunks.json",
+      "bytes": 399559
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_full_docs.json",
+      "bytes": 151416
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_llm_response_cache.json",
+      "bytes": 1504604
+    },
+    {
+      "path": "recovery388-graph-replay-01/graph_chunk_entity_relation.graphml",
+      "bytes": 902904
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_full_relations.json",
+      "bytes": 133554
+    },
+    {
+      "path": "recovery388-graph-replay-01/kv_store_entity_chunks.json",
+      "bytes": 314762
+    },
+    {
+      "path": "recovery388-vectors-01/vdb_chunks.json",
+      "bytes": 816540
+    },
+    {
+      "path": "recovery388-vectors-01/vdb_entities.json",
+      "bytes": 10764288
+    },
+    {
+      "path": "recovery388-vectors-01/vdb_relationships.json",
+      "bytes": 16336408
+    },
+    {
+      "path": "lightrag/abitur_kb/vdb_chunks.json",
+      "bytes": 2687464
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_doc_status.json",
+      "bytes": 14695
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_full_entities.json",
+      "bytes": 100442
+    },
+    {
+      "path": "lightrag/abitur_kb/vdb_entities.json",
+      "bytes": 41789591
+    },
+    {
+      "path": "lightrag/abitur_kb/vdb_relationships.json",
+      "bytes": 46805260
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_text_chunks.json",
+      "bytes": 369199
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_relation_chunks.json",
+      "bytes": 712266
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_full_docs.json",
+      "bytes": 271648
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_llm_response_cache.json",
+      "bytes": 2272078
+    },
+    {
+      "path": "lightrag/abitur_kb/graph_chunk_entity_relation.graphml",
+      "bytes": 2504706
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_full_relations.json",
+      "bytes": 245210
+    },
+    {
+      "path": "lightrag/abitur_kb/llm_cache_clear.marker",
+      "bytes": 18
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_entity_chunks.json",
+      "bytes": 532232
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_doc_status.json",
+      "bytes": 10605
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_full_entities.json",
+      "bytes": 63878
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_text_chunks.json",
+      "bytes": 228183
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_relation_chunks.json",
+      "bytes": 451958
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_full_docs.json",
+      "bytes": 166888
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_full_relations.json",
+      "bytes": 157347
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8-attempt-01/kv_store_entity_chunks.json",
+      "bytes": 337238
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/vdb_chunks.json",
+      "bytes": 1723963
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_doc_status.json",
+      "bytes": 10605
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_full_entities.json",
+      "bytes": 63878
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/vdb_entities.json",
+      "bytes": 27202999
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/vdb_relationships.json",
+      "bytes": 30014160
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_text_chunks.json",
+      "bytes": 228183
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_relation_chunks.json",
+      "bytes": 451958
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_full_docs.json",
+      "bytes": 166888
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/graph_chunk_entity_relation.graphml",
+      "bytes": 1594866
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_full_relations.json",
+      "bytes": 157347
+    },
+    {
+      "path": "recovery388-light/DOC-be8ca7262223f1f8/kv_store_entity_chunks.json",
+      "bytes": 337238
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/vdb_chunks.json",
+      "bytes": 2073469
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_doc_status.json",
+      "bytes": 12361
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_full_entities.json",
+      "bytes": 75691
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/vdb_entities.json",
+      "bytes": 31692056
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/vdb_relationships.json",
+      "bytes": 35357505
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_text_chunks.json",
+      "bytes": 278698
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_relation_chunks.json",
+      "bytes": 533888
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_full_docs.json",
+      "bytes": 204168
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_llm_response_cache.json",
+      "bytes": 831295
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/graph_chunk_entity_relation.graphml",
+      "bytes": 1898892
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_full_relations.json",
+      "bytes": 187384
+    },
+    {
+      "path": "recovery388-light/DOC-de8ef06e37fe496b/kv_store_entity_chunks.json",
+      "bytes": 398143
+    }
+  ],
+  "graph_document_status_counts": {
+    "processed": 9
+  },
+  "documents": [
+    {
+      "id": "01a1b547-1029-7c3e-9577-554857174189",
+      "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+      "source_proposal_id": "01a1b547-0f93-7a25-bf39-81f076b77a9e",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T09:24:02.205119"
+    },
+    {
+      "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+      "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+      "source_proposal_id": "01a1b623-296c-70d8-98b6-bb4415f20491",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T13:15:30.079835"
+    },
+    {
+      "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+      "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+      "source_proposal_id": "01a1b626-5e72-710c-bb8d-ac0b01d66af1",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T13:18:30.589152"
+    },
+    {
+      "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+      "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+      "source_proposal_id": "01a1b629-1eee-772b-b5e6-f2d02ca4efd7",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T13:22:17.768391"
+    },
+    {
+      "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+      "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+      "source_proposal_id": "01a1b62c-9655-71b6-868e-db5f31a3f9bf",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T13:24:45.022448"
+    },
+    {
+      "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+      "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+      "source_proposal_id": "01a1b62e-d58f-71db-b2a3-ba3fd47b12e2",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T14:24:38.358039"
+    },
+    {
+      "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+      "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+      "source_proposal_id": "01a1b667-f47f-76fa-b18f-f735e309af67",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T15:00:30.770944"
+    },
+    {
+      "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+      "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+      "source_proposal_id": "01a1b687-c725-7089-b2d9-ca0de12004aa",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T15:18:23.481171"
+    },
+    {
+      "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+      "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+      "source_proposal_id": "01a1b698-40b6-7f90-bd2b-4263718a47a3",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T15:29:57.749857"
+    }
+  ],
+  "redis_keys": 0,
+  "redis_run_id": "af3873f6b8ba11f7d65b631c229622ef09573e3f",
+  "resources": {
+    "memory.max": "671088640",
+    "memory.current": "178438144",
+    "memory.swap.max": "268435456",
+    "cpu.max": "75000 100000"
+  }
+}

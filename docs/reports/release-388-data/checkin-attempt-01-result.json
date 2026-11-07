@@ -1,0 +1,13 @@
+{
+  "status": "failed",
+  "source_id": "DOC-be8ca7262223f1f8",
+  "error_type": "FileNotFoundError",
+  "check": null,
+  "prior_attempts": 4229,
+  "attempts": 4229,
+  "uncertain_failure": false,
+  "embedding_input_bytes": 10000000,
+  "peak_no_cache_reserve_cny": 12.699338,
+  "elapsed_seconds": 2.827,
+  "peak_process_rss_kib": 210164
+}
