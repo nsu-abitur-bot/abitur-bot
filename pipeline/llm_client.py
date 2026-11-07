@@ -491,7 +491,8 @@ async def _retrieve_context(
         if use_crag:
             logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
             retrieval = await query_graph_with_crag(
-                rag_query,
+                expanded_message,
+                search_query=rag_query,
                 conversation_history=history_text or None,
             )
         else:

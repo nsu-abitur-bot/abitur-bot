@@ -41,6 +41,7 @@ async def query_graph_with_crag(
     query: str,
     mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
     conversation_history: str | None = None,
+    search_query: str | None = None,
 ) -> RetrievalResult:
     """CRAG-вариант ретрива: фильтрует чанки до генерации финального ответа."""
     graph_memory = get_graph_memory()
@@ -49,4 +50,5 @@ async def query_graph_with_crag(
         query,
         mode=mode,
         conversation_history=conversation_history,
+        search_query=search_query,
     )

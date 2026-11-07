@@ -71,9 +71,7 @@ async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch
 
     assert searches == [f"{history_text}\n\nа на ММФ?"]
     assert "математика и компьютерные науки" in retrieval.context.lower()
-    assert any(
-        "https://mmf.nsu.ru" in s.get("url", "") for s in retrieval.sources
-    )
+    assert any("https://mmf.nsu.ru" in s.get("url", "") for s in retrieval.sources)
 
 
 class _FakeRag:
@@ -311,3 +309,43 @@ async def test_source_reranker_preserves_ranking_filtering_and_limit(monkeypatch
     assert await GraphMemory()._rerank_sources_with_llm(
         "question", "previous question", candidates, 2
     ) == [{"url": s["url"], "title": s["title"]} for s in [candidates[2], candidates[1]]]
+
+
+@pytest.mark.asyncio
+async def test_crag_separates_search_instructions_from_filter_question(monkeypatch):
+    from pipeline.prompts import LIGHTRAG_LEVEL_HINT
+    from rag.crag import CragConfig, FacultyHint
+
+    memory = GraphMemory()
+    question = "Какие документы нужны?"
+    search_query = f"{question}\n\n{LIGHTRAG_LEVEL_HINT}"
+    searches = []
+    filtered = []
+
+    @asynccontextmanager
+    async def use_graph(graph_id):
+        yield object()
+
+    async def retrieve(rag, query, mode):
+        searches.append(query)
+        return []
+
+    async def config():
+        return CragConfig(enabled=True)
+
+    async def crag(question, chunks, **kwargs):
+        filtered.append((question, kwargs.get("conversation_history")))
+        return [], FacultyHint(faculty=None, level="master")
+
+    monkeypatch.setattr(memory, "_use_graph", use_graph)
+    monkeypatch.setattr(memory, "_retrieve_raw_chunks", retrieve)
+    monkeypatch.setattr("rag.graph_memory.load_crag_config", config)
+    monkeypatch.setattr("rag.graph_memory.run_crag", crag)
+    await memory.query_with_crag(
+        "test",
+        question,
+        search_query=search_query,
+        conversation_history="user: магистратура",
+    )
+    assert searches == [f"user: магистратура\n\n{search_query}"]
+    assert filtered == [(question, "user: магистратура")]

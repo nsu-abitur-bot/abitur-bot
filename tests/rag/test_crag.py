@@ -108,7 +108,7 @@ async def test_detect_faculty_hint(seeded):
     hint = await detect_faculty_hint("проходные баллы на ФИТ")
     assert hint.faculty is not None
     assert hint.faculty.name == "Факультет информационных технологий"
-    assert hint.level is None
+    assert hint.level == "undergraduate"
 
     hint_master = await detect_faculty_hint("магистратура на ФИТ")
     assert hint_master.level == "master"
@@ -648,3 +648,80 @@ def test_scrub_drops_foreign_specialitet_keeps_bachelor():
     assert result is not None
     assert "Программная инженерия — бакалавриат." in result.content
     assert "Лечебное дело" not in result.content
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("question", "history", "expected"),
+    [
+        ("Какие документы нужны?", None, "undergraduate"),
+        ("Какие документы нужны?", "user: магистратура", "master"),
+        ("Бакалавриат: какие документы?", "user: магистратура", "bachelor"),
+        ("Магистратура: какие документы?", None, "master"),
+        ("Какие документы нужны для СПО?", None, "spo"),
+    ],
+)
+async def test_level_defaults_after_user_question_and_history(
+    seeded, question, history, expected
+):
+    from rag.crag import detect_faculty_hint
+
+    hint = await detect_faculty_hint(question, conversation_history=history)
+    assert hint.level == expected
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("question", "expected_names"),
+    [
+        ("Сколько лет учиться на лечебном деле?", {"бакалавриат", "специалитет"}),
+        ("Какие программы бакалавриата есть?", {"бакалавриат"}),
+        ("Какие программы специалитета есть?", {"специалитет"}),
+        ("Какие программы магистратуры есть?", {"магистратура"}),
+    ],
+)
+async def test_default_keeps_specialist_without_broadening_explicit_level(
+    seeded, question, expected_names
+):
+    from rag.crag import (
+        CragChunk,
+        _build_grading_prompt,
+        _load_scrub_context,
+        _scrub_chunk,
+        detect_faculty_hint,
+    )
+
+    async with seeded() as session:
+        await FacultyService(session).upsert_from_seed(
+            [
+                {
+                    "name": "Тестовый факультет",
+                    "programs": [
+                        {"name": "Лечебное дело", "level": "specialist"},
+                        {"name": "Медицинская информатика", "level": "master"},
+                    ],
+                }
+            ]
+        )
+    hint = await detect_faculty_hint(question)
+    scrub_context = await _load_scrub_context(hint)
+    assert scrub_context is not None
+    own, foreign = scrub_context
+    chunks = [
+        ("бакалавриат", "Программная инженерия — бакалавриат."),
+        ("специалитет", "Специалитет: программа «Лечебное дело», срок обучения — 6 лет."),
+        ("магистратура", "Медицинская информатика — магистратура."),
+        ("спо", "Сестринское дело — СПО."),
+    ]
+    kept = {
+        level
+        for level, text in chunks
+        if _scrub_chunk(CragChunk(0, text, None, None), own, foreign, hint.level)
+        is not None
+    }
+    assert kept == expected_names
+    if expected_names == {"бакалавриат", "специалитет"}:
+        prompt, _ = _build_grading_prompt(
+            question, hint, CragChunk(0, chunks[1][1], None, None)
+        )
+        assert "бакалавриат или специалитет" in prompt
