@@ -57,7 +57,9 @@ async def test_rag_does_not_start_before_faq_matcher_finishes(monkeypatch):
             faq_done = True
             return None
 
-    async def fake_query_graph_with_sources(query: str, conversation_history=None):
+    async def fake_query_graph_with_sources(
+        query: str, conversation_history=None, search_query=None
+    ):
         assert faq_done
         return RetrievalResult(context="Контекст из RAG")
 
@@ -87,7 +89,9 @@ async def test_faq_hit_returns_without_rag(monkeypatch):
         async def match_async(self, user_question: str) -> str | None:
             return "Ответ из FAQ"
 
-    async def fake_query_graph_with_sources(query: str, conversation_history=None):
+    async def fake_query_graph_with_sources(
+        query: str, conversation_history=None, search_query=None
+    ):
         nonlocal rag_started
         rag_started = True
         return RetrievalResult(context="Контекст из RAG")
@@ -133,7 +137,7 @@ def _patch_pipeline(monkeypatch, redis, provider) -> None:
     async def get_redis():
         return redis
 
-    async def fake_query(query: str, conversation_history=None):
+    async def fake_query(query: str, conversation_history=None, search_query=None):
         return RetrievalResult(context="Контекст из RAG")
 
     monkeypatch.setattr(llm_client, "get_redis_client", get_redis)

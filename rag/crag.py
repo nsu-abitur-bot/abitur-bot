@@ -230,6 +230,9 @@ async def detect_faculty_hint(
         if level is None:
             level = detect_level(conversation_history)
 
+    if level is None:
+        level = "bachelor"
+
     try:
         async with AsyncSessionLocal() as session:
             faculties = await FacultyService(session).get_all_faculties(only_active=True)
