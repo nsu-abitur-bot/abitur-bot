@@ -156,6 +156,9 @@ async def recover(account: dict) -> dict:
         "vector_repair_usage_sha256": hashlib.sha256(
             Path("/reports/vector-repair-01-usage.jsonl").read_bytes()
         ).hexdigest(),
+        "graph_replay_usage_sha256": hashlib.sha256(
+            Path("/reports/graph-replay-01-usage.jsonl").read_bytes()
+        ).hexdigest(),
         "interruption_tail_uncertain": True,
         "note": (
             "Processed text, URL, chunks and vectors matched. SQL metadata was "

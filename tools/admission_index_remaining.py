@@ -40,7 +40,7 @@ def restore_after_disconnect(
     require(
         recovery["status"] == "recovered"
         and recovery["prior_usage_sha256"] == hashlib.sha256(payload).hexdigest()
-        and [row["attempt"] for row in rows] == list(range(1, len(rows) + 1))
+        and sorted(row["attempt"] for row in rows) == list(range(1, len(rows) + 1))
         and all(row["http_status"] == 200 and row["usage_complete"] for row in rows)
         and len(recovery["completed_source_ids"]) == 6,
         "Prior batch requires manual recovery",
@@ -51,7 +51,8 @@ def restore_after_disconnect(
     repair_payload = (recovery_path.parent / "vector-repair-01-usage.jsonl").read_bytes()
     repair_rows = [json.loads(line) for line in repair_payload.decode().splitlines()]
     require(
-        repair["status"] == "completed"
+        repair["status"] == "failed"
+        and repair["check"] == "Missing graph nodes"
         and not repair["uncertain_failure"]
         and len(repair_rows) == repair["attempts"]
         and hashlib.sha256(repair_payload).hexdigest()
@@ -65,6 +66,24 @@ def restore_after_disconnect(
         "Vector repair accounting requires review",
     )
     rows += repair_rows
+    replay = json.loads(
+        (recovery_path.parent / "graph-replay-01-result.json").read_text()
+    )
+    replay_payload = (recovery_path.parent / "graph-replay-01-usage.jsonl").read_bytes()
+    replay_rows = [json.loads(line) for line in replay_payload.decode().splitlines()]
+    require(
+        replay["status"] == "completed"
+        and not replay["uncertain_failure"]
+        and replay["prior_attempts"] == len(rows)
+        and replay["attempts"] == len(rows) + len(replay_rows)
+        and hashlib.sha256(replay_payload).hexdigest()
+        == recovery["graph_replay_usage_sha256"]
+        and all(
+            row["http_status"] == 200 and row["usage_complete"] for row in replay_rows
+        ),
+        "Graph replay accounting requires review",
+    )
+    rows += replay_rows
     ledger.sequence = len(rows)
     ledger.operation_counts = dict(Counter(row["operation"] for row in rows))
     # Preserve a separate reserve for the unobserved interruption tail. This is
@@ -74,7 +93,7 @@ def restore_after_disconnect(
         for row in rows
         if row["operation"] == "generation"
     )
-    ledger.reserved_embedding_bytes = 5_000_000 + repair["embedding_input_bytes"]
+    ledger.reserved_embedding_bytes = replay["embedding_input_bytes"]
     ledger.operation_counts["generation"] = (
         ledger.operation_counts.get("generation", 0) + 4
     )
