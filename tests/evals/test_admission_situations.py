@@ -52,11 +52,14 @@ def test_general_payment_schedule_is_not_mislabeled_calendar_year():
 
 
 @pytest.mark.asyncio
-async def test_live_adapter_passes_context_before_question(monkeypatch):
+@pytest.mark.parametrize(
+    "case_id", ["nsu-post-arrival-01", "nsu-paid-steps-01", "nsu-paid-steps-03"]
+)
+async def test_live_adapter_passes_context_before_question(monkeypatch, case_id):
     from evals import product
 
     scenarios, _ = data()
-    case = scenarios["nsu-post-arrival-01"]
+    case = scenarios[case_id]
     events = []
 
     async def add_message(session_id, entry):
