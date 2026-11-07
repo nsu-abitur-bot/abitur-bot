@@ -205,3 +205,30 @@ class TestExpandAbbrevs:
         monkeypatch.setattr(llm_client, "get_abbrev_expander", boom)
 
         assert _expand_abbrevs("Что с ФИТ?", "session-1") == "Что с ФИТ?"
+
+
+@pytest.mark.asyncio
+async def test_retrieval_keeps_service_hints_out_of_crag_question(monkeypatch):
+    from types import SimpleNamespace
+
+    from rag.trace import RetrievalResult
+
+    captured = {}
+
+    async def config():
+        return SimpleNamespace(enabled=True)
+
+    async def retrieve(question, **kwargs):
+        captured.update(question=question, **kwargs)
+        return RetrievalResult(context="", sources=[], trace=[])
+
+    monkeypatch.setattr(llm_client, "load_crag_config", config)
+    monkeypatch.setattr(llm_client, "query_graph_with_crag", retrieve)
+    monkeypatch.setattr(llm_client._Ctx, "log", lambda *args, **kwargs: None)
+    question = "Какие документы нужны для поступления?"
+    await llm_client._retrieve_context(
+        question, "user: интересует магистратура", llm_client._Ctx("test", 1)
+    )
+    assert captured["question"] == question
+    assert llm_client.LIGHTRAG_LEVEL_HINT in captured["search_query"]
+    assert captured["conversation_history"] == "user: интересует магистратура"

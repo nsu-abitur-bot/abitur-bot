@@ -856,6 +856,7 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
         max_sources: int = 3,
         conversation_history: str | None = None,
+        search_query: str | None = None,
     ) -> RetrievalResult:
         """CRAG-вариант ретрива: фильтрует чанки до генерации ответа.
 
@@ -867,7 +868,10 @@ class GraphMemory:
         """
         config = await load_crag_config()
         history = conversation_history.strip() if conversation_history else ""
-        search_question = f"{history}\n\n{question}" if history else question
+        retrieval_query = search_query if search_query is not None else question
+        search_question = (
+            f"{history}\n\n{retrieval_query}" if history else retrieval_query
+        )
         try:
             with capture_lightrag_trace() as trace:
                 async with self._use_graph(graph_id) as rag:

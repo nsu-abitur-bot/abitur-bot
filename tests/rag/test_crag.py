@@ -108,7 +108,7 @@ async def test_detect_faculty_hint(seeded):
     hint = await detect_faculty_hint("проходные баллы на ФИТ")
     assert hint.faculty is not None
     assert hint.faculty.name == "Факультет информационных технологий"
-    assert hint.level is None
+    assert hint.level == "bachelor"
 
     hint_master = await detect_faculty_hint("магистратура на ФИТ")
     assert hint_master.level == "master"
@@ -648,3 +648,23 @@ def test_scrub_drops_foreign_specialitet_keeps_bachelor():
     assert result is not None
     assert "Программная инженерия — бакалавриат." in result.content
     assert "Лечебное дело" not in result.content
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("question", "history", "expected"),
+    [
+        ("Какие документы нужны?", None, "bachelor"),
+        ("Какие документы нужны?", "user: магистратура", "master"),
+        ("Бакалавриат: какие документы?", "user: магистратура", "bachelor"),
+        ("Магистратура: какие документы?", None, "master"),
+        ("Какие документы нужны для СПО?", None, "spo"),
+    ],
+)
+async def test_level_defaults_after_user_question_and_history(
+    seeded, question, history, expected
+):
+    from rag.crag import detect_faculty_hint
+
+    hint = await detect_faculty_hint(question, conversation_history=history)
+    assert hint.level == expected
