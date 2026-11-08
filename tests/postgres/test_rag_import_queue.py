@@ -97,3 +97,46 @@ async def test_queued_upload_appears_in_materials_before_worker(session):
         ("Институт", "queued")
     ]
     assert materials.documents[0].id == response["job_id"]
+
+
+@pytest.mark.asyncio
+async def test_failed_import_is_marked_and_does_not_block_next_job(
+    session, test_engine, monkeypatch
+):
+    monkeypatch.setattr(
+        rag_import_queue,
+        "AsyncSessionLocal",
+        async_sessionmaker(test_engine, expire_on_commit=False),
+    )
+
+    async def index_or_fail(
+        *, title, document, document_service, new_rag_doc_id, **kwargs
+    ):
+        if title == "Падает":
+            raise RuntimeError("indexing failed")
+        return await document_service.mark_indexed(
+            document.id,
+            content_hash=kwargs["content_hash"],
+            content_length=len(kwargs["text"]),
+            rag_doc_id=new_rag_doc_id,
+            source_proposal_id=kwargs["source_proposal_id"],
+        )
+
+    monkeypatch.setattr(rag_import_queue, "index_document", index_or_fail)
+
+    failed = await confirm_rag_upload(
+        ConfirmUploadRequest(title="Падает", text="Описание", url="", documents=[]),
+        session,
+    )
+    succeeded = await confirm_rag_upload(
+        ConfirmUploadRequest(title="Проходит", text="Текст", url="", documents=[]),
+        session,
+    )
+    await session.commit()
+
+    assert await rag_import_queue.process_next_import()
+    assert await rag_import_queue.process_next_import()
+
+    session.expire_all()
+    assert (await get_rag_import(failed["job_id"], session))["status"] == "index_failed"
+    assert (await get_rag_import(succeeded["job_id"], session))["status"] == "indexed"

@@ -95,40 +95,50 @@ async def process_next_import() -> bool:
             except Exception:
                 logger.warning("Could not fetch source hash for RAG import %s", job.id)
 
-        async with AsyncSessionLocal() as session:
-            service = DocumentService(session)
-            document = await service.get_by_source_proposal_id(job.id)
-            if document is None:
-                document = await service.create_or_update_for_source(
-                    graph_id=job.graph_id,
-                    title=job.title,
-                    source_url=job.source_url,
-                    rag_doc_id=job.id,
-                    source_proposal_id=job.id,
-                )
-            # Long LightRAG calls should only hold the worker lock connection.
-            await session.commit()
-            if document.source_proposal_id == job.id and document.last_indexed_at:
-                indexed = document
-            else:
-                indexed = await index_document(
-                    document=document,
-                    title=job.title,
-                    source_url=job.source_url,
-                    graph_id=job.graph_id,
-                    text=job.text,
-                    content_hash=content_hash,
-                    document_service=service,
-                    source_proposal_id=job.id,
-                    new_rag_doc_id=job.id,
-                )
+        status = "index_failed"
+        document_id: str | None = None
+        try:
+            async with AsyncSessionLocal() as session:
+                service = DocumentService(session)
+                document = await service.get_by_source_proposal_id(job.id)
+                if document is None:
+                    document = await service.create_or_update_for_source(
+                        graph_id=job.graph_id,
+                        title=job.title,
+                        source_url=job.source_url,
+                        rag_doc_id=job.id,
+                        source_proposal_id=job.id,
+                    )
+                document_id = document.id
+                # Long LightRAG calls should only hold the worker lock connection.
+                await session.commit()
+                if document.source_proposal_id == job.id and document.last_indexed_at:
+                    indexed = document
+                else:
+                    indexed = await index_document(
+                        document=document,
+                        title=job.title,
+                        source_url=job.source_url,
+                        graph_id=job.graph_id,
+                        text=job.text,
+                        content_hash=content_hash,
+                        document_service=service,
+                        source_proposal_id=job.id,
+                        new_rag_doc_id=job.id,
+                    )
 
-        job.status = (
-            ("approved" if job.reviewer_id else "indexed")
-            if indexed is not None
-            else "index_failed"
-        )
-        job.document_id = indexed.id if indexed is not None else document.id
+            if indexed is not None:
+                status = "approved" if job.reviewer_id else "indexed"
+                document_id = indexed.id
+        except Exception:
+            logger.exception("RAG import queue import %s failed", job.id)
+
+        async with AsyncSessionLocal() as state_session, state_session.begin():
+            await state_session.execute(
+                update(ContentProposal)
+                .where(ContentProposal.id == job.id)
+                .values(status=status, document_id=document_id)
+            )
         return True
 
 
