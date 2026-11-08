@@ -1,0 +1,11 @@
+{
+  "services": {
+    "api": {
+      "read_only": true,
+      "tmpfs": ["/tmp:rw,noexec,nosuid,size=32m"],
+      "security_opt": ["no-new-privileges:true"],
+      "healthcheck": {"disable": true},
+      "restart": "no"
+    }
+  }
+}
