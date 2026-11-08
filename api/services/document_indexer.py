@@ -85,6 +85,7 @@ async def index_document(
     document_service: Optional[DocumentService] = None,
     wait_timeout: Optional[float] = None,
     source_proposal_id: Optional[str] = None,
+    new_rag_doc_id: str | None = None,
 ) -> Optional[Document]:
     """Индексирует документ в RAG с безопасной заменой версии (add → switch → delete).
 
@@ -116,6 +117,7 @@ async def index_document(
                     session=auto_session,
                     wait_timeout=wait_timeout,
                     source_proposal_id=source_proposal_id,
+                    new_rag_doc_id=new_rag_doc_id,
                 )
 
     resolved_title = (
@@ -139,17 +141,25 @@ async def index_document(
         )
 
     old_rag_doc_id = document.rag_doc_id
-    new_rag_doc_id = str(uuid7())
+    known_id = new_rag_doc_id is not None
+    new_rag_doc_id = new_rag_doc_id or str(uuid7())
     resolved_file_path = file_path or resolved_source_url or resolved_title
 
     # 1. ADD: индексируем новую версию под новым rag_doc_id
     try:
-        saved_count = await add_texts_async(
-            texts=[text],
-            graph_id=graph_id,
-            source_ids=[new_rag_doc_id],
-            file_paths=[resolved_file_path] if resolved_file_path else None,
-        )
+        memory = get_graph_memory() if known_id else None
+        if (
+            memory
+            and await memory.get_doc_status(graph_id, new_rag_doc_id) in _READY_STATUSES
+        ):
+            saved_count = 1
+        else:
+            saved_count = await add_texts_async(
+                texts=[text],
+                graph_id=graph_id,
+                source_ids=[new_rag_doc_id],
+                file_paths=[resolved_file_path] if resolved_file_path else None,
+            )
     except Exception as exc:
         logger.exception(
             "Ошибка при индексации документа %s в RAG (graph %s): %s",

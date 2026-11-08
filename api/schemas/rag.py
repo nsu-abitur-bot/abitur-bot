@@ -23,8 +23,8 @@ class ParsedPageResult(BaseModel):
 
 
 class ConfirmUploadRequest(BaseModel):
-    title: str = Field(..., description="Название страницы")
-    url: str = Field(..., description="URL страницы")
+    title: str = Field(..., max_length=500, description="Название страницы")
+    url: str = Field(..., max_length=1000, description="URL страницы")
     text: str = Field(..., description="Отредактированный текст страницы")
     documents: list[ParsedDocument] = Field(
         ..., description="Финальный список файлов для загрузки"

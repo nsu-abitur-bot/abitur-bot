@@ -1,7 +1,8 @@
+import asyncio
 import logging
 import os
 import re
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from datetime import date, datetime
 from pathlib import Path
 from typing import List, Optional
@@ -30,6 +31,7 @@ from api.routes.settings import router as settings_router
 from api.routes.stats import router as stats_router
 from api.routes.system_logs import router as system_logs_router
 from api.routes.topic import router as topic_router
+from api.services.rag_import_queue import run_import_queue
 from bootstrap.runtime_settings import runtime_settings
 from db.postgres.db import AsyncSessionLocal, get_async_session
 from db.postgres.models import Admin, Message
@@ -95,7 +97,13 @@ async def lifespan(app: FastAPI):
                 )
             except Exception:
                 logger.exception("Ошибка загрузки FAQ/аббревиатур из БД при старте")
-        yield
+        import_worker = asyncio.create_task(run_import_queue())
+        try:
+            yield
+        finally:
+            import_worker.cancel()
+            with suppress(asyncio.CancelledError):
+                await import_worker
 
 
 app = FastAPI(title="Abitur API", lifespan=lifespan)

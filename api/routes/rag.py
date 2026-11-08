@@ -48,13 +48,11 @@ from api.schemas.rag import (
     RagDocumentUpdateRequest,
     RagUploadResponse,
 )
-from api.services.document_indexer import index_document
 from api.services.document_update import (
     DocumentUpdateService,
-    calculate_content_hash,
-    fetch_url_bytes,
     readable_fetch_error,
 )
+from api.services.rag_import_queue import IMPORT_STATES, enqueue_import
 from api.services.rag_upload import (
     MAX_MULTIPART_OVERHEAD_BYTES,
     MAX_UPLOAD_FILES,
@@ -63,6 +61,7 @@ from api.services.rag_upload import (
 )
 from api.services.url_to_rag import parse_and_save_url
 from db.postgres.db import get_async_session
+from db.postgres.models import ContentProposal
 from db.postgres.services.document import (
     DOCUMENT_STATUS_CHANGED,
     DOCUMENT_STATUS_UPDATED,
@@ -323,51 +322,31 @@ async def parse_page_for_rag(url: HttpUrl = Query(..., description="URL стра
     )
 
 
-@router.post("/confirm", status_code=201, summary="Подтвердить загрузку в RAG")
+@router.post("/confirm", status_code=202, summary="Поставить загрузку в очередь RAG")
 async def confirm_rag_upload(
     request: ConfirmUploadRequest,
     session: AsyncSession = Depends(get_async_session),
-):
-    """Загружает отредактированный текст и выбранные документы в RAG."""
+) -> dict[str, str]:
+    prepared = get_abbrev_expander().expand(request.text.strip())
+    if not prepared:
+        raise HTTPException(status_code=422, detail="Укажите текст документа")
+    job = await enqueue_import(
+        session,
+        title=request.title.strip() or "Документ",
+        source_url=request.url.strip() or None,
+        content=prepared,
+    )
+    return {"status": "queued", "job_id": job.id}
 
-    try:
-        # 1. Загружаем текст страницы (если он есть и не пуст)
-        if request.text and request.text.strip():
-            prepared_text = get_abbrev_expander().expand(request.text.strip())
-            try:
-                raw = await fetch_url_bytes(request.url)
-                content_hash = calculate_content_hash(raw)
-            except Exception:
-                content_hash = calculate_content_hash(prepared_text.encode("utf-8"))
 
-            document_service = DocumentService(session)
-            document = await document_service.create_or_update_for_source(
-                graph_id=DEFAULT_GRAPH_ID,
-                title=request.title,
-                source_url=request.url,
-            )
-            indexed_doc = await index_document(
-                document=document,
-                text=prepared_text,
-                content_hash=content_hash,
-                file_path=request.url,
-                graph_id=DEFAULT_GRAPH_ID,
-                session=session,
-                document_service=document_service,
-            )
-            if not indexed_doc:
-                raise HTTPException(status_code=500, detail="Failed to upload")
-
-        # 2. Вложенные документы больше не загружаем (по запросу)
-        # if request.documents:
-        #     for doc in request.documents:
-        #         logger.info(f"Парсинг вложенного документа: {doc.url}")
-        #         await parse_and_save_url(doc.url, title=doc.title)
-
-        return {"status": "success", "message": "Content and documents uploaded to RAG"}
-    except Exception as e:
-        logger.error(f"Error during RAG confirmation upload: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to upload: {str(e)}")
+@router.get("/imports/{job_id}", summary="Состояние загрузки в RAG")
+async def get_rag_import(
+    job_id: str, session: AsyncSession = Depends(get_async_session)
+) -> dict[str, str]:
+    job = await session.get(ContentProposal, job_id)
+    if job is None or job.graph_id != DEFAULT_GRAPH_ID or job.status not in IMPORT_STATES:
+        raise HTTPException(status_code=404, detail="Загрузка не найдена")
+    return {"status": job.status, "job_id": job.id}
 
 
 @router.post(
