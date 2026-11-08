@@ -69,12 +69,3 @@ class ContentProposalService:
             .with_for_update()
         )
         return result.scalar_one_or_none()
-
-    async def finish(
-        self, proposal: ContentProposal, reviewer_id: str, document_id: str
-    ) -> ContentProposal:
-        proposal.status = "approved"
-        proposal.reviewer_id = reviewer_id
-        proposal.document_id = document_id
-        proposal.reviewed_at = timestamp()
-        return proposal

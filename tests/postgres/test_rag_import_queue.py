@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from api.routes.rag import confirm_rag_upload, get_rag_import
+from api.routes.rag import confirm_rag_upload, get_rag_import, list_rag_documents
 from api.schemas.rag import ConfirmUploadRequest
 from api.services import rag_import_queue
 from api.services.rag_import_queue import enqueue_import
@@ -38,6 +38,12 @@ async def test_worker_finishes_confirmed_import_and_keeps_editor_drafts(
     )
 
     async def finish_indexing(*, document, document_service, new_rag_doc_id, **kwargs):
+        materials = await list_rag_documents(session)
+        assert {doc.title: doc.import_state for doc in materials.documents} == {
+            "Институт": "processing",
+            "Черновик": "review",
+        }
+        await session.commit()
         assert document.rag_doc_id == new_rag_doc_id
         assert document.status == "pending"
         return await document_service.mark_indexed(
@@ -70,5 +76,24 @@ async def test_worker_finishes_confirmed_import_and_keeps_editor_drafts(
     document = await DocumentService(session).get_by_source_proposal_id(job_id)
     assert document is not None
     assert document.rag_doc_id == job_id
+    materials = await list_rag_documents(session)
+    assert {doc.title: doc.import_state for doc in materials.documents} == {
+        "Институт": None,
+        "Черновик": "review",
+    }
     await session.refresh(draft)
     assert draft.status == "pending"
+
+
+@pytest.mark.asyncio
+async def test_queued_upload_appears_in_materials_before_worker(session):
+    response = await confirm_rag_upload(
+        ConfirmUploadRequest(title="Институт", text="Описание", url="", documents=[]),
+        session,
+    )
+
+    materials = await list_rag_documents(session)
+    assert [(doc.title, doc.import_state) for doc in materials.documents] == [
+        ("Институт", "queued")
+    ]
+    assert materials.documents[0].id == response["job_id"]

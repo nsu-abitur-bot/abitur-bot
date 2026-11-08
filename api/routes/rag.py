@@ -20,6 +20,7 @@ from fastapi import (
 )
 from fastapi.responses import Response
 from pydantic import HttpUrl
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.datastructures import FormData
 from starlette.datastructures import UploadFile as StarletteUploadFile
@@ -52,7 +53,11 @@ from api.services.document_update import (
     DocumentUpdateService,
     readable_fetch_error,
 )
-from api.services.rag_import_queue import IMPORT_STATES, enqueue_import
+from api.services.rag_import_queue import (
+    ACTIVE_IMPORT_STATES,
+    IMPORT_STATES,
+    enqueue_import,
+)
 from api.services.rag_upload import (
     MAX_MULTIPART_OVERHEAD_BYTES,
     MAX_UPLOAD_FILES,
@@ -336,7 +341,7 @@ async def confirm_rag_upload(
         source_url=request.url.strip() or None,
         content=prepared,
     )
-    return {"status": "queued", "job_id": job.id}
+    return {"status": job.status, "job_id": job.id}
 
 
 @router.get("/imports/{job_id}", summary="Состояние загрузки в RAG")
@@ -411,6 +416,57 @@ async def list_rag_documents(
                 else None,
                 "last_checked_hash": document.last_checked_hash,
                 "last_check_message": document.last_check_message,
+            }
+        )
+    by_id = {doc["id"]: doc for doc in docs}
+    by_url = {doc["url"]: doc for doc in docs if doc["url"]}
+    proposals = await session.execute(
+        select(
+            ContentProposal.id,
+            ContentProposal.title,
+            ContentProposal.source_url,
+            ContentProposal.status,
+            ContentProposal.document_id,
+            ContentProposal.created_at,
+        )
+        .where(
+            ContentProposal.graph_id == DEFAULT_GRAPH_ID,
+            ContentProposal.status.in_(
+                ("pending", *ACTIVE_IMPORT_STATES, "index_failed")
+            ),
+        )
+        .order_by(ContentProposal.created_at.desc(), ContentProposal.id.desc())
+    )
+    handled_sources = set()
+    for job in proposals:
+        state = "review" if job.status == "pending" else job.status
+        if state != "review":
+            key = job.source_url or job.document_id or job.id
+            if key in handled_sources:
+                continue
+            handled_sources.add(key)
+            document = by_id.get(job.document_id) or by_url.get(job.source_url)
+            if state == "index_failed":
+                if document is None and job.document_id is not None:
+                    continue  # The failed material was deleted.
+                if (
+                    document is not None
+                    and (document["last_indexed_at"] or "") >= job.created_at.isoformat()
+                ):
+                    continue  # A newer import has already succeeded.
+            if document is not None:
+                document["import_state"] = state
+                continue
+        # Jobs and drafts can be listed before a real document exists.
+        docs.append(
+            {
+                "id": job.id,
+                "title": job.title,
+                "url": job.source_url,
+                "status": state,
+                "import_state": state,
+                "proposal_only": True,
+                "created_at": job.created_at.isoformat(),
             }
         )
     return RagDocumentListResponse(documents=docs)

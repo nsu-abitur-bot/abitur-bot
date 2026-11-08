@@ -6,12 +6,10 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.auth.dependencies import require_admin
-from api.services.document_indexer import index_document
-from api.services.document_update import calculate_content_hash, fetch_url_bytes
-from db.postgres.db import AsyncSessionLocal, get_async_session
-from db.postgres.models import Admin, ContentProposal
+from api.services.rag_import_queue import ACTIVE_IMPORT_STATES
+from db.postgres.db import get_async_session
+from db.postgres.models import Admin, ContentProposal, timestamp
 from db.postgres.services.content_proposal import ContentProposalService
-from db.postgres.services.document import DocumentService
 from rag.loader import DEFAULT_GRAPH_ID
 
 router = APIRouter(prefix="/content-proposals", tags=["Content proposals"])
@@ -78,66 +76,25 @@ async def reject_proposal(
     return ProposalResponse.from_record(proposal)
 
 
-@router.post("/{proposal_id}/approve", response_model=ProposalResponse)
+@router.post("/{proposal_id}/approve", status_code=202, response_model=ProposalResponse)
 async def approve_proposal(
     proposal_id: str,
     session: AsyncSession = Depends(get_async_session),
     editor: Admin = Depends(require_admin),
 ) -> ProposalResponse:
-    async with AsyncSessionLocal() as review_session:
-        async with review_session.begin():
-            review_service = ContentProposalService(review_session)
-            proposal = await review_service.lock_pending(proposal_id)
-            if proposal is None:
-                raise HTTPException(status_code=409, detail="Proposal is not pending")
+    service = ContentProposalService(session)
+    proposal = await service.lock_pending(proposal_id)
+    if proposal is None:
+        existing = await service.get(proposal_id)
+        if existing is not None and existing.status in (
+            *ACTIVE_IMPORT_STATES,
+            "approved",
+        ):
+            return ProposalResponse.from_record(existing)
+        raise HTTPException(status_code=409, detail="Proposal is not pending")
 
-            try:
-                content_hash = proposal.source_hash
-                if proposal.source_url and content_hash is None:
-                    content_hash = calculate_content_hash(
-                        await fetch_url_bytes(proposal.source_url)
-                    )
-                if content_hash is None:
-                    content_hash = calculate_content_hash(proposal.text.encode("utf-8"))
-
-                document_service = DocumentService(session)
-                document = await document_service.get_by_source_proposal_id(proposal.id)
-                if (
-                    document is not None
-                    and document.last_indexed_at is not None
-                    and document.content_hash == content_hash
-                ):
-                    indexed = document
-                else:
-                    if document is None and proposal.source_url:
-                        document = await document_service.get_by_source_url(
-                            proposal.graph_id, proposal.source_url
-                        )
-                    if document is None:
-                        document = await document_service.create_or_update_for_source(
-                            graph_id=proposal.graph_id,
-                            title=proposal.title,
-                            source_url=proposal.source_url,
-                            source_proposal_id=proposal.id,
-                        )
-                    indexed = await index_document(
-                        document=document,
-                        title=proposal.title,
-                        text=proposal.text,
-                        source_url=proposal.source_url,
-                        content_hash=content_hash,
-                        graph_id=proposal.graph_id,
-                        session=session,
-                        document_service=document_service,
-                        source_proposal_id=proposal.id,
-                    )
-                    if indexed is None:
-                        raise RuntimeError("RAG indexing failed")
-            except Exception as exc:
-                await session.rollback()
-                raise HTTPException(
-                    status_code=503, detail="RAG indexing failed"
-                ) from exc
-
-            reviewed = await review_service.finish(proposal, editor.id, indexed.id)
-            return ProposalResponse.from_record(reviewed)
+    proposal.status = "queued"
+    proposal.reviewer_id = editor.id
+    proposal.reviewed_at = timestamp()
+    await session.commit()
+    return ProposalResponse.from_record(proposal)

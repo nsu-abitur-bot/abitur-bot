@@ -56,6 +56,8 @@ class RagDocument(BaseModel):
     title: str | None = Field(None, description="Название документа")
     url: str | None = Field(None, description="Оригинальный URL или путь к файлу")
     status: str = Field(..., description="Статус обработки")
+    import_state: str | None = None
+    proposal_only: bool = False
     content_hash: str | None = Field(None, description="SHA-256 сырого контента")
     content_summary: str | None = Field(None, description="Краткое содержание")
     content_length: int | None = Field(None, description="Длина контента")

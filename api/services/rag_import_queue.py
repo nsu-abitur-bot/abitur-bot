@@ -3,7 +3,7 @@
 import asyncio
 import logging
 
-from sqlalchemy import func, select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.services.document_indexer import index_document
@@ -15,7 +15,8 @@ from rag.loader import DEFAULT_GRAPH_ID
 
 logger = logging.getLogger(__name__)
 
-IMPORT_STATES = ("queued", "indexed", "index_failed")
+ACTIVE_IMPORT_STATES = ("queued", "processing")
+IMPORT_STATES = (*ACTIVE_IMPORT_STATES, "indexed", "index_failed")
 _WORKER_LOCK = 726_414_720
 
 
@@ -41,7 +42,7 @@ async def enqueue_import(
     )
     if (
         previous is not None
-        and previous.status == "queued"
+        and previous.status in ACTIVE_IMPORT_STATES
         and previous.title == title
         and previous.text == content
     ):
@@ -70,15 +71,23 @@ async def process_next_import() -> bool:
             return False
         job = await queue_session.scalar(
             select(ContentProposal)
-            .where(ContentProposal.status == "queued")
+            .where(ContentProposal.status.in_(ACTIVE_IMPORT_STATES))
             .order_by(ContentProposal.created_at, ContentProposal.id)
             .limit(1)
         )
         if job is None:
             return False
 
-        content_hash = calculate_content_hash(job.text.encode("utf-8"))
-        if job.source_url:
+        if job.status == "queued":
+            async with AsyncSessionLocal() as state_session, state_session.begin():
+                await state_session.execute(
+                    update(ContentProposal)
+                    .where(ContentProposal.id == job.id)
+                    .values(status="processing")
+                )
+
+        content_hash = job.source_hash or calculate_content_hash(job.text.encode("utf-8"))
+        if job.source_url and job.source_hash is None:
             try:
                 content_hash = calculate_content_hash(
                     await fetch_url_bytes(job.source_url)
@@ -99,19 +108,26 @@ async def process_next_import() -> bool:
                 )
             # Long LightRAG calls should only hold the worker lock connection.
             await session.commit()
-            indexed = await index_document(
-                document=document,
-                title=job.title,
-                source_url=job.source_url,
-                graph_id=job.graph_id,
-                text=job.text,
-                content_hash=content_hash,
-                document_service=service,
-                source_proposal_id=job.id,
-                new_rag_doc_id=job.id,
-            )
+            if document.source_proposal_id == job.id and document.last_indexed_at:
+                indexed = document
+            else:
+                indexed = await index_document(
+                    document=document,
+                    title=job.title,
+                    source_url=job.source_url,
+                    graph_id=job.graph_id,
+                    text=job.text,
+                    content_hash=content_hash,
+                    document_service=service,
+                    source_proposal_id=job.id,
+                    new_rag_doc_id=job.id,
+                )
 
-        job.status = "indexed" if indexed is not None else "index_failed"
+        job.status = (
+            ("approved" if job.reviewer_id else "indexed")
+            if indexed is not None
+            else "index_failed"
+        )
         job.document_id = indexed.id if indexed is not None else document.id
         return True
 
