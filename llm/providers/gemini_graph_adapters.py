@@ -56,9 +56,13 @@ class GeminiLLM:
             )
             content = response.text
             return content.strip() if isinstance(content, str) else str(content or "")
-        except Exception as e:
-            logger.error(f"Error in GeminiLLM: {e}")
-            return ""
+        except Exception:
+            # Ошибку не глотаем и пустую строку не подставляем: на индексации
+            # пустой ответ графового LLM заливает документ без сущностей и
+            # связей (в hybrid он потом недостижим), а статус остаётся «успех».
+            # Повторы при сбое делает сам LightRAG (#290).
+            logger.exception("Ошибка в GeminiLLM")
+            raise
 
 
 class GeminiEmbedding:

@@ -92,9 +92,13 @@ class OpenAILLM:
             )
 
             return response.output_text.strip()
-        except Exception as e:
-            logger.error(f"Error in OpenAILLM: {e}")
-            return ""
+        except Exception:
+            # Ошибку не глотаем и пустую строку не подставляем: на индексации
+            # пустой ответ графового LLM заливает документ без сущностей и
+            # связей (в hybrid он потом недостижим), а статус остаётся «успех».
+            # Повторы при сбое делает сам LightRAG (#290).
+            logger.exception("Ошибка в OpenAILLM")
+            raise
 
 
 class OpenAIEmbedding:
