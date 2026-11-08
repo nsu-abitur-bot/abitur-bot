@@ -1,7 +1,8 @@
 import logging
-from typing import Optional
+from typing import Iterator, Optional
 
 from sqlalchemy import select, text
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,14 @@ from ..models import FaqEntry, normalize_question, timestamp
 
 logger = logging.getLogger(__name__)
 FAQ_CHANGE_CHANNEL = "abitur_faq_changed"
+
+# asyncpg не принимает больше 32767 связанных параметров в одном запросе.
+_ASYNC_PG_PARAM_LIMIT = 32767
+
+
+def _chunks(items: list, size: int) -> Iterator[list]:
+    for start in range(0, len(items), size):
+        yield items[start : start + size]
 
 
 class FaqDbService:
@@ -65,12 +74,14 @@ class FaqDbService:
             return [], 0, 0
 
         keys = list(deduped.keys())
-        result = await self.session.execute(
-            select(FaqEntry.normalized_question).where(
-                FaqEntry.normalized_question.in_(keys)
+        existing_keys: set[str] = set()
+        for key_chunk in _chunks(keys, _ASYNC_PG_PARAM_LIMIT):
+            result = await self.session.execute(
+                select(FaqEntry.normalized_question).where(
+                    FaqEntry.normalized_question.in_(key_chunk)
+                )
             )
-        )
-        existing_keys = set(result.scalars())
+            existing_keys.update(result.scalars())
         updated = len(existing_keys)
         created = len(deduped) - updated
 
@@ -88,18 +99,31 @@ class FaqDbService:
             }
             for key, item in deduped.items()
         ]
-        stmt = pg_insert(FaqEntry).values(values)
-        stmt = stmt.on_conflict_do_update(
-            index_elements=[FaqEntry.normalized_question],
-            set_={
-                "question": stmt.excluded.question,
-                "aliases": stmt.excluded.aliases,
-                "answer": stmt.excluded.answer,
-                "updated_at": timestamp(),
-            },
-        )
+
+        def _upsert_stmt(batch: list[dict]):
+            stmt = pg_insert(FaqEntry).values(batch)
+            return stmt.on_conflict_do_update(
+                index_elements=[FaqEntry.normalized_question],
+                set_={
+                    "question": stmt.excluded.question,
+                    "aliases": stmt.excluded.aliases,
+                    "answer": stmt.excluded.answer,
+                    "updated_at": timestamp(),
+                },
+            )
+
+        # Один INSERT на весь файл превышает лимит связанных параметров asyncpg
+        # (32767): импорт 3000 FAQ падал с InterfaceError. Режем на пакеты по
+        # фактическому числу параметров на строку — оно больше числа ключей
+        # в values, потому что SQLAlchemy добавляет клиентские дефолты (id,
+        # created_at, updated_at) и константу в ON CONFLICT SET. Все пакеты
+        # идут в одной транзакции: сбой любого откатывает импорт целиком (#295).
+        probe = _upsert_stmt(values[:1]).compile(dialect=postgresql.dialect())
+        batch_size = max(1, _ASYNC_PG_PARAM_LIMIT // len(probe.params))
         try:
-            await self.session.execute(stmt)
+            for start in range(0, len(values), batch_size):
+                batch = _upsert_stmt(values[start : start + batch_size])
+                await self.session.execute(batch)
             await self._notify_changed()
             await self.session.commit()
         except Exception:
@@ -107,13 +131,17 @@ class FaqDbService:
             logger.exception("Ошибка массового импорта FAQ")
             raise
 
-        result = await self.session.execute(
-            select(FaqEntry)
-            .where(FaqEntry.normalized_question.in_(keys))
-            .order_by(FaqEntry.created_at)
-            .execution_options(populate_existing=True)
-        )
-        return list(result.scalars().all()), created, updated
+        entries: list[FaqEntry] = []
+        for key_chunk in _chunks(keys, _ASYNC_PG_PARAM_LIMIT):
+            result = await self.session.execute(
+                select(FaqEntry)
+                .where(FaqEntry.normalized_question.in_(key_chunk))
+                .order_by(FaqEntry.created_at)
+                .execution_options(populate_existing=True)
+            )
+            entries.extend(result.scalars().all())
+        entries.sort(key=lambda e: (e.created_at, e.normalized_question))
+        return entries, created, updated
 
     async def get(self, item_id: str) -> Optional[FaqEntry]:
         result = await self.session.execute(

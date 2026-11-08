@@ -201,6 +201,37 @@ async def test_upsert_many_last_wins_within_batch(session: AsyncSession):
 
 
 @pytest.mark.asyncio
+async def test_upsert_many_large_import_fits_param_limit(session: AsyncSession):
+    """Регрессия #295: единый INSERT на 3000 строк превышал лимит asyncpg.
+
+    Импорт файла на 3000 вопросов в один pg_insert даёт 27000+ связанных
+    параметров и падал с InterfaceError «query arguments cannot exceed
+    32767». Пакеты должны проходить целиком, повторная загрузка того же
+    файла — обновлять, а не дублировать.
+    """
+    service = FaqDbService(session)
+    items = [
+        {"question": f"Вопрос номер {i}?", "aliases": [], "answer": f"Ответ {i}"}
+        for i in range(3000)
+    ]
+
+    entries, created, updated = await service.upsert_many(items)
+
+    assert (created, updated) == (3000, 0)
+    assert len(entries) == 3000
+    assert len(await service.get_all()) == 3000
+
+    for item in items:
+        item["answer"] += " (обновлён)"
+    entries, created, updated = await service.upsert_many(items)
+
+    assert (created, updated) == (0, 3000)
+    assert len(await service.get_all()) == 3000
+    answers = {entry.question: entry.answer for entry in entries}
+    assert answers["Вопрос номер 0?"] == "Ответ 0 (обновлён)"
+
+
+@pytest.mark.asyncio
 async def test_create_duplicate_question_raises_value_error(session: AsyncSession):
     service = FaqDbService(session)
     await service.create(question="Дубликат", aliases=[], answer="Первый ответ")
