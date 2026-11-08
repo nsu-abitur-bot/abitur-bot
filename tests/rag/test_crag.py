@@ -108,7 +108,7 @@ async def test_detect_faculty_hint(seeded):
     hint = await detect_faculty_hint("проходные баллы на ФИТ")
     assert hint.faculty is not None
     assert hint.faculty.name == "Факультет информационных технологий"
-    assert hint.level == "undergraduate"
+    assert hint.level == "bachelor"
 
     hint_master = await detect_faculty_hint("магистратура на ФИТ")
     assert hint_master.level == "master"
@@ -654,8 +654,19 @@ def test_scrub_drops_foreign_specialitet_keeps_bachelor():
 @pytest.mark.parametrize(
     ("question", "history", "expected"),
     [
-        ("Какие документы нужны?", None, "undergraduate"),
-        ("Какие документы нужны?", "user: магистратура", "master"),
+        ("Какие документы нужны?", None, "bachelor"),
+        ("Какие ИТ-направления есть?", "user: магистратура", "bachelor"),
+        ("А какие там документы?", "user: магистратура", "master"),
+        (
+            "[from applicant] А какие там документы?",
+            "user: Какие направления есть?\nassistant: Есть магистратура.",
+            "bachelor",
+        ),
+        (
+            "А какие там документы?",
+            "user: магистратура\nuser: Какие направления есть?",
+            "bachelor",
+        ),
         ("Бакалавриат: какие документы?", "user: магистратура", "bachelor"),
         ("Магистратура: какие документы?", None, "master"),
         ("Какие документы нужны для СПО?", None, "spo"),
@@ -674,18 +685,17 @@ async def test_level_defaults_after_user_question_and_history(
 @pytest.mark.parametrize(
     ("question", "expected_names"),
     [
-        ("Сколько лет учиться на лечебном деле?", {"бакалавриат", "специалитет"}),
+        ("Какие направления есть?", {"бакалавриат"}),
         ("Какие программы бакалавриата есть?", {"бакалавриат"}),
         ("Какие программы специалитета есть?", {"специалитет"}),
         ("Какие программы магистратуры есть?", {"магистратура"}),
     ],
 )
-async def test_default_keeps_specialist_without_broadening_explicit_level(
+async def test_default_and_explicit_levels_filter_other_programs(
     seeded, question, expected_names
 ):
     from rag.crag import (
         CragChunk,
-        _build_grading_prompt,
         _load_scrub_context,
         _scrub_chunk,
         detect_faculty_hint,
@@ -720,8 +730,3 @@ async def test_default_keeps_specialist_without_broadening_explicit_level(
         is not None
     }
     assert kept == expected_names
-    if expected_names == {"бакалавриат", "специалитет"}:
-        prompt, _ = _build_grading_prompt(
-            question, hint, CragChunk(0, chunks[1][1], None, None)
-        )
-        assert "бакалавриат или специалитет" in prompt

@@ -159,11 +159,6 @@ class FacultyHint:
     level: Optional[str] = None
 
 
-def _allowed_levels(level: str) -> set[str]:
-    # Неуказанный уровень охватывает обе программы первого высшего образования.
-    return {"bachelor", "specialist"} if level == "undergraduate" else {level}
-
-
 # Маркеры уровня образования в тексте вопроса.
 _LEVEL_MARKERS: dict[str, tuple[str, ...]] = {
     "master": ("магистратур", "магистр", "магистерск"),
@@ -211,6 +206,29 @@ def _match_faculty(
     return best
 
 
+_FOLLOW_UP = re.compile(r"^(?:\[from [^\n\]]+\]\s*)?\s*(?:а|и|там|туда|тогда)\b", re.I)
+_HISTORY_ROLE = re.compile(r"(?m)^(user|assistant|system): ")
+
+
+def _question_level(question: str, history: str | None) -> str:
+    level = detect_level(question)
+    if level is not None:
+        return level
+
+    if history and _FOLLOW_UP.match(question):
+        messages = _HISTORY_ROLE.split(history)
+        for role, message in reversed(list(zip(messages[1::2], messages[2::2]))):
+            if role != "user":
+                continue
+            level = detect_level(message)
+            if level is not None:
+                return level
+            if not _FOLLOW_UP.match(message):
+                break
+
+    return "bachelor"
+
+
 async def detect_faculty_hint(
     question: str,
     conversation_history: Optional[str] = None,
@@ -223,20 +241,7 @@ async def detect_faculty_hint(
     он выбирается независимо от наличия других факультетов в истории диалога.
     Если в текущем вопросе факультет не найден, поиск продолжается в истории.
     """
-    level = detect_level(question)
-    if level is None and conversation_history:
-        for line in reversed(conversation_history.splitlines()):
-            if not line.strip():
-                continue
-            lvl = detect_level(line)
-            if lvl is not None:
-                level = lvl
-                break
-        if level is None:
-            level = detect_level(conversation_history)
-
-    if level is None:
-        level = "undergraduate"
+    level = _question_level(question, conversation_history)
 
     try:
         async with AsyncSessionLocal() as session:
@@ -329,7 +334,7 @@ async def _load_scrub_context(
                 p
                 for p in all_programs
                 if (hint.faculty is None or p.faculty_id == hint.faculty.id)
-                and (hint.level is None or p.level in _allowed_levels(hint.level))
+                and (hint.level is None or p.level == hint.level)
             ]
     except Exception as exc:
         logger.warning("CRAG: не удалось загрузить справочник для фильтрации: %s", exc)
@@ -341,7 +346,7 @@ async def _load_scrub_context(
         for p in all_programs
         if (
             (hint.faculty is not None and p.faculty_id != hint.faculty.id)
-            or (hint.level is not None and p.level not in _allowed_levels(hint.level))
+            or (hint.level is not None and p.level != hint.level)
         )
         and (n := normalize_name(p.name))
         and len(n) >= 4
@@ -403,7 +408,7 @@ def _segment_has_foreign_level(
         normalized = normalize_name(segment)
         if not any(name in normalized for name in program_names):
             return False
-    return bool(levels - _allowed_levels(level))
+    return bool(levels - {level})
 
 
 def _scrub_chunk(
@@ -457,7 +462,6 @@ def _build_grading_prompt(
     level_clause = ""
     if hint.level is not None:
         level_map = {
-            "undergraduate": "бакалавриат или специалитет",
             "bachelor": "бакалавриат",
             "specialist": "специалитет",
             "master": "магистратура",
