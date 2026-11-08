@@ -230,5 +230,5 @@ async def test_retrieval_keeps_service_hints_out_of_crag_question(monkeypatch):
         question, "user: интересует магистратура", llm_client._Ctx("test", 1)
     )
     assert captured["question"] == question
-    assert llm_client.LIGHTRAG_LEVEL_HINT in captured["search_query"]
+    assert llm_client.LIGHTRAG_LEVEL_HINT not in captured["search_query"]
     assert captured["conversation_history"] == "user: интересует магистратура"

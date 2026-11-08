@@ -476,9 +476,9 @@ async def _retrieve_context(
     rag_trace_lines: list[str] = []
     try:
         logger.info(f"[{session_id}] Querying LightRAG for context.")
-        rag_query = (
-            f"{expanded_message}\n\n{LIGHTRAG_LEVEL_HINT}\n\n{LIGHTRAG_FORMAT_HINT}"
-        )
+        use_crag = (await load_crag_config()).enabled
+        level_hint = "" if use_crag else f"\n\n{LIGHTRAG_LEVEL_HINT}"
+        rag_query = f"{expanded_message}{level_hint}\n\n{LIGHTRAG_FORMAT_HINT}"
         ctx.log(
             "rag_query",
             _truncate_log_content(rag_query),
@@ -487,7 +487,6 @@ async def _retrieve_context(
             history_present=bool(history_text),
         )
 
-        use_crag = (await load_crag_config()).enabled
         if use_crag:
             logger.info(f"[{session_id}] CRAG enabled — using corrective RAG.")
             retrieval = await query_graph_with_crag(
