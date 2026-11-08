@@ -22,6 +22,19 @@ services:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Проба живости процесса (#241): бот — long polling, портов не открывает;
+    # liveness.py поднимает GET /healthz на 127.0.0.1:8080 внутри контейнера.
+    # В slim-образе нет curl, но python есть всегда. Порт закрыт: снаружи
+    # контейнера проба недостижима, наружу не публикуется.
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c 'import urllib.request as u; u.urlopen("http://127.0.0.1:8080/healthz", timeout=3)'
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      # Старт бота — это миграции и загрузка FAQ; до готовности даём минуту.
+      start_period: 60s
 
   api:
     image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
@@ -55,6 +68,16 @@ services:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Проба живости процесса (#241): /health в api/main.py отвечает, пока
+    # жив event loop. БД здесь не проверяем — у postgres свой healthcheck.
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c 'import urllib.request as u; u.urlopen("http://127.0.0.1:8000/health", timeout=3)'
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   scheduler:
     image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
@@ -73,6 +96,17 @@ services:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    # Проба живости процесса (#241): планировщик — цикл синхронизации без
+    # портов; liveness.py поднимает GET /healthz на 127.0.0.1:8080 в этом
+    # контейнере (своём сетевом namespace, боту не мешает).
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c 'import urllib.request as u; u.urlopen("http://127.0.0.1:8080/healthz", timeout=3)'
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
   redis:
     image: redis:alpine

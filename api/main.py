@@ -101,6 +101,17 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="Abitur API", lifespan=lifespan)
 
 
+@app.get("/health")
+async def health() -> dict:
+    """Проба живости процесса API (#241).
+
+    Без обращения к БД: доступность PostgreSQL закрывает её собственный
+    healthcheck в compose, дублировать его здесь — сваливать API из-за БД,
+    которая и так мониторится.
+    """
+    return {"status": "ok"}
+
+
 @app.get("/review/proposals", include_in_schema=False)
 async def proposal_review_page() -> FileResponse:
     return FileResponse(Path(__file__).parent / "static" / "proposals.html")
