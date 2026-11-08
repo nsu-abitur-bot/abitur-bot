@@ -1,0 +1,147 @@
+{
+  "prepared_at": "2026-11-08",
+  "mode": "static_preparation_not_live_results",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "scenarios": 50,
+  "internal_confirmed": 0,
+  "expert_confirmed": 0,
+  "source_check_date": "2026-11-07",
+  "snapshot_hashes_rechecked": 9,
+  "changed_since_wording_review": [
+    "nsu-pre-flow-01",
+    "nsu-paid-steps-01",
+    "nsu-paid-steps-03"
+  ],
+  "wording_review": {
+    "url": "https://github.com/nsu-abitur-bot/abitur-bot/pull/407#pullrequestreview-5798221909",
+    "reviewer": "Marat-nsu",
+    "commit": "b904deaf9ea2ff634b00887ed69fed251c3a341d",
+    "scope": "previous wording corrections, not all facts confirmed"
+  },
+  "host_readiness": {
+    "checked_at_utc": "2026-11-08T07:44:36.826518+00:00",
+    "available_memory_kib": 838784,
+    "wrapper_required_memory_kib": 1126400,
+    "memory_start_guard_met": false,
+    "root_free_bytes": 51951013888,
+    "disk_start_guard_met": true,
+    "generation_calls": 0,
+    "embedding_calls": 0,
+    "judge_calls": 0
+  },
+  "runtime_version": {
+    "image": "ghcr.io/nsu-abitur-bot/abitur-bot@sha256:9f6278952bc3bef2635d21c33d7dee983befaf801294c17c014686dead210f4e",
+    "revision": "0ec0f788cf590b364e9e7a65f2f0c53de4d5bf40"
+  },
+  "current_main": "1fe4c1a6ca00e9b173cadd703c1bde2253006416",
+  "runtime_includes_pr434": false,
+  "pilot": {
+    "status": "not_started",
+    "case_ids": [
+      "nsu-pre-flow-01",
+      "nsu-pre-scholar-01",
+      "nsu-pre-compare-01",
+      "nsu-pre-compare-02",
+      "nsu-post-dorm-03",
+      "nsu-pre-building-03",
+      "nsu-paid-steps-01",
+      "nsu-pre-general-02",
+      "nsu-pre-compare-04",
+      "nsu-pre-chance-01"
+    ],
+    "conditions": [
+      "with_kb",
+      "empty_kb"
+    ],
+    "answers_planned": 20,
+    "document_cases": 8,
+    "special_cases": 2,
+    "source_ids_covered": [
+      "DOC-03ae446000cfbc45",
+      "DOC-2338f0807b9bc328",
+      "DOC-317c53d5b5ae2baf",
+      "DOC-3d63df62af354868",
+      "DOC-6674be71e05b972c",
+      "DOC-770b0c6ebb172dbe",
+      "DOC-83001f87d00915c7",
+      "DOC-be8ca7262223f1f8",
+      "DOC-de8ef06e37fe496b"
+    ],
+    "concurrency": 1,
+    "automatic_retries_of_cases": 0,
+    "authorization": "awaiting clarification whether pilot is excluded by no-run instruction",
+    "calibration_examples_planned": [
+      "correct complete fact",
+      "incorrect year or category",
+      "generic referral instead of fact",
+      "decision made for applicant"
+    ],
+    "calibration_status": "not_started"
+  },
+  "acceptance": {
+    "document_passes_required": 41,
+    "document_total": 45,
+    "special_passes_required": 5,
+    "special_total": 5,
+    "critical_violations_allowed": 0,
+    "kb_delta_threshold": null,
+    "kb_delta_status": "must be agreed after pilot and before final comparison"
+  },
+  "cost_scenarios": {
+    "method": "illustrative workload assumptions, not measured estimates or upper bounds",
+    "includes": "pipeline generations and one judge response per answer",
+    "excludes": "embedding, judge calibration, unknown retries, repairs, future reindexing",
+    "pilot_low": {
+      "answer_count": 20,
+      "pipeline_calls_per_answer_assumption": 2,
+      "pipeline_input_tokens_per_call_assumption": 4000,
+      "pipeline_output_tokens_per_call_assumption": 300,
+      "judge_input_tokens_per_answer_assumption": 1500,
+      "judge_output_tokens_per_answer_assumption": 200,
+      "input_tokens_assumption": 190000,
+      "output_tokens_assumption": 16000,
+      "deepseek_offpeak_cny_no_cache": 0.254,
+      "deepseek_peak_cny_no_cache": 0.508
+    },
+    "pilot_high": {
+      "answer_count": 20,
+      "pipeline_calls_per_answer_assumption": 8,
+      "pipeline_input_tokens_per_call_assumption": 20000,
+      "pipeline_output_tokens_per_call_assumption": 1500,
+      "judge_input_tokens_per_answer_assumption": 4000,
+      "judge_output_tokens_per_answer_assumption": 600,
+      "input_tokens_assumption": 3280000,
+      "output_tokens_assumption": 252000,
+      "deepseek_offpeak_cny_no_cache": 4.288,
+      "deepseek_peak_cny_no_cache": 8.576
+    },
+    "full_low": {
+      "answer_count": 100,
+      "pipeline_calls_per_answer_assumption": 2,
+      "pipeline_input_tokens_per_call_assumption": 4000,
+      "pipeline_output_tokens_per_call_assumption": 300,
+      "judge_input_tokens_per_answer_assumption": 1500,
+      "judge_output_tokens_per_answer_assumption": 200,
+      "input_tokens_assumption": 950000,
+      "output_tokens_assumption": 80000,
+      "deepseek_offpeak_cny_no_cache": 1.27,
+      "deepseek_peak_cny_no_cache": 2.54
+    },
+    "full_high": {
+      "answer_count": 100,
+      "pipeline_calls_per_answer_assumption": 8,
+      "pipeline_input_tokens_per_call_assumption": 20000,
+      "pipeline_output_tokens_per_call_assumption": 1500,
+      "judge_input_tokens_per_answer_assumption": 4000,
+      "judge_output_tokens_per_answer_assumption": 600,
+      "input_tokens_assumption": 16400000,
+      "output_tokens_assumption": 1260000,
+      "deepseek_offpeak_cny_no_cache": 21.44,
+      "deepseek_peak_cny_no_cache": 42.88
+    },
+    "rates_checked_at": "2026-11-08",
+    "rates_url": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/"
+  },
+  "provider_calls_this_preparation": 0,
+  "full_run_authorized": false
+}
