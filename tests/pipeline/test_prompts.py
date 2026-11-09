@@ -38,8 +38,8 @@ VERSIONED_PROMPTS = [
 # подними версию в pipeline/prompts.py и обнови обе колонки здесь.
 PINNED = {
     "system": (
-        "2.0",
-        "58c78976f31c575bfd3f6476477aa235bfac431b1d90e1f21dc4d3a1e693d7cf",
+        "3.0",
+        "e3835bd984d1fd9772ebe3f5e86fe10ac8e40679d780b7d5f9d4d21fe4468a8a",
     ),
     "sources_hint": (
         "1.0",
@@ -138,3 +138,10 @@ class TestIntentPrompt:
         assert '{"is_nsu": true' in prompt
         assert "1: Приём" in prompt
         assert "{" not in prompt.replace('{"is_nsu"', "")
+
+
+def test_empty_program_catalog_does_not_override_knowledge_base() -> None:
+    assert (
+        "Пустой результат get_education_programs относится только к справочнику"
+        in SYSTEM_PROMPT_BASE
+    )
