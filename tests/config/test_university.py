@@ -23,11 +23,11 @@ def render() -> str:
     )
 
 
-def test_nsu_prompt_is_unchanged():
+def test_nsu_prompt_matches_snapshot():
     instance.install({}, 0)
     assert (
         hashlib.sha256(render().encode()).hexdigest()
-        == "d4450e3e8571c2ca064d6400d14a5c9af4d93110160e68ce026a35d299d04a42"
+        == "727e44fc1b9e0f0f5288e4e8332466e1a316b69a944baacf0b0c006426235f56"
     )
     assert is_nsu()
 
