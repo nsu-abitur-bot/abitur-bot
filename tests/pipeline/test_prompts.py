@@ -39,7 +39,7 @@ VERSIONED_PROMPTS = [
 PINNED = {
     "system": (
         "3.0",
-        "21569885e2c45445a76d63007e332045b4da6cfc402a7635aef183432227ba02",
+        "e3835bd984d1fd9772ebe3f5e86fe10ac8e40679d780b7d5f9d4d21fe4468a8a",
     ),
     "sources_hint": (
         "1.0",
