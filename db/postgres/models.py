@@ -695,7 +695,7 @@ class AdmissionScore(Base):
     year: Mapped[int] = mapped_column(Integer, nullable=False)
     # Форма обучения: budget / paid.
     form: Mapped[str] = mapped_column(String(20), nullable=False)
-    passing_score: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    passing_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     average_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     source_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
