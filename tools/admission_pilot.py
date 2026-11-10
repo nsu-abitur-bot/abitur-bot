@@ -57,6 +57,31 @@ def object_digest(value: object) -> str:
     return digest(json.dumps(value, ensure_ascii=False, sort_keys=True).encode())
 
 
+def empty_store_valid(name: str, data: dict) -> bool:
+    if name != "kv_store_llm_response_cache.json":
+        return not (data.get("data") if name.startswith("vdb_") else data)
+    # Query keyword caches survive earlier runs, but are not indexed knowledge.
+    # Answer/extraction caches must never be accepted as an empty control.
+    for row in data.values():
+        if not isinstance(row, dict) or row.get("cache_type") != "keywords":
+            return False
+        try:
+            result = json.loads(row["return"])
+            if not isinstance(result, dict) or set(result) != {
+                "high_level_keywords",
+                "low_level_keywords",
+            }:
+                return False
+            if not all(
+                isinstance(v, list) and all(isinstance(x, str) for x in v)
+                for v in result.values()
+            ):
+                return False
+        except (ValueError, TypeError, KeyError):
+            return False
+    return True
+
+
 def validate_plan(plan: dict) -> None:
     require(plan["mode"] == "ten_case_pilot")
     require(plan["case_ids"] == list(CASE_IDS))
@@ -305,7 +330,7 @@ async def inspect_condition(
         for file in root.glob("**/*.json"):
             require(not file.is_symlink())
             data = json.loads(file.read_text())
-            require(not (data.get("data") if file.name.startswith("vdb_") else data))
+            require(empty_store_valid(file.name, data))
         for file in root.glob("**/*.graphml"):
             from xml.etree import ElementTree
 

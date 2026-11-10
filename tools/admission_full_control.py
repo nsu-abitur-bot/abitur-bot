@@ -99,7 +99,7 @@ def main() -> int:
                     "cli-run",
                     "--profile",
                     "pilot",
-                    "/evaluation/admission_full_batch_v1.py",
+                    "/evaluation/admission_full_batch_v2.py",
                     "--execute",
                     "--condition",
                     condition,

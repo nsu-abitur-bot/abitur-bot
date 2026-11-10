@@ -12,6 +12,26 @@ from tools.admission_full_plan import (
     reserve,
 )
 
+from tools.admission_pilot import empty_store_valid
+
+
+def test_empty_control_accepts_only_keyword_search_cache():
+    row = {
+        "cache_type": "keywords",
+        "return": json.dumps(
+            {"high_level_keywords": ["поступление"], "low_level_keywords": ["ФИТ"]}
+        ),
+    }
+    assert empty_store_valid("kv_store_llm_response_cache.json", {"one": row})
+    assert not empty_store_valid("kv_store_full_docs.json", {"one": row})
+    assert not empty_store_valid(
+        "kv_store_llm_response_cache.json", {"one": {**row, "cache_type": "query"}}
+    )
+    assert not empty_store_valid(
+        "kv_store_llm_response_cache.json",
+        {"one": {**row, "return": '{"answer":"fact"}'}},
+    )
+
 
 def plan():
     ids = [f"case-{i}" for i in range(50)]
