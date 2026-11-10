@@ -200,3 +200,106 @@ async def test_get_faq_hit_stats_respects_period(session: AsyncSession):
 
     assert stats["total_questions"] == 0
     assert stats["hit_rate"] is None
+
+
+@pytest.mark.asyncio
+async def test_get_answer_stats_aggregates_latency_no_answer_errors(
+    session: AsyncSession,
+):
+    """Метрики по периодам (#242): p50/p95 по latency_ms, доли неответов
+    и ошибок; записи без метаданных участвуют только в счётчике ответов."""
+    from db.postgres.models import MessageLog
+
+    service = MessageLogService(session)
+    day_one = datetime(2026, 11, 8, 12, 0, 0)
+    day_two = datetime(2026, 11, 9, 12, 0, 0)
+    rows = [
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="user_input",
+            content="В1",
+            created_at=day_one,
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="user_input",
+            content="В2",
+            created_at=day_one,
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="llm_response",
+            content="Не нашёл информации",
+            created_at=day_one,
+            message_metadata={"latency_ms": 100.0, "no_answer": True},
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="llm_response",
+            content="Ответ",
+            created_at=day_one,
+            message_metadata={"latency_ms": 300.0, "no_answer": False},
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="llm_response",
+            content="Сбой",
+            created_at=day_one,
+            message_metadata={"latency_ms": 500.0, "error": True},
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="user_input",
+            content="В3",
+            created_at=day_two,
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="llm_response",
+            content="Старая запись без метрик",
+            created_at=day_two,
+        ),
+        MessageLog(
+            user_id=1,
+            session_id="s",
+            message_type="faq_match",
+            content="Готовый ответ",
+            created_at=day_two,
+        ),
+    ]
+    session.add_all(rows)
+    await session.commit()
+
+    stats = await service.get_answer_stats(
+        start=datetime(2026, 11, 8), end=datetime(2026, 11, 9, 23, 59), group_by="day"
+    )
+
+    assert stats["total_questions"] == 3
+    assert stats["total_answers"] == 4
+    assert stats["total_no_answer"] == 1
+    assert stats["no_answer_share"] == pytest.approx(1 / 3)
+    assert stats["total_errors"] == 1
+    assert stats["error_share"] == pytest.approx(1 / 3)
+
+    first, second = stats["buckets"]
+    assert first["period"] == datetime(2026, 11, 8)
+    assert (first["questions"], first["answers"]) == (2, 3)
+    assert first["no_answer_share"] == pytest.approx(0.5)
+    assert first["error_share"] == pytest.approx(0.5)
+    # percentile_cont по {100, 300, 500}: p50 = 300, p95 интерполируется в 480.
+    assert first["latency_ms_p50"] == pytest.approx(300.0)
+    assert first["latency_ms_p95"] == pytest.approx(480.0)
+
+    # Запись без метрик считается ответом, но в перцентили не попадает.
+    assert (second["questions"], second["answers"]) == (1, 1)
+    assert second["no_answer"] == 0
+    assert second["errors"] == 0
+    assert second["latency_ms_p50"] is None
+    assert second["latency_ms_p95"] is None
