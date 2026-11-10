@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from evals.schema import Scenario
 
-RUNTIME = Path("/evaluation/pilot-runtime-20261110")
+RUNTIME = Path("/evaluation/pilot-runtime-20261110-v2")
 if RUNTIME.is_dir():
     sys.path.insert(0, str(RUNTIME))
 
@@ -205,8 +205,10 @@ class Progress:
                 os._exit(76)
 
 
-async def inspect_condition(condition: str) -> dict:
-    from sqlalchemy import text
+async def inspect_condition(
+    condition: str, *, prior_log_sessions: tuple[str, ...] = (), prior_log_count: int = 0
+) -> dict:
+    from sqlalchemy import bindparam, text
 
     from db.postgres.db import engine
 
@@ -225,9 +227,17 @@ async def inspect_condition(condition: str) -> dict:
                 "message_logs",
             )
         }
-        require(
-            all(counts[t] == 0 for t in ("faq_entry", "user", "message", "message_logs"))
-        )
+        require(all(counts[t] == 0 for t in ("faq_entry", "user", "message")))
+        require(counts["message_logs"] == prior_log_count)
+        if prior_log_count:
+            require(bool(prior_log_sessions))
+            known_logs = await connection.scalar(
+                text(
+                    "SELECT count(*) FROM message_logs WHERE session_id IN :sessions"
+                ).bindparams(bindparam("sessions", expanding=True)),
+                {"sessions": list(prior_log_sessions)},
+            )
+            require(known_logs == prior_log_count)
         rows = [
             dict(row)
             for row in (
@@ -347,7 +357,12 @@ async def evaluate(
         for relative, expected in plan["instrumentation_files"].items():
             require(digest((Path("/evaluation") / relative).read_bytes()) == expected)
         condition = progress.data["condition"]
-        kb = await inspect_condition(condition)
+        prior_state = plan.get("prior_state", {}).get(condition, {})
+        kb = await inspect_condition(
+            condition,
+            prior_log_sessions=tuple(prior_state.get("log_sessions", [])),
+            prior_log_count=prior_state.get("log_count", 0),
+        )
         config = {
             name: get_setting(name, spec.default)
             for name, spec in SPECS.items()
@@ -494,11 +509,25 @@ def main() -> int:
     progress.data["root_run_id"] = os.environ.get("EVAL388_RUN_ID")
     prior = plan.get("prior_reserve_micro_cny", {}).get(args.condition, 0)
     if prior:
-        require(args.condition == "with-kb")
-        require(
-            digest(Path("/reports/pilot-20261110-01/usage.jsonl").read_bytes())
-            == plan["prior_usage_sha256"]
-        )
+        records = plan.get("prior_usage_files", {}).get(args.condition)
+        if records:
+            for record in records:
+                require(
+                    re.fullmatch(
+                        r"(?:pilot|stream-diagnostic)-[0-9]{8}-[0-9]{2}/usage.jsonl",
+                        record["path"],
+                    )
+                )
+                require(
+                    digest((Path("/reports") / record["path"]).read_bytes())
+                    == record["sha256"]
+                )
+        else:
+            require(args.condition == "with-kb")
+            require(
+                digest(Path("/reports/pilot-20261110-01/usage.jsonl").read_bytes())
+                == plan["prior_usage_sha256"]
+            )
     ledger = PilotLedger(
         progress.path.parent,
         inspect_only=args.inspect_only,

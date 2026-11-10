@@ -1,4 +1,6 @@
+import gzip
 import json
+import zlib
 
 import httpx
 import pytest
@@ -29,10 +31,22 @@ def stream_body(usage=True, done=True):
     return body
 
 
+def encode_body(body: bytes, encoding: str) -> bytes:
+    if encoding == "gzip":
+        return gzip.compress(body)
+    if encoding == "deflate":
+        return zlib.compress(body)
+    if encoding == "zstd":
+        zstandard = pytest.importorskip("zstandard")
+        return zstandard.ZstdCompressor().compress(body)
+    return body
+
+
 @pytest.mark.asyncio
+@pytest.mark.parametrize("encoding", ["identity", "gzip", "deflate", "zstd"])
 @pytest.mark.parametrize("usage,done", [(True, True), (False, True), (True, False)])
 async def test_stream_preserved_and_incomplete_usage_blocks_spending(
-    tmp_path, usage, done
+    tmp_path, usage, done, encoding: str
 ):
     body = stream_body(usage, done)
     received = []
@@ -41,8 +55,11 @@ async def test_stream_preserved_and_incomplete_usage_blocks_spending(
         received.append(json.loads(request.content))
         return httpx.Response(
             200,
-            headers={"content-type": "text/event-stream; charset=utf-8"},
-            stream=Chunks(body),
+            headers={
+                "content-type": "text/event-stream; charset=utf-8",
+                "content-encoding": encoding,
+            },
+            stream=Chunks(encode_body(body, encoding)),
         )
 
     ledger = EvaluationUsageLedger(tmp_path / "usage.jsonl")
@@ -111,7 +128,10 @@ async def test_usage_required_before_network_and_unconsumed_stream_is_unknown(tm
 
 
 @pytest.mark.asyncio
-async def test_real_sdk_consumes_stream_and_records_usage_on_done(tmp_path):
+@pytest.mark.parametrize("encoding", ["identity", "gzip", "zstd"])
+async def test_real_sdk_consumes_stream_and_records_usage_on_done(
+    tmp_path, encoding: str
+):
     from openai import AsyncOpenAI
 
     frames = [
@@ -148,7 +168,9 @@ async def test_real_sdk_consumes_stream_and_records_usage_on_done(tmp_path):
     body += b"data: [DONE]\n\n"
     transport = httpx.MockTransport(
         lambda request: httpx.Response(
-            200, headers={"content-type": "text/event-stream"}, stream=Chunks(body)
+            200,
+            headers={"content-type": "text/event-stream", "content-encoding": encoding},
+            stream=Chunks(encode_body(body, encoding)),
         )
     )
     ledger = EvaluationUsageLedger(tmp_path / "usage.jsonl")

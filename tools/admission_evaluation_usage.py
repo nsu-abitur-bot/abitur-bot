@@ -70,7 +70,20 @@ class EvaluationUsageLedger(UsageLedger):
                         != "text/event-stream"
                     ):
                         raise IncompleteEvaluationStream("Unexpected stream transport")
-                    response.stream = _MeteredStream(response.stream, ledger, row)
+                    encoding = str(response.headers.get("content-encoding", "identity"))
+                    row["content_encoding"] = (
+                        encoding
+                        if encoding in ("identity", "gzip", "deflate", "br", "zstd")
+                        else "other"
+                    )
+                    # Transport bytes may be compressed. Decode a separate copy
+                    # for accounting, leaving the SDK's stream/decoder unchanged.
+                    decoder = httpx.Response(
+                        200, headers={"content-encoding": encoding}
+                    )._get_content_decoder()
+                    response.stream = _MeteredStream(
+                        response.stream, ledger, row, decoder=decoder
+                    )
                     return response
                 await response.aread()
             except BaseException as exc:
@@ -94,7 +107,7 @@ class EvaluationUsageLedger(UsageLedger):
 
 
 class _MeteredStream(httpx.AsyncByteStream):
-    def __init__(self, stream, ledger: UsageLedger, row: dict) -> None:
+    def __init__(self, stream, ledger: UsageLedger, row: dict, *, decoder) -> None:
         self.stream = stream
         self.ledger = ledger
         self.row = row
@@ -106,6 +119,8 @@ class _MeteredStream(httpx.AsyncByteStream):
         self.recorded = False
         self.failed: BaseException | None = None
         self.total_bytes = 0
+        self.wire_bytes = 0
+        self.decoder = decoder
         self.events_seen = 0
         self.provider_error_seen = False
 
@@ -164,6 +179,7 @@ class _MeteredStream(httpx.AsyncByteStream):
         # Fixed counters/flags explain the next failure without retaining frames,
         # provider error messages, generated text or headers.
         self.row["stream_evidence"] = {
+            "wire_bytes_seen": self.wire_bytes,
             "bytes_seen": self.total_bytes,
             "json_events_seen": self.events_seen,
             "done_seen": self.done,
@@ -177,8 +193,10 @@ class _MeteredStream(httpx.AsyncByteStream):
     async def __aiter__(self) -> AsyncIterator[bytes]:
         try:
             async for chunk in self.stream:
-                self._consume(chunk)
+                self.wire_bytes += len(chunk)
+                self._consume(self.decoder.decode(chunk))
                 yield chunk
+            self._consume(self.decoder.flush())
         except BaseException as exc:
             self.failed = exc
             raise
