@@ -23,8 +23,8 @@ class ParsedPageResult(BaseModel):
 
 
 class ConfirmUploadRequest(BaseModel):
-    title: str = Field(..., description="Название страницы")
-    url: str = Field(..., description="URL страницы")
+    title: str = Field(..., max_length=500, description="Название страницы")
+    url: str = Field(..., max_length=1000, description="URL страницы")
     text: str = Field(..., description="Отредактированный текст страницы")
     documents: list[ParsedDocument] = Field(
         ..., description="Финальный список файлов для загрузки"
@@ -56,6 +56,8 @@ class RagDocument(BaseModel):
     title: str | None = Field(None, description="Название документа")
     url: str | None = Field(None, description="Оригинальный URL или путь к файлу")
     status: str = Field(..., description="Статус обработки")
+    import_state: str | None = None
+    proposal_only: bool = False
     content_hash: str | None = Field(None, description="SHA-256 сырого контента")
     content_summary: str | None = Field(None, description="Краткое содержание")
     content_length: int | None = Field(None, description="Длина контента")
