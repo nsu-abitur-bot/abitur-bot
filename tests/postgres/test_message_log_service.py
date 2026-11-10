@@ -104,6 +104,39 @@ async def test_get_question_groups_merges_exact_matches(session: AsyncSession):
 
 
 @pytest.mark.asyncio
+async def test_get_question_groups_filters_by_message_type(session: AsyncSession):
+    """Очередь неотвеченных (#258): тип no_answer отделяет пробелы контента
+    от всех вопросов и сервисных записей."""
+    service = MessageLogService(session)
+
+    entries = [
+        ("user_input", "Как поступить в НГУ?"),
+        ("faq_match", "Как поступить в НГУ?"),
+        ("llm_response", "Документы принимают с 20 июня."),
+        ("no_answer", "Есть ли стипендия для аспирантов?"),
+        ("no_answer", "есть ли стипендия для аспирантов?"),
+        ("no_answer", "Как проходит апелляция?"),
+    ]
+    for index, (message_type, content) in enumerate(entries, start=1):
+        await service.create_log(
+            user_id=index,
+            session_id=f"session-{index}",
+            message_type=message_type,
+            content=content,
+        )
+
+    groups = await service.get_question_groups(raw_limit=10, message_type="no_answer")
+
+    assert [group["count"] for group in groups] == [2, 1]
+    assert groups[0]["question"] == "Есть ли стипендия для аспирантов?"
+    assert groups[0]["variants"] == [
+        "Есть ли стипендия для аспирантов?",
+        "есть ли стипендия для аспирантов?",
+    ]
+    assert groups[1]["question"] == "Как проходит апелляция?"
+
+
+@pytest.mark.asyncio
 async def test_get_faq_hit_stats_counts_and_rate(session: AsyncSession):
     """Доля срабатываний FAQ: faq_match / user_input, прочие типы не считаются."""
     service = MessageLogService(session)
