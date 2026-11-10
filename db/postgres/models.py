@@ -248,7 +248,7 @@ class MessageLog(Base):
     session_id: Mapped[str] = mapped_column(String(255), nullable=False)
     message_type: Mapped[str] = mapped_column(
         String(50), nullable=False
-    )  # 'user_input', 'rag_context', 'llm_response', 'faq_match'
+    )  # 'user_input', 'rag_context', 'llm_response', 'faq_match', 'no_answer'
     content: Mapped[str] = mapped_column(Text, nullable=False)
     message_metadata: Mapped[Optional[dict]] = mapped_column(
         JSON, nullable=True

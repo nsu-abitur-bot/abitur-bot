@@ -379,10 +379,12 @@ class MessageLogService:
     async def get_question_groups(
         self,
         raw_limit: int = DEFAULT_QUESTION_RAW_LIMIT,
+        message_type: str = "user_input",
     ) -> List[QuestionGroup]:
         """Вопросы пользователей, сгруппированные по точному совпадению текста.
 
-        Объединение близких по смыслу формулировок делает
+        `message_type` отделяет очередь неотвеченных (`no_answer`, #258) от
+        всех вопросов. Объединение близких по смыслу формулировок делает
         `api/services/popular_questions.py`: для него нужны эмбеддинги, то есть
         вызов модели, и слою данных он не принадлежит.
         """
@@ -391,7 +393,7 @@ class MessageLogService:
                 MessageLog.content.label("question"),
                 func.count(MessageLog.id).label("count"),
             )
-            .where(MessageLog.message_type == "user_input")
+            .where(MessageLog.message_type == message_type)
             .group_by(MessageLog.content)
             .order_by(func.count(MessageLog.id).desc())
             .limit(raw_limit)

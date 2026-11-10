@@ -318,3 +318,41 @@ async def get_popular_questions(
         raise HTTPException(
             status_code=500, detail=f"Ошибка получения популярных вопросов: {str(e)}"
         )
+
+
+@router.get(
+    "/unanswered",
+    response_model=PopularQuestionsResponse,
+    summary="Очередь вопросов без ответа",
+)
+async def get_unanswered_questions(
+    limit: int = Query(50, ge=1, le=200),
+    raw_limit: int = Query(500, ge=1, le=5000),
+    log_service: MessageLogService = Depends(get_message_log_service),
+):
+    """Вопросы, на которые бот честно ответил «не нашёл информации» (#258).
+
+    Пайплайн пишет их с типом `no_answer`; здесь они сгруппированы с частотой
+    и вариантами формулировок — это очередь на наполнение базы знаний.
+    Сервисные сбои («сервис недоступен») в очередь не попадают: это ошибки
+    инфраструктуры, а не пробелы контента.
+    """
+    try:
+        groups = await log_service.get_question_groups(
+            raw_limit=raw_limit,
+            message_type="no_answer",
+        )
+        return PopularQuestionsResponse(
+            questions=[
+                PopularQuestion(
+                    question=item["question"],
+                    count=item["count"],
+                    variants=item["variants"],
+                )
+                for item in groups[:limit]
+            ]
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Ошибка получения вопросов без ответа: {str(e)}"
+        )

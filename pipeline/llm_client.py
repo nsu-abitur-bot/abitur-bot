@@ -744,6 +744,24 @@ async def _run_tool_loop(
     return result.text or streamed.strip(), result.usage, provider_name
 
 
+EMPTY_ANSWER_TEXT = "Ответ не найден"
+_NOT_FOUND_MARKERS = ("не нашел информации", "не нашёл информации", "не найдена")
+
+
+def _is_no_answer_text(text: str) -> bool:
+    """Честный отказ «в базе этого нет» — пробел в наполнении, а не сбой (#258).
+
+    Маркеры те же, по которым _postprocess отклеивает источники от отказа;
+    тексты сервисных сбоев («сервис недоступен», «LLM временно недоступна»)
+    сюда не входят — это ошибки инфраструктуры, а не пробел контента.
+    """
+    lowered = text.lower()
+    return (
+        any(marker in lowered for marker in _NOT_FOUND_MARKERS)
+        or text.strip() == EMPTY_ANSWER_TEXT
+    )
+
+
 def _postprocess(content: str, rag_sources: list[dict]) -> _Postprocessed:
     """Готовит ответ к отправке: ссылки, источники, артефакты, пустой ответ."""
     # Ссылки, которые придумала модель, оставляем текстом без адреса: свои
@@ -752,18 +770,13 @@ def _postprocess(content: str, rag_sources: list[dict]) -> _Postprocessed:
     log_text = content
 
     # К отказу «не нашёл информации» список источников приклеивать бессмысленно.
-    lowered = content.lower()
-    not_found = (
-        "не нашел информации" in lowered
-        or "не нашёл информации" in lowered
-        or "не найдена" in lowered
-    )
+    not_found = _is_no_answer_text(content)
     sources = [] if not_found else list(rag_sources)
 
     content = content.strip()
     if not content:
         logger.warning("LLM returned empty content.")
-        return _Postprocessed(text="Ответ не найден", sources=[], log_text=log_text)
+        return _Postprocessed(text=EMPTY_ANSWER_TEXT, sources=[], log_text=log_text)
 
     return _Postprocessed(text=content, sources=sources, log_text=log_text)
 
@@ -985,6 +998,11 @@ async def ask_local_llm(
             ctx,
             stream_callback,
         )
+        # Вопрос остался без содержательного ответа — в очередь редактору (#258):
+        # тип no_answer агрегируется MessageLogService.get_question_groups,
+        # так что повторы одного вопроса накапливаются с частотой.
+        if _is_no_answer_text(content):
+            ctx.log("no_answer", message)
         _store_answer(content, message, redis_client, ctx)
 
         logger.info(f"[{session_id}] Message processing complete.")
