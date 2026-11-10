@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from evals.schema import Scenario
 
 RUNTIME = Path("/evaluation/pilot-runtime-20261110-v2")
-if RUNTIME.is_dir():
+if __name__ == "__main__" and RUNTIME.is_dir():
     sys.path.insert(0, str(RUNTIME))
 
 from tools.admission_evaluation_usage import EvaluationUsageLedger  # noqa: E402
@@ -72,15 +72,17 @@ class PilotLedger(EvaluationUsageLedger):
         *,
         inspect_only: bool = False,
         prior_reserve_micro_cny: int = 0,
+        max_attempts: int = 256,
     ) -> None:
         require(
             type(prior_reserve_micro_cny) is int
             and 0 <= prior_reserve_micro_cny < 5_000_000
         )
+        require(type(max_attempts) is int and 1 <= max_attempts <= 512)
         super().__init__(
             directory / "usage.jsonl",
             batch=True,
-            max_attempts=0 if inspect_only else 256,
+            max_attempts=0 if inspect_only else max_attempts,
             embedding_byte_limit=1_000_000,
             deepseek_ceiling_micro_cny=5_000_000 - prior_reserve_micro_cny,
         )
@@ -139,22 +141,30 @@ class PilotLedger(EvaluationUsageLedger):
 
 
 class Progress:
-    def __init__(self, directory: Path, condition: str, plan: dict) -> None:
+    def __init__(
+        self,
+        directory: Path,
+        condition: str,
+        plan: dict,
+        *,
+        case_ids: tuple[str, ...] = CASE_IDS,
+        full_run: bool = False,
+    ) -> None:
         directory.mkdir()
         self.path = directory / "report.json"
         self.lock = threading.RLock()
         self.stop = threading.Event()
         self.data: dict = {
             "schema_version": 1,
-            "mode": "live_pilot",
+            "mode": "live_full_batch" if full_run else "live_pilot",
             "status": "started",
             "condition": condition,
             "dataset_sha256": DATASET_SHA,
             "plan_sha256": object_digest(plan),
             "image_revision": IMAGE_REVISION,
             "started_at_utc": datetime.now(UTC).isoformat(),
-            "total": 10,
-            "selected_ids": list(CASE_IDS),
+            "total": len(case_ids),
+            "selected_ids": list(case_ids),
             "results": [],
             "calibration": [],
             "phases": [],
@@ -162,7 +172,7 @@ class Progress:
             "case_timeout_seconds": CASE_TIMEOUT,
             "concurrency": 1,
             "case_retries": 0,
-            "full_run_started": False,
+            "full_run_started": full_run,
             "peak_sampled_swap_bytes": 0,
             "min_host_available_kib": 2**63,
         }
@@ -206,7 +216,10 @@ class Progress:
 
 
 async def inspect_condition(
-    condition: str, *, prior_log_sessions: tuple[str, ...] = (), prior_log_count: int = 0
+    condition: str,
+    *,
+    prior_log_sessions: tuple[str, ...] = (),
+    prior_log_count: int | None = 0,
 ) -> dict:
     from sqlalchemy import bindparam, text
 
@@ -228,8 +241,9 @@ async def inspect_condition(
             )
         }
         require(all(counts[t] == 0 for t in ("faq_entry", "user", "message")))
-        require(counts["message_logs"] == prior_log_count)
-        if prior_log_count:
+        if prior_log_count is not None:
+            require(counts["message_logs"] == prior_log_count)
+        if counts["message_logs"]:
             require(bool(prior_log_sessions))
             known_logs = await connection.scalar(
                 text(
@@ -237,7 +251,7 @@ async def inspect_condition(
                 ).bindparams(bindparam("sessions", expanding=True)),
                 {"sessions": list(prior_log_sessions)},
             )
-            require(known_logs == prior_log_count)
+            require(known_logs == counts["message_logs"])
         rows = [
             dict(row)
             for row in (
@@ -339,7 +353,12 @@ def calibrations(scenarios: dict[str, Scenario]) -> list[tuple[str, Scenario, st
 
 
 async def evaluate(
-    progress: Progress, ledger: PilotLedger, plan: dict, *, inspect_only: bool = False
+    progress: Progress,
+    ledger: PilotLedger,
+    plan: dict,
+    *,
+    inspect_only: bool = False,
+    case_ids: tuple[str, ...] = CASE_IDS,
 ) -> None:
     from bootstrap.runtime_settings import refresh_settings
     from config.instance import SPECS, get_setting
@@ -401,7 +420,7 @@ async def evaluate(
         scenarios = load_scenarios(path)
         require(len(scenarios) == 50)
         by_id = {s.id: s for s in scenarios}
-        require(set(CASE_IDS) <= set(by_id))
+        require(set(case_ids) <= set(by_id))
         progress.sample("preflight_complete")
         if plan.get("expected_configuration_sha256"):
             require(
@@ -438,7 +457,7 @@ async def evaluate(
             require(entry["matches"])
         ledger.context("answer", "setup")
         progress.sample("calibration_completed")
-        for case_id in CASE_IDS:
+        for case_id in case_ids:
             scenario = by_id[case_id]
             before = progress.sample(case_id)
             started = time.monotonic()
