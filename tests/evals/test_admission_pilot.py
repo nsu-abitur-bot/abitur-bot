@@ -97,3 +97,9 @@ def test_price_guard_can_only_be_tightened(tmp_path):
             )
         )
     assert ledger.sequence == 0
+
+
+def test_retry_reserves_previous_unknown_cost_inside_same_budget(tmp_path):
+    ledger = PilotLedger(tmp_path, prior_reserve_micro_cny=10926)
+    assert ledger.deepseek_ceiling_micro_cny == 5_000_000 - 10926
+    assert ledger.accounting()["prior_reserve_micro_cny"] == 10926

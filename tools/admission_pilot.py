@@ -66,13 +66,23 @@ def validate_plan(plan: dict) -> None:
 
 
 class PilotLedger(EvaluationUsageLedger):
-    def __init__(self, directory: Path, *, inspect_only: bool = False) -> None:
+    def __init__(
+        self,
+        directory: Path,
+        *,
+        inspect_only: bool = False,
+        prior_reserve_micro_cny: int = 0,
+    ) -> None:
+        require(
+            type(prior_reserve_micro_cny) is int
+            and 0 <= prior_reserve_micro_cny < 5_000_000
+        )
         super().__init__(
             directory / "usage.jsonl",
             batch=True,
             max_attempts=0 if inspect_only else 256,
             embedding_byte_limit=1_000_000,
-            deepseek_ceiling_micro_cny=5_000_000,
+            deepseek_ceiling_micro_cny=5_000_000 - prior_reserve_micro_cny,
         )
         self.intent_path = directory / "intents.jsonl"
         self.path.touch(exist_ok=False)
@@ -81,6 +91,7 @@ class PilotLedger(EvaluationUsageLedger):
         self.case_id = "setup"
         self.completed = 0
         self.halted = False
+        self.prior_reserve_micro_cny = prior_reserve_micro_cny
 
     def context(self, phase: str, case_id: str) -> None:
         require(
@@ -121,6 +132,7 @@ class PilotLedger(EvaluationUsageLedger):
             "operation_counts": dict(self.operation_counts),
             "uncertain_failure": self.uncertain_failure,
             "halted": self.halted,
+            "prior_reserve_micro_cny": self.prior_reserve_micro_cny,
             "reserved_peak_no_cache_micro_cny": self.reserved_deepseek_micro_cny,
             "embedding_input_bytes": self.reserved_embedding_bytes,
         }
@@ -480,7 +492,18 @@ def main() -> int:
     progress = Progress(Path("/reports") / args.label, args.condition, plan)
     progress.data["inspect_only"] = args.inspect_only
     progress.data["root_run_id"] = os.environ.get("EVAL388_RUN_ID")
-    ledger = PilotLedger(progress.path.parent, inspect_only=args.inspect_only)
+    prior = plan.get("prior_reserve_micro_cny", {}).get(args.condition, 0)
+    if prior:
+        require(args.condition == "with-kb")
+        require(
+            digest(Path("/reports/pilot-20261110-01/usage.jsonl").read_bytes())
+            == plan["prior_usage_sha256"]
+        )
+    ledger = PilotLedger(
+        progress.path.parent,
+        inspect_only=args.inspect_only,
+        prior_reserve_micro_cny=prior,
+    )
     observer = threading.Thread(target=progress.observe, daemon=True)
     observer.start()
     code = 1
