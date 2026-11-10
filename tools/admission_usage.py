@@ -112,6 +112,7 @@ class UsageLedger:
         *,
         batch: bool = False,
         embedding_byte_limit: int | None = None,
+        deepseek_ceiling_micro_cny: int | None = None,
     ) -> None:
         self.path = path
         self.max_attempts = max_attempts
@@ -122,6 +123,14 @@ class UsageLedger:
         self.reserved_embedding_bytes = 0
         self.uncertain_failure = False
         self.batch = batch
+        default_ceiling = 20_000_000 if batch else 5_000_000
+        self.deepseek_ceiling_micro_cny = (
+            default_ceiling
+            if deepseek_ceiling_micro_cny is None
+            else deepseek_ceiling_micro_cny
+        )
+        if not 0 < self.deepseek_ceiling_micro_cny <= default_ceiling:
+            raise ValueError("The price guard can only be tightened")
         self.embedding_byte_limit = (
             embedding_byte_limit
             if embedding_byte_limit is not None
@@ -193,7 +202,7 @@ class UsageLedger:
                 # Conservative Flash peak rate, cache treated as a miss. JSON bytes
                 # plus framing are a planning bound, not a provider token count.
                 reserve = (len(request.content) + 512) * 2 + maximum * 8
-                ceiling = 20_000_000 if self.batch else 5_000_000
+                ceiling = self.deepseek_ceiling_micro_cny
                 if self.reserved_deepseek_micro_cny + reserve > ceiling:
                     raise IndexingLimit("Indexing planning reserve exceeded")
                 self.reserved_deepseek_micro_cny += reserve
@@ -271,7 +280,7 @@ class UsageLedger:
                     + row["usage"]["completion_tokens"] * 8
                 )
                 self.reserved_deepseek_micro_cny += settled - row["reserved_micro_cny"]
-                if self.reserved_deepseek_micro_cny > 20_000_000:
+                if self.reserved_deepseek_micro_cny > self.deepseek_ceiling_micro_cny:
                     self.uncertain_failure = True
             with self.path.open("a", encoding="utf-8") as output:
                 output.write(json.dumps(row, ensure_ascii=False) + "\n")
