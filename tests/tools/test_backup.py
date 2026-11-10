@@ -7,6 +7,7 @@
 
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import tarfile
@@ -181,6 +182,16 @@ def test_pg_dump_command_and_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     assert calls["env"]["PGPASSWORD"] == "secret-pass"
 
 
+def _client_major() -> int:
+    version = subprocess.run(
+        ["pg_dump", "--version"], capture_output=True, text=True, check=True
+    ).stdout
+    match = re.search(r"(\d+)\.", version)
+    if match is None:
+        pytest.skip(f"Не разобрали версию pg_dump: {version.strip()}")
+    return int(match.group(1))
+
+
 @pytest.mark.skipif(not PG_DUMP_AVAILABLE, reason="в окружении нет pg_dump")
 async def test_dump_restore_roundtrip_real_postgres(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -190,6 +201,22 @@ async def test_dump_restore_roundtrip_real_postgres(
     from tests.postgres.conftest import TEST_DATABASE_URL
 
     monkeypatch.setenv("DATABASE_URL", TEST_DATABASE_URL)
+    engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
+
+    # Клиент новее сервера умеет дампы, которые старый сервер не примет
+    # (pg_dump 17+ кладёт SET transaction_timeout, которого нет в PG15).
+    # В проде версии совпадают (в образе postgresql-client 15, сервер 15),
+    # рассинхрон — артефакт окружения, честный roundtrip там невозможен.
+    async with engine.connect() as conn:
+        server_version = await conn.execute(text("SHOW server_version"))
+        server_major = int(str(server_version.scalar()).split(".")[0])
+    await engine.dispose()
+    if _client_major() > server_major:
+        pytest.skip(
+            f"pg_dump {_client_major()} новее сервера {server_major}: "
+            "дамп с SET transaction_timeout сервер не примет"
+        )
+
     engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
 
     async with engine.begin() as conn:
