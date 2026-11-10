@@ -12,6 +12,7 @@ from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.dto import RatingEntry
 from db.postgres.services.rating import RatingService
+from liveness import LivenessServer
 from logging_config import setup_logging
 from parser.rating import (
     ListFetchResult,
@@ -256,6 +257,8 @@ def reload_settings() -> None:
 
 async def main() -> None:
     async with runtime_settings():
+        liveness = LivenessServer()
+        await liveness.start()
         interval = int(get_setting("RATING_POLL_START_SECONDS", "1800"))
         while True:
             reload_settings()

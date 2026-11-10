@@ -39,6 +39,7 @@ dependencies = [
     "cryptography>=50.0.2",
     "pillow>=12.2.0",
     "certifi>=2025.10.5",
+    "aiohttp>=3.12.15",
 ]
 
 [dependency-groups]

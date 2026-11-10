@@ -9,6 +9,7 @@ from bot.telegram_bot import run_telegram_bot
 from db.postgres.config import DATABASE_URL
 from faq.matcher import get_faq_matcher
 from faq.updates import watch_faq_updates
+from liveness import LivenessServer
 from pipeline.llm_client import cleanup_redis
 
 logger = logging.getLogger(__name__)
@@ -47,6 +48,8 @@ async def _run_with_restart(
 
 async def main() -> None:
     async with runtime_settings():
+        liveness = LivenessServer()
+        await liveness.start()
         tasks = [
             asyncio.create_task(supervise_channel("telegram", run_telegram_bot)),
             asyncio.create_task(supervise_channel("max", run_max_bot)),
@@ -64,6 +67,7 @@ async def main() -> None:
                 task.cancel()
             await asyncio.gather(*tasks, return_exceptions=True)
             await cleanup_redis()
+            await liveness.aclose()
 
 
 if __name__ == "__main__":
