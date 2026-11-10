@@ -7,6 +7,7 @@ COPY --from=ghcr.io/astral-sh/uv:0.10.7 /uv /uvx /bin/
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 # Контейнер работает не от root; фиксированный UID 1000 — чтобы владельцем

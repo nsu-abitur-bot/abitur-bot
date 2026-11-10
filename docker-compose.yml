@@ -129,6 +129,30 @@ services:
       timeout: 3s
       retries: 10
 
+  # Резервное копирование БД и базы знаний (#229): цикл tools/backup снимает
+  # pg_dump и архив data/lightrag в ./backups на хосте, ротация держит
+  # последние BACKUP_KEEP копий. Восстановление — tools/restore (docs/backup.md).
+  backup:
+    image: ghcr.io/nsu-abitur-bot/abitur-bot:${BACKEND_IMAGE_TAG:-main}
+    restart: always
+    command: python -m tools.backup
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
+      - DB_HOST=postgres
+      - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      - BACKUP_DIR=/app/backups
+      - BACKUP_INTERVAL_SECONDS=${BACKUP_INTERVAL_SECONDS:-86400}
+      - BACKUP_KEEP=${BACKUP_KEEP:-14}
+    volumes:
+      - ./backups:/app/backups
+      # Только чтение: сервис копирует файлы БЗ, писать в них должен лишь бот.
+      - ./data:/app/data:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   postgres:
     image: postgres:15-alpine
     restart: always
