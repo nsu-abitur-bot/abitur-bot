@@ -26,7 +26,7 @@
     },
     {
       "file": "manual-review.json",
-      "sha256": "50f78c8c17ae32f376e3f38baaed44ca015f2f2499d2baa90b257be39e77ca26"
+      "sha256": "c764d65262945f969498120c9592fef55486f8c8a586b94c3dfa3caeeb21eada"
     },
     {
       "file": "pilot-20261110-controller-04-empty-kb-controller.json",
@@ -58,7 +58,7 @@
     },
     {
       "file": "summary.json",
-      "sha256": "4a29bc6b03a4d820b93ac0ac5291fa68c9534bf9976bf5029e124f2dc003223a"
+      "sha256": "7b3088c467d64556394b4ae193f8f745bfdf48918e736960ee47942d53084c8b"
     },
     {
       "file": "with-kb-pilot-20261110-03-intents.jsonl",
