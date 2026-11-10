@@ -20,7 +20,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from evals.schema import Scenario
 
-from tools.admission_evaluation_usage import EvaluationUsageLedger
+RUNTIME = Path("/evaluation/pilot-runtime-20261110")
+if RUNTIME.is_dir():
+    sys.path.insert(0, str(RUNTIME))
+
+from tools.admission_evaluation_usage import EvaluationUsageLedger  # noqa: E402
 
 CASE_IDS = (
     "nsu-pre-flow-01",
@@ -224,11 +228,24 @@ async def inspect_condition(condition: str) -> dict:
     statuses = root / "abitur_kb/kv_store_doc_status.json"
     records = json.loads(statuses.read_text()) if statuses.exists() else {}
     if condition == "with-kb":
-        from tools.admission_index_remaining import read_sources, ready_sources
-
-        sources = read_sources(Path("/evaluation"))
+        sources = json.loads(Path("/evaluation/batch-sources.json").read_text())[
+            "sources"
+        ]
         require(counts["document"] == counts["content_proposal"] == len(records) == 9)
-        require(ready_sources(rows, sources) == {s["url"] for s in sources})
+        by_url = {source["url"]: source for source in sources}
+        require({row["source_url"] for row in rows} == set(by_url))
+        for row in rows:
+            source = by_url[row["source_url"]]
+            require(row["content_hash"] == source["raw_sha256"])
+            require(row["graph_id"] == "abitur_kb" and row["last_indexed_at"] is not None)
+            require(
+                row["proposal_status"] == "approved"
+                and row["proposal_document_id"] == row["id"]
+            )
+            require(
+                digest((Path("/evaluation/inputs") / source["filename"]).read_bytes())
+                == source["text_sha256"]
+            )
         require(set(records) == {row["rag_doc_id"] for row in rows})
         require(all(value["status"] == "processed" for value in records.values()))
         for row in rows:
