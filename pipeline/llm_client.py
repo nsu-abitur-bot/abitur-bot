@@ -316,6 +316,13 @@ class _Ctx:
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
     score_query: dict | None = None
+    # Начало обработки вопроса (perf_counter): по нему в llm_response
+    # пишется latency_ms для агрегатов наблюдаемости (#242).
+    started_monotonic: float = field(default_factory=perf_counter)
+
+    def latency_ms(self) -> float:
+        """Сколько прошло от начала обработки вопроса до текущего момента."""
+        return round((perf_counter() - self.started_monotonic) * 1000, 1)
 
     def remember_score_scope(self, scope: dict) -> None:
         self.score_query = scope
@@ -835,6 +842,13 @@ async def _answer_without_kb(
         )
     except Exception as e:
         logger.warning(f"[{session_id}] Provider generation error: {e}")
+        ctx.log(
+            "llm_response",
+            RAG_UNAVAILABLE_ANSWER,
+            error=True,
+            retrieval_failed=True,
+            latency_ms=ctx.latency_ms(),
+        )
         return RAG_UNAVAILABLE_ANSWER, []
 
     if not used_tool and content in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
@@ -843,6 +857,13 @@ async def _answer_without_kb(
         logger.info(
             f"[{session_id}] Knowledge base unavailable and no tool used: "
             "answering that the service is unavailable."
+        )
+        ctx.log(
+            "llm_response",
+            RAG_UNAVAILABLE_ANSWER,
+            error=True,
+            retrieval_failed=True,
+            latency_ms=ctx.latency_ms(),
         )
         return RAG_UNAVAILABLE_ANSWER, []
 
@@ -855,6 +876,9 @@ async def _answer_without_kb(
         tokens=llm_usage.to_dict(),
         tokens_used=llm_usage.total_tokens or None,
         retrieval_failed=True,
+        # Ответ собран из инструмента при упавшем поиске — не сбой и не пробел.
+        no_answer=_is_no_answer_text(processed.text),
+        latency_ms=ctx.latency_ms(),
     )
     return processed.text, processed.sources
 
@@ -897,6 +921,8 @@ async def _generate_answer(
             provider=provider_name,
             tokens=llm_usage.to_dict(),
             tokens_used=llm_usage.total_tokens or None,
+            no_answer=_is_no_answer_text(processed.text),
+            latency_ms=ctx.latency_ms(),
         )
         logger.info(
             f"[{session_id}] Final LLM response "
@@ -905,6 +931,12 @@ async def _generate_answer(
         return processed.text, processed.sources
     except Exception as e:
         logger.warning(f"[{session_id}] Provider generation error: {e}")
+        ctx.log(
+            "llm_response",
+            "LLM временно недоступна.",
+            error=True,
+            latency_ms=ctx.latency_ms(),
+        )
         return "LLM временно недоступна.", []
 
 
@@ -1010,6 +1042,12 @@ async def ask_local_llm(
 
     except Exception as e:
         logger.error(f"[{session_id}] LLM error: {e}")
+        ctx.log(
+            "llm_response",
+            "Что-то пошло не так",
+            error=True,
+            latency_ms=ctx.latency_ms(),
+        )
         return LlmAnswer(text="Что-то пошло не так", trace=ctx.trace)
 
 

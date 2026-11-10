@@ -3,6 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from api.schemas.message_log import (
+    AnswerStatsResponse,
     FaqHitStatsResponse,
     MessageLogListResponse,
     MessageLogQueryParams,
@@ -120,6 +121,61 @@ async def get_faq_hit_stats(
         raise HTTPException(
             status_code=500,
             detail=f"Ошибка получения статистики FAQ: {str(e)}",
+        )
+
+
+@router.get(
+    "/answer-stats",
+    response_model=AnswerStatsResponse,
+    summary="Метрики ответов: latency, доля неотвеченных, ошибки",
+)
+async def get_answer_stats(
+    start: datetime | None = Query(None, description="Начало периода (ISO 8601)"),
+    end: datetime | None = Query(None, description="Конец периода (ISO 8601)"),
+    group_by: str = Query(
+        "day",
+        description="Группировка: hour, day, week, month",
+    ),
+    log_service: MessageLogService = Depends(get_message_log_service),
+):
+    """Наблюдаемость ответов по периодам (#242): время отклика (p50/p95),
+    доля неотвеченных и ошибок. Наполняется с момента деплоя: метрики
+    пишутся пайплайном в message_metadata каждой записи llm_response."""
+    allowed_groups = {"hour", "day", "week", "month"}
+    if group_by not in allowed_groups:
+        raise HTTPException(
+            status_code=400,
+            detail=f"group_by должен быть одним из {sorted(allowed_groups)}",
+        )
+
+    if start is not None and end is not None and start > end:
+        raise HTTPException(
+            status_code=400,
+            detail="start не может быть позже end",
+        )
+
+    try:
+        stats = await log_service.get_answer_stats(
+            start=start,
+            end=end,
+            group_by=group_by,
+        )
+        return AnswerStatsResponse(
+            total_questions=stats["total_questions"],
+            total_answers=stats["total_answers"],
+            total_no_answer=stats["total_no_answer"],
+            no_answer_share=stats["no_answer_share"],
+            total_errors=stats["total_errors"],
+            error_share=stats["error_share"],
+            group_by=group_by,
+            start=start,
+            end=end,
+            buckets=stats["buckets"],
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Ошибка получения метрик ответов: {str(e)}",
         )
 
 

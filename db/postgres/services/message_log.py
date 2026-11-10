@@ -4,7 +4,8 @@ import re
 from datetime import datetime, timedelta
 from typing import List, Optional, TypedDict
 
-from sqlalchemy import Sequence, func, or_
+from sqlalchemy import Float, Sequence, func, or_
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -310,6 +311,108 @@ class MessageLogService:
             "total_questions": total_questions,
             "total_hits": total_hits,
             "hit_rate": total_hits / total_questions if total_questions else None,
+            "buckets": buckets,
+        }
+
+    async def get_answer_stats(
+        self,
+        start: Optional[datetime],
+        end: Optional[datetime],
+        group_by: str,
+    ) -> dict:
+        """Наблюдаемость ответов по периодам (#242): latency, неответы, ошибки.
+
+        Числитель метрик — записи `llm_response`, у которых пайплайн пишет
+        `latency_ms` / `no_answer` / `error` в message_metadata; записи без
+        этих ключей (старые данные) участвуют только в счётчике ответов.
+        `questions` — все `user_input` периода: FAQ-попадания отвечают без
+        `llm_response`, поэтому знаменатель доли неответов шире ответов модели.
+        """
+        if start is not None:
+            start = start.replace(tzinfo=None)
+        if end is not None:
+            end = end.replace(tzinfo=None)
+
+        # JSON-колонка приводится к jsonb ради ->>: так ключи читаются
+        # текстом и кастуются на месте, NULL для отсутствующих ключей.
+        meta = MessageLog.message_metadata.cast(JSONB)
+        latency_expr = func.nullif(meta["latency_ms"].astext, "").cast(Float)
+        no_answer_expr = meta["no_answer"].astext == "true"
+        error_expr = meta["error"].astext == "true"
+
+        period_expr = func.date_trunc(group_by, MessageLog.created_at).label("period")
+        questions_expr = (
+            func.count()
+            .filter(MessageLog.message_type == "user_input")
+            .label("questions")
+        )
+        answers_expr = (
+            func.count()
+            .filter(MessageLog.message_type == "llm_response")
+            .label("answers")
+        )
+        no_answer_count_expr = func.count().filter(no_answer_expr).label("no_answer")
+        error_count_expr = func.count().filter(error_expr).label("errors")
+        p50_expr = func.percentile_cont(0.5).within_group(latency_expr).label("p50_ms")
+        p95_expr = func.percentile_cont(0.95).within_group(latency_expr).label("p95_ms")
+
+        stmt = (
+            select(
+                period_expr,
+                questions_expr,
+                answers_expr,
+                no_answer_count_expr,
+                error_count_expr,
+                p50_expr,
+                p95_expr,
+            )
+            .where(
+                MessageLog.message_type.in_(["user_input", "llm_response"]),
+            )
+            .group_by(period_expr)
+            .order_by(period_expr)
+        )
+        if start is not None:
+            stmt = stmt.where(MessageLog.created_at >= start)
+        if end is not None:
+            stmt = stmt.where(MessageLog.created_at <= end)
+        rows = (await self.session.execute(stmt)).all()
+
+        def _bucket(mapping) -> dict:
+            questions = int(mapping["questions"])
+            answers = int(mapping["answers"])
+            no_answer = int(mapping["no_answer"])
+            errors = int(mapping["errors"])
+            return {
+                "period": mapping["period"],
+                "questions": questions,
+                "answers": answers,
+                "no_answer": no_answer,
+                "no_answer_share": no_answer / questions if questions else None,
+                "errors": errors,
+                "error_share": errors / questions if questions else None,
+                "latency_ms_p50": mapping["p50_ms"],
+                "latency_ms_p95": mapping["p95_ms"],
+            }
+
+        buckets = [
+            bucket
+            for row in rows
+            if (bucket := _bucket(row._mapping))["period"] is not None
+        ]
+        totals_questions = sum(bucket["questions"] for bucket in buckets)
+        totals_answers = sum(bucket["answers"] for bucket in buckets)
+        totals_no_answer = sum(bucket["no_answer"] for bucket in buckets)
+        totals_errors = sum(bucket["errors"] for bucket in buckets)
+        return {
+            "total_questions": totals_questions,
+            "total_answers": totals_answers,
+            "total_no_answer": totals_no_answer,
+            "no_answer_share": (
+                totals_no_answer / totals_questions if totals_questions else None
+            ),
+            "total_errors": totals_errors,
+            "error_share": totals_errors / totals_questions if totals_questions else None,
             "buckets": buckets,
         }
 
