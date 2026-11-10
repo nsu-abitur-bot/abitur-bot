@@ -106,6 +106,8 @@ class _MeteredStream(httpx.AsyncByteStream):
         self.recorded = False
         self.failed: BaseException | None = None
         self.total_bytes = 0
+        self.events_seen = 0
+        self.provider_error_seen = False
 
     def _event(self) -> None:
         if not self.event:
@@ -119,8 +121,12 @@ class _MeteredStream(httpx.AsyncByteStream):
             self.done = True
             return
         body = json.loads(data)
+        self.events_seen += 1
         if not isinstance(body, dict):
             raise IncompleteEvaluationStream("Invalid SSE object")
+        if body.get("error") is not None:
+            self.provider_error_seen = True
+            raise IncompleteEvaluationStream("Provider error frame")
         if body.get("usage") is not None:
             if self.usage_body:
                 raise IncompleteEvaluationStream("Ambiguous repeated stream usage")
@@ -155,6 +161,17 @@ class _MeteredStream(httpx.AsyncByteStream):
         if not self.done or self.buffer or self.event or not self.usage_body:
             error = error or IncompleteEvaluationStream()
         response = httpx.Response(200, json=self.usage_body)
+        # Fixed counters/flags explain the next failure without retaining frames,
+        # provider error messages, generated text or headers.
+        self.row["stream_evidence"] = {
+            "bytes_seen": self.total_bytes,
+            "json_events_seen": self.events_seen,
+            "done_seen": self.done,
+            "usage_seen": bool(self.usage_body),
+            "provider_error_seen": self.provider_error_seen,
+            "pending_bytes": len(self.buffer),
+            "pending_event_lines": len(self.event),
+        }
         self.ledger.finish(self.row, response, error)
 
     async def __aiter__(self) -> AsyncIterator[bytes]:

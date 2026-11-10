@@ -70,6 +70,8 @@ async def test_stream_preserved_and_incomplete_usage_blocks_spending(
     assert "private-answer" not in saved and "private-question" not in saved
     row = json.loads(saved)
     assert row["usage_complete"] is usage
+    assert row["stream_evidence"]["done_seen"] is done
+    assert row["stream_evidence"]["usage_seen"] is usage
     assert ledger.uncertain_failure is not (usage and done)
     if usage:
         assert row["usage"]["prompt_cache_hit_tokens"] == 80
@@ -230,3 +232,37 @@ async def test_unexpected_unread_stream_is_recorded_before_failing(tmp_path):
     saved = ledger.path.read_text()
     assert "private" not in saved
     assert not json.loads(saved)["usage_complete"]
+
+
+@pytest.mark.asyncio
+async def test_provider_error_frame_records_only_fixed_flags(tmp_path):
+    from tools.admission_evaluation_usage import IncompleteEvaluationStream
+
+    body = b'data: {"error":{"message":"private-provider-message"}}\n\n'
+    ledger = EvaluationUsageLedger(tmp_path / "usage.jsonl")
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200, headers={"content-type": "text/event-stream"}, stream=Chunks(body)
+        )
+    )
+    with ledger.capture():
+        async with httpx.AsyncClient(transport=transport) as client:
+            with pytest.raises(IncompleteEvaluationStream):
+                async with client.stream(
+                    "POST",
+                    "https://api.deepseek.com/chat/completions",
+                    json={
+                        "model": "deepseek-flash",
+                        "max_tokens": 100,
+                        "stream": True,
+                        "stream_options": {"include_usage": True},
+                    },
+                ) as response:
+                    await response.aread()
+    saved = ledger.path.read_text()
+    assert "private-provider-message" not in saved
+    row = json.loads(saved)
+    assert row["stream_evidence"]["provider_error_seen"]
+    assert row["stream_evidence"]["json_events_seen"] == 1
+    assert not row["usage_complete"]
+    assert ledger.uncertain_failure
