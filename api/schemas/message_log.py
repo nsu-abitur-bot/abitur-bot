@@ -91,3 +91,32 @@ class FaqHitStatsResponse(BaseModel):
     start: Optional[datetime] = None
     end: Optional[datetime] = None
     buckets: List[FaqHitBucket]
+
+
+class AnswerStatsBucket(BaseModel):
+    """Наблюдаемость одного периода: latency, неответы, ошибки (#242)."""
+
+    period: datetime
+    questions: int
+    answers: int
+    no_answer: int
+    no_answer_share: Optional[float] = None
+    errors: int
+    error_share: Optional[float] = None
+    latency_ms_p50: Optional[float] = None
+    latency_ms_p95: Optional[float] = None
+
+
+class AnswerStatsResponse(BaseModel):
+    """Метрики ответов по периодам для дашборда наблюдаемости."""
+
+    total_questions: int
+    total_answers: int
+    total_no_answer: int
+    no_answer_share: Optional[float] = None
+    total_errors: int
+    error_share: Optional[float] = None
+    group_by: str
+    start: Optional[datetime] = None
+    end: Optional[datetime] = None
+    buckets: List[AnswerStatsBucket]
