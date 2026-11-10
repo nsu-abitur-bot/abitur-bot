@@ -18,6 +18,7 @@ from lightrag.utils import (
     compute_mdhash_id,
     wrap_embedding_func_with_attrs,
 )
+from sqlalchemy import select
 
 from config.instance import get_setting
 from config.latency import stage, timed
@@ -32,7 +33,14 @@ from llm.providers.gigachat import GigaChatEmbedding
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
 from rag.crag import CragChunk, load_crag_config, run_crag
+from rag.program_exams import (
+    ProgramCard,
+    can_query_program_exams,
+    read_program_card,
+    retrieve_program_exams,
+)
 from rag.trace import (
+    LightragTrace,
     RetrievalResult,
     capture_lightrag_trace,
     trace_queued_callback,
@@ -849,6 +857,57 @@ class GraphMemory:
         )
         return str(text).strip()
 
+    async def _retrieve_program_exams(
+        self,
+        rag: LightRAG,
+        graph_id: str,
+        question: str,
+        trace: LightragTrace,
+        max_sources: int,
+        conversation_history: str | None,
+    ) -> RetrievalResult | None:
+        if not can_query_program_exams(question, conversation_history):
+            return None
+
+        catalog = {}
+        current_by_url = {}
+        try:
+            async with AsyncSessionLocal() as session:
+                rows = await session.execute(
+                    select(
+                        Document.rag_doc_id,
+                        Document.title,
+                        Document.source_url,
+                        Document.status,
+                    ).where(Document.graph_id == graph_id)
+                )
+                for doc_id, title, url, status in rows:
+                    catalog[doc_id] = (title, url, status)
+                    if url and status in ACTIVE_DOCUMENT_STATUSES:
+                        current_by_url[url] = doc_id
+        except Exception as exc:
+            logger.warning("Unable to load program card titles: %s", exc)
+
+        processed = await rag.doc_status.get_docs_by_status(DocStatus.PROCESSED)
+        preprocessed = await rag.doc_status.get_docs_by_status(DocStatus.PREPROCESSED)
+        cards: list[ProgramCard] = []
+        for doc_id, document in (processed | preprocessed).items():
+            title, source_url, status = catalog.get(doc_id, ("", None, None))
+            path = document.file_path
+            if not path or path == "no-file-path":
+                path = document.metadata.get("file_path") or document.metadata.get("url")
+            url = source_url or self._chunk_source_url({"file_path": path or doc_id})
+            if (status is not None and status not in ACTIVE_DOCUMENT_STATUSES) or (
+                url in current_by_url and current_by_url[url] != doc_id
+            ):
+                continue
+            card = read_program_card(doc_id, url, title, document.content_summary or "")
+            if card is not None:
+                cards.append(card)
+        return await retrieve_program_exams(
+            rag, question, cards, trace, max_sources, conversation_history
+        )
+
     async def query_with_crag(
         self,
         graph_id: str,
@@ -866,7 +925,6 @@ class GraphMemory:
         Финальную генерацию выполняет вызывающий код (llm_client) по этому
         контексту.
         """
-        config = await load_crag_config()
         history = conversation_history.strip() if conversation_history else ""
         retrieval_query = search_query if search_query is not None else question
         search_question = (
@@ -875,6 +933,12 @@ class GraphMemory:
         try:
             with capture_lightrag_trace() as trace:
                 async with self._use_graph(graph_id) as rag:
+                    program_result = await self._retrieve_program_exams(
+                        rag, graph_id, question, trace, max_sources, conversation_history
+                    )
+                    if program_result is not None:
+                        return program_result
+                    config = await load_crag_config()
                     logger.info(
                         "CRAG retrieval start: graph_id=%s mode=%s question=%s",
                         graph_id,
@@ -985,10 +1049,21 @@ class GraphMemory:
         mode: Literal["local", "global", "hybrid", "naive", "mix", "bypass"] = "hybrid",
         max_sources: int = 3,
         conversation_history: str | None = None,
+        program_question: str | None = None,
     ) -> RetrievalResult:
         try:
             with capture_lightrag_trace() as trace:
                 async with self._use_graph(graph_id) as rag:
+                    program_result = await self._retrieve_program_exams(
+                        rag,
+                        graph_id,
+                        program_question if program_question is not None else question,
+                        trace,
+                        max_sources,
+                        conversation_history,
+                    )
+                    if program_result is not None:
+                        return program_result
                     query_param = QueryParam(mode=mode)
                     for attr_name, attr_value in (
                         ("enable_rerank", True),

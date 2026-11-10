@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "sibsiu_geology_ege_code": {"passed": true},
+    "sibsiu_geology_ege_code_level": {"passed": true},
+    "sibsiu_geology_ege_name": {"passed": true}
+  }
+}

@@ -232,3 +232,39 @@ async def test_retrieval_keeps_service_hints_out_of_crag_question(monkeypatch):
     assert captured["question"] == question
     assert llm_client.LIGHTRAG_LEVEL_HINT not in captured["search_query"]
     assert captured["conversation_history"] == "user: интересует магистратура"
+
+
+@pytest.mark.asyncio
+async def test_missing_exam_data_answer_skips_model_and_sources(monkeypatch):
+    from types import SimpleNamespace
+
+    from rag.trace import RetrievalResult
+
+    answer = "В карточке 09.03.02 нет данных о ЕГЭ."
+    logs = {}
+
+    async def config():
+        return SimpleNamespace(enabled=False)
+
+    async def retrieve(search_query, *, conversation_history, program_question):
+        assert "бакалавриат" in search_query
+        assert program_question == "Какие ЕГЭ нужны на 09.03.02?"
+        return RetrievalResult(context="", answer=answer)
+
+    async def unexpected_generation(*args, **kwargs):
+        pytest.fail("No model call after the scoped exam data check")
+
+    def capture_log(ctx, name, content, **metadata):
+        logs[name] = metadata
+
+    monkeypatch.setattr(llm_client, "load_crag_config", config)
+    monkeypatch.setattr(llm_client, "query_graph_with_sources", retrieve)
+    monkeypatch.setattr(llm_client, "_run_tool_loop", unexpected_generation)
+    monkeypatch.setattr(llm_client._Ctx, "log", capture_log)
+
+    question = "Какие ЕГЭ нужны на 09.03.02?"
+    ctx = llm_client._Ctx("test", 1)
+    rag = await llm_client._retrieve_context(question, "", ctx)
+    assert await llm_client._generate_answer(rag, [], question, ctx) == (answer, [])
+    assert logs["llm_response"]["no_answer"]
+    assert not logs["rag_response"]["found_context"]

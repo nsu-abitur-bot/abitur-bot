@@ -383,3 +383,135 @@ async def test_real_lightrag_partial_update_with_shared_chunks_findable_after_de
         assert len(old_exclusive_chunks) > 0
         in_text_chunks = await rag.text_chunks.get_by_ids(list(old_exclusive_chunks))
         assert all(c is None for c in in_text_chunks)
+
+
+@pytest.mark.asyncio
+async def test_program_exam_cards_from_existing_index(real_lightrag_env):
+    memory, _ = real_lightrag_env
+    graph_id = "test_graph_program_exams"
+    base_url = "https://priem.sibsiu.ru/specialities/"
+    exam_text = (
+        "## Экзамены для поступающих\n"
+        "##### Единый государственный экзамен (ЕГЭ)\n"
+        "###### Обязательные предметы\n"
+        "- Математика (профильная) (мин. балл 40)\n"
+        "- Русский язык (мин. балл 40)\n"
+        "###### Предметы на выбор\n"
+        "- Один на выбор: физика (41), информатика и ИКТ (46), "
+        "география (40) или химия (40).\n"
+        "##### Для поступающих после среднего профессионального образования\n"
+        "- Физические основы технических наук (мин. балл 55)\n"
+    )
+    cards = {
+        "322": (
+            "# Прикладная геология\nКод специальности: 21.05.02\n#### Специалитет\n\n"
+            + "Подробности об учебной программе и практических занятиях. " * 80
+            + "\n\n"
+            + exam_text
+            + "\n## 09.03.01 Информатика и вычислительная техника\n"
+            "### ЕГЭ\n- Математика (профильная) — 99\n"
+        ),
+        "101": (
+            "# 09.03.01 Информатика и вычислительная техника\n"
+            "Экзамены для поступающихЕдиный государственный экзамен (ЕГЭ)"
+            "Математика (профильная) — 70"
+            "Для поступающих после среднего профессионального образования"
+            "Физические основы — 99"
+        ),
+        "102": (
+            "# 09.03.02 Информационные системы и технологии\n"
+            "## Стоимость обучения\n200 000 рублей\n"
+        ),
+        "103": (
+            "# 09.03.03 Прикладная информатика — Цифровая экономика\n"
+            "## ЕГЭ\n- Математика (профильная) — 50\n"
+        ),
+        "104": (
+            "# 09.03.03 Прикладная информатика — Аналитика данных\n"
+            "## ЕГЭ\n- Физика — 60\n"
+        ),
+    }
+    try:
+        async with memory._use_graph(graph_id) as rag:
+            rag.chunk_token_size = 70
+            rag.chunk_overlap_token_size = 18
+        for card_id, text in cards.items():
+            assert await memory.save(
+                graph_id,
+                text,
+                file_paths_str=base_url + card_id,
+                source_id="card-" + card_id,
+            )
+        await memory.cleanup(graph_id)
+        for question in (
+            "Какие ЕГЭ нужны на 21.05.02?",
+            "Какие ЕГЭ нужны на 21.05.02 специалитет?",
+            "«ПРИКЛАДНАЯ   ГЕОЛОГИЯ» специалитет какие ЕГЭ нужны?",
+        ):
+            result = await memory.query_with_crag(graph_id, question)
+            assert "Математика (профильная) (мин. балл 40)" in result.context
+            assert "Русский язык (мин. балл 40)" in result.context
+            assert "физика (41), информатика и ИКТ (46)" in result.context
+            assert "география (40) или химия (40)" in result.context
+            assert "Физические основы технических наук" not in result.context
+            assert "99" not in result.context
+            assert "Уровень образования — специалитет" in result.context
+            assert "специалитет" in (result.generation_question or "")
+            assert [source["url"] for source in result.sources] == [base_url + "322"]
+            assert any("card-322" in line for line in result.trace)
+            reason = "code_mismatch" if "21.05.02" in question else "name_mismatch"
+            assert any("card-101" in line and reason in line for line in result.trace)
+            assert (
+                sum("card-322" in line and " kept " in line for line in result.trace) >= 2
+            )
+
+        result = await memory.query_with_sources(graph_id, "Какие ЕГЭ нужны на 21.05.02?")
+        assert [source["url"] for source in result.sources] == [base_url + "322"]
+
+        result = await memory.query_with_crag(graph_id, "Какие ЕГЭ нужны на 09.03.01?")
+        assert "70" in result.context
+        assert "Физические основы" not in result.context
+        assert "99" not in result.context
+        assert [source["url"] for source in result.sources] == [base_url + "101"]
+
+        result = await memory.query_with_crag(graph_id, "Какие ЕГЭ нужны на 09.03.02?")
+        assert result.answer and "нет данных о ЕГЭ" in result.answer
+        assert not result.context and not result.sources
+        result = await memory.query_with_crag(
+            graph_id, "Какие ЕГЭ нужны на Прикладная геология, бакалавриат?"
+        )
+        assert result.answer and "нет данных о ЕГЭ" in result.answer
+        assert not result.context and not result.sources
+
+        result = await memory.query_with_crag(graph_id, "Какие ЕГЭ нужны на 09.03.03?")
+        assert result.answer and "Уточните профиль" in result.answer
+        assert (
+            "Цифровая экономика" in result.answer and "Аналитика данных" in result.answer
+        )
+        assert not result.context and not result.sources
+        history = (
+            f"user: Какие ЕГЭ нужны на 09.03.03?\nassistant: {result.answer}\n"
+            "user: Аналитика данных"
+        )
+        follow_up = await memory.query_with_crag(
+            graph_id, "Аналитика данных", conversation_history=history
+        )
+        assert "Физика — 60" in follow_up.context and "50" not in follow_up.context
+        assert [source["url"] for source in follow_up.sources] == [base_url + "104"]
+        assert follow_up.generation_question
+        assert "Какие ЕГЭ нужны на 09.03.03?" in follow_up.generation_question
+
+        result = await memory.query_with_crag(
+            graph_id, "Какие ЕГЭ нужны на 09.03.03, профиль «Аналитика данных»?"
+        )
+        assert "Физика — 60" in result.context and "50" not in result.context
+        assert [source["url"] for source in result.sources] == [base_url + "104"]
+
+        result = await memory.query_with_crag(
+            graph_id, "Какие ЕГЭ нужны на 09.03.03, профиль «Нейросети»?"
+        )
+        assert result.answer and "нет данных о ЕГЭ" in result.answer
+        assert not result.context and not result.sources
+        assert any("profile_mismatch" in line for line in result.trace)
+    finally:
+        await memory.cleanup(graph_id)

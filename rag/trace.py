@@ -37,11 +37,15 @@ class LightragTrace:
         self.closed = False
 
     def add(self, record: logging.LogRecord) -> None:
-        if self.closed:
-            return
         try:
             line = f"{record.levelname}: {record.getMessage()}"
         except Exception:
+            return
+        self.note(line)
+
+    def note(self, line: str) -> None:
+        """Добавляет диагностическую строку самого ретривера."""
+        if self.closed:
             return
         if len(self.lines) < self.limit:
             self.lines.append(line)
@@ -65,6 +69,8 @@ class RetrievalResult:
     context: str
     sources: list[dict] = field(default_factory=list)
     trace: list[str] = field(default_factory=list)
+    answer: str | None = None
+    generation_question: str | None = None
 
 
 _active_trace: ContextVar[Optional[LightragTrace]] = ContextVar(
