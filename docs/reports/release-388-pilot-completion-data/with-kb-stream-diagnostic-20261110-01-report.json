@@ -1,0 +1,21 @@
+{
+  "mode": "single_stream_diagnostic",
+  "full_run_started": false,
+  "counts": {
+    "document": 9,
+    "faq_entry": 0,
+    "user": 0,
+    "message": 0,
+    "message_logs": 2,
+    "question_embedding_cache": 0
+  },
+  "redis": {
+    "total": 0,
+    "known_previous_history_keys": 0,
+    "other_keys": 0
+  },
+  "sdk_frames": 3,
+  "sdk_answer_characters": 1,
+  "uncertain_failure": true,
+  "attempts": 1
+}

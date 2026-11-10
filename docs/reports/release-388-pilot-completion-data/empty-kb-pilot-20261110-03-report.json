@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "mode": "live_pilot",
+  "status": "inspected",
+  "condition": "empty-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "6bfebb1793e5790ca85a831bc1b9e21cbd60d5c9719fba486b403ab9f3003540",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T13:33:50.278490+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-flow-01",
+    "nsu-pre-scholar-01",
+    "nsu-pre-compare-01",
+    "nsu-pre-compare-02",
+    "nsu-post-dorm-03",
+    "nsu-pre-building-03",
+    "nsu-paid-steps-01",
+    "nsu-pre-general-02",
+    "nsu-pre-compare-04",
+    "nsu-pre-chance-01"
+  ],
+  "results": [],
+  "calibration": [],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 219283456,
+      "memory.peak": 219283456,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1298096,
+      "process_maxrss_kib": 211172
+    },
+    {
+      "phase": "finished",
+      "memory.current": 219250688,
+      "memory.peak": 219541504,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1297952,
+      "process_maxrss_kib": 211172
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": false,
+  "peak_sampled_swap_bytes": 0,
+  "min_host_available_kib": 1297952,
+  "inspect_only": true,
+  "root_run_id": "62c292ccfec94dfbbe1a12ee9dda0f6a",
+  "latest_memory": {
+    "memory.current": 219250688,
+    "memory.peak": 219541504,
+    "memory.swap.current": 0,
+    "memory.events": {
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 1297952,
+    "process_maxrss_kib": 211172
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "e99aace262e5fad8d49697345a0a24a469d33bfa66e7cbeee85176986b3daca8",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 0,
+      "content_proposal": 0,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 0
+    },
+    "documents": [],
+    "graph_documents": 0,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 0,
+    "attempts_finished": 0,
+    "operation_counts": {},
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 0,
+    "reserved_peak_no_cache_micro_cny": 0,
+    "embedding_input_bytes": 0
+  },
+  "finished_at_utc": "2026-11-10T13:34:02.578530+00:00",
+  "unexecuted_ids": [
+    "nsu-pre-flow-01",
+    "nsu-pre-scholar-01",
+    "nsu-pre-compare-01",
+    "nsu-pre-compare-02",
+    "nsu-post-dorm-03",
+    "nsu-pre-building-03",
+    "nsu-paid-steps-01",
+    "nsu-pre-general-02",
+    "nsu-pre-compare-04",
+    "nsu-pre-chance-01"
+  ]
+}
