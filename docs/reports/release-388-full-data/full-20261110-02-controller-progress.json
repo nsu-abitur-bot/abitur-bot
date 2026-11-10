@@ -1,0 +1,19 @@
+{
+  "status": "completed",
+  "run_id": "full-20261110-02",
+  "completed_batches": [
+    "with-kb-00",
+    "with-kb-01",
+    "with-kb-02",
+    "with-kb-03",
+    "with-kb-04",
+    "empty-kb-00",
+    "empty-kb-01",
+    "empty-kb-02",
+    "empty-kb-03",
+    "empty-kb-04"
+  ],
+  "budget_micro_cny": 5000000,
+  "active_batch": null,
+  "used_micro_cny": 2348698
+}

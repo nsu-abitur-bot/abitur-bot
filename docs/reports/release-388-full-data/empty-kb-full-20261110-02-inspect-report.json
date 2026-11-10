@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "mode": "live_pilot",
+  "status": "inspected",
+  "condition": "empty-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "d1cc2a4cef2f84d8299cbe0a10e5e71cd7712f2f3425ed1eedc4b5d382da1cd4",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T14:38:53.347818+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-flow-01",
+    "nsu-pre-flow-02",
+    "nsu-pre-flow-03",
+    "nsu-pre-flow-04",
+    "nsu-pre-scholar-01",
+    "nsu-pre-scholar-02",
+    "nsu-pre-scholar-03",
+    "nsu-pre-dorm-01",
+    "nsu-pre-dorm-02",
+    "nsu-pre-dorm-03"
+  ],
+  "results": [],
+  "calibration": [],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 184168448,
+      "memory.peak": 184426496,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1271036,
+      "process_maxrss_kib": 211028
+    },
+    {
+      "phase": "finished",
+      "memory.current": 184094720,
+      "memory.peak": 184426496,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1271036,
+      "process_maxrss_kib": 211160
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": false,
+  "peak_sampled_swap_bytes": 0,
+  "min_host_available_kib": 1271036,
+  "batch_index": 0,
+  "run_id": "full-20261110-02",
+  "root_run_id": "acebe2c263b648e7be800bb66ebe0f98",
+  "inspect_only": true,
+  "latest_memory": {
+    "memory.current": 184094720,
+    "memory.peak": 184426496,
+    "memory.swap.current": 0,
+    "memory.events": {
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 1271036,
+    "process_maxrss_kib": 211160
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "f2fd441135ee390a4df9bd7e28beef54a4c9bce48e193ae9dc2a7bb4cf9dea70",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 0,
+      "content_proposal": 0,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 30
+    },
+    "documents": [],
+    "graph_documents": 0,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 0,
+    "attempts_finished": 0,
+    "operation_counts": {},
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 0,
+    "reserved_peak_no_cache_micro_cny": 0,
+    "embedding_input_bytes": 0
+  },
+  "finished_at_utc": "2026-11-10T14:39:05.368103+00:00",
+  "unexecuted_ids": [
+    "nsu-pre-flow-01",
+    "nsu-pre-flow-02",
+    "nsu-pre-flow-03",
+    "nsu-pre-flow-04",
+    "nsu-pre-scholar-01",
+    "nsu-pre-scholar-02",
+    "nsu-pre-scholar-03",
+    "nsu-pre-dorm-01",
+    "nsu-pre-dorm-02",
+    "nsu-pre-dorm-03"
+  ]
+}

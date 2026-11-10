@@ -1,0 +1,24 @@
+{
+  "condition": "with-kb",
+  "settings": {
+    "UNIVERSITY_PROFILE": "custom",
+    "UNIVERSITY_SHORT_NAME": null,
+    "UNIVERSITY_FULL_NAME": null,
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR"
+  },
+  "counts": {
+    "document": 9,
+    "content_proposal": 9,
+    "faculty": 0,
+    "program": 0,
+    "admission_score": 0,
+    "faq_entry": 0,
+    "user": 0,
+    "message": 0,
+    "message_logs": 182
+  },
+  "provider_http_attempts": 0
+}

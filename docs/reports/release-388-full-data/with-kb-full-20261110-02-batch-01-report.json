@@ -1,0 +1,762 @@
+{
+  "schema_version": 1,
+  "mode": "live_full_batch",
+  "status": "completed",
+  "condition": "with-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "b9e59c076f73de1019a38c27c55d6a2a9cda222e4dc1f4d3b1c43e83364d97cc",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T14:45:04.661986+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-partner-01",
+    "nsu-pre-partner-02",
+    "nsu-pre-lang-01",
+    "nsu-pre-lang-02",
+    "nsu-pre-lang-03",
+    "nsu-pre-lang-04",
+    "nsu-pre-compare-01",
+    "nsu-pre-compare-02",
+    "nsu-pre-compare-03",
+    "nsu-pre-compare-04"
+  ],
+  "results": [
+    {
+      "id": "nsu-pre-partner-01",
+      "question": "Какие студенческие лаборатории есть на ФИТ?",
+      "session_id": "eval:e72a994777844ef8ab3e39525b235670:nsu-pre-partner-01",
+      "passed": true,
+      "answer": "На ФИТ работают следующие студенческие учебно-научные лаборатории:\n\n<b>Учебно-научные лаборатории с индустриальными партнёрами:</b>\n<ul>\n<li>лаборатория СберЛаб-НГУ;</li>\n<li>лаборатория ШИФТ НГУ-ЦФТ;</li>\n<li>лаборатория PGLab НГУ-Postgres Professional.</li>\n</ul>\n\n<b>Научно-исследовательские лаборатории (две):</b>\n<ul>\n<li>современных компьютерных технологий;</li>\n<li>теоретико-информационных методов и обработки данных.</li>\n</ul>\n\nТакже для школьников создана научно-техническая проектная лаборатория <b>Инжевика</b>, где можно выполнять проекты под руководством студентов и углублять знания по предметам школьной программы.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты (СберЛаб-НГУ, ШИФТ НГУ-ЦФТ, PGLab НГУ-Postgres Professional) и не противоречит эталону. Однако добавлены сведения, отсутствующие в эталоне (две научно-исследовательские лаборатории, Инжевика), что выходит за рамки подтверждённого контекста; критерий не нарушен, но есть лишние неподтверждённые детали.",
+      "elapsed_seconds": 15.209,
+      "memory_before": {
+        "memory.current": 215613440,
+        "memory.peak": 215928832,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1238876,
+        "process_maxrss_kib": 218080
+      },
+      "memory_after": {
+        "memory.current": 432758784,
+        "memory.peak": 503349248,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1051208,
+        "process_maxrss_kib": 496152
+      }
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "question": "ТИПИ разрабатывали вместе с IT-компаниями? Кто участвовал?",
+      "session_id": "eval:301826e25d7e417f8e320a52812e6744:nsu-pre-partner-02",
+      "passed": true,
+      "answer": "Да, программа «Технологии индустриальной программной инженерии» (ТИПИ) разработана совместно с лидерами ИТ-индустрии. Партнёры:\n\n<b>АО ЦФТ, СКБ Контур, ДубльГИС, Постгрес Профессиональный, КНС ГРУПП (YADRO), Т1 (Иннотех)</b>\n\nТакже программа создана в рамках гранта «ТОП ИТ СТАРТ» (Аналитический центр при Правительстве РФ совместно с Минцифры России) — в целях достижения результата федерального проекта «Кадры для цифровой трансформации» нацпроекта «Экономика данных и цифровая трансформация государства».",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо подтверждает, что ТИПИ разрабатывалась совместно с IT-компаниями, и перечисляет все обязательные факты из эталона: ЦФТ, СКБ Контур, ДубльГИС, Постгрес Профессиональный, YADRO (КНС ГРУПП), Т1 (Иннотех). Дополнительные сведения о гранте не противоречат эталону и не нарушают ограничений. Список разработчиков не выдаётся за места стажировки.",
+      "elapsed_seconds": 17.195,
+      "memory_before": {
+        "memory.current": 431927296,
+        "memory.peak": 503349248,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1051212,
+        "process_maxrss_kib": 496152
+      },
+      "memory_after": {
+        "memory.current": 510345216,
+        "memory.peak": 617447424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959072,
+        "process_maxrss_kib": 605448
+      }
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "question": "Какие языки программирования изучают на ПИиКН?",
+      "session_id": "eval:cfb495cdf26846af8dfdb83ffc6feb22:nsu-pre-lang-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ доступном контексте есть перечень дисциплин по программированию (С, Haskell, SQL, С++/Python, Assembler, Java, C#, Python и др.), но он не привязан к направлению «ПИиКН», поэтому подтвердить, какие именно языки изучают на этой программе, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит требуемого обязательного факта в утвердительной форме: эталон — «C++, Java, C# и Python». Помощник перечисляет языки из контекста, но заявляет, что не может подтвердить их привязку к ПИиКН, то есть фактически отказывается дать доступный фактический ответ, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением». При этом ответ не выдумывает сведения и не противоречит эталону прямо, поэтому не 1, но большая часть требуемой информации не подтверждена — 2.",
+      "elapsed_seconds": 11.749,
+      "memory_before": {
+        "memory.current": 509440000,
+        "memory.peak": 617447424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959072,
+        "process_maxrss_kib": 605448
+      },
+      "memory_after": {
+        "memory.current": 514256896,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 958904,
+        "process_maxrss_kib": 655260
+      }
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "question": "Какие технологии изучают на курсе по C# на ФИТ?",
+      "session_id": "eval:32ab62ebd6a942b0a37ff8a5a553d92f:nsu-pre-lang-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов (язык C# и платформа .NET), а вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 17.008,
+      "memory_before": {
+        "memory.current": 513490944,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 958672,
+        "process_maxrss_kib": 655260
+      },
+      "memory_after": {
+        "memory.current": 537997312,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 943412,
+        "process_maxrss_kib": 656004
+      }
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "question": "На ФИТ есть курс по оптимизации программ? На каком языке там работают?",
+      "session_id": "eval:90514af8da474ac58127d70694a7ba89:nsu-pre-lang-03",
+      "passed": true,
+      "answer": "В базе знаний Ваш вуз есть дисциплина <b>«Оптимизация производительности Java-программ»</b> — то есть работа там идёт на языке <b>Java</b>.\n\nОднако подтверждения, что этот курс относится именно к факультету <b>ФИТ</b>, в моём контексте нет, поэтому привязывать его к этому факультету не могу. Уточните, пожалуйста, название факультета полностью — проверю по справочнику.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных факта: есть курс оптимизации производительности программ и работа идёт на Java. Однако он не подтверждает прямо, что курс есть на ФИТ, и добавляет оговорку о невозможности привязать курс к факультету, что является небольшим отклонением/пропуском, но не противоречит эталону и не выдумывает факты.",
+      "elapsed_seconds": 18.889,
+      "memory_before": {
+        "memory.current": 538152960,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 943416,
+        "process_maxrss_kib": 656004
+      },
+      "memory_after": {
+        "memory.current": 544022528,
+        "memory.peak": 671088640,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 118,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926132,
+        "process_maxrss_kib": 680116
+      }
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "question": "На ФИТ учат разработке мобильных приложений? Под какие платформы?",
+      "session_id": "eval:daf998cb5c2c4dd79c58c876bc93ba40:nsu-pre-lang-04",
+      "passed": true,
+      "answer": "В базе знаний Ваш вуз есть дисциплины по разработке мобильных приложений:\n\n<b>Введение в разработку мобильных приложений</b>\n<b>Разработка мобильных приложений на платформе Android</b>\n\nОднако информации о том, что эти дисциплины относятся именно к факультету ФИТ, а также о других платформах (кроме Android) в базе знаний нет — поэтому подтвердить принадлежность этих курсов ФИТ я не могу.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных факта: есть курс мобильной разработки и платформа Android. Однако он не подтверждает прямо, что это на ФИТ, и добавляет оговорку о невозможности подтвердить принадлежность курсов факультету, что частично расходится с эталонным ответом «Да, есть курс... на Android». Существенных ошибок или выдуманных фактов нет, критерий в целом выполнен с небольшим пропуском/осторожностью.",
+      "elapsed_seconds": 17.672,
+      "memory_before": {
+        "memory.current": 543805440,
+        "memory.peak": 671088640,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 118,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926132,
+        "process_maxrss_kib": 680116
+      },
+      "memory_after": {
+        "memory.current": 527446016,
+        "memory.peak": 671088640,
+        "memory.swap.current": 8695808,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946348,
+        "process_maxrss_kib": 691684
+      }
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "question": "Что изучают на прикладной математике и информатике ММФ и для каких задач это нужно?",
+      "session_id": "eval:1c3dc9e5dff540aa99d66c3b287f9263:nsu-pre-compare-01",
+      "passed": true,
+      "answer": "На направлении <b>«Прикладная математика и информатика»</b> (ММФ) студенты осваивают прикладную математику и информатику как неотъемлемую часть многих индустрий.\n\n<b>Что изучают и что важно:</b>\nВыпускники разрабатывают программное обеспечение самого разного рода, разбираются в том, как применять вычислительные, статистические и иные математические методы при решении научных и индустриальных задач. Отличительная особенность направления — очень важна предметная область (в отличие от «Математики и компьютерных наук»).\n\n<b>Для каких задач:</b>\nПрименение вычислительных, статистических и других математических методов для решения научных и индустриальных задач, а также разработка программного обеспечения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: математические и вычислительные методы, применение к научным и индустриальным задачам, важность предметной области. Нет выдуманных сведений или гарантий, нет переноса условий, нет объявления факультета лучшим. Краткий правильный ответ достаточен.",
+      "elapsed_seconds": 9.909,
+      "memory_before": {
+        "memory.current": 527216640,
+        "memory.peak": 671088640,
+        "memory.swap.current": 8695808,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945832,
+        "process_maxrss_kib": 691684
+      },
+      "memory_after": {
+        "memory.current": 531361792,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4497408,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945560,
+        "process_maxrss_kib": 691684
+      }
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "question": "Как называется направление мехатроники в ИИР и какой у него код?",
+      "session_id": "eval:90d2e39509d3465ca0aaa347f0f08c5e:nsu-pre-compare-02",
+      "passed": true,
+      "answer": "В Институте интеллектуальной робототехники (ИИР НГУ) программа бакалавриата называется <b>«Мехатроника и робототехника»</b>, её код — <b>15.03.06</b>.\n\nТакже в контексте упоминается вариант названия: «Мехатроника и робототехника. Искусственный интеллект» (направление 15.03.06).",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит оба обязательных факта: код 15.03.06 и название «Мехатроника и робототехника». Дополнительное упоминание варианта названия не противоречит эталону и не является выдумкой в контексте вопроса.",
+      "elapsed_seconds": 12.474,
+      "memory_before": {
+        "memory.current": 530685952,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4497408,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945560,
+        "process_maxrss_kib": 691684
+      },
+      "memory_after": {
+        "memory.current": 531070976,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4489216,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946168,
+        "process_maxrss_kib": 691684
+      }
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "question": "Сравни ФИТ и ФФ: куда мне лучше идти? Программы я ещё не выбрал.",
+      "session_id": "eval:2ec9f033ce764c2092b8f8138851c210:nsu-pre-compare-03",
+      "passed": true,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nМогу помочь, если уточните, какие направления вас интересуют — тогда подскажу по конкретным программам и баллам.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ корректно уточняет программы и не выбирает за абитуриента, не приписывает всем программам одинаковое содержание — ключевые требования эталона выполнены. Однако он не предлагает критерии сравнения (только программы и баллы) и содержит фразу о ненайденной информации, что частично смещает фокус; допустимый небольшой пропуск деталей.",
+      "elapsed_seconds": 12.033,
+      "memory_before": {
+        "memory.current": 531001344,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4489216,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945928,
+        "process_maxrss_kib": 691684
+      },
+      "memory_after": {
+        "memory.current": 522661888,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14131200,
+        "memory.events": {
+          "max": 309,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 930688,
+        "process_maxrss_kib": 691704
+      }
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "question": "Хочу заниматься программированием. Как выбрать между ПИиКН и КНиС на ФИТ?",
+      "session_id": "eval:fcc9db060182434b957769501d7afb10:nsu-pre-compare-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ моём контексте нет данных ни о факультете ФИТ, ни о направлениях ПИиКН и КНиС, поэтому подсказать, чем они различаются, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ («не нашёл информации»), что по критерию недостаточно. Он не уточняет интересы и задачи абитуриента, не предлагает сопоставить учебные планы и проекты и не помогает сравнить варианты, оставляя выбор человеку. Требуемые полезные шаги выбора полностью отсутствуют.",
+      "elapsed_seconds": 11.397,
+      "memory_before": {
+        "memory.current": 521695232,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14131200,
+        "memory.events": {
+          "max": 309,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 930496,
+        "process_maxrss_kib": 691704
+      },
+      "memory_after": {
+        "memory.current": 520990720,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14127104,
+        "memory.events": {
+          "max": 310,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 956216,
+        "process_maxrss_kib": 691704
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно совпадает с эталоном: указан код 09.03.01 и название «Информатика и вычислительная техника». Все обязательные факты присутствуют, выдуманных сведений нет, ограничения поведения не нарушены.",
+      "elapsed_seconds": 2.609
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает критерии «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и нарушение ограничений поведения — оценка 1.",
+      "elapsed_seconds": 1.301
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 0.827
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не помогает сравнить варианты. Критерий выбора между программами не выполнен.",
+      "elapsed_seconds": 1.346
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 207065088,
+      "memory.peak": 207065088,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1240676,
+      "process_maxrss_kib": 209896
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 215625728,
+      "memory.peak": 215928832,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1238876,
+      "process_maxrss_kib": 218080
+    },
+    {
+      "phase": "nsu-pre-partner-01",
+      "memory.current": 215613440,
+      "memory.peak": 215928832,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1238876,
+      "process_maxrss_kib": 218080
+    },
+    {
+      "phase": "nsu-pre-partner-02",
+      "memory.current": 431927296,
+      "memory.peak": 503349248,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1051212,
+      "process_maxrss_kib": 496152
+    },
+    {
+      "phase": "nsu-pre-lang-01",
+      "memory.current": 509440000,
+      "memory.peak": 617447424,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 959072,
+      "process_maxrss_kib": 605448
+    },
+    {
+      "phase": "nsu-pre-lang-02",
+      "memory.current": 513490944,
+      "memory.peak": 666861568,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 958672,
+      "process_maxrss_kib": 655260
+    },
+    {
+      "phase": "nsu-pre-lang-03",
+      "memory.current": 538152960,
+      "memory.peak": 666861568,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 943416,
+      "process_maxrss_kib": 656004
+    },
+    {
+      "phase": "nsu-pre-lang-04",
+      "memory.current": 543805440,
+      "memory.peak": 671088640,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 118,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 926132,
+      "process_maxrss_kib": 680116
+    },
+    {
+      "phase": "nsu-pre-compare-01",
+      "memory.current": 527216640,
+      "memory.peak": 671088640,
+      "memory.swap.current": 8695808,
+      "memory.events": {
+        "max": 247,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 945832,
+      "process_maxrss_kib": 691684
+    },
+    {
+      "phase": "nsu-pre-compare-02",
+      "memory.current": 530685952,
+      "memory.peak": 671088640,
+      "memory.swap.current": 4497408,
+      "memory.events": {
+        "max": 247,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 945560,
+      "process_maxrss_kib": 691684
+    },
+    {
+      "phase": "nsu-pre-compare-03",
+      "memory.current": 531001344,
+      "memory.peak": 671088640,
+      "memory.swap.current": 4489216,
+      "memory.events": {
+        "max": 247,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 945928,
+      "process_maxrss_kib": 691684
+    },
+    {
+      "phase": "nsu-pre-compare-04",
+      "memory.current": 521695232,
+      "memory.peak": 671088640,
+      "memory.swap.current": 14131200,
+      "memory.events": {
+        "max": 309,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 930496,
+      "process_maxrss_kib": 691704
+    },
+    {
+      "phase": "finished",
+      "memory.current": 519737344,
+      "memory.peak": 671088640,
+      "memory.swap.current": 14090240,
+      "memory.events": {
+        "max": 310,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 956248,
+      "process_maxrss_kib": 691704
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": true,
+  "peak_sampled_swap_bytes": 14139392,
+  "min_host_available_kib": 796692,
+  "batch_index": 1,
+  "run_id": "full-20261110-02",
+  "root_run_id": "9dfe65ec949448a4bc35a2bd8b5c5e95",
+  "inspect_only": false,
+  "latest_memory": {
+    "memory.current": 519737344,
+    "memory.peak": 671088640,
+    "memory.swap.current": 14090240,
+    "memory.events": {
+      "max": 310,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 956248,
+    "process_maxrss_kib": 691704
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "f3d97212207c1c656a3d6469db281cb8fee0a69c1c11b26103247ae799f1145d",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 9,
+      "content_proposal": 9,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 62
+    },
+    "documents": [
+      {
+        "id": "01a1b547-1029-7c3e-9577-554857174189",
+        "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+        "content_hash": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 09:24:02.205119",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      {
+        "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+        "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+        "source_url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+        "content_hash": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:15:30.079835",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+      },
+      {
+        "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+        "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+        "source_url": "https://education.nsu.ru/tipi",
+        "content_hash": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:18:30.589152",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+      },
+      {
+        "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+        "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+        "source_url": "https://education.nsu.ru/mechatronics/",
+        "content_hash": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:22:17.768391",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+      },
+      {
+        "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+        "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+        "content_hash": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:24:45.022448",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+      },
+      {
+        "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+        "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+        "source_url": "https://education.nsu.ru/mathematics/",
+        "content_hash": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 14:24:38.358039",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68"
+      },
+      {
+        "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+        "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+        "source_url": "https://www.nsu.ru/n/life/campus/check-in/",
+        "content_hash": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:00:30.770944",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c"
+      },
+      {
+        "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+        "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+        "source_url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+        "content_hash": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:18:23.481171",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b696-dfda-7e90-bea0-3a8f7914526a"
+      },
+      {
+        "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+        "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+        "source_url": "https://education.nsu.ru/information-technologies/",
+        "content_hash": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:29:57.749857",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7"
+      }
+    ],
+    "graph_documents": 9,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 283,
+    "attempts_finished": 283,
+    "operation_counts": {
+      "generation": 237,
+      "oauth": 1,
+      "embedding": 45
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 351700,
+    "reserved_peak_no_cache_micro_cny": 384078,
+    "embedding_input_bytes": 10561
+  },
+  "finished_at_utc": "2026-11-10T14:47:51.465498+00:00",
+  "unexecuted_ids": []
+}

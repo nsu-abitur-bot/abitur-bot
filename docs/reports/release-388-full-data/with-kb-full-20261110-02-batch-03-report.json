@@ -1,0 +1,757 @@
+{
+  "schema_version": 1,
+  "mode": "live_full_batch",
+  "status": "completed",
+  "condition": "with-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "ea524e2b66cf00428e2ffda981f1519eef079b462793714af04992723db5ab74",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T14:51:43.505371+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-general-02",
+    "nsu-pre-general-03",
+    "nsu-post-dorm-01",
+    "nsu-post-dorm-02",
+    "nsu-post-dorm-03",
+    "nsu-post-dorm-04",
+    "nsu-post-arrival-01",
+    "nsu-post-arrival-02",
+    "nsu-post-arrival-03",
+    "nsu-post-docs-01"
+  ],
+  "results": [
+    {
+      "id": "nsu-pre-general-02",
+      "question": "Где найти образец договора на платное обучение в бакалавриате НГУ?",
+      "session_id": "eval:1383647ee2c74e7fb15aac0e587f9915:nsu-pre-general-02",
+      "passed": false,
+      "answer": "В базе знаний Ваш вуз есть раздел «Образец договора об оказании платных образовательных услуг», однако конкретной ссылки или места размещения образца в переданном контексте нет.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз.\n\nМогу подсказать контакты приёмной комиссии, где уточнят, где найти образец:\n<b>Тел.:</b> +7 (383) 363-40-37\n<b>E-mail:</b> priem@nsu.ru",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит обязательного факта «страница приёма в бакалавриат НГУ» и не указывает, что образец договора размещён в разделе информации для поступающих на странице приёма в бакалавриат. Вместо этого ответ утверждает, что не нашёл информации, и перенаправляет к контактам приёмной комиссии, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением». Упоминание названия раздела частично соответствует первому обязательному факту, но большая часть требуемой информации отсутствует.",
+      "elapsed_seconds": 15.605,
+      "memory_before": {
+        "memory.current": 242864128,
+        "memory.peak": 243146752,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1263620,
+        "process_maxrss_kib": 217960
+      },
+      "memory_after": {
+        "memory.current": 464166912,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1038472,
+        "process_maxrss_kib": 496208
+      }
+    },
+    {
+      "id": "nsu-pre-general-03",
+      "question": "Как узнать, какие вступительные испытания проводит НГУ и где они будут проходить?",
+      "session_id": "eval:b3183805b8474d69b4ab611e41750a2f:nsu-pre-general-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (перечень вступительных испытаний, расписание с местом проведения, страница приёма в бакалавриат НГУ) и фактически отказывается отвечать, хотя эталонный ответ доступен. Это противоречит критерию «не заменять доступный фактический ответ общим перенаправлением» и не удовлетворяет требованию полноты.",
+      "elapsed_seconds": 14.154,
+      "memory_before": {
+        "memory.current": 463249408,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1038900,
+        "process_maxrss_kib": 496208
+      },
+      "memory_after": {
+        "memory.current": 466595840,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1049916,
+        "process_maxrss_kib": 496208
+      }
+    },
+    {
+      "id": "nsu-post-dorm-01",
+      "question": "Договор найма общежития ФИТ в 2026 году уже подписан. У кого получить направление на проживание для дальнейшего заселения?",
+      "session_id": "eval:306797f60a954522b75e45714adddd73:nsu-post-dorm-01",
+      "passed": true,
+      "answer": "Направление на проживание выдаёт <b>заведующий общежитием</b> — при заключении договора найма.\n\nПо инструкции порядок такой: сначала заполнить заявление о предоставлении места в общежитии (кабинет №1112 Учебного корпуса №1, ул. Пирогова, д. 1, вход №1 из внутреннего дворика; 29–30 августа с 09:00 до 16:00, обед 13:00–14:00), затем заключить договор найма и получить направление на проживание у заведующего общежитием.\n\nЗаселение иногородних первокурсников ФИТ — 29–30 августа 2026 года.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо указывает заведующего общежитием как источник направления на проживание, что соответствует эталону. Дополнительные детали (порядок, кабинет, даты) не противоречат эталону и не выдумывают гарантий; критерий выполнен.",
+      "elapsed_seconds": 11.483,
+      "memory_before": {
+        "memory.current": 465793024,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1049916,
+        "process_maxrss_kib": 496208
+      },
+      "memory_after": {
+        "memory.current": 546742272,
+        "memory.peak": 652869632,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 988440,
+        "process_maxrss_kib": 605732
+      }
+    },
+    {
+      "id": "nsu-post-dorm-02",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. На направлении уже две печати, проживание оплатил. Какие документы теперь отнести заведующему?",
+      "session_id": "eval:57fb40211cd3479fb20c8434c5dd0031:nsu-post-dorm-02",
+      "passed": true,
+      "answer": "По контексту базы знаний, на финальном этапе заселения заведующему общежитием нужно сдать:\n\n• направление с 2 печатями,\n• чек об оплате,\n• 2 фотографии 3×4.\n\nПосле этого вы получите пропуск и ключи.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных факта (направление с двумя печатями, чек об оплате), но добавляет не подтверждённые эталоном детали — 2 фотографии 3×4, пропуск и ключи, что является небольшим выходом за рамки эталона; критерий отказа не нарушен.",
+      "elapsed_seconds": 9.657,
+      "memory_before": {
+        "memory.current": 546095104,
+        "memory.peak": 652869632,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 988188,
+        "process_maxrss_kib": 605732
+      },
+      "memory_after": {
+        "memory.current": 551383040,
+        "memory.peak": 671088640,
+        "memory.swap.current": 16769024,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 942624,
+        "process_maxrss_kib": 636936
+      }
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. Все документы оформлены. Как получить пропуск в общежитие?",
+      "session_id": "eval:0ecb51b5c2aa4ec0978f45031a2306ef:nsu-post-dorm-03",
+      "passed": true,
+      "answer": "Чтобы получить пропуск и ключи, нужно сдать заведующему вашего общежития:\n\n• направление с 2 печатями,\n• чек об оплате,\n• 2 фотографии 3×4.\n\nПосле этого вы получаете пропуск и ключи — на этом заселение завершено.\n\nНапомню: заселение иногородних первокурсников ФИТ проходит 29–30 августа 2026 года.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты: обращение к заведующему общежитием, передачу направления с двумя печатями и чека об оплате, получение пропуска после передачи документов. Однако добавлены не подтверждённые эталоном детали — 2 фотографии 3×4, ключи и даты заселения 29–30 августа 2026 года, что нарушает ограничение «не выдумывать сведения». Существенных пропусков нет, но из-за неподтверждённых добавлений оценка снижена до 4.",
+      "elapsed_seconds": 9.15,
+      "memory_before": {
+        "memory.current": 550350848,
+        "memory.peak": 671088640,
+        "memory.swap.current": 16769024,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 940424,
+        "process_maxrss_kib": 636936
+      },
+      "memory_after": {
+        "memory.current": 501936128,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6205440,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 947928,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-dorm-04",
+      "question": "До каких чисел нужно оплачивать общежитие ФИТ за осенний семестр, весенний семестр и лето?",
+      "session_id": "eval:6d35a2a6cc4146759b88bcf2597b0ed1:nsu-post-dorm-04",
+      "passed": true,
+      "answer": "В базе знаний Ваш вуз есть сроки оплаты проживания в общежитии:\n\n- за первый семестр — до 10 сентября,\n- за второй семестр — до 10 февраля,\n- за летний период — до 30 июня текущего года.\n\nОплатить проживание можно на сайте НГУ или в кассе НГУ (ул. Пирогова, 1, новый административный корпус, 1 этаж, оф. 115).\n\nОтдельного графика оплаты именно для общежития ФИТ в базе знаний нет — указанные сроки общие.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: первый семестр — до 10 сентября, второй — до 10 февраля, лето — до 30 июня. Формулировки эквивалентны эталону, факты не выдуманы, нет переноса на другие годы/программы, ответ не заменён общим перенаправлением. Небольшое уточнение про общий характер сроков не противоречит эталону.",
+      "elapsed_seconds": 8.928,
+      "memory_before": {
+        "memory.current": 501690368,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6205440,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 947928,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 504135680,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6197248,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 931756,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-arrival-01",
+      "question": "Я буду жить в общежитии № 8/2. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:e7dac82e420f43f1a129bc1171e956c4:nsu-post-arrival-01",
+      "passed": true,
+      "answer": "По вашему вопросу: вы не оформили медицинское разрешение на проживание в период с 28.08 по 09.09.2026, поэтому вам подходит время:\n\n<b>10, 11 сентября 2026, 08:00 — 20:00</b> — для студентов, не оформивших медицинское разрешение на проживание в период с 28.08 по 09.09.2026.\n\nТакже есть резервные даты: <b>14, 15 сентября 2026, 08:00 — 20:00</b> — для той же категории студентов.\n\nЧто взять с собой (для граждан РФ):\n— копия паспорта (стр. 2–3, 5);\n— копия полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года либо справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит корректные интервалы (10, 11 сентября 08:00–20:00 и 14, 15 сентября 08:00–20:00) с правильным временем, что соответствует обязательным фактам. Однако он пропускает допустимые интервалы 28.08, 05.09, 12.09 и 13.09, а также добавляет неподтверждённые детали (список документов, формулировку о периоде 28.08–09.09), которых нет в эталоне. Существенного противоречия эталону нет, но ответ неполный и содержит лишние сведения.",
+      "elapsed_seconds": 11.278,
+      "memory_before": {
+        "memory.current": 504160256,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6193152,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 931760,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 503926784,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6176768,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 952684,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-arrival-02",
+      "question": "Я буду жить в общежитии № 9. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:3772e73b9e5e46e1826a4952893827e0:nsu-post-arrival-02",
+      "passed": true,
+      "answer": "По графику оформления медицинского разрешения на проживание:\n\n<b>Общежитие № 9</b> — <b>7 сентября 2026</b>, с 08:00 до 20:00 (в этот же день — общежитие № 10).\n\nТакже есть резервные даты для студентов, не оформивших разрешение в период с 28.08 по 09.09.2026: <b>10–11 сентября</b> (08:00–20:00), <b>12–13 сентября</b> (10:00–14:00) и <b>14–15 сентября</b> (08:00–20:00).\n\nДокументы для получения разрешения (для граждан РФ):\n— копия паспорта (стр. 2–3, 5);\n— копия полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года или справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [
+        "get_admission_scores",
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит корректный полный интервал для общежития № 9 (7 сентября 2026, 08:00–20:00) и дополнительно перечисляет все резервные интервалы с правильным временем, что соответствует эталону. Условие резервных дней указано корректно, факты не выдуманы, ответ не ограничен только первым днём и не подменяет процедуру.",
+      "elapsed_seconds": 13.47,
+      "memory_before": {
+        "memory.current": 504131584,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6176768,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 952688,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 528891904,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6094848,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926120,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-arrival-03",
+      "question": "Я буду жить в общежитии № 10. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:e5b18fd8fd7b404ba62e8a76de88271d:nsu-post-arrival-03",
+      "passed": true,
+      "answer": "По вашему вопросу: вы не оформили медицинское разрешение в основной период (28.08–09.09.2026), поэтому вам подходят дополнительные даты для таких студентов:\n\n<b>10, 11 сентября 2026</b> — с 08:00 до 20:00\n<b>12, 13 сентября 2026</b> — с 10:00 до 14:00\n<b>14, 15 сентября 2026</b> — с 08:00 до 20:00\n\nОтдельной привязки этих дат к конкретному общежитию (в том числе № 10) в базе знаний нет, поэтому уточнить место оформления лучше в общежитии № 10 или в ММЦИММТ НГУ (ул. Ляпунова, 6).\n\nДокументы для получения медицинского разрешения:\n— копия паспорта (стр. 2–3, 5);\n— копия страхового медицинского полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года или справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные интервалы резервных дней (10–15 сентября) с правильным временем, что соответствует эталону. Однако он добавляет неподтверждённое утверждение об основном периоде 28.08–09.09.2026 и не упоминает подходящие интервалы 30.08 и 07.09, хотя они не обязательны. Также присутствует лишняя информация о документах и месте оформления, не требуемая вопросом, но не противоречащая эталону. Существенных ошибок нет, критерий выполнен.",
+      "elapsed_seconds": 12.244,
+      "memory_before": {
+        "memory.current": 528695296,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6094848,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 925928,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 521523200,
+        "memory.peak": 671088640,
+        "memory.swap.current": 13221888,
+        "memory.events": {
+          "max": 596,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 929252,
+        "process_maxrss_kib": 691636
+      }
+    },
+    {
+      "id": "nsu-post-docs-01",
+      "question": "Я первокурсник ФИТ, гражданин РФ. Какие страницы паспорта копировать для медразрешения на общежитие в 2026 году?",
+      "session_id": "eval:72804efe2ab64b488e6b9c14d0896b88:nsu-post-docs-01",
+      "passed": true,
+      "answer": "Для получения медицинского разрешения на вселение нужна <b>копия паспорта (страницы 2–3 и 5)</b>.\n\nПомимо этого, понадобятся:\n<ul>\n<li>копия страхового медицинского полиса ОМС;</li>\n<li>копия СНИЛС;</li>\n<li>копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;</li>\n<li>результаты флюорографии или рентгенографии органов грудной клетки давностью не более 1 года либо справка формы СЭМД-196;</li>\n<li>направление на проживание, выданное при заключении договора найма специализированного жилого помещения.</li>\n</ul>",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно указывает обязательный факт — копии страниц 2–3 и 5 паспорта; дополнительная информация не противоречит эталону и не содержит выдуманных гарантий или переноса условий на другой год/категорию.",
+      "elapsed_seconds": 11.69,
+      "memory_before": {
+        "memory.current": 521809920,
+        "memory.peak": 671088640,
+        "memory.swap.current": 13221888,
+        "memory.events": {
+          "max": 596,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 927488,
+        "process_maxrss_kib": 691636
+      },
+      "memory_after": {
+        "memory.current": 523431936,
+        "memory.peak": 671088640,
+        "memory.swap.current": 13221888,
+        "memory.events": {
+          "max": 596,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 927612,
+        "process_maxrss_kib": 691636
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно совпадает с эталоном: указан код 09.03.01 и название «Информатика и вычислительная техника». Все обязательные факты присутствуют, выдуманных сведений нет.",
+      "elapsed_seconds": 2.661
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает ограничения «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и критериям отказа.",
+      "elapsed_seconds": 1.699
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 0.893
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не оставляет выбор абитуриенту. Критерий не выполнен.",
+      "elapsed_seconds": 1.196
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 232542208,
+      "memory.peak": 232804352,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1273536,
+      "process_maxrss_kib": 210104
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 242876416,
+      "memory.peak": 243146752,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1263620,
+      "process_maxrss_kib": 217960
+    },
+    {
+      "phase": "nsu-pre-general-02",
+      "memory.current": 242864128,
+      "memory.peak": 243146752,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1263620,
+      "process_maxrss_kib": 217960
+    },
+    {
+      "phase": "nsu-pre-general-03",
+      "memory.current": 463249408,
+      "memory.peak": 534794240,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1038900,
+      "process_maxrss_kib": 496208
+    },
+    {
+      "phase": "nsu-post-dorm-01",
+      "memory.current": 465793024,
+      "memory.peak": 534794240,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1049916,
+      "process_maxrss_kib": 496208
+    },
+    {
+      "phase": "nsu-post-dorm-02",
+      "memory.current": 546095104,
+      "memory.peak": 652869632,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 988188,
+      "process_maxrss_kib": 605732
+    },
+    {
+      "phase": "nsu-post-dorm-03",
+      "memory.current": 550350848,
+      "memory.peak": 671088640,
+      "memory.swap.current": 16769024,
+      "memory.events": {
+        "max": 155,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 940424,
+      "process_maxrss_kib": 636936
+    },
+    {
+      "phase": "nsu-post-dorm-04",
+      "memory.current": 501690368,
+      "memory.peak": 671088640,
+      "memory.swap.current": 6205440,
+      "memory.events": {
+        "max": 543,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 947928,
+      "process_maxrss_kib": 691620
+    },
+    {
+      "phase": "nsu-post-arrival-01",
+      "memory.current": 504160256,
+      "memory.peak": 671088640,
+      "memory.swap.current": 6193152,
+      "memory.events": {
+        "max": 543,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 931760,
+      "process_maxrss_kib": 691620
+    },
+    {
+      "phase": "nsu-post-arrival-02",
+      "memory.current": 504131584,
+      "memory.peak": 671088640,
+      "memory.swap.current": 6176768,
+      "memory.events": {
+        "max": 543,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 952688,
+      "process_maxrss_kib": 691620
+    },
+    {
+      "phase": "nsu-post-arrival-03",
+      "memory.current": 528695296,
+      "memory.peak": 671088640,
+      "memory.swap.current": 6094848,
+      "memory.events": {
+        "max": 543,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 925928,
+      "process_maxrss_kib": 691620
+    },
+    {
+      "phase": "nsu-post-docs-01",
+      "memory.current": 521809920,
+      "memory.peak": 671088640,
+      "memory.swap.current": 13221888,
+      "memory.events": {
+        "max": 596,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 927488,
+      "process_maxrss_kib": 691636
+    },
+    {
+      "phase": "finished",
+      "memory.current": 523001856,
+      "memory.peak": 671088640,
+      "memory.swap.current": 13201408,
+      "memory.events": {
+        "max": 596,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 930304,
+      "process_maxrss_kib": 691636
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": true,
+  "peak_sampled_swap_bytes": 16769024,
+  "min_host_available_kib": 825024,
+  "batch_index": 3,
+  "run_id": "full-20261110-02",
+  "root_run_id": "697aa9c76ef240f6b2cb7a46315606fe",
+  "inspect_only": false,
+  "latest_memory": {
+    "memory.current": 523001856,
+    "memory.peak": 671088640,
+    "memory.swap.current": 13201408,
+    "memory.events": {
+      "max": 596,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 930304,
+    "process_maxrss_kib": 691636
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "87e7c0ddcd4ecb19e33ed220c30ad2f132766bef5d861e6f357f29fb361ae277",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 9,
+      "content_proposal": 9,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 122
+    },
+    "documents": [
+      {
+        "id": "01a1b547-1029-7c3e-9577-554857174189",
+        "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+        "content_hash": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 09:24:02.205119",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      {
+        "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+        "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+        "source_url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+        "content_hash": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:15:30.079835",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+      },
+      {
+        "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+        "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+        "source_url": "https://education.nsu.ru/tipi",
+        "content_hash": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:18:30.589152",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+      },
+      {
+        "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+        "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+        "source_url": "https://education.nsu.ru/mechatronics/",
+        "content_hash": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:22:17.768391",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+      },
+      {
+        "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+        "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+        "content_hash": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:24:45.022448",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+      },
+      {
+        "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+        "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+        "source_url": "https://education.nsu.ru/mathematics/",
+        "content_hash": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 14:24:38.358039",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68"
+      },
+      {
+        "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+        "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+        "source_url": "https://www.nsu.ru/n/life/campus/check-in/",
+        "content_hash": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:00:30.770944",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c"
+      },
+      {
+        "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+        "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+        "source_url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+        "content_hash": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:18:23.481171",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b696-dfda-7e90-bea0-3a8f7914526a"
+      },
+      {
+        "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+        "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+        "source_url": "https://education.nsu.ru/information-technologies/",
+        "content_hash": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:29:57.749857",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7"
+      }
+    ],
+    "graph_documents": 9,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 212,
+    "attempts_finished": 212,
+    "operation_counts": {
+      "generation": 178,
+      "oauth": 1,
+      "embedding": 33
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 1135812,
+    "reserved_peak_no_cache_micro_cny": 310402,
+    "embedding_input_bytes": 10568
+  },
+  "finished_at_utc": "2026-11-10T14:54:05.354546+00:00",
+  "unexecuted_ids": []
+}

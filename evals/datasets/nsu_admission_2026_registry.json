@@ -3113,7 +3113,9 @@
   "group_proposal": {
     "document": 45,
     "special": 5,
-    "status": "pending_Marat_agreement"
+    "status": "accepted",
+    "basis": "https://github.com/nsu-abitur-bot/abitur-bot/issues/388",
+    "note": "Состав 45/5 принят. Подтверждение фактов каждого ответа учитывается отдельно."
   },
   "source_collection": {
     "checked_at": "2026-11-05",
@@ -3121,5 +3123,22 @@
     "raw_materials_location": "outside repositories",
     "supplemental_sources_need_agreement": false,
     "source_selection_review": "https://github.com/nsu-abitur-bot/abitur-bot/pull/407#pullrequestreview-5797772194"
+  },
+  "quality_targets": {
+    "document_passes": 41,
+    "document_total": 45,
+    "special_passes": 5,
+    "special_total": 5,
+    "critical_failures_allowed": 0,
+    "basis": "https://github.com/nsu-abitur-bot/abitur-bot/issues/388",
+    "kb_delta_proposal_pp": 20,
+    "kb_delta_status": "awaiting_review"
+  },
+  "source_verification": {
+    "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+    "semantic_source_check": "docs/reports/388-source-check-2026-11-07.json",
+    "integrity_recheck": "docs/reports/388-source-integrity-recheck-2026-11-10.json",
+    "internal_confirmation_added": false,
+    "expert_confirmation_added": false
   }
 }
