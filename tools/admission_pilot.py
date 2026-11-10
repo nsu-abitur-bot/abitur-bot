@@ -25,6 +25,7 @@ if RUNTIME.is_dir():
     sys.path.insert(0, str(RUNTIME))
 
 from tools.admission_evaluation_usage import EvaluationUsageLedger  # noqa: E402
+from tools.admission_usage import IndexingLimit  # noqa: E402
 
 CASE_IDS = (
     "nsu-pre-flow-01",
@@ -79,13 +80,24 @@ class PilotLedger(EvaluationUsageLedger):
         self.phase = "setup"
         self.case_id = "setup"
         self.completed = 0
+        self.halted = False
 
     def context(self, phase: str, case_id: str) -> None:
-        require(self.completed == self.sequence and not self.uncertain_failure)
+        require(
+            self.completed == self.sequence
+            and not self.uncertain_failure
+            and not self.halted
+        )
         self.phase, self.case_id = phase, case_id
 
     def begin(self, request) -> dict:
-        row = super().begin(request)
+        if self.halted:
+            raise IndexingLimit("Pilot was halted")
+        try:
+            row = super().begin(request)
+        except IndexingLimit:
+            self.halted = True
+            raise
         row.update(phase=self.phase, case_id=self.case_id)
         with self.lock:
             with self.intent_path.open("a", encoding="utf-8") as output:
@@ -108,6 +120,7 @@ class PilotLedger(EvaluationUsageLedger):
             "attempts_finished": self.completed,
             "operation_counts": dict(self.operation_counts),
             "uncertain_failure": self.uncertain_failure,
+            "halted": self.halted,
             "reserved_peak_no_cache_micro_cny": self.reserved_deepseek_micro_cny,
             "embedding_input_bytes": self.reserved_embedding_bytes,
         }
@@ -430,7 +443,11 @@ async def evaluate(
                 progress.data["results"].append(row)
                 progress.data["accounting"] = ledger.accounting()
                 progress.save()
-            require(not ledger.uncertain_failure and ledger.sequence == ledger.completed)
+            require(
+                not ledger.uncertain_failure
+                and not ledger.halted
+                and ledger.sequence == ledger.completed
+            )
             gc.collect()
         progress.data["status"] = "completed"
     finally:
