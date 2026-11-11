@@ -5,9 +5,12 @@
 """
 
 import os
+from types import SimpleNamespace
+from typing import cast
 
 import pytest
 import pytest_asyncio
+from lightrag import LightRAG
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -24,6 +27,8 @@ from pipeline.tools.admission_scores import (
     AdmissionScoresResult,
     execute_admission_scores,
 )
+from rag.program_exams import retrieve_program_exams
+from rag.trace import LightragTrace, RetrievalResult
 
 TEST_DB_NAME = os.getenv("TEST_DB_NAME", "abitur_test")
 _DB_HOST = os.getenv("DB_HOST", "localhost")
@@ -102,6 +107,66 @@ async def _seed_fit(maker) -> None:
                 ),
             ]
         )
+
+
+@pytest.mark.parametrize("use_crag", [True, False], ids=["crag", "lightrag"])
+@pytest.mark.parametrize(
+    ("question", "metric", "expected"),
+    [
+        (
+            "Какой проходной балл ЕГЭ на 09.03.01 за 2024 год?",
+            "passing",
+            "проходной 260",
+        ),
+        ("Какой средний балл ЕГЭ на 09.03.01?", "average", "средний 88.1"),
+    ],
+)
+async def test_ege_score_question_uses_sql_without_program_card(
+    sessionmaker_bound, monkeypatch, use_crag, question, metric, expected
+):
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    await _seed_fit(sessionmaker_bound)
+
+    async def crag_config():
+        return SimpleNamespace(enabled=use_crag)
+
+    async def retrieve(
+        query: str,
+        conversation_history: str | None = None,
+        program_question: str | None = None,
+        **_,
+    ) -> RetrievalResult:
+        result = await retrieve_program_exams(
+            cast(LightRAG, None),
+            program_question or query,
+            [],
+            LightragTrace(),
+            3,
+            conversation_history,
+        )
+        return result or RetrievalResult(context="")
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            result = await kwargs["tool_executor"](
+                "get_admission_scores",
+                {"program": "09.03.01", "metric": metric, "year": 2024},
+            )
+            return LLMResult(text=str(result))
+
+    monkeypatch.setattr(llm_client, "load_crag_config", crag_config)
+    monkeypatch.setattr(llm_client, "query_graph_with_crag", retrieve)
+    monkeypatch.setattr(llm_client, "query_graph_with_sources", retrieve)
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+
+    ctx = llm_client._Ctx(session_id="ege-score", user_id=0)
+    rag = await llm_client._retrieve_context(question, "", ctx)
+    answer, _ = await llm_client._generate_answer(rag, [], question, ctx)
+
+    assert expected in answer
+    assert ctx.trace.tools_called == ["get_admission_scores"]
 
 
 @pytest.mark.asyncio

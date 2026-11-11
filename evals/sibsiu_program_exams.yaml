@@ -1,0 +1,46 @@
+schema_version: 1
+scenarios:
+  - id: sibsiu_geology_ege_code
+    question: Какие ЕГЭ нужны на 21.05.02?
+    reference_answer: &geology_answer >-
+      21.05.02 «Прикладная геология», специалитет. Обязательны профильная
+      математика (40) и русский язык (40). Третий предмет на выбор — физика (41),
+      информатика и ИКТ (46), география (40) или химия (40).
+    topic: program-exams
+    source: &geology_source https://priem.sibsiu.ru/specialities/322
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions: &geology_assertions
+      - {kind: regex, value: 'математик\w*.{0,60}40'}
+      - {kind: regex, value: 'русск\w* язык\w*.{0,60}40'}
+      - {kind: regex, value: 'физик\w*.{0,40}41'}
+      - {kind: regex, value: 'информатик\w*.{0,40}46'}
+      - {kind: regex, value: 'географ\w*.{0,40}40'}
+      - {kind: regex, value: 'хими\w*.{0,40}40'}
+      - {kind: source_contains, value: *geology_source}
+      - {kind: not_contains, value: '09.03.01'}
+      - {kind: not_contains, value: '09.03.02'}
+    judge_criteria: &geology_criteria >-
+      Два обязательных предмета и ровно один из четырёх предметов на выбор.
+      Баллы — минимальные по предметам. Ответ относится к специальности 21.05.02.
+  - id: sibsiu_geology_ege_code_level
+    question: Какие ЕГЭ нужны на 21.05.02 специалитет?
+    reference_answer: *geology_answer
+    topic: program-exams
+    source: *geology_source
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions: *geology_assertions
+    judge_criteria: *geology_criteria
+  - id: sibsiu_geology_ege_name
+    question: Прикладная геология специалитет какие ЕГЭ нужны?
+    reference_answer: *geology_answer
+    topic: program-exams
+    source: *geology_source
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions: *geology_assertions
+    judge_criteria: *geology_criteria

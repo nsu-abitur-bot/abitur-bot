@@ -4,9 +4,9 @@ import logging
 import re
 from contextlib import suppress
 from dataclasses import dataclass, field, replace
-from html import unescape
+from html import escape, unescape
 from time import perf_counter
-from typing import Awaitable, Callable, Optional
+from typing import Awaitable, Callable, Optional, TypedDict
 
 from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
@@ -50,6 +50,7 @@ from pipeline.tools.admission_scores import AdmissionScoresResult
 from rag.crag import load_crag_config
 from rag.retriever import (
     RetrievalError,
+    can_query_program_exams,
     query_graph_with_crag,
     query_graph_with_sources,
 )
@@ -370,6 +371,12 @@ class _RagResult:
     context: str
     sources: list[dict] = field(default_factory=list)
     failed: bool = False
+    answer: str | None = None
+    generation_question: str | None = None
+
+
+class _ProgramQuestion(TypedDict, total=False):
+    program_question: str
 
 
 @dataclass
@@ -502,9 +509,15 @@ async def _retrieve_context(
                 conversation_history=history_text or None,
             )
         else:
+            scoped_question: _ProgramQuestion = (
+                {"program_question": expanded_message}
+                if can_query_program_exams(expanded_message, history_text)
+                else {}
+            )
             retrieval = await query_graph_with_sources(
                 rag_query,
                 conversation_history=history_text or None,
+                **scoped_question,
             )
         # Трасса внутренних логов LightRAG приходит в результате ретрива:
         # перехват процессного логгера отсюда смешивал конкурентные запросы (#303).
@@ -536,7 +549,12 @@ async def _retrieve_context(
             internal_logs_count=len(rag_trace_lines),
             found_context=found,
         )
-        return _RagResult(context=_clean_rag_context(context), sources=sources)
+        return _RagResult(
+            context=_clean_rag_context(context),
+            sources=sources,
+            answer=retrieval.answer,
+            generation_question=retrieval.generation_question,
+        )
     except Exception as e:
         # RetrievalError — штатный сигнал сбоя из rag/, остальное — неожиданная
         # ошибка уже здесь; для пользователя обе значат одно: поиск не прошёл.
@@ -752,7 +770,12 @@ async def _run_tool_loop(
 
 
 EMPTY_ANSWER_TEXT = "Ответ не найден"
-_NOT_FOUND_MARKERS = ("не нашел информации", "не нашёл информации", "не найдена")
+_NOT_FOUND_MARKERS = (
+    "не нашел информации",
+    "не нашёл информации",
+    "не найдена",
+    "нет данных о егэ",
+)
 
 
 def _is_no_answer_text(text: str) -> bool:
@@ -894,10 +917,24 @@ async def _generate_answer(
     """Промпт, генерация, постобработка. При сбое модели — текст-заглушка."""
     if rag.failed:
         return await _answer_without_kb(history_entries, question, ctx)
+    if rag.answer is not None:
+        ctx.log(
+            "llm_response",
+            rag.answer,
+            response_length=len(rag.answer),
+            provider="rag",
+            no_answer=_is_no_answer_text(rag.answer),
+            latency_ms=ctx.latency_ms(),
+        )
+        return escape(rag.answer), []
     session_id = ctx.session_id
     try:
         logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
-        messages = _build_messages(rag.context, history_entries, question)
+        messages = _build_messages(
+            rag.context,
+            history_entries,
+            rag.generation_question or question,
+        )
 
         await ctx.emit_status(STATUS_GENERATING)
         content, llm_usage, provider_name = await _run_tool_loop(
