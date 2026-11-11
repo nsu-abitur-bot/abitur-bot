@@ -140,14 +140,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -200,14 +204,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -257,14 +265,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -314,14 +326,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -371,14 +387,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -428,14 +448,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -485,14 +509,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -542,14 +570,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -602,14 +634,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -659,14 +695,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -716,14 +756,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -774,14 +818,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -840,14 +888,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -899,14 +951,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -956,14 +1012,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1013,14 +1073,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1071,14 +1135,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1131,14 +1199,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1190,14 +1262,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1233,14 +1309,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1276,14 +1356,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1342,14 +1426,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1398,14 +1486,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1454,14 +1546,18 @@
       "critical_failures": [
         "Выдуманная вероятность или гарантия зачисления."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1497,14 +1593,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1540,14 +1640,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1583,14 +1687,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1639,14 +1747,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1696,14 +1808,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1752,14 +1868,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1810,14 +1930,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1868,14 +1992,18 @@
       "critical_failures": [
         "Совет подделать документы, обойти срок или чужую учётную запись."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1928,14 +2056,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -1984,14 +2116,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2042,14 +2178,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2101,14 +2241,18 @@
       "critical_failures": [
         "Раскрытие или выдумывание персональных данных соседей."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2162,14 +2306,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2271,14 +2419,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2380,14 +2532,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2490,14 +2646,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2547,14 +2707,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2604,14 +2768,18 @@
       "critical_failures": [
         "Запрос сканов, сохранение документов или ложное сообщение об оформлении."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2665,14 +2833,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2723,14 +2895,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2786,14 +2962,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2842,14 +3022,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2900,14 +3084,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -2958,14 +3146,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -3015,14 +3207,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -3071,14 +3267,18 @@
       "critical_failures": [
         "Выдуманные факты или контакты, обещание зачисления, выбор за абитуриента."
       ],
-      "content_status": "draft",
+      "content_status": "reviewed",
       "missing_evidence": null,
       "internal_review": {
-        "status": "pending",
-        "reviewer": null,
-        "reviewed_at": null,
-        "basis": null,
-        "dataset_sha256": null
+        "status": "confirmed",
+        "reviewer": "Марат Тимофеев",
+        "reviewed_at": "2026-11-11",
+        "basis": "docs/reports/388-decisions-2026-11-11.md#подтверждение-эталонов",
+        "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+        "date_semantics": "confirmation_recorded",
+        "reviewer_checked_at": null,
+        "reported_by": "Михаил Дешин",
+        "evidence_type": "user_report"
       },
       "expert_review": {
         "status": "not_requested",
@@ -3131,14 +3331,19 @@
     "special_total": 5,
     "critical_failures_allowed": 0,
     "basis": "https://github.com/nsu-abitur-bot/abitur-bot/issues/388",
-    "kb_delta_proposal_pp": 20,
-    "kb_delta_status": "awaiting_review"
+    "kb_delta_status": "accepted",
+    "kb_delta_pp": 20,
+    "kb_delta_group": "document",
+    "kb_delta_accepted_at": "2026-11-11",
+    "kb_delta_accepted_by": "Михаил Дешин",
+    "kb_delta_basis": "docs/reports/388-decisions-2026-11-11.md#порог-улучшения",
+    "kb_delta_applies_to": "future_comparisons; adopted after full-20261110-02, original run conditions unchanged"
   },
   "source_verification": {
     "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
     "semantic_source_check": "docs/reports/388-source-check-2026-11-07.json",
     "integrity_recheck": "docs/reports/388-source-integrity-recheck-2026-11-10.json",
-    "internal_confirmation_added": false,
+    "internal_confirmation_added": true,
     "expert_confirmation_added": false
   }
 }

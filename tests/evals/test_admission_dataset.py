@@ -42,7 +42,7 @@ def test_changed_answer_invalidates_registry(dataset_copy: Path) -> None:
 def test_claimed_review_needs_evidence(dataset_copy: Path) -> None:
     update_registry(
         dataset_copy,
-        lambda r: r["cases"][0]["internal_review"].update(status="confirmed"),
+        lambda r: r["cases"][0]["internal_review"].update(status="confirmed", basis=None),
     )
     with pytest.raises(ValueError, match="incomplete internal_review"):
         validate_dataset(dataset_copy)
@@ -63,7 +63,15 @@ def test_unrecorded_expert_approval_is_rejected(dataset_copy: Path) -> None:
     )
     path.write_text(text, encoding="utf-8")
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
-    update_registry(dataset_copy, lambda r: r.update(dataset_sha256=digest))
+
+    def change(registry: dict) -> None:
+        registry["dataset_sha256"] = digest
+        # Keep synthetic internal evidence current to exercise the expert guard.
+        for case in registry["cases"]:
+            if case["internal_review"]["status"] == "confirmed":
+                case["internal_review"]["dataset_sha256"] = digest
+
+    update_registry(dataset_copy, change)
     with pytest.raises(ValueError, match="unrecorded expert confirmation"):
         validate_dataset(dataset_copy)
 

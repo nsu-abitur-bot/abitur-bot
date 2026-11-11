@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from evals.evaluator import Judge, Runner
     from evals.schema import Scenario
 
 RUNTIME = Path("/evaluation/pilot-runtime-20261110-v2")
@@ -377,6 +378,58 @@ def calibrations(scenarios: dict[str, Scenario]) -> list[tuple[str, Scenario, st
     ]
 
 
+async def evaluate_cases(
+    progress: Progress,
+    ledger: PilotLedger,
+    path: Path,
+    by_id: dict[str, Scenario],
+    case_ids: tuple[str, ...],
+    runner: Runner,
+    judge: Judge,
+) -> None:
+    from evals.evaluator import PipelineEvaluator
+
+    for case_id in case_ids:
+        scenario = by_id[case_id]
+        before = progress.sample(case_id)
+        started = time.monotonic()
+
+        async def answer_case(case, session_id):
+            ledger.context("answer", case.id)
+            return await runner(case, session_id)
+
+        async def judge_case(**kwargs):
+            ledger.context("judge", case_id)
+            return await judge(**kwargs)
+
+        evaluator = PipelineEvaluator(
+            path,
+            runner=answer_case,
+            judge=judge_case,
+            concurrency=1,
+            timeout=CASE_TIMEOUT,
+        )
+        evaluator.scenarios = [scenario]
+        report = await evaluator.run()
+        row = report["results"][0]
+        row.update(
+            elapsed_seconds=round(time.monotonic() - started, 3),
+            memory_before=before,
+            memory_after=progress.sample(),
+        )
+        with progress.lock:
+            progress.data["results"].append(row)
+            progress.data["accounting"] = ledger.accounting()
+            progress.save()
+        require(not row.get("error"))
+        require(
+            not ledger.uncertain_failure
+            and not ledger.halted
+            and ledger.sequence == ledger.completed
+        )
+        gc.collect()
+
+
 async def evaluate(
     progress: Progress,
     ledger: PilotLedger,
@@ -435,7 +488,6 @@ async def evaluate(
                 )
             },
         )
-        from evals.evaluator import PipelineEvaluator
         from evals.judge import evaluate_rag_answer
         from evals.product import prepare_product, run_product
         from evals.schema import load_scenarios
@@ -482,44 +534,9 @@ async def evaluate(
             require(entry["matches"])
         ledger.context("answer", "setup")
         progress.sample("calibration_completed")
-        for case_id in case_ids:
-            scenario = by_id[case_id]
-            before = progress.sample(case_id)
-            started = time.monotonic()
-
-            async def answer_case(case, session_id):
-                ledger.context("answer", case.id)
-                return await run_product(case, session_id)
-
-            async def judge_case(**kwargs):
-                ledger.context("judge", case_id)
-                return await evaluate_rag_answer(**kwargs)
-
-            evaluator = PipelineEvaluator(
-                path,
-                runner=answer_case,
-                judge=judge_case,
-                concurrency=1,
-                timeout=CASE_TIMEOUT,
-            )
-            evaluator.scenarios = [scenario]
-            report = await evaluator.run()
-            row = report["results"][0]
-            row.update(
-                elapsed_seconds=round(time.monotonic() - started, 3),
-                memory_before=before,
-                memory_after=progress.sample(),
-            )
-            with progress.lock:
-                progress.data["results"].append(row)
-                progress.data["accounting"] = ledger.accounting()
-                progress.save()
-            require(
-                not ledger.uncertain_failure
-                and not ledger.halted
-                and ledger.sequence == ledger.completed
-            )
-            gc.collect()
+        await evaluate_cases(
+            progress, ledger, path, by_id, case_ids, run_product, evaluate_rag_answer
+        )
         progress.data["status"] = "completed"
     finally:
         module = sys.modules.get("rag.graph_memory")

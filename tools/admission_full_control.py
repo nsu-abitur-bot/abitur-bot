@@ -27,6 +27,7 @@ def validate_result(
     require(report["status"] == "completed")
     require(report["selected_ids"] == list(ids))
     require([r["id"] for r in report["results"]] == list(ids))
+    require(all(not r.get("error") for r in report["results"]))
     require(not report["unexecuted_ids"])
     require(len({r["attempt"] for r in intents}) == len(intents) == len(usage))
     require({r["attempt"] for r in intents} == {r["attempt"] for r in usage})
