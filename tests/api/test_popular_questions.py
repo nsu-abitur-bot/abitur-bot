@@ -26,6 +26,11 @@ def clustered(monkeypatch):
     monkeypatch.setattr(
         message_log_route.popular_questions_service, "get_popular_questions", fake
     )
+    monkeypatch.setattr(
+        message_log_route.popular_questions_service,
+        "popular_questions_cache",
+        message_log_route.popular_questions_service.PopularQuestionsCache(),
+    )
     return fake
 
 
@@ -56,7 +61,7 @@ def test_get_popular_questions_returns_semantic_clusters(clustered):
     # Сервис БД передаётся первым позиционным аргументом, параметры — по имени.
     clustered.assert_awaited_once_with(
         service,
-        limit=5,
+        limit=50,
         raw_limit=50,
         similarity_threshold=0.9,
     )

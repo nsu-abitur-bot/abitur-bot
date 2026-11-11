@@ -14,8 +14,14 @@
 import asyncio
 import logging
 import math
+import time
+from collections import OrderedDict
+from collections.abc import Callable
+from copy import deepcopy
 from typing import Any, List, TypedDict
+from weakref import WeakValueDictionary
 
+from config import instance
 from config.instance import get_setting
 from db.postgres.services.message_log import MessageLogService, QuestionGroup
 from llm.factory import get_faq_provider as get_llm_provider
@@ -195,7 +201,7 @@ async def get_popular_questions(
     if vectors is None:
         return _rows_without_clustering(groups, limit)
 
-    clusters = _cluster(groups, vectors, similarity_threshold)
+    clusters = await asyncio.to_thread(_cluster, groups, vectors, similarity_threshold)
     return [
         {
             "question": cluster["question"],
@@ -204,3 +210,58 @@ async def get_popular_questions(
         }
         for cluster in clusters[:limit]
     ]
+
+
+class PopularQuestionsCache:
+    """Bounded per-API-process cache; each deployment has its own tenant/settings.
+
+    Counts can lag by five minutes. Settings revisions invalidate results immediately.
+    A per-key lock prevents concurrent page opens from duplicating expensive work.
+    """
+
+    def __init__(
+        self,
+        ttl: float = 300,
+        max_entries: int = 16,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        self.ttl = ttl
+        self.max_entries = max_entries
+        self.clock = clock
+        self._entries: OrderedDict[tuple, tuple[float, list[PopularQuestion]]] = (
+            OrderedDict()
+        )
+        self._locks: WeakValueDictionary[tuple, asyncio.Lock] = WeakValueDictionary()
+
+    async def get(
+        self,
+        log_service: MessageLogService,
+        limit: int = 10,
+        raw_limit: int = DEFAULT_RAW_LIMIT,
+        similarity_threshold: float = DEFAULT_SIMILARITY_THRESHOLD,
+        embedder: Any | None = None,
+    ) -> list[PopularQuestion]:
+        raw_limit = max(limit, raw_limit)
+        identity = _embedder_cache_identity(embedder) if embedder is not None else None
+        key = (raw_limit, similarity_threshold, instance.revision(), identity)
+        lock = self._locks.setdefault(key, asyncio.Lock())
+        async with lock:
+            entry = self._entries.get(key)
+            if entry is None or self.clock() >= entry[0]:
+                # Cache all clusters so changing the display limit costs only a slice.
+                rows = await get_popular_questions(
+                    log_service,
+                    limit=raw_limit,
+                    raw_limit=raw_limit,
+                    similarity_threshold=similarity_threshold,
+                    **({"embedder": embedder} if embedder is not None else {}),
+                )
+                entry = (self.clock() + self.ttl, rows)
+                self._entries[key] = entry
+                while len(self._entries) > self.max_entries:
+                    self._entries.popitem(last=False)
+            self._entries.move_to_end(key)
+            return deepcopy(entry[1][:limit])
+
+
+popular_questions_cache = PopularQuestionsCache()

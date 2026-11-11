@@ -354,7 +354,7 @@ async def get_popular_questions(
     - **similarity_threshold**: порог семантической близости формулировок
     """
     try:
-        popular = await popular_questions_service.get_popular_questions(
+        popular = await popular_questions_service.popular_questions_cache.get(
             log_service,
             limit=limit,
             raw_limit=raw_limit,
