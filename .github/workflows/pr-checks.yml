@@ -7,15 +7,15 @@ on:
 
 jobs:
   evals-offline:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       PYTHON_DOTENV_DISABLED: "1"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.13"
-      - uses: astral-sh/setup-uv@v3
+      - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
       - run: uv sync
@@ -23,25 +23,25 @@ jobs:
         run: uv run python -m evals.evaluator --offline --report eval-report.json
       - name: Upload evaluation report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: eval-report
           path: eval-report.json
           if-no-files-found: ignore
 
   lint-and-types:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
@@ -60,7 +60,7 @@ jobs:
         run: uv run python tools/check_layers.py
 
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # БД-тесты работают с реальной тестовой базой, без моков —
     # см. docs/agents/testing.md.
@@ -95,15 +95,15 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Set up uv
-        uses: astral-sh/setup-uv@v3
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
