@@ -18,6 +18,7 @@ _CODE = re.compile(r"(?<![\w.])\d{2}\.\d{2}\.\d{2}(?!\w|\.\d)")
 _EGE = re.compile(r"\bегэ\b|\bедин\w+\s+государственн\w+\s+экзамен\w*", re.I)
 _EXAMS = re.compile(r"\bэкзамен\w*|\bвступительн\w+\s+испытан\w*", re.I)
 _OTHER_EXAMS = re.compile(r"внутренн|расписани|\bкогда\b|после\s+спо", re.I)
+_ADMISSION_SCORES = re.compile(r"\b(?:проходн\w*|средн\w*)\s+балл\w*\b", re.I)
 _HISTORY_ROLE = re.compile(r"(?m)^(user|assistant|system): ")
 _CLARIFY_PROFILE = "Уточните профиль, чтобы я назвал требования к ЕГЭ."
 _SUBJECT = re.compile(
@@ -86,8 +87,10 @@ class ProgramCard:
 
 def is_program_exam_question(question: str) -> bool:
     """Распознаёт запрос требований к экзаменам до поиска по карточкам."""
-    return not _OTHER_EXAMS.search(question) and bool(
-        _EGE.search(question) or _EXAMS.search(question)
+    return (
+        not _OTHER_EXAMS.search(question)
+        and not _ADMISSION_SCORES.search(question)
+        and bool(_EGE.search(question) or _EXAMS.search(question))
     )
 
 
@@ -105,7 +108,7 @@ def _pending_exam_question(history: str | None) -> str | None:
 
 def can_query_program_exams(question: str, history: str | None) -> bool:
     """Проверяет, нужен ли резолвер карточек, включая уточнение профиля."""
-    return (
+    return not _ADMISSION_SCORES.search(question) and (
         is_program_exam_question(question) or _pending_exam_question(history) is not None
     )
 
@@ -401,6 +404,8 @@ async def retrieve_program_exams(
     conversation_history: str | None = None,
 ) -> RetrievalResult | None:
     """Возвращает контекст одной карточки или готовое уточнение/отсутствие данных."""
+    if _ADMISSION_SCORES.search(question):
+        return None
     follow_up = None
     if is_program_exam_question(question):
         selected, recognized = _select_cards(question, cards, trace)

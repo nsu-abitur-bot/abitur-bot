@@ -445,6 +445,7 @@ async def test_program_exam_cards_from_existing_index(real_lightrag_env):
         await memory.cleanup(graph_id)
         for question in (
             "Какие ЕГЭ нужны на 21.05.02?",
+            "Какие минимальные баллы ЕГЭ нужны на 21.05.02?",
             "Какие ЕГЭ нужны на 21.05.02 специалитет?",
             "«ПРИКЛАДНАЯ   ГЕОЛОГИЯ» специалитет какие ЕГЭ нужны?",
         ):
@@ -513,5 +514,50 @@ async def test_program_exam_cards_from_existing_index(real_lightrag_env):
         assert result.answer and "нет данных о ЕГЭ" in result.answer
         assert not result.context and not result.sources
         assert any("profile_mismatch" in line for line in result.trace)
+    finally:
+        await memory.cleanup(graph_id)
+
+
+async def test_program_exam_card_preserves_scores_from_history(
+    real_lightrag_env, monkeypatch
+):
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    memory, _ = real_lightrag_env
+    graph_id = "test_program_exam_history"
+    question = "Какие ЕГЭ нужны на 09.03.01, с моими баллами могу поступить?"
+    previous = "У меня 44 по информатике и 70 по математике"
+    history = [{"role": "user", "content": previous}]
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            assert "Информатика — 46" in str(messages[0].content)
+            assert [
+                message.content for message in messages if message.type == "human"
+            ] == [
+                previous,
+                f"{question}\nУровень образования — бакалавриат.",
+            ]
+            return LLMResult(text="44 по информатике ниже минимального балла 46.")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    try:
+        assert await memory.save(
+            graph_id,
+            "# 09.03.01 Информатика и вычислительная техника\n"
+            "## ЕГЭ\n- Информатика — 46\n- Математика (профильная) — 40\n",
+            file_paths_str="https://example.org/program",
+            source_id="card-101",
+        )
+        retrieval = await memory.query_with_crag(
+            graph_id, question, conversation_history=f"user: {previous}\nuser: {question}"
+        )
+        rag = llm_client._RagResult(
+            context=retrieval.context, generation_question=retrieval.generation_question
+        )
+        ctx = llm_client._Ctx(session_id="ege-history", user_id=0)
+        answer, _ = await llm_client._generate_answer(rag, history, question, ctx)
+        assert answer == "44 по информатике ниже минимального балла 46."
     finally:
         await memory.cleanup(graph_id)

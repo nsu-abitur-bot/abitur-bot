@@ -932,7 +932,7 @@ async def _generate_answer(
         logger.info(f"[{session_id}] Preparing prompt to LLM provider.")
         messages = _build_messages(
             rag.context,
-            [] if rag.generation_question else history_entries,
+            history_entries,
             rag.generation_question or question,
         )
 
