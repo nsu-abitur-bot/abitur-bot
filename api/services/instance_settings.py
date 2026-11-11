@@ -22,6 +22,9 @@ class ConfigurationError(ValueError):
     pass
 
 
+WELCOME_MESSAGE_MAX_LENGTH = 3999
+
+
 def merge_changes(
     current: InstanceSnapshot, changes: dict[str, str | None]
 ) -> dict[str, str]:
@@ -33,7 +36,12 @@ def merge_changes(
     }
     for name, value in changes.items():
         spec = SPECS[name]
-        candidate = spec.default if value is None else value.strip()
+        candidate = spec.default if value is None else value
+        if spec.kind == "textarea":
+            candidate = candidate.replace("\r\n", "\n").replace("\r", "\n")
+            candidate = candidate if candidate.strip() else ""
+        else:
+            candidate = candidate.strip()
         validate_value(spec, candidate)
         values[name] = candidate
     if float(values["RATING_POLL_MIN_SECONDS"]) > float(
@@ -47,6 +55,15 @@ def merge_changes(
 
 
 def validate_value(spec: SettingSpec, value: str) -> None:
+    if spec.kind == "textarea":
+        if re.search(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\ud800-\udfff]", value):
+            raise ConfigurationError("Приветствие содержит недопустимые символы")
+        if len(value.encode("utf-16-le")) // 2 > WELCOME_MESSAGE_MAX_LENGTH:
+            raise ConfigurationError(
+                f"Приветствие должно содержать не более "
+                f"{WELCOME_MESSAGE_MAX_LENGTH} символов"
+            )
+        return
     if len(value) > 4000 or "\n" in value or "\r" in value:
         raise ConfigurationError("Недопустимое значение настройки")
     if spec.group == "Вуз" and (len(value) > 300 or any(c in value for c in "{}<>")):
