@@ -203,17 +203,18 @@ async def test_dump_restore_roundtrip_real_postgres(
     monkeypatch.setenv("DATABASE_URL", TEST_DATABASE_URL)
     engine = create_async_engine(TEST_DATABASE_URL, pool_pre_ping=True)
 
-    # Клиент новее сервера умеет дампы, которые старый сервер не примет
-    # (pg_dump 17+ кладёт SET transaction_timeout, которого нет в PG15).
-    # В проде версии совпадают (в образе postgresql-client 15, сервер 15),
-    # рассинхрон — артефакт окружения, честный roundtrip там невозможен.
+    # Дальний клиент умеет дампы, которые старый сервер не примет: pg_dump 17+
+    # кладёт SET transaction_timeout, которого нет в PG15 (в 16-м его ещё не
+    # было, такой клиент работает). В проде версии совпадают (в образе
+    # postgresql-client 15, сервер 15), рассинхрон — артефакт окружения.
     async with engine.connect() as conn:
         server_version = await conn.execute(text("SHOW server_version"))
         server_major = int(str(server_version.scalar()).split(".")[0])
     await engine.dispose()
-    if _client_major() > server_major:
+    client_major = _client_major()
+    if client_major >= 17 > server_major:
         pytest.skip(
-            f"pg_dump {_client_major()} новее сервера {server_major}: "
+            f"pg_dump {client_major} новее сервера {server_major}: "
             "дамп с SET transaction_timeout сервер не примет"
         )
 
