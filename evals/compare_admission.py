@@ -48,7 +48,7 @@ def compare_reports(with_kb: dict, empty_kb: dict) -> dict:
             missing_with_kb=[i for i in ids if i not in mappings[0]],
             missing_empty_kb=[i for i in ids if i not in mappings[1]],
         )
-    return dict(groups=output, acceptance="pending agreed thresholds and human review")
+    return dict(groups=output, acceptance="pending human review")
 
 
 def main() -> None:
