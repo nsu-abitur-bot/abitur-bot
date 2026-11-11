@@ -33,16 +33,16 @@ class _FakeAbbrevExpander:
 
 
 class _FakeProvider:
-    async def generate(self, messages, profile) -> str:
-        return '{"verdict":"supported","quotes":["Контекст из RAG"]}'
-
     async def generate_with_usage(self, messages, profile) -> LLMResult:
+        return LLMResult(text='{"verdict":"supported","quotes":["Контекст из RAG"]}')
+
+    async def _generate_draft(self, messages, profile) -> LLMResult:
         return LLMResult(text="Ответ из LLM")
 
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None
     ) -> LLMResult:
-        return await self.generate_with_usage(messages, profile)
+        return await self._generate_draft(messages, profile)
 
 
 def _close_background_coro(coro) -> None:
@@ -253,8 +253,10 @@ async def test_missing_user_context_replaces_generic_draft(
     monkeypatch, question, clarification, retrieval_failed
 ):
     class Provider(_FakeProvider):
-        async def generate(self, messages, profile):
-            return json.dumps({"verdict": "clarify", "question": clarification})
+        async def generate_with_usage(self, messages, profile):
+            return LLMResult(
+                text=json.dumps({"verdict": "clarify", "question": clarification})
+            )
 
     async def retrieve(*args, **kwargs):
         if retrieval_failed:
@@ -302,12 +304,12 @@ async def test_unsupported_procedure_never_reaches_transport(
                 await kwargs["on_delta"](draft)
             return LLMResult(text=draft)
 
-        async def generate(self, messages, profile):
+        async def generate_with_usage(self, messages, profile):
             payload = json.loads(messages[-1].content)
             assert payload["sources"] == ["Контекст из RAG"]
             if review is None:
                 raise TimeoutError
-            return review
+            return LLMResult(text=review)
 
     async def retrieve(*args, **kwargs):
         return RetrievalResult(
@@ -340,3 +342,37 @@ async def test_unsupported_procedure_never_reaches_transport(
             "url": "https://events.nsu.ru/abiturient",
         }
     ]
+
+
+async def test_mixed_score_and_procedure_answer_requires_review(monkeypatch):
+    from pipeline.tools.admission_scores import AdmissionScoresResult
+
+    sql_result = "09.03.01, 2024, бюджет: проходной балл 141."
+    draft = "Проходной балл 141. Сначала идите к коменданту."
+    reviewed = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, *, tool_executor, **kwargs):
+            await tool_executor("get_admission_scores", {"program": "09.03.01"})
+            return LLMResult(text=draft)
+
+        async def generate_with_usage(self, messages, profile):
+            reviewed.append(json.loads(messages[-1].content))
+            return LLMResult(text='{"verdict":"refer"}')
+
+    async def execute(name, args):
+        return AdmissionScoresResult(
+            sql_result, status="ok", scope={"_program_ids": ["09.03.01"]}
+        )
+
+    _patch_pipeline(monkeypatch, _FakeRedis(), Provider())
+    monkeypatch.setattr(llm_client, "default_tool_executor", execute)
+    response = await llm_client.ask_local_llm(
+        "Какой проходной балл на 09.03.01 и куда нести документы для заселения?",
+        "s-mixed",
+    )
+
+    assert "идите к коменданту" not in response.text
+    assert reviewed[0]["draft"] == draft
+    assert reviewed[0]["admission_scores"][0]["result"] == sql_result
+    assert reviewed[0]["sources"] == ["Контекст из RAG"]

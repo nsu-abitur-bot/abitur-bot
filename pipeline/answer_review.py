@@ -3,7 +3,7 @@
 import json
 import logging
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal
 
 from langchain_core.messages import HumanMessage, SystemMessage
@@ -11,7 +11,7 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from config.instance import get_setting
 from config.latency import stage
 from config.university import identity, is_nsu
-from llm.base import BaseLLMProvider
+from llm.base import BaseLLMProvider, LLMUsage
 from llm.profiles import LLMProfile
 from pipeline.prompts import ANSWER_REVIEW_PROMPT
 
@@ -26,6 +26,7 @@ REVIEW_UNAVAILABLE = "Сейчас я не могу подтвердить от�
 class ReviewDecision:
     verdict: Literal["supported", "neutral", "clarify", "refer", "unavailable"]
     question: str = ""
+    usage: LLMUsage = field(default_factory=LLMUsage)
 
 
 @dataclass(frozen=True)
@@ -92,6 +93,7 @@ async def review_answer(
     history: list[dict[str, str]],
     draft: str,
     evidence: list[str],
+    admission_scores: list[dict],
 ) -> ReviewDecision:
     """Возвращает решение о публикации. Сбой проверки блокирует черновик."""
     if not draft.strip():
@@ -103,32 +105,36 @@ async def review_answer(
             "history": history,
             "draft": draft,
             "sources": evidence,
+            "admission_scores": admission_scores,
         },
         ensure_ascii=False,
     )
+    usage = LLMUsage()
+    sources = [*evidence, *(score["result"] for score in admission_scores)]
     try:
         with stage("answer_review"):
-            result = await provider.generate(
+            response = await provider.generate_with_usage(
                 [
                     SystemMessage(content=ANSWER_REVIEW_PROMPT),
                     HumanMessage(content=payload),
                 ],
                 profile=REVIEW_PROFILE,
             )
-            result = result.strip()
+            usage = response.usage
+            result = response.text.strip()
             fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", result, flags=re.DOTALL)
             decision = json.loads(fenced[1] if fenced else result)
         if isinstance(decision, dict):
             verdict = decision.get("verdict")
             if verdict in ("neutral", "refer"):
-                return ReviewDecision(verdict)
+                return ReviewDecision(verdict, usage=usage)
             if verdict == "clarify":
                 followup = decision.get("question")
                 if isinstance(followup, str):
                     followup = followup.strip()
                     if re.fullmatch(r"[^<>\r\n?]{1,499}\?", followup):
-                        return ReviewDecision("clarify", question=followup)
-                return ReviewDecision("unavailable")
+                        return ReviewDecision("clarify", question=followup, usage=usage)
+                return ReviewDecision("unavailable", usage=usage)
             quotes = decision.get("quotes")
             if (
                 verdict == "supported"
@@ -137,13 +143,13 @@ async def review_answer(
                 and all(
                     isinstance(quote, str)
                     and quote.strip()
-                    and any(quote in source for source in evidence)
+                    and any(quote in source for source in sources)
                     for quote in quotes
                 )
             ):
-                return ReviewDecision("supported")
+                return ReviewDecision("supported", usage=usage)
             if verdict == "supported":
-                return ReviewDecision("refer")
+                return ReviewDecision("refer", usage=usage)
     except Exception as exc:
         logger.warning("Answer review failed: %s", type(exc).__name__)
-    return ReviewDecision("unavailable")
+    return ReviewDecision("unavailable", usage=usage)

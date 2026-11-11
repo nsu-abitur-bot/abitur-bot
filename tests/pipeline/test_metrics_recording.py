@@ -34,12 +34,14 @@ class _Provider:
         self._text = text
         self._error = error
 
-    async def generate(self, messages, profile):
+    async def generate_with_usage(self, messages, profile):
         if self._text and "не нашёл" in self._text.casefold():
-            return '{"verdict":"refer"}'
-        return '{"verdict":"supported","quotes":["Документы принимают с 20 июня."]}'
+            return LLMResult(text='{"verdict":"refer"}')
+        return LLMResult(
+            text='{"verdict":"supported","quotes":["Документы принимают с 20 июня."]}'
+        )
 
-    async def generate_with_usage(self, messages, profile) -> LLMResult:
+    async def _generate_draft(self, messages, profile) -> LLMResult:
         if self._error:
             raise self._error
         return LLMResult(text=self._text or "")
@@ -47,7 +49,7 @@ class _Provider:
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None
     ) -> LLMResult:
-        return await self.generate_with_usage(messages, profile)
+        return await self._generate_draft(messages, profile)
 
 
 async def _get_fake_redis() -> _FakeRedis:

@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 from collections.abc import Coroutine
 from typing import Any
@@ -32,8 +33,19 @@ class _FakeFaqMatcher:
 
 
 class _FakeStreamingProvider:
-    async def generate(self, messages, profile):
-        return '{"verdict":"supported","quotes":["Контекст"]}'
+    def __init__(self, clarification: str | None = None) -> None:
+        self.clarification = clarification
+
+    async def generate_with_usage(self, messages, profile):
+        review = (
+            {"verdict": "clarify", "question": self.clarification}
+            if self.clarification
+            else {"verdict": "supported", "quotes": ["Контекст"]}
+        )
+        return LLMResult(
+            text=json.dumps(review),
+            usage=LLMUsage(prompt_tokens=25, completion_tokens=5, total_tokens=30),
+        )
 
     async def generate_stream_with_usage(self, messages, profile=None, on_delta=None):
         if on_delta is not None:
@@ -53,7 +65,8 @@ class _FakeStreamingProvider:
 
 
 @pytest.mark.asyncio
-async def test_reviewed_answer_and_generation_usage_are_saved(monkeypatch):
+@pytest.mark.parametrize("clarification", [None, "Какой уровень вас интересует?"])
+async def test_reviewed_answer_and_combined_usage_are_saved(monkeypatch, clarification):
     saved_logs = []
     background_tasks: list[asyncio.Task] = []
     streamed_updates = []
@@ -97,7 +110,8 @@ async def test_reviewed_answer_and_generation_usage_are_saved(monkeypatch):
         "pipeline.llm_client.query_graph_with_crag", fake_query_graph_with_sources
     )
     monkeypatch.setattr(
-        "pipeline.llm_client.get_llm_provider", lambda: _FakeStreamingProvider()
+        "pipeline.llm_client.get_llm_provider",
+        lambda: _FakeStreamingProvider(clarification),
     )
     monkeypatch.setattr("pipeline.llm_client._save_log_to_db", fake_save_log_to_db)
     monkeypatch.setattr(
@@ -114,16 +128,16 @@ async def test_reviewed_answer_and_generation_usage_are_saved(monkeypatch):
     if background_tasks:
         await asyncio.gather(*background_tasks)
 
-    assert response.text == "Ответ бота"
-    assert streamed_updates == ["Ответ бота"]
+    assert response.text == (clarification or "Ответ бота")
+    assert streamed_updates == [response.text]
 
     llm_logs = [log for log in saved_logs if log["message_type"] == "llm_response"]
     assert len(llm_logs) == 1
-    assert llm_logs[0]["tokens_used"] == 50
+    assert llm_logs[0]["tokens_used"] == 80
     assert llm_logs[0]["message_metadata"]["tokens"] == {
-        "prompt_tokens": 40,
-        "completion_tokens": 10,
-        "total_tokens": 50,
+        "prompt_tokens": 65,
+        "completion_tokens": 15,
+        "total_tokens": 80,
     }
 
     rag_query_logs = [log for log in saved_logs if log["message_type"] == "rag_query"]

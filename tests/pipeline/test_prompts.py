@@ -41,8 +41,8 @@ VERSIONED_PROMPTS = [
 # подними версию в pipeline/prompts.py и обнови обе колонки здесь.
 PINNED = {
     "answer_review": (
-        "2.0",
-        "a0804098495208c4b9dedacd3ded7399693cbf1a23d781ccbe5c6afb283b2c31",
+        "3.0",
+        "4e32bb54f09ccda531a4efc9f2d0704317ef39824a41ba271488cda1f57329b9",
     ),
     "system": (
         "4.0",

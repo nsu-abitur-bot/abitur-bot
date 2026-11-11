@@ -80,12 +80,21 @@ def _fixture_pipeline() -> Iterator[Runner]:
             ]
 
     class FixtureProvider:
-        async def generate(self, messages, profile) -> str:
+        async def generate_with_usage(self, messages, profile) -> LLMResult:
             payload = json.loads(str(messages[-1].content))
             draft = payload["draft"]
+            for score in payload["admission_scores"]:
+                if score["result"] in draft:
+                    return LLMResult(
+                        text=json.dumps(
+                            {"verdict": "supported", "quotes": [score["result"]]}
+                        )
+                    )
             if draft in payload["sources"]:
-                return json.dumps({"verdict": "supported", "quotes": [draft]})
-            return '{"verdict":"refer"}'
+                return LLMResult(
+                    text=json.dumps({"verdict": "supported", "quotes": [draft]})
+                )
+            return LLMResult(text='{"verdict":"refer"}')
 
         async def generate_with_tools(
             self,

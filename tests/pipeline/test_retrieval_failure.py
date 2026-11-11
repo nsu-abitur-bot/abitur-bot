@@ -6,6 +6,7 @@
 через инструмент, а не через базу знаний, и при упавшем поиске работают.
 """
 
+import json
 import logging
 from types import SimpleNamespace
 
@@ -32,10 +33,15 @@ class _RecordingProvider:
         self.system_prompts: list[str] = []
         self.call_tool = False
 
-    async def generate(self, messages, profile):
+    async def generate_with_usage(self, messages, profile):
         if "Приём документов с 20 июня." in str(messages[-1].content):
-            return '{"verdict":"supported","quotes":["Приём документов с 20 июня."]}'
-        return '{"verdict":"refer"}'
+            return LLMResult(
+                text='{"verdict":"supported","quotes":["Приём документов с 20 июня."]}'
+            )
+        payload = json.loads(messages[-1].content)
+        if payload["admission_scores"]:
+            return LLMResult(text='{"verdict":"supported","quotes":["246"]}')
+        return LLMResult(text='{"verdict":"refer"}')
 
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None
