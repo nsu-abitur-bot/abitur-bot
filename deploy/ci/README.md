@@ -89,16 +89,24 @@ images; never blanket prune, `down -v`, or downgrade the database for rollback.
 
 Retry the failed Actions run only while its checked SHA is still main. An old run
 will intentionally skip; push/merge a new checked commit to deliver a newer main.
-To roll back an application image manually, root must acquire the same lock and
-use `previous_image` for only the affected component from the receipt. Preserve
-the other component entries. For example, with `component` set literally to
-`backend` or `web`, a root-operated Python script can use this helper's
-`atomic_json`, `PINS`, `RECEIPT`, `LOCK`, `SERVICES`, `Host` and
-`start(host, component, migrate=False)` under `fcntl.flock(..., LOCK_EX)`.
-Choose an already retained local image and leave migrations disabled; this does
-not undo schema changes. Verify the public endpoints and bot state, then record
-the operator intervention in the deployment receipt. Never edit pins concurrently
-with Actions or force an old commit through the automatic main freshness guard.
+
+To roll back an application image manually (#244), one command on the server:
+
+```sh
+/usr/local/sbin/abitur-deploy --rollback backend   # или web
+```
+
+The command takes the same server lock as CI, repins only the affected
+component to the receipt's `previous_image`, verifies that image is present
+locally, starts services without pulling and without migrations (schema is
+**not downgraded**), and requires the same health checks as a deploy. On
+success it rewrites the receipt (`manual_rollback: true`, the rolled-back-from
+image becomes the new `previous_image`, so a repeated call rolls forward).
+If health fails after the rollback, the pin is restored and the previous
+services are restarted; root must then inspect. Reinstall the updated helper
+from the merged commit as shown above before first use. Never edit pins
+concurrently with Actions or force an old commit through the automatic main
+freshness guard.
 
 Exact healthy retries are no-ops: migrations are not repeated and the rollback
 receipt is preserved. An unhealthy same-image retry repairs the application and

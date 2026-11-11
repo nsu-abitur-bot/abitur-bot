@@ -282,3 +282,89 @@ def test_failure_receipt_and_diagnostics_never_include_secret(
     assert '"returncode": 17' in output
     assert "secret" not in output + d.FAILURE.read_text()
     assert json.loads(d.PINS.read_text()) == state
+
+
+PREV = "ghcr.io/nsu-abitur-bot/abitur-bot@sha256:" + "c" * 64
+CUR = "ghcr.io/nsu-abitur-bot/abitur-bot@sha256:" + "d" * 64
+
+
+@pytest.fixture
+def rolled_state(state: dict) -> dict:
+    """Успешный деплой уже прошёл: pins на текущем образе, receipt помнит предыдущий."""
+    pins = json.loads(d.PINS.read_text())
+    for service in d.SERVICES["backend"]:
+        pins["services"][service] = {"image": CUR}
+    d.atomic_json(d.PINS, pins)
+    d.atomic_json(
+        d.RECEIPT,
+        {
+            "backend": {
+                "sha": SHA,
+                "image": CUR,
+                "previous_image": PREV,
+                "completed_at": 1,
+                "instances": ["nsu"],
+                "targets": [
+                    {"name": "nsu", "api_port": 18001, "web_port": 13001, "bot": True}
+                ],
+            }
+        },
+    )
+    return pins
+
+
+def test_rollback_pins_previous_image_without_migrations(rolled_state: dict) -> None:
+    host = FakeHost()
+
+    assert d.rollback("backend", host) == "Rollback healthy"
+
+    pins = json.loads(d.PINS.read_text())
+    for service in d.SERVICES["backend"]:
+        assert pins["services"][service] == {"image": PREV}
+    # Чужой компонент не тронут.
+    assert pins["services"]["web"] == rolled_state["services"]["web"]
+    # Миграции не запускаются и не откатываются.
+    assert not any("migrate" in call or "permissions" in call for call in host.calls)
+    assert ("docker", "login") not in host.calls
+    assert ("docker", "pull", PREV) not in host.calls
+    receipt = json.loads(d.RECEIPT.read_text())["backend"]
+    assert receipt["image"] == PREV
+    assert receipt["previous_image"] == CUR
+    assert receipt["manual_rollback"] is True
+
+
+def test_rollback_without_receipt_fails_closed(state: dict) -> None:
+    host = FakeHost()
+
+    with pytest.raises(ValueError, match="previous image"):
+        d.rollback("backend", host)
+
+    assert json.loads(d.PINS.read_text()) == state
+    assert not any("up" in call for call in host.calls)
+
+
+def test_rollback_health_failure_restores_pin(rolled_state: dict) -> None:
+    host = FakeHost()
+    host.health_failures = 1
+
+    with pytest.raises(RuntimeError):
+        d.rollback("backend", host)
+
+    pins = json.loads(d.PINS.read_text())
+    for service in d.SERVICES["backend"]:
+        assert pins["services"][service] == {"image": CUR}
+    # Откат отката: сервисы подняты повторно на прежнем образе.
+    assert sum("up" in call for call in host.calls) == 2
+    receipt = json.loads(d.RECEIPT.read_text())["backend"]
+    assert receipt["image"] == CUR
+
+
+def test_rollback_same_image_is_noop(rolled_state: dict) -> None:
+    pins = json.loads(d.PINS.read_text())
+    for service in d.SERVICES["backend"]:
+        pins["services"][service] = {"image": PREV}
+    d.atomic_json(d.PINS, pins)
+
+    host = FakeHost()
+    assert d.rollback("backend", host) == "Already rolled back"
+    assert not any("up" in call for call in host.calls)
