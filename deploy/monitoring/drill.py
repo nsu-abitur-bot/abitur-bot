@@ -7,8 +7,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
-from monitor import run  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from tools.monitor import run  # noqa: E402
 
 
 def main() -> None:

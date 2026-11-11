@@ -2,6 +2,7 @@
 проброс инструмента в ask_local_llm (без обращения к сети и реальным LLM)."""
 
 import asyncio
+import json
 from types import SimpleNamespace
 
 import pytest
@@ -83,6 +84,13 @@ class _ToolCallingProvider:
     def __init__(self) -> None:
         self.tools_seen: list[ToolSpec] | None = None
         self.tool_result: str | None = None
+
+    async def generate_with_usage(self, messages, profile) -> LLMResult:
+        payload = json.loads(messages[-1].content)
+        [score] = payload["admission_scores"]
+        return LLMResult(
+            text=json.dumps({"verdict": "supported", "quotes": [score["result"]]})
+        )
 
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None

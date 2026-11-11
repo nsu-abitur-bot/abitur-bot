@@ -24,6 +24,7 @@ from faq.matcher import FAQMatcher, get_faq_matcher, load_faq_threshold
 from llm.base import LLMUsage, ToolExecutor, ToolSpec
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from pipeline.answer_review import ReviewDecision, handoff, review_answer
 from pipeline.prompts import (
     INTENT_PROMPT_TEMPLATE,
     LIGHTRAG_FORMAT_HINT,
@@ -317,6 +318,8 @@ class _Ctx:
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
     score_query: dict | None = None
+    program_evidence: list[str] = field(default_factory=list)
+    score_evidence: list[dict] = field(default_factory=list)
     # Начало обработки вопроса (perf_counter): по нему в llm_response
     # пишется latency_ms для агрегатов наблюдаемости (#242).
     started_monotonic: float = field(default_factory=perf_counter)
@@ -325,8 +328,9 @@ class _Ctx:
         """Сколько прошло от начала обработки вопроса до текущего момента."""
         return round((perf_counter() - self.started_monotonic) * 1000, 1)
 
-    def remember_score_scope(self, scope: dict) -> None:
+    def remember_verified_scores(self, scope: dict, evidence: list[dict]) -> None:
         self.score_query = scope
+        self.score_evidence = evidence
 
     @timed("tool_execution")
     async def execute_tool(self, name: str, args: dict) -> str:
@@ -334,6 +338,9 @@ class _Ctx:
         output = await default_tool_executor(name, args)
         if isinstance(output, AdmissionScoresResult) and output.status in ("ok", "empty"):
             self.score_query = output.scope or dict(args)
+            self.score_evidence.append({"scope": self.score_query, "result": str(output)})
+        if name == EDUCATION_PROGRAMS_TOOL.name:
+            self.program_evidence.append(output)
         return output
 
     async def emit_status(self, text: str) -> None:
@@ -371,6 +378,7 @@ class _RagResult:
     context: str
     sources: list[dict] = field(default_factory=list)
     failed: bool = False
+    evidence: list[str] = field(default_factory=list)
     answer: str | None = None
     generation_question: str | None = None
 
@@ -390,6 +398,7 @@ class _Postprocessed:
     text: str
     sources: list[dict]
     log_text: str
+    review_usage: LLMUsage = field(default_factory=LLMUsage)
 
 
 def _expand_abbrevs(message: str, session_id: str) -> str:
@@ -554,6 +563,7 @@ async def _retrieve_context(
             sources=sources,
             answer=retrieval.answer,
             generation_question=retrieval.generation_question,
+            evidence=retrieval.evidence,
         )
     except Exception as e:
         # RetrievalError — штатный сигнал сбоя из rag/, остальное — неожиданная
@@ -636,7 +646,7 @@ async def _run_tool_loop(
     session_id: str,
     stream_callback: Optional[StreamCallback] = None,
     tool_executor: Optional[ToolExecutor] = None,
-    score_scope_callback: Callable[[dict], None] | None = None,
+    verified_scores_callback: Callable[[dict, list[dict]], None] | None = None,
 ) -> tuple[str, LLMUsage, str]:
     """Генерация ответа с доступом к инструментам. Возвращает текст, расход, провайдера.
 
@@ -654,6 +664,7 @@ async def _run_tool_loop(
     if guard is not None:
         executor = tool_executor
         resolved_scope: dict = {}
+        score_evidence: list[dict] = []
 
         async def checked_executor(name: str, args: dict) -> str:
             nonlocal resolved_scope
@@ -690,6 +701,9 @@ async def _run_tool_loop(
                 guard.record(output)
                 if guard.verified and isinstance(output, AdmissionScoresResult):
                     resolved_scope = output.scope or dict(args)
+                    score_evidence.append(
+                        {"scope": resolved_scope, "result": str(output)}
+                    )
                 return output
             return await executor(name, args)
 
@@ -715,15 +729,10 @@ async def _run_tool_loop(
                 profile=LLMProfiles.CHAT,
                 required_tool=SCORES_TOOL,
             )
-            usage = LLMUsage(
-                prompt_tokens=usage.prompt_tokens + result.usage.prompt_tokens,
-                completion_tokens=usage.completion_tokens
-                + result.usage.completion_tokens,
-                total_tokens=usage.total_tokens + result.usage.total_tokens,
-            )
+            usage = usage + result.usage
         content = result.text if guard.verified else SCORES_UNAVAILABLE
-        if guard.verified and score_scope_callback is not None:
-            score_scope_callback(guard.history_scope(resolved_scope))
+        if guard.verified and verified_scores_callback is not None:
+            verified_scores_callback(guard.history_scope(resolved_scope), score_evidence)
         if stream_callback is not None:
             try:
                 await stream_callback(content)
@@ -833,6 +842,55 @@ async def _answer_from_faq(
     return LlmAnswer(text=faq_answer, trace=ctx.trace)
 
 
+async def _review_draft(
+    messages: list[BaseMessage], content: str, evidence: list[str], scores: list[dict]
+) -> ReviewDecision:
+    history = [
+        {"role": message.type, "content": str(message.content)}
+        for message in messages[1:-1]
+    ]
+    return await review_answer(
+        get_llm_provider(),
+        str(messages[-1].content),
+        history,
+        content,
+        evidence,
+        scores,
+    )
+
+
+async def _review_generated(
+    messages: list[BaseMessage],
+    content: str,
+    rag: _RagResult,
+    ctx: _Ctx,
+) -> _Postprocessed:
+    processed = _postprocess(content, rag.sources)
+    if content in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
+        return processed
+
+    review = await _review_draft(
+        messages, content, [*rag.evidence, *ctx.program_evidence], ctx.score_evidence
+    )
+    if review.verdict == "clarify":
+        return _Postprocessed(
+            text=review.question,
+            sources=[],
+            log_text=review.question,
+            review_usage=review.usage,
+        )
+    if review.verdict in ("supported", "neutral"):
+        return replace(processed, review_usage=review.usage)
+
+    ctx.log("answer_review", review.verdict)
+    text, sources = handoff(
+        str(messages[-1].content), unavailable=review.verdict == "unavailable"
+    )
+    return _Postprocessed(
+        text=text, sources=sources, log_text=text, review_usage=review.usage
+    )
+
+
 async def _answer_without_kb(
     history_entries: list[dict], question: str, ctx: _Ctx
 ) -> tuple[str, list[dict]]:
@@ -840,7 +898,8 @@ async def _answer_without_kb(
 
     Модель всё равно зовём: проходные баллы она берёт из инструмента, а не из
     базы знаний, и этот путь от сбоя поиска не зависит. Но ответ модели
-    отдаём, только если она опиралась на инструмент. Иначе с пустым
+    отдаём, если она опиралась на инструмент или нужен ответ абитуриента
+    на уточняющий вопрос. Иначе с пустым
     контекстом она сказала бы «этого нет в базе НГУ», и сбой сервиса
     выглядел бы как отсутствие информации — поэтому отвечаем, что сервис
     временно недоступен. Без стриминга: решение принимается после генерации,
@@ -861,7 +920,7 @@ async def _answer_without_kb(
             messages,
             session_id,
             tool_executor=tracking_executor,
-            score_scope_callback=ctx.remember_score_scope,
+            verified_scores_callback=ctx.remember_verified_scores,
         )
     except Exception as e:
         logger.warning(f"[{session_id}] Provider generation error: {e}")
@@ -874,9 +933,20 @@ async def _answer_without_kb(
         )
         return RAG_UNAVAILABLE_ANSWER, []
 
-    if not used_tool and content in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
-        return content, []
-    if not used_tool:
+    if not used_tool and content not in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
+        review = await _review_draft(messages, content, [], [])
+        llm_usage = llm_usage + review.usage
+        if review.verdict == "clarify":
+            ctx.log(
+                "llm_response",
+                review.question,
+                provider=provider_name,
+                tokens=llm_usage.to_dict(),
+                tokens_used=llm_usage.total_tokens or None,
+                retrieval_failed=True,
+                latency_ms=ctx.latency_ms(),
+            )
+            return review.question, []
         logger.info(
             f"[{session_id}] Knowledge base unavailable and no tool used: "
             "answering that the service is unavailable."
@@ -885,12 +955,16 @@ async def _answer_without_kb(
             "llm_response",
             RAG_UNAVAILABLE_ANSWER,
             error=True,
+            provider=provider_name,
+            tokens=llm_usage.to_dict(),
+            tokens_used=llm_usage.total_tokens or None,
             retrieval_failed=True,
             latency_ms=ctx.latency_ms(),
         )
         return RAG_UNAVAILABLE_ANSWER, []
 
-    processed = _postprocess(content, [])
+    processed = await _review_generated(messages, content, _RagResult(context=""), ctx)
+    llm_usage = llm_usage + processed.review_usage
     ctx.log(
         "llm_response",
         processed.log_text[:2000],
@@ -940,12 +1014,17 @@ async def _generate_answer(
         content, llm_usage, provider_name = await _run_tool_loop(
             messages,
             session_id,
-            stream_callback,
             tool_executor=ctx.execute_tool,
-            score_scope_callback=ctx.remember_score_scope,
+            verified_scores_callback=ctx.remember_verified_scores,
         )
 
-        processed = _postprocess(content, rag.sources)
+        processed = await _review_generated(messages, content, rag, ctx)
+        llm_usage = llm_usage + processed.review_usage
+        if stream_callback is not None:
+            try:
+                await stream_callback(processed.text)
+            except Exception as exc:
+                logger.warning("[%s] stream_callback error: %s", session_id, exc)
         logger.info(f"[{session_id}] Received response from LLM.")
         logger.info(
             f"[{session_id}] - Raw response (first 500 chars): "
@@ -1014,8 +1093,8 @@ async def ask_local_llm(
 
     session_id — идентификатор переписки, по нему берётся и сохраняется история.
     user_id — внутренний идентификатор для записей в PG.
-    stream_callback вызывается с накопленным текстом по мере генерации: на
-    FAQ-матче модель не зовётся, и колбэк не срабатывает.
+    stream_callback получает ответ после проверки. На FAQ-матче колбэк
+    не срабатывает.
     """
     logger.info(
         f"[{session_id}] New message received from user={user_id}: {message[:50]}..."
