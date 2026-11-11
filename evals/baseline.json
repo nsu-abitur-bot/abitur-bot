@@ -8,6 +8,8 @@
     "tool_1": {"passed": true},
     "rag_1": {"passed": true},
     "rag_rerank_failure": {"passed": true},
-    "crag_topic_switch_mmf": {"passed": true}
+    "crag_topic_switch_mmf": {"passed": true},
+    "unsupported_procedure_handoff": {"passed": true},
+    "fit_phd_handoff": {"passed": true}
   }
 }

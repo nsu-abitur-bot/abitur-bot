@@ -1,11 +1,14 @@
 import asyncio
+import json
 import logging
 
+import pytest
 from langchain_core.messages import HumanMessage
 from redis.exceptions import ConnectionError as RedisConnectionError
 
 from llm.base import LLMResult
 from pipeline import llm_client
+from rag.retriever import RetrievalError
 from rag.trace import RetrievalResult
 
 
@@ -30,6 +33,9 @@ class _FakeAbbrevExpander:
 
 
 class _FakeProvider:
+    async def generate(self, messages, profile) -> str:
+        return '{"verdict":"supported","quotes":["Контекст из RAG"]}'
+
     async def generate_with_usage(self, messages, profile) -> LLMResult:
         return LLMResult(text="Ответ из LLM")
 
@@ -61,7 +67,7 @@ async def test_rag_does_not_start_before_faq_matcher_finishes(monkeypatch):
         query: str, conversation_history=None, search_query=None
     ):
         assert faq_done
-        return RetrievalResult(context="Контекст из RAG")
+        return RetrievalResult(context="Контекст из RAG", evidence=["Контекст из RAG"])
 
     monkeypatch.setattr(llm_client, "get_redis_client", _get_fake_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
@@ -94,7 +100,7 @@ async def test_faq_hit_returns_without_rag(monkeypatch):
     ):
         nonlocal rag_started
         rag_started = True
-        return RetrievalResult(context="Контекст из RAG")
+        return RetrievalResult(context="Контекст из RAG", evidence=["Контекст из RAG"])
 
     monkeypatch.setattr(llm_client, "get_redis_client", _get_fake_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
@@ -120,7 +126,7 @@ class _NoFaq:
         return None
 
 
-class _RecordingProvider:
+class _RecordingProvider(_FakeProvider):
     """Запоминает сообщения, ушедшие в модель."""
 
     def __init__(self) -> None:
@@ -138,7 +144,7 @@ def _patch_pipeline(monkeypatch, redis, provider) -> None:
         return redis
 
     async def fake_query(query: str, conversation_history=None, search_query=None):
-        return RetrievalResult(context="Контекст из RAG")
+        return RetrievalResult(context="Контекст из RAG", evidence=["Контекст из RAG"])
 
     monkeypatch.setattr(llm_client, "get_redis_client", get_redis)
     monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: _FakeAbbrevExpander())
@@ -228,4 +234,109 @@ async def test_repeated_question_keeps_earlier_turn(monkeypatch):
         "Есть ли общежитие?",
         "Да, есть.",
         "Есть ли общежитие?",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("question", "clarification", "retrieval_failed"),
+    [
+        (
+            "Есть ли шансы?",
+            "На какой уровень вы поступаете и какие предметы сдаёте?",
+            False,
+        ),
+        ("Когда это нужно отправить?", "Что именно вы хотите отправить?", False),
+        ("Когда это нужно отправить?", "Что именно вы хотите отправить?", True),
+    ],
+)
+async def test_missing_user_context_replaces_generic_draft(
+    monkeypatch, question, clarification, retrieval_failed
+):
+    class Provider(_FakeProvider):
+        async def generate(self, messages, profile):
+            return json.dumps({"verdict": "clarify", "question": clarification})
+
+    async def retrieve(*args, **kwargs):
+        if retrieval_failed:
+            raise RetrievalError("test search failure")
+        return RetrievalResult(
+            context="Контекст из RAG",
+            sources=[{"url": "https://example.test"}],
+            evidence=["Контекст из RAG"],
+        )
+
+    _patch_pipeline(monkeypatch, _FakeRedis(), Provider())
+    monkeypatch.setattr(llm_client, "query_graph_with_sources", retrieve)
+    monkeypatch.setattr(llm_client, "query_graph_with_crag", retrieve)
+    updates = []
+
+    async def stream(text):
+        updates.append(text)
+
+    answer = await llm_client.ask_local_llm(question, "s-clarify", stream_callback=stream)
+
+    assert answer.text == clarification
+    assert updates == ([] if retrieval_failed else [clarification])
+    assert answer.sources == []
+
+
+@pytest.mark.parametrize(
+    ("review", "explanation"),
+    [
+        ('{"verdict":"refer"}', "не нашёл информации"),
+        (
+            '{"verdict":"supported","quotes":["Сначала идите к коменданту."]}',
+            "не нашёл информации",
+        ),
+        ("", "не могу подтвердить"),
+        (None, "не могу подтвердить"),
+    ],
+)
+async def test_unsupported_procedure_never_reaches_transport(
+    monkeypatch, review, explanation
+):
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            draft = "Сначала идите к коменданту."
+            if kwargs.get("on_delta"):
+                await kwargs["on_delta"](draft)
+            return LLMResult(text=draft)
+
+        async def generate(self, messages, profile):
+            payload = json.loads(messages[-1].content)
+            assert payload["sources"] == ["Контекст из RAG"]
+            if review is None:
+                raise TimeoutError
+            return review
+
+    async def retrieve(*args, **kwargs):
+        return RetrievalResult(
+            context="Сначала идите к коменданту.",
+            evidence=["Контекст из RAG"],
+        )
+
+    _patch_pipeline(monkeypatch, _FakeRedis(), Provider())
+    monkeypatch.setattr(llm_client, "query_graph_with_sources", retrieve)
+    monkeypatch.setattr(llm_client, "query_graph_with_crag", retrieve)
+    updates = []
+
+    async def stream(text):
+        updates.append(text)
+
+    answer = await llm_client.ask_local_llm(
+        "С документами в приёмную комиссию или к коменданту?",
+        "s-procedure",
+        stream_callback=stream,
+    )
+
+    assert explanation in answer.text
+    assert "Марина Шашкова" in answer.text
+    assert "priem@nsu.ru" in answer.text
+    assert "идите к коменданту" not in answer.text
+    assert updates == [answer.text]
+    assert answer.sources == [
+        {
+            "title": "Контакты приёмной комиссии НГУ",
+            "url": "https://events.nsu.ru/abiturient",
+        }
     ]

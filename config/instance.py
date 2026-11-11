@@ -39,6 +39,7 @@ for key, label, kind in (
     ("UNIVERSITY_WEBSITE", "Сайт", "url"),
     ("ADMISSIONS_EMAIL", "Почта приёмной комиссии", "text"),
     ("ADMISSIONS_PHONE", "Телефон приёмной комиссии", "text"),
+    ("ADMISSIONS_HANDOFF_NAME", "Имя сотрудника для переадресации", "text"),
     ("ADMISSIONS_ADDRESS", "Адрес приёмной комиссии", "text"),
     ("UNIVERSITY_LOGO_URL", "Логотип", "url"),
 ):

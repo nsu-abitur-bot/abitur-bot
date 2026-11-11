@@ -32,6 +32,9 @@ class _FakeFaqMatcher:
 
 
 class _FakeStreamingProvider:
+    async def generate(self, messages, profile):
+        return '{"verdict":"supported","quotes":["Контекст"]}'
+
     async def generate_stream_with_usage(self, messages, profile=None, on_delta=None):
         if on_delta is not None:
             await on_delta("Ответ")
@@ -50,7 +53,7 @@ class _FakeStreamingProvider:
 
 
 @pytest.mark.asyncio
-async def test_streaming_llm_usage_is_saved(monkeypatch):
+async def test_reviewed_answer_and_generation_usage_are_saved(monkeypatch):
     saved_logs = []
     background_tasks: list[asyncio.Task] = []
     streamed_updates = []
@@ -61,6 +64,7 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
     async def fake_query_graph_with_sources(*args, **kwargs):
         return RetrievalResult(
             context="Контекст",
+            evidence=["Контекст"],
             trace=[
                 "INFO: Query nodes: IT, факультеты (top_k:40, cosine:0.2)",
                 "WARNING: Rerank is enabled but no rerank model is configured",
@@ -111,7 +115,7 @@ async def test_streaming_llm_usage_is_saved(monkeypatch):
         await asyncio.gather(*background_tasks)
 
     assert response.text == "Ответ бота"
-    assert streamed_updates == ["Ответ", "Ответ бота"]
+    assert streamed_updates == ["Ответ бота"]
 
     llm_logs = [log for log in saved_logs if log["message_type"] == "llm_response"]
     assert len(llm_logs) == 1

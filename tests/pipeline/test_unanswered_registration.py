@@ -39,6 +39,11 @@ class _Provider:
     def __init__(self, text: str) -> None:
         self._text = text
 
+    async def generate(self, messages, profile):
+        if self._text and "не нашёл" in self._text.casefold():
+            return '{"verdict":"refer"}'
+        return '{"verdict":"supported","quotes":["Документы принимают с 20 июня."]}'
+
     async def generate_with_usage(self, messages, profile) -> LLMResult:
         return LLMResult(text=self._text)
 
@@ -53,7 +58,8 @@ async def _get_fake_redis() -> _FakeRedis:
 
 
 async def _fake_query(query, conversation_history=None, search_query=None):
-    return RetrievalResult(context="Контекст из базы знаний")
+    evidence = "Документы принимают с 20 июня."
+    return RetrievalResult(context=evidence, evidence=[evidence])
 
 
 def _setup(monkeypatch, provider_text: str) -> list[dict]:
