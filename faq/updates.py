@@ -3,6 +3,7 @@
 import asyncio
 import logging
 from contextlib import suppress
+from typing import Callable
 
 import asyncpg
 
@@ -12,7 +13,9 @@ from faq.matcher import FAQMatcher
 logger = logging.getLogger(__name__)
 
 
-async def watch_faq_updates(matcher: FAQMatcher, dsn: str) -> None:
+async def watch_faq_updates(
+    matcher: FAQMatcher | Callable[[], FAQMatcher], dsn: str
+) -> None:
     """Listen for FAQ changes; re-read the table after every reconnection."""
     while True:
         connection: asyncpg.Connection | None = None
@@ -29,7 +32,7 @@ async def watch_faq_updates(matcher: FAQMatcher, dsn: str) -> None:
                 changed.set()
 
             await connection.add_listener(FAQ_CHANGE_CHANNEL, on_change)
-            await matcher.refresh_from_db()
+            await (matcher() if callable(matcher) else matcher).refresh_from_db()
             logger.info("FAQ: подписка на изменения БД активна")
 
             while True:
@@ -39,7 +42,7 @@ async def watch_faq_updates(matcher: FAQMatcher, dsn: str) -> None:
                     await connection.execute("SELECT 1")
                     continue
                 changed.clear()
-                await matcher.refresh_from_db()
+                await (matcher() if callable(matcher) else matcher).refresh_from_db()
         except asyncio.CancelledError:
             raise
         except Exception:

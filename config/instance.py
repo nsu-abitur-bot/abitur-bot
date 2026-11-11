@@ -1,8 +1,12 @@
 """Process-local, immutable view of application settings; no database dependencies."""
 
 import os
-from dataclasses import dataclass
-from typing import overload
+import re
+from contextlib import asynccontextmanager, contextmanager
+from contextvars import ContextVar
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import AsyncGenerator, Generator, overload
 
 
 @dataclass(frozen=True)
@@ -31,6 +35,24 @@ def define(
     SPECS[name] = SettingSpec(label, group, default, secret, kind, choices)
 
 
+define(
+    "TEXT_PROVIDER",
+    "Провайдер текста",
+    "Модели",
+    "gemini",
+    choices=("openai", "gemini", "deepseek"),
+)
+define("TEXT_MODEL", "Текстовая модель", "Модели")
+define(
+    "EMBEDDING_PROVIDER",
+    "Провайдер эмбеддингов",
+    "Модели",
+    "gemini",
+    choices=("openai", "gemini", "gigachat"),
+)
+define("EMBEDDING_MODEL", "Модель эмбеддингов", "Модели")
+
+
 define("UNIVERSITY_PROFILE", "Профиль вуза", "Вуз", "nsu", choices=("nsu", "custom"))
 for key, label, kind in (
     ("UNIVERSITY_SHORT_NAME", "Краткое название", "text"),
@@ -48,6 +70,14 @@ for key, label, kind in (
 define("UNIVERSITY_ACCENT_COLOR", "Акцентный цвет", "Вуз", "#4b4bd2")
 define("BOT_WELCOME_MESSAGE", "Приветственное сообщение бота", "Вуз", kind="textarea")
 
+
+define(
+    "DOCUMENT_RECOGNITION_ENABLED",
+    "Распознавать сканы",
+    "Документы",
+    "true",
+    kind="boolean",
+)
 
 for provider in ("OPENAI", "GEMINI"):
     group = "OpenAI" if provider == "OPENAI" else "Gemini"
@@ -341,6 +371,39 @@ _values: dict[str, str] | None = None
 _revision = 0
 _loaded = False
 _secret_history: set[str] = set()
+_pinned: ContextVar[tuple[dict[str, str] | None, int] | None] = ContextVar(
+    "settings_snapshot", default=None
+)
+
+
+def snapshot_values() -> dict[str, str] | None:
+    pinned = _pinned.get()
+    values = pinned[0] if pinned is not None else _values
+    return dict(values) if values is not None else None
+
+
+@contextmanager
+def settings_scope(values: dict[str, str] | None, revision: int) -> Generator[None, None]:
+    if values is not None:
+        remember_secrets(values)
+    token = _pinned.set((dict(values) if values is not None else None, revision))
+    try:
+        yield
+    finally:
+        _pinned.reset(token)
+
+
+@asynccontextmanager
+async def pinned_settings() -> AsyncGenerator[None, None]:
+    with settings_scope(snapshot_values(), revision()):
+        yield
+
+
+def generation_id() -> str:
+    generation = (snapshot_values() or {}).get("_embedding_generation", "")
+    if generation and not re.fullmatch(r"[a-f0-9]{32}", generation):
+        raise ValueError("Некорректное поколение индекса")
+    return generation
 
 
 def install(values: dict[str, str], revision: int, *, loaded: bool = True) -> None:
@@ -357,7 +420,8 @@ def is_loaded() -> bool:
 
 
 def revision() -> int:
-    return _revision
+    pinned = _pinned.get()
+    return pinned[1] if pinned is not None else _revision
 
 
 @overload
@@ -367,9 +431,18 @@ def get_setting(name: str, default: None = None) -> str | None: ...
 
 
 def get_setting(name: str, default: str | None = None) -> str | None:
-    if _values is None or name not in SPECS:
+    pinned = _pinned.get()
+    values = pinned[0] if pinned is not None else _values
+    if (
+        name in {"LIGHTRAG_WORKSPACE_BASE", "FAQ_EMBEDDINGS_CACHE_PATH"}
+        and generation_id()
+    ):
+        root = Path(os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
+        root = root / ".generations" / generation_id()
+        return str(root if name == "LIGHTRAG_WORKSPACE_BASE" else root / "faq_cache.pkl")
+    if values is None or name not in SPECS:
         return os.getenv(name, default)
-    value = _values.get(name, SPECS[name].default)
+    value = values.get(name, SPECS[name].default)
     return value if value != "" else default
 
 
@@ -393,3 +466,21 @@ def remember_secrets(values: dict[str, str]) -> None:
     _secret_history.update(
         values[k] for k, spec in SPECS.items() if spec.secret and values.get(k)
     )
+
+
+@asynccontextmanager
+async def using_settings(
+    values: dict[str, str] | None, version: int
+) -> AsyncGenerator[None, None]:
+    with settings_scope(values, version):
+        yield
+
+
+@dataclass(frozen=True)
+class SettingsBinding:
+    values: dict[str, str] | None = field(repr=False)
+    revision: int = 0
+
+
+def capture_settings() -> SettingsBinding:
+    return SettingsBinding(snapshot_values(), revision())

@@ -10,6 +10,7 @@ FAQ Matcher — модуль для поиска готовых ответов �
 """
 
 import asyncio
+import json
 import logging
 import os
 import re
@@ -21,12 +22,13 @@ import numpy as np
 import yaml
 from sqlalchemy import select
 
-from config.instance import get_setting
+from config.instance import generation_id, get_setting, pinned_settings, snapshot_values
 from config.latency import stage
 from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import FaqEntry
 from db.postgres.services.settings import SettingsService
+from llm.embedding import UnifiedEmbedding
 from llm.factory import get_faq_provider as get_llm_provider
 
 logger = logging.getLogger(__name__)
@@ -182,6 +184,7 @@ class FAQMatcher:
         threshold: Optional[float] = None,
         embedder: Optional["EmbeddingClient"] = None,
         cache_path: Optional[Path] = None,
+        load_yaml: bool = True,
     ):
         # None → env-дефолт; явное значение передают тесты и вызовы,
         # которым нужен детерминированный порог.
@@ -190,7 +193,7 @@ class FAQMatcher:
         )
         self._faq_path = faq_path or FAQ_DATA_PATH
         self._cache_path = cache_path or Path(
-            os.getenv(
+            get_setting(
                 "FAQ_EMBEDDINGS_CACHE_PATH",
                 str(self._faq_path.with_name("faq_cache.pkl")),
             )
@@ -206,10 +209,13 @@ class FAQMatcher:
         # Загружаем FAQ
         self._index: tuple[list[str], list[str], Optional[np.ndarray]] = ([], [], None)
 
-        self._load_faq()
+        if load_yaml:
+            self._load_faq()
 
     def _create_embedder(self) -> Optional["EmbeddingClient"]:
         try:
+            if (snapshot_values() or {}).get("_model_settings_version") == "2":
+                return UnifiedEmbedding()
             provider = get_llm_provider()
             embedder = provider.get_embeddings_model()
             if embedder:
@@ -371,6 +377,7 @@ class FAQMatcher:
             for item in items
         )
 
+    @pinned_settings()
     async def refresh_from_db(self) -> None:
         """Перестраивает индекс только при изменении записей в БД."""
         async with self._refresh_lock:
@@ -496,11 +503,20 @@ class EmbeddingClient(Protocol):
 # ── Singleton ────────────────────────────────────────────────────────────
 
 _faq_matcher: Optional[FAQMatcher] = None
+_generation_matchers: dict[str, FAQMatcher] = {}
 
 
 def get_faq_matcher() -> FAQMatcher:
     """Возвращает глобальный экземпляр FAQMatcher (lazy singleton)."""
     global _faq_matcher
+    generation = generation_id()
+    if generation:
+        if generation not in _generation_matchers:
+            matcher = FAQMatcher(load_yaml=False)
+            root = Path(get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
+            matcher.load_items(json.loads((root / "faq-items.json").read_text()))
+            _generation_matchers[generation] = matcher
+        return _generation_matchers[generation]
     if _faq_matcher is None:
         _faq_matcher = FAQMatcher()
     return _faq_matcher

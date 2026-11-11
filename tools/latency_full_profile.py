@@ -251,7 +251,7 @@ async def run(args: argparse.Namespace, snapshot_override: Any = None) -> None:
                 await destination.execute(table.insert(), rows)
     await source_engine.dispose()
 
-    original_kb = Path(get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
+    original_kb = Path(os.getenv("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
     isolated_kb = args.output / "kb"
     if not isolated_kb.exists():
         shutil.copytree(

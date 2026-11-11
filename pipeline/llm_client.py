@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 
 from abbrev.expander import get_abbrev_expander
+from config.instance import pinned_settings
 from config.latency import observation, request_timed, stage, timed
 from config.university import identity
 from db.postgres.db import AsyncSessionLocal
@@ -1002,6 +1003,7 @@ def _store_answer(
 
 
 @request_timed("pipeline_total")
+@pinned_settings()
 async def ask_local_llm(
     message: str,
     session_id: str,

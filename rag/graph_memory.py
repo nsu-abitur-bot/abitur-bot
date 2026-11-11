@@ -5,6 +5,7 @@ import os
 import re
 import time
 from contextlib import asynccontextmanager
+from functools import wraps
 from typing import Any, Dict, List, Literal, Optional, cast
 from urllib.parse import unquote, urlsplit
 
@@ -20,11 +21,18 @@ from lightrag.utils import (
 )
 from sqlalchemy import select
 
-from config.instance import get_setting
+from config.content_gate import content_write
+from config.instance import (
+    generation_id,
+    get_setting,
+    pinned_settings,
+    snapshot_values,
+)
 from config.latency import stage, timed
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
+from llm.embedding import UnifiedEmbedding
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 from llm.providers.deepseek_graph_adapters import DeepSeekLLM
@@ -205,6 +213,20 @@ def graph_configuration() -> tuple:
             "GIGACHAT_EMBEDDING_MODEL",
             "LIGHTRAG_EMBEDDING_WORKERS",
             "LIGHTRAG_LLM_WORKERS",
+            "LIGHTRAG_LLM_PROVIDER",
+            "OPENAI_API_KEY",
+            "GEMINI_API_KEY",
+            "DEEPSEEK_API_KEY",
+            "GIGACHAT_API_KEY",
+            "OPENAI_BASE_URL",
+            "GEMINI_BASE_URL",
+            "DEEPSEEK_BASE_URL",
+            "OPENAI_GRAPH_MODEL",
+            "GEMINI_GRAPH_MODEL",
+            "DEEPSEEK_GRAPH_MODEL",
+            "PROFILE_GRAPH_MAX_TOKENS",
+            "PROFILE_GRAPH_TIMEOUT",
+            "PROFILE_GRAPH_TEMPERATURE",
         )
     )
 
@@ -217,6 +239,17 @@ class _GraphWrapper:
         self.usage_count = 0
         self.marked_for_deletion = False
         self.configuration = graph_configuration()
+
+
+def generation_bound(method):
+    @wraps(method)
+    @pinned_settings()
+    async def invoke(self, *args, **kwargs):
+        if getattr(self, "_generation", "") != generation_id():
+            return await getattr(get_graph_memory(), method.__name__)(*args, **kwargs)
+        return await method(self, *args, **kwargs)
+
+    return invoke
 
 
 class GraphMemory:
@@ -243,6 +276,7 @@ class GraphMemory:
             str, tuple[tuple[tuple[float, float], tuple[int, Any]], dict[str, str]]
         ] = {}
 
+        self._generation = generation_id()
         self.workspace_path = get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag")
         os.makedirs(self.workspace_path, exist_ok=True)
 
@@ -482,7 +516,10 @@ class GraphMemory:
                     "gemini" if default_provider == "deepseek" else default_provider,
                 ).lower()
 
-                if graph_llm_provider == "openai":
+                unified = (snapshot_values() or {}).get("_model_settings_version") == "2"
+                if unified:
+                    embedding_adapter = UnifiedEmbedding()
+                elif graph_llm_provider == "openai":
                     openai_api_key = get_setting("OPENAI_API_KEY", "")
                     if not openai_api_key:
                         raise RuntimeError(
@@ -534,11 +571,18 @@ class GraphMemory:
                     )
                 )
 
+                callback_values = snapshot_values()
+                actual_dim = (callback_values or {}).get("_embedding_dim")
+
                 @wrap_embedding_func_with_attrs(
-                    embedding_dim=embedding_adapter.embedding_dim
+                    embedding_dim=int(actual_dim)
+                    if actual_dim
+                    else embedding_adapter.embedding_dim
                 )
                 @trace_worker_callback
                 async def embedding_func(texts: List[str]) -> List[List[float]]:
+                    if unified:
+                        return await UnifiedEmbedding()(texts)
                     provider = embedding_provider
                     if provider == "openai":
                         adapter = OpenAIEmbedding(
@@ -590,7 +634,7 @@ class GraphMemory:
                 if self._pg_storage:
                     await pg_storage.ensure_lightrag_tables()
                     storage_kwargs = {
-                        "workspace": graph_id,
+                        "workspace": pg_storage.physical_workspace(graph_id),
                         "kv_storage": "PGKVStorage",
                         "doc_status_storage": "PGDocStatusStorage",
                     }
@@ -676,6 +720,8 @@ class GraphMemory:
                 except Exception as e:
                     logger.warning(f"Ошибка при отложенной финализации: {e}")
 
+    @generation_bound
+    @content_write()
     async def save(
         self,
         graph_id: str,
@@ -779,6 +825,7 @@ class GraphMemory:
                 "Не удалось восстановить список чанков документа %s: %s", doc_id, exc
             )
 
+    @generation_bound
     async def query(
         self,
         graph_id: str,
@@ -908,6 +955,7 @@ class GraphMemory:
             rag, question, cards, trace, max_sources, conversation_history
         )
 
+    @generation_bound
     async def query_with_crag(
         self,
         graph_id: str,
@@ -1042,6 +1090,7 @@ class GraphMemory:
                 raise
             raise RetrievalError(f"{type(e).__name__}: {e}") from e
 
+    @generation_bound
     async def query_with_sources(
         self,
         graph_id: str,
@@ -1483,6 +1532,7 @@ class GraphMemory:
             logger.error(f"Error reading doc status for {workspace_path}: {e}")
             return []
 
+    @generation_bound
     async def get_list_docs(
         self, graph_id: str, *, resolve_urls: bool = True
     ) -> list[dict]:
@@ -1492,6 +1542,7 @@ class GraphMemory:
         workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
         return await asyncio.to_thread(self._read_doc_list, workspace_path, resolve_urls)
 
+    @generation_bound
     async def get_doc_full_text(self, graph_id: str, doc_id: str) -> Optional[str]:
         """Возвращает полный текст документа по его ID."""
         if self._pg_storage:
@@ -1516,6 +1567,7 @@ class GraphMemory:
         # kv_store_full_docs.json содержит все тексты целиком — читаем в потоке.
         return await asyncio.to_thread(_read_full_doc)
 
+    @generation_bound
     async def get_doc_diagnostics(self, graph_id: str, doc_id: str) -> dict:
         """Диагностика документа по данным LightRAG.
 
@@ -1584,6 +1636,7 @@ class GraphMemory:
             "error": error,
         }
 
+    @generation_bound
     async def debug_query(
         self,
         graph_id: str,
@@ -1732,6 +1785,7 @@ class GraphMemory:
                 "sources": sources,
             }
 
+    @generation_bound
     async def export_stores(
         self, graph_id: str, include_embeddings: bool = False
     ) -> bytes:
@@ -1772,6 +1826,7 @@ class GraphMemory:
         buffer.seek(0)
         return buffer.getvalue()
 
+    @generation_bound
     async def get_doc_status(self, graph_id: str, doc_id: str) -> str | None:
         """Возвращает статус документа в LightRAG («pending», «processed», «failed»).
 
@@ -1797,6 +1852,7 @@ class GraphMemory:
             )
             return None
 
+    @generation_bound
     async def get_chunks_list(self, graph_id: str, doc_id: str) -> list[str]:
         """Возвращает chunks_list документа из doc_status LightRAG.
 
@@ -1822,6 +1878,8 @@ class GraphMemory:
             )
             return []
 
+    @generation_bound
+    @content_write()
     async def delete_doc_safe(
         self,
         graph_id: str,
@@ -1971,6 +2029,8 @@ class GraphMemory:
 
         return True
 
+    @generation_bound
+    @content_write()
     async def delete_doc(self, graph_id: str, doc_id: str) -> bool:
         """Удаляет документ из RAG по его ID."""
         try:
@@ -2047,6 +2107,8 @@ class GraphMemory:
         except Exception as e:
             logger.error(f"Ошибка при очистке: {e}")
 
+    @generation_bound
+    @content_write()
     async def clear_cache(self, graph_id: str) -> None:
         """
         Очищает кеш ответов LLM (kv_store_llm_response_cache.json)
@@ -2123,10 +2185,16 @@ class GraphMemory:
 
 
 _graph_memory_instance = None
+_generation_memories: dict[str, GraphMemory] = {}
 
 
 def get_graph_memory() -> GraphMemory:
     global _graph_memory_instance
+    generation = generation_id()
+    if generation:
+        if generation not in _generation_memories:
+            _generation_memories[generation] = GraphMemory()
+        return _generation_memories[generation]
     if _graph_memory_instance is None:
         _graph_memory_instance = GraphMemory()
     return _graph_memory_instance

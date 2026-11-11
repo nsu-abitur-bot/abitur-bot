@@ -1,4 +1,7 @@
 import logging
+from functools import wraps
+from threading import RLock
+from typing import Callable
 
 from config.instance import get_setting
 from llm.base import BaseLLMProvider
@@ -7,8 +10,23 @@ logger = logging.getLogger(__name__)
 
 _provider_instance: BaseLLMProvider | None = None
 _provider_signature: tuple = ()
+_factory_lock = RLock()
 
 
+def _serialized_factory(
+    factory: Callable[[], BaseLLMProvider],
+) -> Callable[[], BaseLLMProvider]:
+    @wraps(factory)
+    def get() -> BaseLLMProvider:
+        # Staging and old-generation requests deliberately coexist in threads.
+        # A provider must be returned with the same signature that selected it.
+        with _factory_lock:
+            return factory()
+
+    return get
+
+
+@_serialized_factory
 def get_llm_provider() -> BaseLLMProvider:
     """Создаёт LLM провайдер на основе переменной окружения LLM_PROVIDER.
 
@@ -73,6 +91,7 @@ _faq_provider: BaseLLMProvider | None = None
 _faq_signature: tuple = ()
 
 
+@_serialized_factory
 def get_faq_provider() -> BaseLLMProvider:
     global _faq_provider, _faq_signature
     default = get_setting("LLM_PROVIDER", "gemini")

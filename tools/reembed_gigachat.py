@@ -67,6 +67,8 @@ async def _migrate(changes: dict[str, str], root: Path) -> dict:
     async with AsyncSessionLocal() as session:
         service = InstanceSettingsService(session)
         snapshot = await service.read()
+        if snapshot.values.get("_model_settings_version") == "2":
+            raise ValueError("Используйте пересчёт в разделе «Модели» админки")
         proposed = merge_changes(
             snapshot,
             {

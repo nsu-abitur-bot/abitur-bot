@@ -17,7 +17,7 @@ import math
 from collections.abc import Callable
 from typing import Any, List, TypedDict
 
-from config.instance import get_setting
+from config.instance import generation_id, get_setting
 from db.postgres.services.message_log import MessageLogService, QuestionGroup
 from llm.factory import get_faq_provider as get_llm_provider
 
@@ -69,6 +69,11 @@ def _embedder_cache_identity(embedder: Any) -> tuple[str, str]:
         or getattr(embedder, "model_id", None)
         or "default"
     )
+    generation = generation_id()
+    if generation:
+        import hashlib
+
+        model = hashlib.sha256((str(model) + "@" + generation).encode()).hexdigest()
     return str(provider).lower(), str(model)
 
 
