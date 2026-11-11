@@ -249,6 +249,7 @@ async def test_timeout_and_shutdown_keep_lease_until_embedding_thread_finishes(
     redis, session, test_engine, monkeypatch
 ):
     import threading
+    from types import SimpleNamespace
 
     from sqlalchemy.ext.asyncio import async_sessionmaker
 
@@ -266,7 +267,12 @@ async def test_timeout_and_shutdown_keep_lease_until_embedding_thread_finishes(
             return [[1.0, 0.0] for _ in texts]
 
     await _log_questions(MessageLogService(session), ["Как поступить?"])
-    monkeypatch.setattr(popular_statistics, "REFRESH_TIMEOUT", 0.02)
+    # Trigger the real deadline only after the thread started; SQL startup time
+    # must not turn this into a flaky test of a 20ms database query budget.
+    deadline = asyncio.timeout(None)
+    controlled_asyncio = SimpleNamespace(**vars(asyncio))
+    controlled_asyncio.timeout = lambda _seconds: deadline
+    monkeypatch.setattr(popular_statistics, "asyncio", controlled_asyncio)
     factory = async_sessionmaker[AsyncSession](test_engine)
     embedder = Slow()
     first = PopularStatistics(redis, factory, embedder=embedder)
@@ -274,6 +280,7 @@ async def test_timeout_and_shutdown_keep_lease_until_embedding_thread_finishes(
     task = asyncio.create_task(first.refresh())
     try:
         await asyncio.wait_for(started.wait(), 2)
+        deadline.reschedule(loop.time())
         async with asyncio.timeout(2):
             while not task.cancelling():
                 await asyncio.sleep(0.001)
