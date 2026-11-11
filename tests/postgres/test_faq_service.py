@@ -82,10 +82,10 @@ async def test_delete_faq_entry(session: AsyncSession):
 
 
 @pytest.mark.asyncio
-async def test_create_many_faq_entries(session: AsyncSession):
+async def test_upsert_many_faq_entries(session: AsyncSession):
     service = FaqDbService(session)
 
-    entries = await service.create_many(
+    entries, created, updated = await service.upsert_many(
         [
             {"question": "Q1", "aliases": ["a1"], "answer": "A1"},
             {"question": "Q2", "aliases": ["a2"], "answer": "A2"},
@@ -94,7 +94,150 @@ async def test_create_many_faq_entries(session: AsyncSession):
 
     all_entries = await service.get_all()
     assert len(entries) == 2
+    assert (created, updated) == (2, 0)
     assert len(all_entries) == 2
+
+
+@pytest.mark.asyncio
+async def test_upsert_many_reupload_updates_instead_of_duplicates(session: AsyncSession):
+    service = FaqDbService(session)
+    items = [
+        {"question": "Вопрос 1", "aliases": [], "answer": "Ответ 1"},
+        {"question": "Вопрос 2", "aliases": [], "answer": "Ответ 2"},
+    ]
+
+    entries, created, updated = await service.upsert_many(items)
+    assert (created, updated) == (2, 0)
+
+    reupload = [
+        {"question": "Вопрос 1", "aliases": [], "answer": "Ответ 1 (обновлён)"},
+        {"question": "Вопрос 2", "aliases": [], "answer": "Ответ 2"},
+    ]
+    entries, created, updated = await service.upsert_many(reupload)
+
+    assert (created, updated) == (0, 2)
+    all_entries = await service.get_all()
+    assert len(all_entries) == 2
+    answers = {entry.question: entry.answer for entry in all_entries}
+    assert answers["Вопрос 1"] == "Ответ 1 (обновлён)"
+    assert answers["Вопрос 2"] == "Ответ 2"
+
+
+@pytest.mark.asyncio
+async def test_upsert_many_case_and_spacing_variants_are_same_question(
+    session: AsyncSession,
+):
+    service = FaqDbService(session)
+
+    entries, created, updated = await service.upsert_many(
+        [{"question": "Как поступить в НГУ?", "aliases": [], "answer": "Через конкурс."}]
+    )
+    assert (created, updated) == (1, 0)
+
+    entries, created, updated = await service.upsert_many(
+        [
+            {
+                "question": "  как поступить в нгу? ",
+                "aliases": [],
+                "answer": "Обновлённый ответ.",
+            }
+        ]
+    )
+
+    assert (created, updated) == (0, 1)
+    all_entries = await service.get_all()
+    assert len(all_entries) == 1
+    assert all_entries[0].normalized_question == "как поступить в нгу?"
+    assert all_entries[0].answer == "Обновлённый ответ."
+
+
+@pytest.mark.asyncio
+async def test_upsert_many_preserves_verification_metadata(session: AsyncSession):
+    service = FaqDbService(session)
+    confirmed_at = datetime(2026, 11, 5, 10, 0)
+    created = await service.create(
+        question="Как подать документы?",
+        aliases=[],
+        answer="Через личный кабинет.",
+    )
+    await service.update(
+        item_id=created.id,
+        question="Как подать документы?",
+        aliases=[],
+        answer="Через личный кабинет.",
+        metadata={
+            "verification_status": "confirmed",
+            "confirmed_by": "Иванова",
+            "confirmed_at": confirmed_at,
+        },
+    )
+
+    entries, created_count, updated_count = await service.upsert_many(
+        [{"question": "Как подать документы?", "aliases": [], "answer": "Другой ответ."}]
+    )
+
+    assert (created_count, updated_count) == (0, 1)
+    assert len(entries) == 1
+    assert entries[0].answer == "Другой ответ."
+    assert entries[0].verification_status == "confirmed"
+    assert entries[0].confirmed_by == "Иванова"
+    assert entries[0].confirmed_at == confirmed_at
+
+
+@pytest.mark.asyncio
+async def test_upsert_many_last_wins_within_batch(session: AsyncSession):
+    service = FaqDbService(session)
+
+    entries, created, updated = await service.upsert_many(
+        [
+            {"question": "Один вопрос", "aliases": [], "answer": "Первый ответ"},
+            {"question": "Один вопрос", "aliases": [], "answer": "Второй ответ"},
+        ]
+    )
+
+    assert (created, updated) == (1, 0)
+    assert len(entries) == 1
+    assert entries[0].answer == "Второй ответ"
+
+
+@pytest.mark.asyncio
+async def test_upsert_many_large_import_fits_param_limit(session: AsyncSession):
+    """Регрессия #295: единый INSERT на 3000 строк превышал лимит asyncpg.
+
+    Импорт файла на 3000 вопросов в один pg_insert даёт 27000+ связанных
+    параметров и падал с InterfaceError «query arguments cannot exceed
+    32767». Пакеты должны проходить целиком, повторная загрузка того же
+    файла — обновлять, а не дублировать.
+    """
+    service = FaqDbService(session)
+    items = [
+        {"question": f"Вопрос номер {i}?", "aliases": [], "answer": f"Ответ {i}"}
+        for i in range(3000)
+    ]
+
+    entries, created, updated = await service.upsert_many(items)
+
+    assert (created, updated) == (3000, 0)
+    assert len(entries) == 3000
+    assert len(await service.get_all()) == 3000
+
+    for item in items:
+        item["answer"] += " (обновлён)"
+    entries, created, updated = await service.upsert_many(items)
+
+    assert (created, updated) == (0, 3000)
+    assert len(await service.get_all()) == 3000
+    answers = {entry.question: entry.answer for entry in entries}
+    assert answers["Вопрос номер 0?"] == "Ответ 0 (обновлён)"
+
+
+@pytest.mark.asyncio
+async def test_create_duplicate_question_raises_value_error(session: AsyncSession):
+    service = FaqDbService(session)
+    await service.create(question="Дубликат", aliases=[], answer="Первый ответ")
+
+    with pytest.raises(ValueError):
+        await service.create(question="Дубликат", aliases=[], answer="Второй ответ")
 
 
 @pytest.mark.asyncio

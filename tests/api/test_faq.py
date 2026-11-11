@@ -1,3 +1,5 @@
+import io
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -34,6 +36,37 @@ class FakeFaqService:
         self._next_id += 1
         self.items.append(created)
         return created.model_copy(deep=True)
+
+    async def upsert_many(self, items: list[FaqItem]) -> tuple[list[FaqItem], int, int]:
+        # Дедуп внутри файла: побеждает последнее значение.
+        deduped: dict[str, FaqItem] = {}
+        for item in items:
+            deduped[item.question.strip().lower()] = item
+
+        created_count = 0
+        updated_count = 0
+        touched: set[str] = set()
+        for key, item in deduped.items():
+            match = next(
+                (e for e in self.items if e.question.strip().lower() == key), None
+            )
+            if match is None:
+                created_item = item.model_copy(update={"id": f"faq-{self._next_id}"})
+                self._next_id += 1
+                self.items.append(created_item)
+                created_count += 1
+            else:
+                updated_item = item.model_copy(update={"id": match.id})
+                self.items[self.items.index(match)] = updated_item
+                updated_count += 1
+            touched.add(key)
+
+        entries = [
+            e.model_copy(deep=True)
+            for e in self.items
+            if e.question.strip().lower() in touched
+        ]
+        return entries, created_count, updated_count
 
     async def update(self, item_id: str, item: FaqItem) -> FaqItem:
         for index, existing in enumerate(self.items):
@@ -159,3 +192,35 @@ def test_delete_faq_item_not_found(client: TestClient):
     response = client.delete("/api/v1/faq/missing")
 
     assert response.status_code == 404
+
+
+def test_upload_faq_csv_reupload_updates_instead_of_duplicates(client: TestClient):
+    csv_content = "Вопросы,Ответы\nНовый вопрос,Новый ответ\n".encode("utf-8")
+
+    first = client.post(
+        "/api/v1/faq/upload",
+        files={"file": ("faq.csv", io.BytesIO(csv_content), "text/csv")},
+    )
+
+    assert first.status_code == 201
+    assert first.json()["created"] == 1
+    assert first.json()["updated"] == 0
+
+    reupload = "Вопросы,Ответы\nНовый вопрос,Обновлённый ответ\n".encode("utf-8")
+    second = client.post(
+        "/api/v1/faq/upload",
+        files={"file": ("faq.csv", io.BytesIO(reupload), "text/csv")},
+    )
+
+    assert second.status_code == 201
+    data = second.json()
+    assert data["created"] == 0
+    assert data["updated"] == 1
+    assert data["items"][0]["question"] == "Новый вопрос"
+    assert data["items"][0]["answer"] == "Обновлённый ответ"
+
+    get_response = client.get("/api/v1/faq")
+    items = get_response.json()["items"]
+    assert len(items) == 3
+    uploaded = next(i for i in items if i["question"] == "Новый вопрос")
+    assert uploaded["answer"] == "Обновлённый ответ"
