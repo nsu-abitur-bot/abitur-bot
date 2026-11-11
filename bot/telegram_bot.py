@@ -207,7 +207,7 @@ async def run_telegram_bot() -> bool | None:
         )
         await bot.send_message(
             str(message.chat.id),
-            normalize_links_for_messaging(reply.text),
+            reply.text,
             parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
         )
 

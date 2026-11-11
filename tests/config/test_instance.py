@@ -38,6 +38,29 @@ def test_invalid_changes_rejected(key, value):
         merge_changes(InstanceSnapshot(0, {}), {key: value})
 
 
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (
+            "  Привет!\r\n\r\n<b>Текст</b> & **символы**\r",
+            "  Привет!\n\n<b>Текст</b> & **символы**\n",
+        ),
+        (" \n\t ", ""),
+        (None, ""),
+        ("я" * 3999, "я" * 3999),
+    ],
+)
+def test_welcome_normalization(value, expected):
+    values = merge_changes(InstanceSnapshot(0, {}), {"BOT_WELCOME_MESSAGE": value})
+    assert values["BOT_WELCOME_MESSAGE"] == expected
+
+
+@pytest.mark.parametrize("value", ["я" * 4000, "👋" * 2000, "Текст\x00", "Текст\ud800"])
+def test_welcome_rejects_unsupported_text(value):
+    with pytest.raises(ConfigurationError, match="Приветствие"):
+        merge_changes(InstanceSnapshot(0, {}), {"BOT_WELCOME_MESSAGE": value})
+
+
 def test_profiles_follow_runtime_changes_without_reimport():
     instance.install({"PROFILE_CHAT_MAX_TOKENS": "512"}, 1)
     assert LLMProfiles.CHAT.max_tokens == 512

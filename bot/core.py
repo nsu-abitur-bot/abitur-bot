@@ -1,9 +1,12 @@
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from html import escape
 from typing import Awaitable, Callable, Optional
 
 from bot.formatting import format_for_channel
+from config.instance import get_setting
+from config.university import identity
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import MessageLog
 from db.postgres.services.answer_feedback import AnswerFeedbackService
@@ -20,8 +23,8 @@ StatusCallback = Callable[[str], Awaitable[None]]
 logger = logging.getLogger(__name__)
 
 
-WELCOME_TEXT = (
-    "Привет! 👋 Я — умный ИИ-помощник для абитуриентов. "
+_WELCOME_INTRO = (
+    "Привет! 👋 Я — умный ИИ-помощник для абитуриентов вуза «{university}». "
     "Моя главная цель — сберечь ваши нервы и сделать процесс "
     "поступления проще и понятнее.\n\n"
     "<b>Что я умею:</b>\n"
@@ -29,20 +32,36 @@ WELCOME_TEXT = (
     "Просто напишите мне любой вопрос про поступление, проходные баллы, "
     "документы или саму учебу, и я постараюсь дать максимально точный "
     "и подробный ответ.\n\n"
-    "📊 <b>Следить за конкурсными списками</b>\n"
+)
+_WELCOME_COMMANDS = (
+    "• /reset — очистить историю переписки.\n"
+    "• /feedback — поделиться обратной связью, если я ответил неправильно.\n"
+    "• /cancel — отменить ввод обратной связи или другое ожидаемое действие.\n\n"
+)
+WELCOME_TEXT = (
+    _WELCOME_INTRO + "📊 <b>Следить за конкурсными списками</b>\n"
     "Используйте эти команды:\n"
     "• /track — добавьте свой идентификационный номер (или СНИЛС), "
     "и я буду присылать уведомление каждый раз, когда ваша позиция "
     "в списке будет меняться.\n"
     "• /untrack — удалить номер из отслеживания.\n"
-    "• /reset — очистить историю переписки.\n"
-    "• /feedback — поделиться обратной связью, если я ответил неправильно.\n"
-    "• /cancel — отменить ввод обратной связи или другое ожидаемое действие.\n\n"
-    "💡 <i>Небольшой факт: этот бот — проект студентов второго курса. "
+    + _WELCOME_COMMANDS
+    + "💡 <i>Небольшой факт: этот бот — проект студентов второго курса. "
     "Мы сами не так давно проходили через все этапы поступления, "
     "поэтому решили создать инструмент, которого нам самим тогда "
     "очень не хватало!</i>\n\n"
     "Напишите свой вопрос или используйте команду /track, чтобы начать! 🚀"
+)
+_SIBGIU_WELCOME_TEXT = (
+    _WELCOME_INTRO
+    + "Чтобы получить более точный ответ, укажите в вопросе уровень образования: "
+    "бакалавриат, специалитет, магистратура или среднее профессиональное "
+    "образование (СПО).\n\n"
+    + "Если хотите задать вопрос на другую тему, сначала выполните /reset. "
+    "Это очистит историю диалога и поможет получить более точный ответ.\n\n"
+    + "<b>Команды:</b>\n"
+    + _WELCOME_COMMANDS
+    + "Напишите свой вопрос, чтобы начать! 🚀"
 )
 
 FEEDBACK_FOOTER = (
@@ -228,10 +247,20 @@ class BotCore:
             external_user_id,
             internal_user_id,
         )
+        welcome = get_setting("BOT_WELCOME_MESSAGE")
+        if welcome:
+            return BotReply(text=welcome)
+
+        university = (
+            get_setting("UNIVERSITY_SHORT_NAME")
+            or get_setting("UNIVERSITY_FULL_NAME")
+            or identity()["short_name"]
+        )
+        template = (
+            _SIBGIU_WELCOME_TEXT if university.casefold() == "сибгиу" else WELCOME_TEXT
+        )
         return BotReply(
-            text=WELCOME_TEXT,
-            parse_mode="HTML",
-            fallback_plain_on_format_error=False,
+            text=template.format(university=escape(university)), parse_mode="HTML"
         )
 
     async def cmd_track(self, session_id: str) -> BotReply:

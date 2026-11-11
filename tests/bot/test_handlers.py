@@ -4,13 +4,18 @@ import asyncio
 import logging
 from types import SimpleNamespace
 from typing import Any, cast
+from unittest.mock import AsyncMock
 
 import pytest
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.methods import SendMessage
+from maxapi import Bot, Dispatcher
+from maxapi.connection.base import BaseConnection
+from maxapi.types.updates.bot_started import BotStarted
+from maxapi.types.updates.message_created import MessageCreated
 
 from bot.core import ERROR_REPLY_TEXT, BotReply
-from bot.max_bot import answer_max_message
+from bot.max_bot import answer_max_message, run_max_bot
 from bot.splitting import MESSAGE_CHUNK_LIMIT
 from bot.telegram_bot import answer_message
 
@@ -238,3 +243,43 @@ async def test_max_long_answer_edits_status_then_sends_rest():
     parts = [client.edits[0][1], *client.sent[1:]]
     assert all(len(p) <= MESSAGE_CHUNK_LIMIT for p in parts)
     assert ERROR_REPLY_TEXT not in parts
+
+
+async def test_max_start_event_and_command_send_welcome_as_plain_text(monkeypatch):
+    welcome = "Привет!\n\n<b>Документы</b> & **сроки**"
+    start = AsyncMock(return_value=BotReply(text=welcome))
+    request = AsyncMock(return_value=object())
+    user = {"user_id": 9, "first_name": "А", "is_bot": False, "last_activity_time": 0}
+
+    async def poll(dispatcher: Dispatcher, _bot: Bot) -> None:
+        dispatcher.routers.append(dispatcher)
+        await dispatcher.handle(
+            BotStarted.model_validate({"chat_id": 5, "user": user, "timestamp": 1})
+        )
+        await dispatcher.handle(
+            MessageCreated.model_validate(
+                {
+                    "timestamp": 2,
+                    "message": {
+                        "sender": user,
+                        "recipient": {"chat_id": 5, "chat_type": "dialog"},
+                        "timestamp": 2,
+                        "body": {"mid": "message", "seq": 1, "text": "/start"},
+                    },
+                }
+            )
+        )
+
+    monkeypatch.setenv("MAX_BOT_TOKEN", "test-token")
+    monkeypatch.setattr("bot.max_bot.BotCore.cmd_start", start)
+    monkeypatch.setattr(Dispatcher, "start_polling", poll)
+    monkeypatch.setattr(BaseConnection, "request", request)
+
+    await run_max_bot()
+
+    assert start.await_count == 2
+    assert all(call.args == ("max", "9", "5") for call in start.await_args_list)
+    assert [call.kwargs["json"] for call in request.await_args_list] == [
+        {"attachments": [], "text": welcome},
+        {"attachments": [], "text": welcome},
+    ]

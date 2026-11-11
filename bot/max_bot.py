@@ -4,7 +4,9 @@ import logging
 from maxapi import Bot, Dispatcher
 from maxapi.enums.parse_mode import ParseMode
 from maxapi.enums.sender_action import SenderAction
+from maxapi.methods.send_message import SendMessage
 from maxapi.types.message import Message
+from maxapi.types.updates.bot_started import BotStarted
 from maxapi.types.updates.message_callback import MessageCallback
 from maxapi.types.updates.message_created import MessageCreated
 
@@ -111,6 +113,22 @@ async def run_max_bot() -> bool | None:
 
     logger.info("MAX bot started (long polling)")
 
+    async def send_welcome(chat_id: int | None, user_id: int) -> None:
+        session_id = str(chat_id if chat_id is not None else user_id)
+        reply = await core.cmd_start("max", str(user_id), session_id)
+        # Bot.send_message inherits the client's HTML mode even with parse_mode=None.
+        await SendMessage(
+            bot=client,
+            chat_id=chat_id,
+            user_id=user_id if chat_id is None else None,
+            text=reply.text,
+            parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
+        ).fetch()
+
+    @dp.bot_started()
+    async def on_bot_started(event: BotStarted) -> None:
+        await send_welcome(event.chat_id, event.user.user_id)
+
     @dp.message_callback()
     async def rate_answer(event: MessageCallback):
         parts = (event.callback.payload or "").split(":", 2)
@@ -152,9 +170,8 @@ async def run_max_bot() -> bool | None:
         chat_id = message.recipient.chat_id
         session_id = str(chat_id if chat_id is not None else sender.user_id)
 
-        if user_text == "/start":
-            reply = await core.cmd_start("max", external_user_id, session_id)
-            await message.answer(text=reply.text)
+        if user_text.split(maxsplit=1)[0] == "/start":
+            await send_welcome(chat_id, sender.user_id)
             return
 
         if user_text == "/track":

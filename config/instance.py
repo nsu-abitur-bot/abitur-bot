@@ -46,6 +46,7 @@ for key, label, kind in (
 
 
 define("UNIVERSITY_ACCENT_COLOR", "Акцентный цвет", "Вуз", "#4b4bd2")
+define("BOT_WELCOME_MESSAGE", "Приветственное сообщение бота", "Вуз", kind="textarea")
 
 
 for provider in ("OPENAI", "GEMINI"):
