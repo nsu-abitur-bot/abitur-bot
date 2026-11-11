@@ -4,6 +4,7 @@ import io
 import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
+from typing import Annotated, Literal
 from urllib.parse import unquote
 
 import httpx
@@ -53,6 +54,7 @@ from api.services.document_update import (
     DocumentUpdateService,
     readable_fetch_error,
 )
+from api.services.materials import page_materials
 from api.services.rag_import_queue import (
     ACTIVE_IMPORT_STATES,
     IMPORT_STATES,
@@ -381,13 +383,17 @@ async def preprocess_document_for_rag(
 )
 async def list_rag_documents(
     session: AsyncSession = Depends(get_async_session),
-):
-    """Возвращает список всех загруженных в RAG документов."""
+    limit: Annotated[int | None, Query(ge=1, le=100)] = None,
+    offset: Annotated[int, Query(ge=0)] = 0,
+    q: Annotated[str, Query(max_length=500)] = "",
+    state: Literal["all", "ready", "attention", "unknown"] = "all",
+) -> RagDocumentListResponse:
+    """Объединяет метаданные и фильтрует их до выделения страницы."""
     document_service = DocumentService(session)
     documents = await document_service.list_active(DEFAULT_GRAPH_ID)
 
     memory = get_graph_memory()
-    rag_docs = await memory.get_list_docs(DEFAULT_GRAPH_ID)
+    rag_docs = await memory.get_list_docs(DEFAULT_GRAPH_ID, resolve_urls=False)
     rag_by_id = {str(doc.get("id")): doc for doc in rag_docs}
     docs = []
     for document in documents:
@@ -400,6 +406,7 @@ async def list_rag_documents(
                 "status": document.status,
                 "content_hash": document.content_hash,
                 "content_summary": rag_doc.get("content_summary"),
+                "lightrag_status": rag_doc.get("status"),
                 "content_length": document.content_length
                 or rag_doc.get("content_length"),
                 "created_at": document.created_at.isoformat()
@@ -438,15 +445,17 @@ async def list_rag_documents(
         .order_by(ContentProposal.created_at.desc(), ContentProposal.id.desc())
     )
     handled_sources = set()
+    has_pending_imports = False
     for job in proposals:
-        state = "review" if job.status == "pending" else job.status
-        if state != "review":
+        has_pending_imports |= job.status in ACTIVE_IMPORT_STATES
+        job_state = "review" if job.status == "pending" else job.status
+        if job_state != "review":
             key = job.source_url or job.document_id or job.id
             if key in handled_sources:
                 continue
             handled_sources.add(key)
             document = by_id.get(job.document_id) or by_url.get(job.source_url)
-            if state == "index_failed":
+            if job_state == "index_failed":
                 if document is None and job.document_id is not None:
                     continue  # The failed material was deleted.
                 if (
@@ -455,7 +464,7 @@ async def list_rag_documents(
                 ):
                     continue  # A newer import has already succeeded.
             if document is not None:
-                document["import_state"] = state
+                document["import_state"] = job_state
                 continue
         # Jobs and drafts can be listed before a real document exists.
         docs.append(
@@ -463,13 +472,15 @@ async def list_rag_documents(
                 "id": job.id,
                 "title": job.title,
                 "url": job.source_url,
-                "status": state,
-                "import_state": state,
+                "status": job_state,
+                "import_state": job_state,
                 "proposal_only": True,
                 "created_at": job.created_at.isoformat(),
             }
         )
-    return RagDocumentListResponse(documents=docs)
+    page = page_materials(docs, limit=limit, offset=offset, query=q, state=state)
+    page["has_pending"] = page["has_pending"] or has_pending_imports
+    return RagDocumentListResponse(**page)
 
 
 @router.get(
