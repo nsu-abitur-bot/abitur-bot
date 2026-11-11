@@ -730,3 +730,155 @@ async def test_default_and_explicit_levels_filter_other_programs(
         is not None
     }
     assert kept == expected_names
+
+
+@pytest.mark.asyncio
+async def test_refinement_reuses_successful_grades_for_identical_prompts(
+    seeded, monkeypatch
+):
+    from collections import Counter
+
+    import rag.crag as module
+    from rag.crag import CragChunk, CragConfig, run_crag
+
+    calls = []
+
+    class Provider:
+        async def generate(self, messages, **kwargs):
+            system, user = [m.content for m in messages]
+            if "Переформулируй" in system:
+                return "Условия поступления в университет"
+            content = user.split("Фрагмент:\n", 1)[1]
+            calls.append(content)
+            return (
+                '{"score": 0, "relevant": false}'
+                if "нерелевантный" in content
+                else '{"score": 1, "relevant": true}'
+            )
+
+    provider = Provider()
+    monkeypatch.setattr(module, "get_llm_provider", lambda: provider)
+    a = CragChunk(
+        index=0,
+        content="Сроки подачи документов",
+        source_url="https://example.test/a",
+        file_path=None,
+    )
+    b = CragChunk(
+        index=1,
+        content="нерелевантный фрагмент",
+        source_url="https://example.test/b",
+        file_path=None,
+    )
+    c = CragChunk(
+        index=2,
+        content="Перечень документов",
+        source_url="https://example.test/c",
+        file_path=None,
+    )
+
+    async def retrieve(_question):
+        return [
+            CragChunk(
+                index=10, content=a.content, source_url=a.source_url, file_path=None
+            ),
+            b,
+            c,
+        ]
+
+    result, _ = await run_crag(
+        "Как поступить?", [a, b], retrieve_fn=retrieve, config=CragConfig(min_chunks=3)
+    )
+    assert [x.content for x in result] == [a.content, c.content]
+    assert Counter(calls) == {a.content: 1, b.content: 1, c.content: 1}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("initial_failure", ["exception", "invalid_json"])
+async def test_refinement_retries_failed_grades_and_does_not_reuse_between_requests(
+    seeded, monkeypatch, initial_failure
+):
+    import rag.crag as module
+    from rag.crag import CragChunk, CragConfig, run_crag
+
+    calls = 0
+
+    class Provider:
+        async def generate(self, messages, **kwargs):
+            nonlocal calls
+            if "Переформулируй" in messages[0].content:
+                return "Условия поступления в университет"
+            calls += 1
+            if calls == 1:
+                if initial_failure == "exception":
+                    raise RuntimeError("temporary failure")
+                return "not a JSON grade"
+            return '{"score": 1, "relevant": true}'
+
+    provider = Provider()
+    monkeypatch.setattr(module, "get_llm_provider", lambda: provider)
+    chunk = CragChunk(
+        index=0,
+        content="Порядок подачи документов",
+        source_url="https://example.test",
+        file_path=None,
+    )
+
+    async def retrieve(_question):
+        return [chunk]
+
+    config = CragConfig(min_chunks=2)
+    await run_crag("Как поступить?", [chunk], retrieve_fn=retrieve, config=config)
+    assert calls == 2
+    await run_crag("Как поступить?", [chunk], retrieve_fn=retrieve, config=config)
+    assert calls == 3
+
+
+@pytest.mark.asyncio
+async def test_identical_concurrent_questions_have_independent_grades(
+    seeded, monkeypatch
+):
+    import asyncio
+
+    import rag.crag as module
+    from rag.crag import CragChunk, CragConfig, run_crag
+
+    calls = 0
+    both_started = asyncio.Event()
+
+    class Provider:
+        async def generate(self, messages, **kwargs):
+            nonlocal calls
+            if "Переформулируй" in messages[0].content:
+                return "Условия поступления в университет"
+            calls += 1
+            if calls == 2:
+                both_started.set()
+            await asyncio.wait_for(both_started.wait(), timeout=3)
+            return '{"score": 1, "relevant": true}'
+
+    provider = Provider()
+    monkeypatch.setattr(module, "get_llm_provider", lambda: provider)
+    chunk = CragChunk(
+        index=0,
+        content="Порядок подачи документов",
+        source_url="https://example.test",
+        file_path=None,
+    )
+
+    async def retrieve(_question):
+        return [chunk]
+
+    results = await asyncio.gather(
+        *(
+            run_crag(
+                "Как поступить?",
+                [chunk],
+                retrieve_fn=retrieve,
+                config=CragConfig(min_chunks=2),
+            )
+            for _ in range(2)
+        )
+    )
+    assert calls == 2
+    assert all([c.content for c in result[0]] == [chunk.content] for result in results)
