@@ -4,7 +4,9 @@ import sqlalchemy as sa
 from alembic import op
 
 revision = "b8f2a9c4d6e1"
-down_revision = "9c7b8608e613"
+# Повешена на актуальный head main (a6d903fb124e): прежний down_revision
+# на общем предке 9c7b8608e613 давал после мерджа две вершины (#295, ревью #421).
+down_revision = "a6d903fb124e"
 branch_labels = None
 depends_on = None
 
