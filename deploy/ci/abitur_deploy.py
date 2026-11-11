@@ -316,10 +316,83 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
     return "Deployment healthy"
 
 
+def rollback(component: str, host: Host) -> str:
+    """Operator rollback to the receipt's previous image (#244).
+
+    Caller holds the shared lock. Registry credentials are not needed: the
+    previous image is already local and services start with pull never.
+    Database migrations are never reversed; schema stays at the newer level.
+    """
+    pins = json.loads(PINS.read_text())
+    expected = set(SERVICES["backend"] + SERVICES["web"])
+    if set(pins) != {"services"} or set(pins["services"]) != expected:
+        raise ValueError("Unexpected image overlay")
+    receipts = json.loads(RECEIPT.read_text()) if RECEIPT.exists() else {}
+    receipt = receipts.get(component)
+    if not receipt or not receipt.get("previous_image"):
+        raise ValueError("No previous image recorded for rollback")
+    previous_image = receipt["previous_image"]
+    rolled_back_image = pins["services"][SERVICES[component][0]]["image"]
+    if rolled_back_image == previous_image:
+        return "Already rolled back"
+    # The image must be present locally; a missing one is a retention break,
+    # not something to fetch with unrecorded credentials.
+    revision = host.run(
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        '{{index .Config.Labels "org.opencontainers.image.revision"}}',
+        previous_image,
+    )
+    previous = json.loads(json.dumps(pins))
+    for service in SERVICES[component]:
+        pins["services"][service] = {"image": previous_image}
+    atomic_json(PINS, pins)
+    try:
+        start(host, component, migrate=False)
+    except Exception:
+        failed_stage = getattr(host, "stage", "rollback")
+        atomic_json(PINS, previous)
+        start(host, component, migrate=False)
+        host.stage = failed_stage
+        raise
+    targets = [asdict(target) for target in host.targets]
+    receipts[component] = {
+        "sha": revision,
+        "image": previous_image,
+        "previous_image": rolled_back_image,
+        "completed_at": int(time.time()),
+        "instances": [target.name for target in host.targets],
+        "targets": targets,
+        "manual_rollback": True,
+    }
+    atomic_json(RECEIPT, receipts)
+    return "Rollback healthy"
+
+
 def main() -> int:
     host = None
     data = None
     try:
+        if len(sys.argv) == 3 and sys.argv[1] == "--rollback":
+            # Operator rollback: no CI payload, no registry credentials; the
+            # lock and signal discipline match the deploy transaction.
+            component = sys.argv[2]
+            if component not in REPOS:
+                raise ValueError("Invalid rollback component")
+            signal.signal(signal.SIGHUP, signal.SIG_IGN)
+            signal.signal(signal.SIGTERM, signal.SIG_IGN)
+            with (
+                LOCK.open("w") as lock,
+                tempfile.TemporaryDirectory(prefix="abitur-rollback-") as config,
+            ):
+                os.chmod(config, 0o700)
+                fcntl.flock(lock, fcntl.LOCK_EX)
+                host = Host(config)
+                result = rollback(component, host)
+            print(result, flush=True)
+            return 0
         data = validate(
             sys.argv[1] if len(sys.argv) == 2 else "", json.loads(sys.stdin.read(20000))
         )
