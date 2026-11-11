@@ -1,0 +1,16 @@
+[Unit]
+Description=Abitur external health and error alerts
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=abitur-monitor
+StateDirectory=abitur-monitor
+ExecStart=/usr/local/bin/uv run --no-project --python 3.12 /opt/abitur-monitor/monitor.py /etc/abitur-monitor/config.json
+TimeoutStartSec=300
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+UMask=0077
