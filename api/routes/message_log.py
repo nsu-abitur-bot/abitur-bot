@@ -11,8 +11,12 @@ from api.schemas.message_log import (
     RequestCountStatsResponse,
     TokenUsageStatsResponse,
 )
-from api.schemas.popular_questions import PopularQuestion, PopularQuestionsResponse
-from api.services import popular_questions as popular_questions_service
+from api.schemas.popular_questions import (
+    PopularQuestion,
+    PopularQuestionsResponse,
+    PopularQuestionsSnapshotResponse,
+)
+from api.services.popular_statistics import PopularStatistics, get_popular_statistics
 from db.postgres.db import get_async_session
 from db.postgres.services.message_log import MessageLogService
 
@@ -337,39 +341,33 @@ async def get_user_logs(
 
 @router.get(
     "/popular",
-    response_model=PopularQuestionsResponse,
+    response_model=PopularQuestionsSnapshotResponse,
     summary="Получить самые популярные вопросы",
 )
 async def get_popular_questions(
     limit: int = Query(10, ge=1, le=100),
     raw_limit: int = Query(500, ge=1, le=5000),
     similarity_threshold: float = Query(0.86, ge=0.5, le=1.0),
-    log_service: MessageLogService = Depends(get_message_log_service),
+    statistics: PopularStatistics = Depends(get_popular_statistics),
 ):
     """
     Получает самые часто задаваемые вопросы пользователей.
+
+    Читает подготовленный фоновым обработчиком снимок. `pending` означает,
+    что снимок ещё не подготовлен; GET не вызывает модели и кластеризацию.
+    Новые комбинации параметров подхватывает следующий фоновый обход.
 
     - **limit**: максимальное количество возвращаемых кластеров вопросов
     - **raw_limit**: сколько исходных формулировок взять для кластеризации
     - **similarity_threshold**: порог семантической близости формулировок
     """
     try:
-        popular = await popular_questions_service.popular_questions_cache.get(
-            log_service,
+        snapshot = await statistics.read(
             limit=limit,
             raw_limit=raw_limit,
             similarity_threshold=similarity_threshold,
         )
-        return PopularQuestionsResponse(
-            questions=[
-                PopularQuestion(
-                    question=item["question"],
-                    count=item["count"],
-                    variants=item["variants"],
-                )
-                for item in popular
-            ]
-        )
+        return PopularQuestionsSnapshotResponse.model_validate(snapshot)
     except Exception as e:
         raise HTTPException(
             status_code=500, detail=f"Ошибка получения популярных вопросов: {str(e)}"
