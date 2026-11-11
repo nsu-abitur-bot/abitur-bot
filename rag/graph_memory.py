@@ -1412,7 +1412,7 @@ class GraphMemory:
         return ordered[:max_sources]
 
     @staticmethod
-    def _read_doc_list(workspace_path: str) -> list[dict]:
+    def _read_doc_list(workspace_path: str, resolve_urls: bool = True) -> list[dict]:
         """Синхронное чтение списка документов из KV-хранилищ.
 
         Выполняется через asyncio.to_thread: kv_store_*.json могут быть
@@ -1425,7 +1425,7 @@ class GraphMemory:
             return []
 
         full_docs_data = {}
-        if os.path.exists(full_docs_file):
+        if resolve_urls and os.path.exists(full_docs_file):
             try:
                 with open(full_docs_file, "r", encoding="utf-8") as f:
                     full_docs_data = json.load(f)
@@ -1483,12 +1483,14 @@ class GraphMemory:
             logger.error(f"Error reading doc status for {workspace_path}: {e}")
             return []
 
-    async def get_list_docs(self, graph_id: str) -> list[dict]:
+    async def get_list_docs(
+        self, graph_id: str, *, resolve_urls: bool = True
+    ) -> list[dict]:
         """Возвращает список документов из KV-хранилища статусов."""
         if self._pg_storage:
             return await pg_storage.list_docs(graph_id)
         workspace_path = await asyncio.to_thread(self._get_workspace_path, graph_id)
-        return await asyncio.to_thread(self._read_doc_list, workspace_path)
+        return await asyncio.to_thread(self._read_doc_list, workspace_path, resolve_urls)
 
     async def get_doc_full_text(self, graph_id: str, doc_id: str) -> Optional[str]:
         """Возвращает полный текст документа по его ID."""

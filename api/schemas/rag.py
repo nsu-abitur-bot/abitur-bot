@@ -56,6 +56,7 @@ class RagDocument(BaseModel):
     title: str | None = Field(None, description="Название документа")
     url: str | None = Field(None, description="Оригинальный URL или путь к файлу")
     status: str = Field(..., description="Статус обработки")
+    lightrag_status: str | None = None
     import_state: str | None = None
     proposal_only: bool = False
     content_hash: str | None = Field(None, description="SHA-256 сырого контента")
@@ -72,7 +73,14 @@ class RagDocument(BaseModel):
 
 
 class RagDocumentListResponse(BaseModel):
-    documents: list[RagDocument] = Field(..., description="Список документов в RAG")
+    documents: list[RagDocument] = Field(..., description="Страница материалов")
+    total: int = Field(0, description="Всего материалов с учётом фильтров")
+    total_all: int = Field(0, description="Всего материалов без фильтров")
+    offset: int = 0
+    limit: int | None = None
+    has_pending: bool = Field(
+        False, description="Есть активные импорты на любой странице"
+    )
 
 
 class CsvImportResult(BaseModel):
