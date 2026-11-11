@@ -1,3 +1,6 @@
+from datetime import datetime
+from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -9,3 +12,8 @@ class PopularQuestion(BaseModel):
 
 class PopularQuestionsResponse(BaseModel):
     questions: list[PopularQuestion]
+
+
+class PopularQuestionsSnapshotResponse(PopularQuestionsResponse):
+    status: Literal["pending", "ready", "error"] = "ready"
+    updated_at: datetime | None = None
