@@ -1,0 +1,12 @@
+{
+  "token_file": "/etc/abitur-monitor/telegram-token",
+  "chat_ids": ["REPLACE_WITH_FIRST_CHAT_ID", "REPLACE_WITH_SECOND_CHAT_ID"],
+  "runbook_url": "REPLACE_WITH_LINK_TO_docs/incident-runbook.md",
+  "targets": [
+    {
+      "name": "nsu",
+      "ssh": "abitur-monitor@REPLACE_WITH_HOST",
+      "urls": ["https://REPLACE_API_HOST/health", "https://REPLACE_WEB_HOST/login"]
+    }
+  ]
+}
