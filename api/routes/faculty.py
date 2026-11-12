@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from api.auth.dependencies import require_superadmin
 from api.schemas.faculty import (
     FacultyCreate,
     FacultyItem,
@@ -117,6 +118,7 @@ async def update_faculty(
     "/{faculty_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Выключить факультет",
+    dependencies=[Depends(require_superadmin)],
 )
 async def delete_faculty(
     faculty_id: str,
@@ -192,6 +194,7 @@ async def update_program(
     "/programs/{program_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Удалить направление",
+    dependencies=[Depends(require_superadmin)],
 )
 async def delete_program(
     program_id: str,
