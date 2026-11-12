@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "run_id": "full-20261110-02",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "reviewer": "Марат Тимофеев",
+  "decision_date": "2026-11-11",
+  "recorded_at": "2026-11-12",
+  "decision_source": "https://github.com/nsu-abitur-bot/abitur-bot/pull/432#issuecomment-6794282105",
+  "evidence_type": "Reported explicit agreement by Marat in correspondence, published by Marat-nsu",
+  "scope": "Согласованные решения по перечисленным сценариям. Остальные исходные оценки сохранены, нового сплошного ручного подтверждения всех ответов бота нет.",
+  "reports": {
+    "with_kb": {
+      "file": "with-kb-aggregate.json",
+      "sha256": "402c08a05493c3b40277cedbba4bc408c33206b9085ae7475ce15b8f1df70cd0"
+    },
+    "empty_kb": {
+      "file": "empty-kb-aggregate.json",
+      "sha256": "cbb1760b9994efa11c6d4eaf649ee4a4339a43add0147c3b7a42a034cdd3f731"
+    }
+  },
+  "decisions": [
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-scholar-03",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "not_assessed",
+      "reason": "Нужные баллы названы, затем отрицается наличие сведений именно о NSU+."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-lang-03",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "not_assessed",
+      "reason": "Названы курс и Java, но ответ не подтверждает принадлежность курса ФИТ."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-lang-04",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "not_assessed",
+      "reason": "Android и курсы названы, затем отрицается наличие сведений об их связи с ФИТ."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-special-02",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "not_assessed",
+      "reason": "Верный срок практики сопровождается утверждением, что ТИПИ неизвестна."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-compare-03",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": true,
+      "criticality": "not_assessed",
+      "reason": "Уточнение направлений частично полезно, но не выяснены интересы и критерии выбора человека."
+    },
+    {
+      "condition": "empty_kb",
+      "case_id": "nsu-pre-compare-03",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": true,
+      "criticality": "not_assessed",
+      "reason": "Уточнение направлений частично полезно, но не выяснены интересы и критерии выбора человека."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-paid-contact-03",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "not_assessed",
+      "reason": "Фраза «на сайте НГУ» не указывает нужную страницу или раздел. Претензия к оплате картами снята."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-paid-steps-01",
+      "automatic_passed": false,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "critical",
+      "reason": "Для ФИТ названы 205 000 рублей за год вместо 300 000. По сверке источников перенесена стоимость другой программы."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-paid-steps-02",
+      "automatic_passed": false,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "critical",
+      "reason": "Для ФИТ названы 102 500 рублей за семестр вместо 150 000. По сверке источников перенесена стоимость другой программы."
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-general-01",
+      "automatic_passed": true,
+      "reviewed_passed": false,
+      "partial_usefulness": false,
+      "criticality": "critical",
+      "reason": "К экзаменам ФИТ добавлены неподтверждённые собеседование и портфолио, найденные в источнике ММФ."
+    }
+  ],
+  "withdrawn_findings": [
+    {
+      "case_id": "nsu-paid-contact-03",
+      "finding": "В ответе выдумана оплата картами",
+      "reason": "Сведения об оплате картами найдены в исходном документе. Неуспех сохраняется по другой причине: нет конкретной страницы или раздела."
+    }
+  ]
+}
