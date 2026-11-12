@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
+from api.auth.dependencies import require_admin
 from api.schemas.feedback_report import (
     FeedbackReportListResponse,
     FeedbackReportQueryParams,
@@ -61,6 +62,7 @@ async def get_feedback_report(
     "/{report_id}",
     response_model=FeedbackReportResponse,
     summary="Обновить статус обращения",
+    dependencies=[Depends(require_admin)],
 )
 async def update_feedback_report_status(
     report_id: int,
