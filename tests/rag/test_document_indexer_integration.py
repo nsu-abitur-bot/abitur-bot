@@ -1,3 +1,4 @@
+import json
 from typing import Any, cast
 
 import pytest
@@ -541,6 +542,12 @@ async def test_program_exam_card_preserves_scores_from_history(
             ]
             return LLMResult(text="44 по информатике ниже минимального балла 46.")
 
+        async def generate_with_usage(self, messages, profile) -> LLMResult:
+            payload = json.loads(messages[-1].content)
+            assert payload["history"] == [{"role": "human", "content": previous}]
+            assert any("Информатика — 46" in source for source in payload["sources"])
+            return LLMResult(text='{"verdict":"supported","quotes":["Информатика — 46"]}')
+
     monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
     try:
         assert await memory.save(
@@ -554,7 +561,9 @@ async def test_program_exam_card_preserves_scores_from_history(
             graph_id, question, conversation_history=f"user: {previous}\nuser: {question}"
         )
         rag = llm_client._RagResult(
-            context=retrieval.context, generation_question=retrieval.generation_question
+            context=retrieval.context,
+            generation_question=retrieval.generation_question,
+            evidence=retrieval.evidence,
         )
         ctx = llm_client._Ctx(session_id="ege-history", user_id=0)
         answer, _ = await llm_client._generate_answer(rag, history, question, ctx)

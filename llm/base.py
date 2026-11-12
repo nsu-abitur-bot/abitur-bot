@@ -15,6 +15,13 @@ class LLMUsage:
     completion_tokens: int = 0
     total_tokens: int = 0
 
+    def __add__(self, other: "LLMUsage") -> "LLMUsage":
+        return LLMUsage(
+            prompt_tokens=self.prompt_tokens + other.prompt_tokens,
+            completion_tokens=self.completion_tokens + other.completion_tokens,
+            total_tokens=self.total_tokens + other.total_tokens,
+        )
+
     def to_dict(self) -> dict:
         return {
             "prompt_tokens": self.prompt_tokens,

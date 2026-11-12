@@ -477,4 +477,5 @@ async def retrieve_program_exams(
         sources=sources,
         trace=trace.get_lines(),
         generation_question=generation_question,
+        evidence=[header, *parts],
     )

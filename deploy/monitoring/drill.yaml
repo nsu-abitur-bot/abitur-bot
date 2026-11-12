@@ -1,0 +1,10 @@
+name: abitur-monitor-drill
+services:
+  sample:
+    image: redis:alpine
+    command: [sh, -c, 'i=0; while [ "$${i}" -lt "$${ERROR_COUNT:-0}" ]; do echo "ERROR: monitor acceptance drill"; i=$$((i+1)); done; sleep 600']
+    environment:
+      ERROR_COUNT: ${ERROR_COUNT:-0}
+    mem_limit: 32m
+    network_mode: none
+    read_only: true

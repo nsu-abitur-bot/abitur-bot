@@ -1,0 +1,17 @@
+[Unit]
+Description=Abitur local service and error alerts (cannot detect host outage)
+After=network-online.target docker.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+StateDirectory=abitur-monitor
+Environment=UV_CACHE_DIR=/var/lib/abitur-monitor/uv-cache
+Environment=UV_PYTHON_DOWNLOADS=never
+ExecStart=/usr/local/bin/uv run --no-project --python /usr/bin/python3 /opt/abitur-monitor/tools/monitor.py /etc/abitur-monitor/config.json
+TimeoutStartSec=240
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+PrivateTmp=true
+UMask=0077

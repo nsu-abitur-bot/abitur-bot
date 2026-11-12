@@ -73,6 +73,7 @@ class RetrievalResult:
     trace: list[str] = field(default_factory=list)
     answer: str | None = None
     generation_question: str | None = None
+    evidence: list[str] = field(default_factory=list)
 
 
 _active_trace: ContextVar[Optional[LightragTrace]] = ContextVar(

@@ -13,6 +13,8 @@ import re
 import pytest
 
 from pipeline.prompts import (
+    ANSWER_REVIEW_PROMPT,
+    ANSWER_REVIEW_PROMPT_VERSION,
     INTENT_PROMPT_TEMPLATE,
     INTENT_PROMPT_VERSION,
     LIGHTRAG_FORMAT_HINT,
@@ -26,6 +28,7 @@ from pipeline.prompts import (
 )
 
 VERSIONED_PROMPTS = [
+    ("answer_review", ANSWER_REVIEW_PROMPT_VERSION, ANSWER_REVIEW_PROMPT),
     ("system", SYSTEM_PROMPT_VERSION, SYSTEM_PROMPT_BASE),
     ("sources_hint", SOURCES_HINT_VERSION, SOURCES_HINT),
     ("lightrag_level", LIGHTRAG_LEVEL_HINT_VERSION, LIGHTRAG_LEVEL_HINT),
@@ -37,9 +40,13 @@ VERSIONED_PROMPTS = [
 # Версия и sha256 текста, с которыми промпт зафиксирован. Поменял текст —
 # подними версию в pipeline/prompts.py и обнови обе колонки здесь.
 PINNED = {
-    "system": (
+    "answer_review": (
         "3.0",
-        "e3835bd984d1fd9772ebe3f5e86fe10ac8e40679d780b7d5f9d4d21fe4468a8a",
+        "4e32bb54f09ccda531a4efc9f2d0704317ef39824a41ba271488cda1f57329b9",
+    ),
+    "system": (
+        "4.0",
+        "5b50de564ddab07f678db41dbade8d08b0173572ebbf6b40c49ba78f747ce9f7",
     ),
     "sources_hint": (
         "1.0",
