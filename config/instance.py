@@ -383,7 +383,9 @@ def snapshot_values() -> dict[str, str] | None:
 
 
 @contextmanager
-def settings_scope(values: dict[str, str] | None, revision: int) -> Generator[None, None]:
+def settings_scope(
+    values: dict[str, str] | None, revision: int
+) -> Generator[None, None, None]:
     if values is not None:
         remember_secrets(values)
     token = _pinned.set((dict(values) if values is not None else None, revision))
