@@ -1034,10 +1034,7 @@ class GraphMemory:
                         )
 
                     return RetrievalResult(
-                        context=context,
-                        sources=sources,
-                        trace=trace.get_lines(),
-                        evidence=context_parts,
+                        context=context, sources=sources, trace=trace.get_lines()
                     )
         except Exception as e:
             logger.error(f"Error in CRAG query for graph {graph_id}: {e}")
@@ -1142,19 +1139,20 @@ class GraphMemory:
 
                     url_to_title = await self._get_source_titles(graph_id)
 
-                    evidence: list[str] = []
                     aggregated: dict[str, dict] = {}
                     for idx, chunk in enumerate(chunks):
                         file_path_value = str(chunk.get("file_path", "") or "").strip()
+                        if not file_path_value:
+                            continue
+
                         chunk_text = (
                             chunk.get("content")
                             or chunk.get("text")
                             or chunk.get("chunk_content")
                             or ""
                         )
-                        chunk_text = str(chunk_text).strip()
                         if chunk_text:
-                            evidence.append(chunk_text)
+                            chunk_text = str(chunk_text).strip()
 
                         for source in file_path_value.split(","):
                             source = source.strip()
@@ -1209,7 +1207,6 @@ class GraphMemory:
                         context=str(answer),
                         sources=reranked_sources,
                         trace=trace.get_lines(),
-                        evidence=evidence,
                     )
         except Exception as e:
             logger.error(f"Error querying graph {graph_id}: {e}")

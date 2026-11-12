@@ -1,6 +1,5 @@
 """Isolated integration fixtures, not a substitute for live model-quality evaluation."""
 
-import json
 import os
 from collections.abc import Iterator
 from contextlib import ExitStack, contextmanager
@@ -80,22 +79,6 @@ def _fixture_pipeline() -> Iterator[Runner]:
             ]
 
     class FixtureProvider:
-        async def generate_with_usage(self, messages, profile) -> LLMResult:
-            payload = json.loads(str(messages[-1].content))
-            draft = payload["draft"]
-            for score in payload["admission_scores"]:
-                if score["result"] in draft:
-                    return LLMResult(
-                        text=json.dumps(
-                            {"verdict": "supported", "quotes": [score["result"]]}
-                        )
-                    )
-            if draft in payload["sources"]:
-                return LLMResult(
-                    text=json.dumps({"verdict": "supported", "quotes": [draft]})
-                )
-            return LLMResult(text='{"verdict":"refer"}')
-
         async def generate_with_tools(
             self,
             messages,
@@ -106,10 +89,6 @@ def _fixture_pipeline() -> Iterator[Runner]:
             required_tool=None,
         ) -> LLMResult:
             question = str(messages[-1].content)
-            if "коменданту" in question.casefold():
-                return LLMResult(text="Сначала идите к коменданту.")
-            if "аспирантур" in question.casefold():
-                return LLMResult(text="Информация не найдена.")
             if required_tool == "get_admission_scores":
                 value = await tool_executor(
                     required_tool,
@@ -157,20 +136,14 @@ def _fixture_pipeline() -> Iterator[Runner]:
                     candidates,
                     max_sources=2,
                 )
-            return RetrievalResult(
-                context="Тестовый контекст НГУ.",
-                sources=sources,
-                evidence=["Тестовый контекст НГУ."],
-            )
+            return RetrievalResult(context="Тестовый контекст НГУ.", sources=sources)
         if "ммф" in question.casefold():
             return RetrievalResult(
                 context="Тестовый контекст ММФ.",
-                evidence=["Тестовый контекст ММФ."],
                 sources=[{"url": "https://mmf.nsu.ru/admission"}],
             )
         return RetrievalResult(
             context="Тестовый контекст НГУ.",
-            evidence=["Тестовый контекст НГУ."],
             sources=[{"url": "https://nsu.ru/info"}],
         )
 

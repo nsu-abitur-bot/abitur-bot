@@ -34,14 +34,7 @@ class _Provider:
         self._text = text
         self._error = error
 
-    async def generate_with_usage(self, messages, profile):
-        if self._text and "не нашёл" in self._text.casefold():
-            return LLMResult(text='{"verdict":"refer"}')
-        return LLMResult(
-            text='{"verdict":"supported","quotes":["Документы принимают с 20 июня."]}'
-        )
-
-    async def _generate_draft(self, messages, profile) -> LLMResult:
+    async def generate_with_usage(self, messages, profile) -> LLMResult:
         if self._error:
             raise self._error
         return LLMResult(text=self._text or "")
@@ -49,7 +42,7 @@ class _Provider:
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None
     ) -> LLMResult:
-        return await self._generate_draft(messages, profile)
+        return await self.generate_with_usage(messages, profile)
 
 
 async def _get_fake_redis() -> _FakeRedis:
@@ -57,8 +50,7 @@ async def _get_fake_redis() -> _FakeRedis:
 
 
 async def _fake_query(query, conversation_history=None, search_query=None):
-    evidence = "Документы принимают с 20 июня."
-    return RetrievalResult(context=evidence, evidence=[evidence])
+    return RetrievalResult(context="Контекст из базы знаний")
 
 
 def _setup(monkeypatch, provider: _Provider) -> list[dict]:

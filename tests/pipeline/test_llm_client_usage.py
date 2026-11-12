@@ -1,5 +1,4 @@
 import asyncio
-import json
 import logging
 from collections.abc import Coroutine
 from typing import Any
@@ -33,20 +32,6 @@ class _FakeFaqMatcher:
 
 
 class _FakeStreamingProvider:
-    def __init__(self, clarification: str | None = None) -> None:
-        self.clarification = clarification
-
-    async def generate_with_usage(self, messages, profile):
-        review = (
-            {"verdict": "clarify", "question": self.clarification}
-            if self.clarification
-            else {"verdict": "supported", "quotes": ["Контекст"]}
-        )
-        return LLMResult(
-            text=json.dumps(review),
-            usage=LLMUsage(prompt_tokens=25, completion_tokens=5, total_tokens=30),
-        )
-
     async def generate_stream_with_usage(self, messages, profile=None, on_delta=None):
         if on_delta is not None:
             await on_delta("Ответ")
@@ -65,8 +50,7 @@ class _FakeStreamingProvider:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("clarification", [None, "Какой уровень вас интересует?"])
-async def test_reviewed_answer_and_combined_usage_are_saved(monkeypatch, clarification):
+async def test_streaming_llm_usage_is_saved(monkeypatch):
     saved_logs = []
     background_tasks: list[asyncio.Task] = []
     streamed_updates = []
@@ -77,7 +61,6 @@ async def test_reviewed_answer_and_combined_usage_are_saved(monkeypatch, clarifi
     async def fake_query_graph_with_sources(*args, **kwargs):
         return RetrievalResult(
             context="Контекст",
-            evidence=["Контекст"],
             trace=[
                 "INFO: Query nodes: IT, факультеты (top_k:40, cosine:0.2)",
                 "WARNING: Rerank is enabled but no rerank model is configured",
@@ -110,8 +93,7 @@ async def test_reviewed_answer_and_combined_usage_are_saved(monkeypatch, clarifi
         "pipeline.llm_client.query_graph_with_crag", fake_query_graph_with_sources
     )
     monkeypatch.setattr(
-        "pipeline.llm_client.get_llm_provider",
-        lambda: _FakeStreamingProvider(clarification),
+        "pipeline.llm_client.get_llm_provider", lambda: _FakeStreamingProvider()
     )
     monkeypatch.setattr("pipeline.llm_client._save_log_to_db", fake_save_log_to_db)
     monkeypatch.setattr(
@@ -128,16 +110,16 @@ async def test_reviewed_answer_and_combined_usage_are_saved(monkeypatch, clarifi
     if background_tasks:
         await asyncio.gather(*background_tasks)
 
-    assert response.text == (clarification or "Ответ бота")
-    assert streamed_updates == [response.text]
+    assert response.text == "Ответ бота"
+    assert streamed_updates == ["Ответ", "Ответ бота"]
 
     llm_logs = [log for log in saved_logs if log["message_type"] == "llm_response"]
     assert len(llm_logs) == 1
-    assert llm_logs[0]["tokens_used"] == 80
+    assert llm_logs[0]["tokens_used"] == 50
     assert llm_logs[0]["message_metadata"]["tokens"] == {
-        "prompt_tokens": 65,
-        "completion_tokens": 15,
-        "total_tokens": 80,
+        "prompt_tokens": 40,
+        "completion_tokens": 10,
+        "total_tokens": 50,
     }
 
     rag_query_logs = [log for log in saved_logs if log["message_type"] == "rag_query"]

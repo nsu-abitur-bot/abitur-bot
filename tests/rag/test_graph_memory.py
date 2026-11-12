@@ -152,7 +152,6 @@ async def test_query_with_sources_uses_document_title(monkeypatch):
     retrieval = await memory.query_with_sources("test_graph", "Вопрос")
 
     assert retrieval.context == "Ответ"
-    assert retrieval.evidence == ["Фрагмент правил приема"]
     assert retrieval.sources == [{"url": source_url, "title": "Правила приема"}]
 
 

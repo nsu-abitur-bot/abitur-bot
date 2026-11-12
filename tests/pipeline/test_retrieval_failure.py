@@ -6,7 +6,6 @@
 через инструмент, а не через базу знаний, и при упавшем поиске работают.
 """
 
-import json
 import logging
 from types import SimpleNamespace
 
@@ -19,7 +18,6 @@ from pipeline.prompts import (
     RAG_CONTEXT_UNAVAILABLE,
     RAG_UNAVAILABLE_ANSWER,
 )
-from pipeline.tools.admission_scores import AdmissionScoresResult
 from rag.retriever import RetrievalError
 from rag.trace import RetrievalResult
 
@@ -33,27 +31,13 @@ class _RecordingProvider:
         self.system_prompts: list[str] = []
         self.call_tool = False
 
-    async def generate_with_usage(self, messages, profile):
-        if "Приём документов с 20 июня." in str(messages[-1].content):
-            return LLMResult(
-                text='{"verdict":"supported","quotes":["Приём документов с 20 июня."]}'
-            )
-        payload = json.loads(messages[-1].content)
-        if payload["admission_scores"]:
-            return LLMResult(text='{"verdict":"supported","quotes":["246"]}')
-        return LLMResult(text='{"verdict":"refer"}')
-
     async def generate_with_tools(
         self, messages, tools, tool_executor, profile=None, on_delta=None
     ) -> LLMResult:
         self.system_prompts.append(str(messages[0].content))
         if self.call_tool:
-            scores = await tool_executor(
-                "get_admission_scores", {"faculty": "ФИТ", "metric": "passing"}
-            )
+            scores = await tool_executor("get_admission_scores", {"faculty": "ФИТ"})
             return LLMResult(text=f"Проходной балл: {scores}")
-        if "Приём документов с 20 июня." in self.system_prompts[-1]:
-            return LLMResult(text="Подать документы можно с 20 июня.")
         return LLMResult(text="Ответ модели")
 
 
@@ -63,7 +47,7 @@ def pipeline_without_io(monkeypatch):
         return SimpleNamespace(enabled=False)
 
     async def fake_tool_executor(name: str, args: dict) -> str:
-        return AdmissionScoresResult("246", status="ok")
+        return "246"
 
     provider = _RecordingProvider()
     monkeypatch.setattr(llm_client, "load_crag_config", crag_disabled)
@@ -77,9 +61,10 @@ def _ctx() -> llm_client._Ctx:
     return llm_client._Ctx(session_id="s-1", user_id=0)
 
 
-async def _answer_with_retrieval(monkeypatch, retrieve, question="Когда приём?") -> str:
+async def _answer_with_retrieval(monkeypatch, retrieve) -> str:
     monkeypatch.setattr(llm_client, "query_graph_with_sources", retrieve)
     ctx = _ctx()
+    question = "Когда приём?"
     rag = await llm_client._retrieve_context(question, "", ctx)
     text, _ = await llm_client._generate_answer(rag, [], question, ctx)
     return text
@@ -121,9 +106,7 @@ async def test_scores_tool_still_answers_when_retrieval_fails(
         raise RetrievalError("RateLimitError 429")
 
     pipeline_without_io.call_tool = True
-    text = await _answer_with_retrieval(
-        monkeypatch, failing_retrieval, "Какой проходной балл на ФИТ?"
-    )
+    text = await _answer_with_retrieval(monkeypatch, failing_retrieval)
 
     assert text == "Проходной балл: 246"
 
@@ -149,20 +132,18 @@ async def test_empty_retrieval_still_means_not_found(monkeypatch, pipeline_witho
 
     text = await _answer_with_retrieval(monkeypatch, empty_retrieval)
 
-    assert "не нашёл информации" in text
-    assert "priem@nsu.ru" in text
+    assert text == "Ответ модели"
     [system_prompt] = pipeline_without_io.system_prompts
     assert RAG_CONTEXT_NOT_FOUND in system_prompt
 
 
 async def test_found_context_goes_to_model(monkeypatch, pipeline_without_io):
     async def found_retrieval(query, conversation_history=None):
-        evidence = "Приём документов с 20 июня."
-        return RetrievalResult(context=evidence, evidence=[evidence])
+        return RetrievalResult(context="Приём документов с 20 июня.")
 
     text = await _answer_with_retrieval(monkeypatch, found_retrieval)
 
-    assert text == "Подать документы можно с 20 июня."
+    assert text == "Ответ модели"
     [system_prompt] = pipeline_without_io.system_prompts
     assert "Приём документов с 20 июня." in system_prompt
     assert RAG_CONTEXT_NOT_FOUND not in system_prompt
