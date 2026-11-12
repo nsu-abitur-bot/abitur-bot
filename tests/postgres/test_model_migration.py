@@ -415,14 +415,18 @@ async def test_cancel_serializes_with_worker_claim(migration_state, monkeypatch)
     async def active(service):
         nonlocal paused
         job = await original_active(service)
-        if asyncio.current_task().get_name() == "claim-worker" and not paused:
+        task = asyncio.current_task()
+        assert task is not None
+        if task.get_name() == "claim-worker" and not paused:
             paused = True
             fetched.set()
             await release.wait()
         return job
 
     async def lock(service):
-        if asyncio.current_task().get_name() == "cancel-request":
+        task = asyncio.current_task()
+        assert task is not None
+        if task.get_name() == "cancel-request":
             cancelling.set()
         await original_lock(service)
 
