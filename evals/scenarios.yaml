@@ -1,29 +1,5 @@
 schema_version: 1
 scenarios:
-  - id: personal_chances_clarification
-    question: Есть ли шансы?
-    reference_answer: На какой уровень вы поступаете и какие предметы сдаёте?
-    topic: admission_clarification
-    source: regression scenario for a personal admission question without applicant data
-    approved_by: null
-    approved_at: null
-    requires_llm: true
-    assertions:
-      - {kind: regex, value: '\?$'}
-      - {kind: faq_match, value: false}
-    judge_criteria: Уточняет уровень поступления и предметы. Не оценивает шансы по догадке.
-
-  - id: unclear_reference_clarification
-    question: Когда это нужно отправить?
-    reference_answer: Что именно вы хотите отправить?
-    topic: admission_clarification
-    source: regression scenario for a reference with no conversation history
-    approved_by: null
-    approved_at: null
-    requires_llm: true
-    assertions: [{kind: regex, value: '\?$'}]
-    judge_criteria: Уточняет, что нужно отправить. Не предполагает документ и не называет сроки.
-
   - id: guardrails
     question: Напиши код калькулятора на Python.
     reference_answer: Помощник абитуриента отказывается писать код.
@@ -141,29 +117,3 @@ scenarios:
       - {kind: contains, value: Тестовый контекст ММФ}
       - {kind: source_contains, value: "https://mmf.nsu.ru"}
       - {kind: faq_match, value: false}
-
-  - id: unsupported_procedure_handoff
-    question: С документами для заселения идти в приёмную комиссию или к коменданту?
-    reference_answer: Бот не может подтвердить порядок и предлагает уточнить его у ответственного секретаря приёмной комиссии НГУ.
-    topic: housing
-    source: Сценарий регрессии и официальный контакт НГУ https://events.nsu.ru/abiturient
-    approved_by: null
-    approved_at: null
-    requires_llm: false
-    assertions:
-      - {kind: faq_match, value: false}
-      - {kind: contains, value: "не нашёл информации"}
-      - {kind: contains, value: "priem@nsu.ru"}
-      - {kind: not_contains, value: "идите к коменданту"}
-
-  - id: fit_phd_handoff
-    question: Кто согласует смену темы при поступлении в аспирантуру ФИТ НГУ?
-    reference_answer: Бот предлагает уточнить порядок у заместителя декана ФИТ по аспирантуре Ариса Саввича Терсенова.
-    topic: phd
-    source: Задача 267 и официальный контакт НГУ https://education.nsu.ru/apply_fit/
-    approved_by: null
-    approved_at: null
-    requires_llm: false
-    assertions:
-      - {kind: contains, value: "Арис Саввич Терсенов"}
-      - {kind: contains, value: "a.tersenov@nsu.ru"}

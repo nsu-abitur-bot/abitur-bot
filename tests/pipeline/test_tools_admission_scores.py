@@ -4,7 +4,6 @@
 баллы, а также работу метрик (проходной/средний) и пустого результата.
 """
 
-import json
 import os
 from types import SimpleNamespace
 from typing import cast
@@ -150,13 +149,6 @@ async def test_ege_score_question_uses_sql_without_program_card(
         return result or RetrievalResult(context="")
 
     class Provider:
-        async def generate_with_usage(self, messages, profile):
-            payload = json.loads(messages[-1].content)
-            [score] = payload["admission_scores"]
-            return LLMResult(
-                text=json.dumps({"verdict": "supported", "quotes": [score["result"]]})
-            )
-
         async def generate_with_tools(self, messages, **kwargs):
             result = await kwargs["tool_executor"](
                 "get_admission_scores",
