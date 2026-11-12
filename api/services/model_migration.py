@@ -426,6 +426,7 @@ async def run_migrations() -> None:
             try:
                 async with AsyncSessionLocal() as session:
                     service = ModelMigrationService(session)
+                    await service.lock()
                     job = await service.active()
                     current = await InstanceSettingsService(session).read()
                     if job and current.values.get(GENERATION) == job["id"]:

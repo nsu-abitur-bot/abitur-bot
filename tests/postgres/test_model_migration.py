@@ -397,3 +397,58 @@ async def test_legacy_same_provider_model_and_dimension_still_requires_contract_
     assert result["job"] is not None
     async with sessions() as session:
         assert (await InstanceSettingsService(session).read()).revision == 2
+
+
+@pytest.mark.asyncio
+async def test_cancel_serializes_with_worker_claim(migration_state, monkeypatch):
+    from api.routes import model_settings
+
+    sessions, source, embedder = migration_state
+    monkeypatch.setattr(model_settings, "AsyncSessionLocal", sessions)
+    result = await migration.start_migration(1, changes(), confirm_reindex=True)
+    job_id = result["job"]["id"]
+    fetched, release, cancelling = asyncio.Event(), asyncio.Event(), asyncio.Event()
+    original_active = ModelMigrationService.active
+    original_lock = ModelMigrationService.lock
+    paused = False
+
+    async def active(service):
+        nonlocal paused
+        job = await original_active(service)
+        if asyncio.current_task().get_name() == "claim-worker" and not paused:
+            paused = True
+            fetched.set()
+            await release.wait()
+        return job
+
+    async def lock(service):
+        if asyncio.current_task().get_name() == "cancel-request":
+            cancelling.set()
+        await original_lock(service)
+
+    monkeypatch.setattr(ModelMigrationService, "active", active)
+    monkeypatch.setattr(ModelMigrationService, "lock", lock)
+    worker = asyncio.create_task(migration.run_migrations(), name="claim-worker")
+    cancellation = None
+    try:
+        await asyncio.wait_for(fetched.wait(), 3)
+        cancellation = asyncio.create_task(
+            model_settings.control_job(job_id, "cancel"), name="cancel-request"
+        )
+        await asyncio.wait_for(cancelling.wait(), 3)
+        await asyncio.sleep(0.05)
+        assert not cancellation.done(), "Cancellation must serialize with the claim"
+        release.set()
+        assert (await asyncio.wait_for(cancellation, 3))["status"] == "cancelling"
+        await wait_status(sessions, job_id, "cancelled")
+        assert len(embedder.calls) == 1
+        async with sessions() as session:
+            assert (await InstanceSettingsService(session).read()).revision == 1
+    finally:
+        release.set()
+        worker.cancel()
+        if cancellation is not None:
+            cancellation.cancel()
+        await asyncio.gather(
+            worker, *([cancellation] if cancellation else []), return_exceptions=True
+        )
