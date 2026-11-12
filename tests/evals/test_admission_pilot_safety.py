@@ -61,14 +61,69 @@ def test_resume_rejects_a_changed_or_completed_source():
         pending_resume([dict(record, status="approved")], item, "same-proposal")
 
 
-@pytest.mark.skipif(os.name == "nt", reason="POSIX lifecycle verified in Linux CI")
+def _linux_launcher_shell() -> str:
+    if sys.platform != "linux":
+        pytest.skip("Launcher lifecycle requires Linux; run these cases in Linux CI")
+    tools = {name: shutil.which(name) for name in ("sh", "timeout", "flock")}
+    missing = [name for name, path in tools.items() if path is None]
+    if missing:
+        pytest.skip("Launcher lifecycle requires tools: " + ", ".join(missing))
+    shell, timeout = tools["sh"], tools["timeout"]
+    assert shell and timeout
+    try:
+        version = subprocess.run(
+            [timeout, "--version"], capture_output=True, text=True, timeout=5
+        )
+    except (OSError, subprocess.SubprocessError) as exc:
+        pytest.skip(f"Launcher lifecycle requires GNU timeout ({type(exc).__name__})")
+    if version.returncode != 0 or "GNU coreutils" not in version.stdout:
+        pytest.skip("Launcher lifecycle requires GNU timeout from coreutils")
+    return shell
+
+
+@pytest.mark.parametrize("platform", ["darwin", "win32"])
+def test_launcher_guard_skips_non_linux(monkeypatch, platform):
+    monkeypatch.setattr(sys, "platform", platform)
+    monkeypatch.setattr(shutil, "which", lambda tool: f"/synthetic/bin/{tool}")
+    with pytest.raises(pytest.skip.Exception, match="requires Linux"):
+        _linux_launcher_shell()
+
+
+@pytest.mark.parametrize("missing", ["sh", "timeout", "flock"])
+def test_launcher_guard_skips_missing_tools(monkeypatch, missing):
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(
+        shutil, "which", lambda tool: None if tool == missing else f"/synthetic/{tool}"
+    )
+    with pytest.raises(pytest.skip.Exception, match=missing):
+        _linux_launcher_shell()
+
+
+@pytest.mark.parametrize("gnu", [False, True])
+def test_launcher_guard_requires_gnu_timeout(monkeypatch, gnu):
+    monkeypatch.setattr(sys, "platform", "linux")
+    monkeypatch.setattr(shutil, "which", lambda tool: f"/synthetic/{tool}")
+
+    def version(command, **kwargs):
+        assert command == ["/synthetic/timeout", "--version"]
+        return subprocess.CompletedProcess(
+            command, 0, "timeout (GNU coreutils) 9.4" if gnu else "BusyBox timeout", ""
+        )
+
+    monkeypatch.setattr(subprocess, "run", version)
+    if gnu:
+        assert _linux_launcher_shell() == "/synthetic/sh"
+    else:
+        with pytest.raises(pytest.skip.Exception, match="GNU timeout"):
+            _linux_launcher_shell()
+
+
 @pytest.mark.parametrize("failure", ["none", "start", "run", "stop", "existing"])
 @pytest.mark.parametrize("launcher", ["run-one.sh", "run-remaining.sh"])
 def test_launcher_stops_only_its_project_on_success_and_failure(
     tmp_path, failure, launcher
 ):
-    shell = shutil.which("sh")
-    assert shell
+    shell = _linux_launcher_shell()
     root = Path(__file__).resolve().parents[2]
     source = (root / "deploy/evals/388" / launcher).read_text()
     # Test-only path substitutions keep this lifecycle test outside /home and sudo.

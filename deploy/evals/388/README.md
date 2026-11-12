@@ -182,3 +182,16 @@ SHA набора, состав 45/5, закреплённый образ и ко
 Docker, серверной БД и моделей. Они проверяют отказ по ресурсам и чужим
 контейнерам, запуск без зависимостей, timeout, прерывание, cleanup и ограничения
 корневой конфигурации. Это не доказательство развёртывания режима на сервере.
+
+Десять lifecycle-сценариев в `tests/evals/test_admission_pilot_safety.py`
+требуют Linux, `sh`, GNU `timeout` из coreutils и `flock` из util-linux.
+До запуска проверяются платформа, наличие команд и GNU-версия `timeout`.
+На macOS и Windows, а также без нужных утилит эти случаи пропускаются
+с явной причиной. Остальные проверки этого файла выполняются на всех
+платформах. В Linux CI lifecycle-сценарии продолжают выполняться.
+
+Запуск из корня backend без загрузки dotenv:
+
+```sh
+PYTHON_DOTENV_DISABLED=1 UV_NO_ENV_FILE=1 uv run --no-sync python -m pytest tests/evals/test_admission_pilot_safety.py -q -rs
+```
