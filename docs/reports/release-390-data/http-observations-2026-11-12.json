@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "scope": "Six read-only HTTP observations; no bot/channel availability inference",
+  "tls_verification": true,
+  "bodies_saved": false,
+  "model_requests": 0,
+  "rows": [
+    {
+      "target": "nsu-web",
+      "url": "https://nsu.abitur.site/login",
+      "checked_at_utc": "2026-11-12T16:53:10.028428+00:00",
+      "http_status": 200,
+      "error_type": null,
+      "elapsed_ms": 429.708
+    },
+    {
+      "target": "nsu-api",
+      "url": "https://api.nsu.abitur.site/health",
+      "checked_at_utc": "2026-11-12T16:53:10.458280+00:00",
+      "http_status": 200,
+      "error_type": null,
+      "elapsed_ms": 589.618
+    },
+    {
+      "target": "nsu-web",
+      "url": "https://nsu.abitur.site/login",
+      "checked_at_utc": "2026-11-12T16:53:12.048423+00:00",
+      "http_status": 200,
+      "error_type": null,
+      "elapsed_ms": 421.637
+    },
+    {
+      "target": "nsu-api",
+      "url": "https://api.nsu.abitur.site/health",
+      "checked_at_utc": "2026-11-12T16:53:12.470066+00:00",
+      "http_status": 200,
+      "error_type": null,
+      "elapsed_ms": 335.621
+    },
+    {
+      "target": "nsu-web",
+      "url": "https://nsu.abitur.site/login",
+      "checked_at_utc": "2026-11-12T16:53:13.805999+00:00",
+      "http_status": 200,
+      "error_type": null,
+      "elapsed_ms": 404.897
+    },
+    {
+      "target": "nsu-api",
+      "url": "https://api.nsu.abitur.site/health",
+      "checked_at_utc": "2026-11-12T16:53:14.210918+00:00",
+      "http_status": 200,
+      "error_type": null,
+      "elapsed_ms": 413.715
+    }
+  ]
+}

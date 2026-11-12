@@ -1,0 +1,1340 @@
+{
+  "schema_version": 1,
+  "run_id": "full-20261110-02",
+  "scope": "Historical isolated bfe4f8a/custom, not current NSU channel acceptance",
+  "pricing": {
+    "snapshot_date": "2026-11-10",
+    "deepseek_cny_per_million": {
+      "cache_hit": "0.02",
+      "cache_miss": "1",
+      "output": "4"
+    },
+    "source": "388-full-evaluation-2026-11-10.md and original run calculation",
+    "current_tariff_verified": false,
+    "billing_debit_verified": false
+  },
+  "verified_inputs": {
+    "additional-fact-source-locations.json": "8d6a2b7eeef50f51ed329caea31b5271d5d957dd37ed32650c50b03f4291dc41",
+    "comparison.json": "04a7e49fdcf03f38832ccc7b1f55dbbf81bb3fbdd6d3ee71e79cd4f11a1ae3a6",
+    "empty-kb-aggregate.json": "cbb1760b9994efa11c6d4eaf649ee4a4339a43add0147c3b7a42a034cdd3f731",
+    "empty-kb-full-20261110-02-batch-00-intents.jsonl": "979eadba26fe185d452e214e5cedb2636d1deee614d5947796284f207c67af1b",
+    "empty-kb-full-20261110-02-batch-00-report.json": "649b7b339210c64b093c9b3c4f86f6337bbfc6c7c75b8976a6ff502e6e1b3f3c",
+    "empty-kb-full-20261110-02-batch-00-usage.jsonl": "155da66e0fba7d445f4be60e62ea0c4983f49bdc4667f6c779f323e451487d96",
+    "empty-kb-full-20261110-02-batch-01-intents.jsonl": "7eb065f173f7b2181947046d4da197e6b1e9a5c9b0632d0e73cf82123eb39af7",
+    "empty-kb-full-20261110-02-batch-01-report.json": "1bbffc216148ad89111445fe8264645656351caebb67f9dd7fe46312aea6299a",
+    "empty-kb-full-20261110-02-batch-01-usage.jsonl": "1fff24f176178cd14a32d92f06d78d70012160c83b0c46d7c40bed3832c7bc5f",
+    "empty-kb-full-20261110-02-batch-02-intents.jsonl": "40e1ae6950502e1e68936d4f7aba0f9a0e536a68bf0a0ef94bfdcb3dd8f15224",
+    "empty-kb-full-20261110-02-batch-02-report.json": "53f8a7eba454457bf788c04141c49fda28004e8ed54098cb2ef3bc37879d31c1",
+    "empty-kb-full-20261110-02-batch-02-usage.jsonl": "8403275706e24002295a2af541db888fcfa22126a62f1b43f9211f91871c2447",
+    "empty-kb-full-20261110-02-batch-03-intents.jsonl": "874d9cbae69af22dff175ff694846d725fe15d727a5a449d79c888d02ac7b150",
+    "empty-kb-full-20261110-02-batch-03-report.json": "0fa60e6167b89ad26bc6405bf80254a3a00bf888885c2554430473085fc4a328",
+    "empty-kb-full-20261110-02-batch-03-usage.jsonl": "5a6e7688e362999f446eb0e4f81952f4047c2c019f969244245f258011149444",
+    "empty-kb-full-20261110-02-batch-04-intents.jsonl": "9f2c04fed40e5ee5957337344f7c00ce25aeaab8d79ce0f827af32a3f3102b95",
+    "empty-kb-full-20261110-02-batch-04-report.json": "76a5c3dab47a3fb94820cdcdebfa82eaf636913f6e9773b9cdee1254586e753f",
+    "empty-kb-full-20261110-02-batch-04-usage.jsonl": "7cb3c8ac6538b0f26b785a4a8409f1e6093dc34a9345abfdbffc8c6554419cf8",
+    "empty-kb-full-20261110-02-inspect-intents.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "empty-kb-full-20261110-02-inspect-report.json": "d9950472af87ae8f7186f59f8cb9f28667464b9f4832bdf915e4331d4361a109",
+    "empty-kb-full-20261110-02-inspect-usage.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "empty-kb-full-runtime-facts-20261110-intents.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "empty-kb-full-runtime-facts-20261110-report.json": "2f27e50296902339d732fb795269d3c5634e4e6d2041b7ba11c546ff1012a6c8",
+    "empty-kb-full-runtime-facts-20261110-usage.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "full-20261110-02-controller-empty-kb-00-controller.json": "3873b57df50c013c4a44084f20be1a9bcd0eee5ad54e8310837b98cdd0548eae",
+    "full-20261110-02-controller-empty-kb-01-controller.json": "039ada2874f1dbb6178e15b1a481a20499e8fdb2b27bb8f1aa37b22ebdb8a3d9",
+    "full-20261110-02-controller-empty-kb-02-controller.json": "41097dec75af9baa799eeb61206855fdfdd09bb7e4a6a311a9a3524cc7fe0377",
+    "full-20261110-02-controller-empty-kb-03-controller.json": "94c2893f5fa9ae8d29cc81bc2938637d5450c22ce1ca2b8dfb4c597a3f30122c",
+    "full-20261110-02-controller-empty-kb-04-controller.json": "5538d58fd922454355c930f5284752dc7c71ae762b55804bd93c9a734b3c8f3e",
+    "full-20261110-02-controller-final-readonly-check.json": "524a4fef4e7d28839a0e6bb0df797a2dc1f2873a8fed491c4798ef2fe3b69448",
+    "full-20261110-02-controller-progress.json": "22275c686a9e27b138da0cf0d028e7c4e2d82555a6c7eba308cb06a9c0f132ad",
+    "full-20261110-02-controller-with-kb-00-controller.json": "ebbfe16287e82547e1f7e9262277766d6c08067b792d83e78e9adf3692d4f367",
+    "full-20261110-02-controller-with-kb-01-controller.json": "6a3b9bc415e39b7637228daacfedb344153f0e890bbaa2fbf869f6eb8359ffb6",
+    "full-20261110-02-controller-with-kb-02-controller.json": "a115c49f430378b41963632f71efbb10bad58bc1e42e3ab934c94d9b93c8d4f1",
+    "full-20261110-02-controller-with-kb-03-controller.json": "98fa87ee972577e21078c8c8d9a217b7ad09e9f2c94403d0f260fc9eca11109e",
+    "full-20261110-02-controller-with-kb-04-controller.json": "59f9e2d46051b4058db19c112090ad92c3be7fa281370bc38520a0a5efae6389",
+    "manual-review.json": "87fa7ce4803a054f9ce81569132243942e5c61dfffa4ab38661c618ce55f7c5e",
+    "plans-base-plan.json": "bd27649cb8937e9d3b55d4766d0ca1d80eef78f355688c7352419fdb43328ae8",
+    "plans-plans-empty-kb-00.json": "3289d8ef4ec9ec68a23a863c3c6244fea5e0d1c800a0c6832e3188c576011f4e",
+    "plans-plans-empty-kb-01.json": "71ba1caf40952a6fa902d3f1b1d960faf0744a43e78dbd2618c0d44f93769dae",
+    "plans-plans-empty-kb-02.json": "e4d98e752f8b91904f0108820f400b6d6ffb7f6907a58845bf0bfdab2942dea9",
+    "plans-plans-empty-kb-03.json": "77a2f076973fe4073aed92248b887e4262255855a84c4a026d880883c939a672",
+    "plans-plans-empty-kb-04.json": "db562295cc3fec78a75701a4034ca02f5ea19448d519541964703b5440e78668",
+    "plans-plans-inspect-empty-kb.json": "6f78471572c0d67377d55e23e7946b2ee7c70d62a2c41d4d68b31d661f9c6ebf",
+    "plans-plans-inspect-with-kb.json": "19c9a0c5fe8ac3e66b8a66817ee453c8e3622c0a2c92d4d09ab2947e6284da49",
+    "plans-plans-with-kb-00.json": "4d1cf86b14073e1ea75d57f923c3902efe3678f270d2e176e00c12d2d0602752",
+    "plans-plans-with-kb-01.json": "69a24b4f22c61f2ef714dfa07257a9b2d3eda6b4ae00351e05d8848a156ec71c",
+    "plans-plans-with-kb-02.json": "7e7ea98e5bf2ca32827343a5a471f76771727b4016d9f15226dba3b8a284007c",
+    "plans-plans-with-kb-03.json": "c5a13ec3605c4a194541d4269b08c5e1f29310c873a696a7b4f907ba94373147",
+    "plans-plans-with-kb-04.json": "f6d93de4bd1909860ff60e63d9abea3cd800d85f44def48b9e97232c08acc905",
+    "summary.json": "01a9247b59d4a9295b284841ed96eac0c153f062bfc29c29e50b1efbeaca0cb5",
+    "with-kb-aggregate.json": "402c08a05493c3b40277cedbba4bc408c33206b9085ae7475ce15b8f1df70cd0",
+    "with-kb-full-20261110-02-batch-00-intents.jsonl": "7aece4b15ec6b65a75ea2dba4468dc5df0c1ad4b1acbeb17aa3b941332205693",
+    "with-kb-full-20261110-02-batch-00-report.json": "2487b2c1b98a692136345811cb9178f382723a7cdecea6537cede68655ec81fb",
+    "with-kb-full-20261110-02-batch-00-usage.jsonl": "6cbaa46837c08599b095d7f023d1f43e5913e49040a9ad4cd5f056d5c512bf63",
+    "with-kb-full-20261110-02-batch-01-intents.jsonl": "f9c20a482798139916de025263f98392606d314ab3ade39be7e187121f8c3564",
+    "with-kb-full-20261110-02-batch-01-report.json": "507503505e6d0a1665cfa2d0e01a51235aba76b755f644357f4947f7f0d200c8",
+    "with-kb-full-20261110-02-batch-01-usage.jsonl": "a331cbbce41f100c247a64ae85b1bde70720767d306019090745ae313c3ee652",
+    "with-kb-full-20261110-02-batch-02-intents.jsonl": "241ae19454583adc288a7b78078aba6c08d9b6216690baf243e519c684cba737",
+    "with-kb-full-20261110-02-batch-02-report.json": "de89739d0f4b909eed7a432bcd867874a8c97aaf4fd8bbfa36ee15343222e4ec",
+    "with-kb-full-20261110-02-batch-02-usage.jsonl": "132fa91783e27b4b01776582273feaebd780d512b112eeea39077573de04af79",
+    "with-kb-full-20261110-02-batch-03-intents.jsonl": "99fde75234f177ced9f5e02ce14c5c9c5d99e5a1def2c739ea9eeef5157a8182",
+    "with-kb-full-20261110-02-batch-03-report.json": "980c3451c537a8b272bcd7d128cb3babb8d46adb0494fca6b527ca3dd7cefa73",
+    "with-kb-full-20261110-02-batch-03-usage.jsonl": "bce13c99fe25d4f10582a6765ed03f38a88d79a5641515e25ed05c98bbed29ed",
+    "with-kb-full-20261110-02-batch-04-intents.jsonl": "69b11037a6080100bae5e6ef7d8c398d403ca56bb175c79bc851f76a2504a28a",
+    "with-kb-full-20261110-02-batch-04-report.json": "1f49be7442e8939e969732f8f545038b9d1946b5a2f6b930c1aa1eba6b4393d8",
+    "with-kb-full-20261110-02-batch-04-usage.jsonl": "c68682b25493308e60d303c38ebca45bf9c6c51d5c0fb3936a74c2c054b75c93",
+    "with-kb-full-20261110-02-inspect-intents.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "with-kb-full-20261110-02-inspect-report.json": "f4423c472d64595ef8d83bd8c21ebd243839078320af8a0969d0282afee27aec",
+    "with-kb-full-20261110-02-inspect-usage.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "with-kb-full-runtime-facts-20261110-intents.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "with-kb-full-runtime-facts-20261110-report.json": "1e4adef14d8cb2af61b3ea01731ddd63cb1020a09a63c577cacffc227514e685",
+    "with-kb-full-runtime-facts-20261110-usage.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "conditions": {
+    "with-kb": {
+      "answer_usage_per_case": {
+        "nsu-pre-flow-01": {
+          "http_attempts": 19,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 13254,
+          "deepseek_output_tokens": 372,
+          "deepseek_historical_cny": "0.00484106",
+          "gigachat_embedding_tokens": 113,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-flow-02": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 10464,
+          "deepseek_output_tokens": 246,
+          "deepseek_historical_cny": "0.00981728",
+          "gigachat_embedding_tokens": 105,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-flow-03": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 14864,
+          "deepseek_output_tokens": 452,
+          "deepseek_historical_cny": "0.01253248",
+          "gigachat_embedding_tokens": 106,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-flow-04": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 16424,
+          "deepseek_output_tokens": 311,
+          "deepseek_historical_cny": "0.01277584",
+          "gigachat_embedding_tokens": 101,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-scholar-01": {
+          "http_attempts": 34,
+          "deepseek_generations": 28,
+          "deepseek_input_tokens": 17456,
+          "deepseek_output_tokens": 453,
+          "deepseek_historical_cny": "0.00848408",
+          "gigachat_embedding_tokens": 247,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-scholar-02": {
+          "http_attempts": 36,
+          "deepseek_generations": 30,
+          "deepseek_input_tokens": 20338,
+          "deepseek_output_tokens": 624,
+          "deepseek_historical_cny": "0.01555848",
+          "gigachat_embedding_tokens": 218,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-scholar-03": {
+          "http_attempts": 36,
+          "deepseek_generations": 30,
+          "deepseek_input_tokens": 21336,
+          "deepseek_output_tokens": 680,
+          "deepseek_historical_cny": "0.017784",
+          "gigachat_embedding_tokens": 200,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-dorm-01": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11038,
+          "deepseek_output_tokens": 337,
+          "deepseek_historical_cny": "0.01075528",
+          "gigachat_embedding_tokens": 132,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-dorm-02": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 10391,
+          "deepseek_output_tokens": 426,
+          "deepseek_historical_cny": "0.01096604",
+          "gigachat_embedding_tokens": 142,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-dorm-03": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11070,
+          "deepseek_output_tokens": 327,
+          "deepseek_historical_cny": "0.01074728",
+          "gigachat_embedding_tokens": 156,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-partner-01": {
+          "http_attempts": 19,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11191,
+          "deepseek_output_tokens": 414,
+          "deepseek_historical_cny": "0.01171804",
+          "gigachat_embedding_tokens": 98,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-partner-02": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 20304,
+          "deepseek_output_tokens": 686,
+          "deepseek_historical_cny": "0.01653296",
+          "gigachat_embedding_tokens": 210,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-01": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 15725,
+          "deepseek_output_tokens": 369,
+          "deepseek_historical_cny": "0.01255972",
+          "gigachat_embedding_tokens": 123,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-02": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 18410,
+          "deepseek_output_tokens": 473,
+          "deepseek_historical_cny": "0.01466014",
+          "gigachat_embedding_tokens": 188,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-03": {
+          "http_attempts": 36,
+          "deepseek_generations": 30,
+          "deepseek_input_tokens": 21480,
+          "deepseek_output_tokens": 614,
+          "deepseek_historical_cny": "0.01691136",
+          "gigachat_embedding_tokens": 184,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-04": {
+          "http_attempts": 36,
+          "deepseek_generations": 30,
+          "deepseek_input_tokens": 21780,
+          "deepseek_output_tokens": 648,
+          "deepseek_historical_cny": "0.01684952",
+          "gigachat_embedding_tokens": 170,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-01": {
+          "http_attempts": 17,
+          "deepseek_generations": 14,
+          "deepseek_input_tokens": 10825,
+          "deepseek_output_tokens": 348,
+          "deepseek_historical_cny": "0.00419276",
+          "gigachat_embedding_tokens": 145,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-02": {
+          "http_attempts": 34,
+          "deepseek_generations": 28,
+          "deepseek_input_tokens": 18487,
+          "deepseek_output_tokens": 505,
+          "deepseek_historical_cny": "0.00846966",
+          "gigachat_embedding_tokens": 200,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-03": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 10491,
+          "deepseek_output_tokens": 310,
+          "deepseek_historical_cny": "0.00959852",
+          "gigachat_embedding_tokens": 126,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-04": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 12087,
+          "deepseek_output_tokens": 332,
+          "deepseek_historical_cny": "0.00425788",
+          "gigachat_embedding_tokens": 138,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-special-01": {
+          "http_attempts": 20,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 16923,
+          "deepseek_output_tokens": 714,
+          "deepseek_historical_cny": "0.0141342",
+          "gigachat_embedding_tokens": 149,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-special-02": {
+          "http_attempts": 20,
+          "deepseek_generations": 17,
+          "deepseek_input_tokens": 13396,
+          "deepseek_output_tokens": 430,
+          "deepseek_historical_cny": "0.0113528",
+          "gigachat_embedding_tokens": 133,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-special-03": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 19381,
+          "deepseek_output_tokens": 533,
+          "deepseek_historical_cny": "0.0157457",
+          "gigachat_embedding_tokens": 216,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-chance-01": {
+          "http_attempts": 34,
+          "deepseek_generations": 28,
+          "deepseek_input_tokens": 19157,
+          "deepseek_output_tokens": 459,
+          "deepseek_historical_cny": "0.00807758",
+          "gigachat_embedding_tokens": 178,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-chance-02": {
+          "http_attempts": 37,
+          "deepseek_generations": 31,
+          "deepseek_input_tokens": 22016,
+          "deepseek_output_tokens": 712,
+          "deepseek_historical_cny": "0.01621158",
+          "gigachat_embedding_tokens": 234,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-chance-03": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 18424,
+          "deepseek_output_tokens": 602,
+          "deepseek_historical_cny": "0.01507058",
+          "gigachat_embedding_tokens": 237,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-building-01": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11359,
+          "deepseek_output_tokens": 629,
+          "deepseek_historical_cny": "0.01274604",
+          "gigachat_embedding_tokens": 176,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-building-02": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 10554,
+          "deepseek_output_tokens": 358,
+          "deepseek_historical_cny": "0.00897544",
+          "gigachat_embedding_tokens": 155,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-building-03": {
+          "http_attempts": 34,
+          "deepseek_generations": 28,
+          "deepseek_input_tokens": 17138,
+          "deepseek_output_tokens": 593,
+          "deepseek_historical_cny": "0.00872804",
+          "gigachat_embedding_tokens": 211,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-general-01": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 16716,
+          "deepseek_output_tokens": 512,
+          "deepseek_historical_cny": "0.01324464",
+          "gigachat_embedding_tokens": 142,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-general-02": {
+          "http_attempts": 19,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 10064,
+          "deepseek_output_tokens": 322,
+          "deepseek_historical_cny": "0.00545926",
+          "gigachat_embedding_tokens": 124,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-general-03": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 18070,
+          "deepseek_output_tokens": 509,
+          "deepseek_historical_cny": "0.01408488",
+          "gigachat_embedding_tokens": 197,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-01": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11077,
+          "deepseek_output_tokens": 394,
+          "deepseek_historical_cny": "0.01102228",
+          "gigachat_embedding_tokens": 167,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-02": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11647,
+          "deepseek_output_tokens": 297,
+          "deepseek_historical_cny": "0.00982444",
+          "gigachat_embedding_tokens": 179,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-03": {
+          "http_attempts": 17,
+          "deepseek_generations": 14,
+          "deepseek_input_tokens": 10621,
+          "deepseek_output_tokens": 254,
+          "deepseek_historical_cny": "0.00373428",
+          "gigachat_embedding_tokens": 161,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-04": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 12149,
+          "deepseek_output_tokens": 357,
+          "deepseek_historical_cny": "0.01194628",
+          "gigachat_embedding_tokens": 193,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-arrival-01": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11852,
+          "deepseek_output_tokens": 502,
+          "deepseek_historical_cny": "0.01273104",
+          "gigachat_embedding_tokens": 196,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-arrival-02": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 14268,
+          "deepseek_output_tokens": 641,
+          "deepseek_historical_cny": "0.01281792",
+          "gigachat_embedding_tokens": 200,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-arrival-03": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11771,
+          "deepseek_output_tokens": 562,
+          "deepseek_historical_cny": "0.01075756",
+          "gigachat_embedding_tokens": 200,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-docs-01": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 11075,
+          "deepseek_output_tokens": 481,
+          "deepseek_historical_cny": "0.01136828",
+          "gigachat_embedding_tokens": 178,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-docs-02": {
+          "http_attempts": 20,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 11279,
+          "deepseek_output_tokens": 515,
+          "deepseek_historical_cny": "0.01070476",
+          "gigachat_embedding_tokens": 190,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-post-docs-03": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 11106,
+          "deepseek_output_tokens": 380,
+          "deepseek_historical_cny": "0.01099528",
+          "gigachat_embedding_tokens": 170,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-contact-01": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 18331,
+          "deepseek_output_tokens": 518,
+          "deepseek_historical_cny": "0.01513452",
+          "gigachat_embedding_tokens": 174,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-contact-02": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 18884,
+          "deepseek_output_tokens": 596,
+          "deepseek_historical_cny": "0.01411792",
+          "gigachat_embedding_tokens": 224,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-contact-03": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 10478,
+          "deepseek_output_tokens": 316,
+          "deepseek_historical_cny": "0.0092332",
+          "gigachat_embedding_tokens": 114,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-01": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 13130,
+          "deepseek_output_tokens": 427,
+          "deepseek_historical_cny": "0.00455192",
+          "gigachat_embedding_tokens": 196,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-02": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 14017,
+          "deepseek_output_tokens": 370,
+          "deepseek_historical_cny": "0.01123204",
+          "gigachat_embedding_tokens": 155,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-03": {
+          "http_attempts": 18,
+          "deepseek_generations": 15,
+          "deepseek_input_tokens": 12170,
+          "deepseek_output_tokens": 314,
+          "deepseek_historical_cny": "0.01229704",
+          "gigachat_embedding_tokens": 213,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-04": {
+          "http_attempts": 35,
+          "deepseek_generations": 29,
+          "deepseek_input_tokens": 18667,
+          "deepseek_output_tokens": 597,
+          "deepseek_historical_cny": "0.01442138",
+          "gigachat_embedding_tokens": 227,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-05": {
+          "http_attempts": 19,
+          "deepseek_generations": 16,
+          "deepseek_input_tokens": 10410,
+          "deepseek_output_tokens": 316,
+          "deepseek_historical_cny": "0.0091652",
+          "gigachat_embedding_tokens": 133,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        }
+      },
+      "usage_by_phase": {
+        "answer": {
+          "http_attempts": 1209,
+          "deepseek_generations": 1003,
+          "deepseek_input_tokens": 733545,
+          "deepseek_output_tokens": 23137,
+          "deepseek_historical_cny": "0.56989846",
+          "gigachat_embedding_tokens": 8524,
+          "gigachat_cost": null,
+          "oauth_attempts": 5
+        },
+        "judge": {
+          "http_attempts": 50,
+          "deepseek_generations": 50,
+          "deepseek_input_tokens": 29502,
+          "deepseek_output_tokens": 5170,
+          "deepseek_historical_cny": "0.04754776",
+          "gigachat_embedding_tokens": 0,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "calibration": {
+          "http_attempts": 20,
+          "deepseek_generations": 20,
+          "deepseek_input_tokens": 8465,
+          "deepseek_output_tokens": 1564,
+          "deepseek_historical_cny": "0.0097034",
+          "gigachat_embedding_tokens": 0,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        }
+      },
+      "total_usage": {
+        "http_attempts": 1279,
+        "deepseek_generations": 1073,
+        "deepseek_input_tokens": 771512,
+        "deepseek_output_tokens": 29871,
+        "deepseek_historical_cny": "0.62714962",
+        "gigachat_embedding_tokens": 8524,
+        "gigachat_cost": null,
+        "oauth_attempts": 5
+      },
+      "evaluation_latency_including_judge": {
+        "total": 50,
+        "failed": 0,
+        "error_rate": 0.0,
+        "p50_ms": 12368.0,
+        "p95_ms": 18034.0,
+        "over_30_seconds": 0,
+        "percentile_method": "p50 median; p95 nearest rank; all terminal outcomes"
+      },
+      "bot_only_latency": null,
+      "faq_matched_cases": 0,
+      "cases_calling_tools": 17,
+      "answer_generation_attempts_per_case": {
+        "mean": 20.06,
+        "max": 31,
+        "denominator": 50
+      }
+    },
+    "empty-kb": {
+      "answer_usage_per_case": {
+        "nsu-pre-flow-01": {
+          "http_attempts": 11,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 4210,
+          "deepseek_output_tokens": 119,
+          "deepseek_historical_cny": "0.00117368",
+          "gigachat_embedding_tokens": 178,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-flow-02": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3453,
+          "deepseek_output_tokens": 177,
+          "deepseek_historical_cny": "0.0016522",
+          "gigachat_embedding_tokens": 170,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-flow-03": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5443,
+          "deepseek_output_tokens": 303,
+          "deepseek_historical_cny": "0.00239102",
+          "gigachat_embedding_tokens": 184,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-flow-04": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5439,
+          "deepseek_output_tokens": 237,
+          "deepseek_historical_cny": "0.00212302",
+          "gigachat_embedding_tokens": 166,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-scholar-01": {
+          "http_attempts": 10,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2843,
+          "deepseek_output_tokens": 156,
+          "deepseek_historical_cny": "0.00133452",
+          "gigachat_embedding_tokens": 243,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-scholar-02": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3472,
+          "deepseek_output_tokens": 213,
+          "deepseek_historical_cny": "0.0018152",
+          "gigachat_embedding_tokens": 212,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-scholar-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3453,
+          "deepseek_output_tokens": 210,
+          "deepseek_historical_cny": "0.0017842",
+          "gigachat_embedding_tokens": 209,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-dorm-01": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3510,
+          "deepseek_output_tokens": 206,
+          "deepseek_historical_cny": "0.0018252",
+          "gigachat_embedding_tokens": 214,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-dorm-02": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3533,
+          "deepseek_output_tokens": 208,
+          "deepseek_historical_cny": "0.0018562",
+          "gigachat_embedding_tokens": 234,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-dorm-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3522,
+          "deepseek_output_tokens": 224,
+          "deepseek_historical_cny": "0.0019092",
+          "gigachat_embedding_tokens": 241,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-partner-01": {
+          "http_attempts": 13,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5446,
+          "deepseek_output_tokens": 279,
+          "deepseek_historical_cny": "0.00229704",
+          "gigachat_embedding_tokens": 176,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-partner-02": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5520,
+          "deepseek_output_tokens": 266,
+          "deepseek_historical_cny": "0.00231904",
+          "gigachat_embedding_tokens": 190,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-01": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5488,
+          "deepseek_output_tokens": 265,
+          "deepseek_historical_cny": "0.00228304",
+          "gigachat_embedding_tokens": 211,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-02": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3471,
+          "deepseek_output_tokens": 206,
+          "deepseek_historical_cny": "0.00166076",
+          "gigachat_embedding_tokens": 191,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-03": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5503,
+          "deepseek_output_tokens": 263,
+          "deepseek_historical_cny": "0.00229004",
+          "gigachat_embedding_tokens": 203,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-lang-04": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5513,
+          "deepseek_output_tokens": 270,
+          "deepseek_historical_cny": "0.00232804",
+          "gigachat_embedding_tokens": 182,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-01": {
+          "http_attempts": 6,
+          "deepseek_generations": 3,
+          "deepseek_input_tokens": 2232,
+          "deepseek_output_tokens": 80,
+          "deepseek_historical_cny": "0.00079584",
+          "gigachat_embedding_tokens": 145,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-02": {
+          "http_attempts": 10,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 4226,
+          "deepseek_output_tokens": 126,
+          "deepseek_historical_cny": "0.00121768",
+          "gigachat_embedding_tokens": 199,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-03": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2919,
+          "deepseek_output_tokens": 181,
+          "deepseek_historical_cny": "0.00138508",
+          "gigachat_embedding_tokens": 130,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-compare-04": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 4260,
+          "deepseek_output_tokens": 185,
+          "deepseek_historical_cny": "0.00148768",
+          "gigachat_embedding_tokens": 126,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-special-01": {
+          "http_attempts": 9,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 4898,
+          "deepseek_output_tokens": 259,
+          "deepseek_historical_cny": "0.00204536",
+          "gigachat_embedding_tokens": 144,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-special-02": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2889,
+          "deepseek_output_tokens": 154,
+          "deepseek_historical_cny": "0.00137252",
+          "gigachat_embedding_tokens": 135,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-special-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3523,
+          "deepseek_output_tokens": 232,
+          "deepseek_historical_cny": "0.0019422",
+          "gigachat_embedding_tokens": 232,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-chance-01": {
+          "http_attempts": 10,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 4265,
+          "deepseek_output_tokens": 188,
+          "deepseek_historical_cny": "0.00138414",
+          "gigachat_embedding_tokens": 175,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-chance-02": {
+          "http_attempts": 13,
+          "deepseek_generations": 7,
+          "deepseek_input_tokens": 6803,
+          "deepseek_output_tokens": 332,
+          "deepseek_historical_cny": "0.00261164",
+          "gigachat_embedding_tokens": 234,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-chance-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3537,
+          "deepseek_output_tokens": 285,
+          "deepseek_historical_cny": "0.00204276",
+          "gigachat_embedding_tokens": 225,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-building-01": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2985,
+          "deepseek_output_tokens": 168,
+          "deepseek_historical_cny": "0.00152452",
+          "gigachat_embedding_tokens": 180,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-building-02": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2907,
+          "deepseek_output_tokens": 167,
+          "deepseek_historical_cny": "0.00144252",
+          "gigachat_embedding_tokens": 155,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-building-03": {
+          "http_attempts": 9,
+          "deepseek_generations": 3,
+          "deepseek_input_tokens": 2248,
+          "deepseek_output_tokens": 126,
+          "deepseek_historical_cny": "0.00099584",
+          "gigachat_embedding_tokens": 211,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-general-01": {
+          "http_attempts": 12,
+          "deepseek_generations": 6,
+          "deepseek_input_tokens": 5529,
+          "deepseek_output_tokens": 305,
+          "deepseek_historical_cny": "0.00248404",
+          "gigachat_embedding_tokens": 229,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-pre-general-02": {
+          "http_attempts": 7,
+          "deepseek_generations": 3,
+          "deepseek_input_tokens": 2232,
+          "deepseek_output_tokens": 80,
+          "deepseek_historical_cny": "0.00079584",
+          "gigachat_embedding_tokens": 124,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-pre-general-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3497,
+          "deepseek_output_tokens": 194,
+          "deepseek_historical_cny": "0.00163876",
+          "gigachat_embedding_tokens": 173,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-01": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2979,
+          "deepseek_output_tokens": 147,
+          "deepseek_historical_cny": "0.00143452",
+          "gigachat_embedding_tokens": 167,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-02": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 3033,
+          "deepseek_output_tokens": 163,
+          "deepseek_historical_cny": "0.00142708",
+          "gigachat_embedding_tokens": 182,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-03": {
+          "http_attempts": 6,
+          "deepseek_generations": 3,
+          "deepseek_input_tokens": 2276,
+          "deepseek_output_tokens": 80,
+          "deepseek_historical_cny": "0.00083984",
+          "gigachat_embedding_tokens": 168,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-dorm-04": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 3068,
+          "deepseek_output_tokens": 155,
+          "deepseek_historical_cny": "0.00155552",
+          "gigachat_embedding_tokens": 193,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-arrival-01": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 3025,
+          "deepseek_output_tokens": 158,
+          "deepseek_historical_cny": "0.00152452",
+          "gigachat_embedding_tokens": 195,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-arrival-02": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 3013,
+          "deepseek_output_tokens": 161,
+          "deepseek_historical_cny": "0.00139908",
+          "gigachat_embedding_tokens": 195,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-arrival-03": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 3013,
+          "deepseek_output_tokens": 160,
+          "deepseek_historical_cny": "0.00139508",
+          "gigachat_embedding_tokens": 196,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-docs-01": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2991,
+          "deepseek_output_tokens": 173,
+          "deepseek_historical_cny": "0.00142508",
+          "gigachat_embedding_tokens": 173,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-post-docs-02": {
+          "http_attempts": 12,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3626,
+          "deepseek_output_tokens": 300,
+          "deepseek_historical_cny": "0.00219176",
+          "gigachat_embedding_tokens": 295,
+          "gigachat_cost": null,
+          "oauth_attempts": 1
+        },
+        "nsu-post-docs-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3563,
+          "deepseek_output_tokens": 238,
+          "deepseek_historical_cny": "0.0020062",
+          "gigachat_embedding_tokens": 260,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-contact-01": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3484,
+          "deepseek_output_tokens": 220,
+          "deepseek_historical_cny": "0.0018552",
+          "gigachat_embedding_tokens": 193,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-contact-02": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3569,
+          "deepseek_output_tokens": 229,
+          "deepseek_historical_cny": "0.0019762",
+          "gigachat_embedding_tokens": 224,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-contact-03": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3484,
+          "deepseek_output_tokens": 204,
+          "deepseek_historical_cny": "0.0017912",
+          "gigachat_embedding_tokens": 196,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-01": {
+          "http_attempts": 6,
+          "deepseek_generations": 3,
+          "deepseek_input_tokens": 2288,
+          "deepseek_output_tokens": 80,
+          "deepseek_historical_cny": "0.00085184",
+          "gigachat_embedding_tokens": 196,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-02": {
+          "http_attempts": 8,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 5032,
+          "deepseek_output_tokens": 352,
+          "deepseek_historical_cny": "0.00242592",
+          "gigachat_embedding_tokens": 157,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-03": {
+          "http_attempts": 8,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 5234,
+          "deepseek_output_tokens": 410,
+          "deepseek_historical_cny": "0.00260904",
+          "gigachat_embedding_tokens": 219,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-04": {
+          "http_attempts": 11,
+          "deepseek_generations": 5,
+          "deepseek_input_tokens": 3542,
+          "deepseek_output_tokens": 240,
+          "deepseek_historical_cny": "0.0019932",
+          "gigachat_embedding_tokens": 242,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "nsu-paid-steps-05": {
+          "http_attempts": 7,
+          "deepseek_generations": 4,
+          "deepseek_input_tokens": 2913,
+          "deepseek_output_tokens": 156,
+          "deepseek_historical_cny": "0.00140452",
+          "gigachat_embedding_tokens": 135,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        }
+      },
+      "usage_by_phase": {
+        "answer": {
+          "http_attempts": 478,
+          "deepseek_generations": 233,
+          "deepseek_input_tokens": 188902,
+          "deepseek_output_tokens": 10290,
+          "deepseek_historical_cny": "0.08631462",
+          "gigachat_embedding_tokens": 9607,
+          "gigachat_cost": null,
+          "oauth_attempts": 5
+        },
+        "judge": {
+          "http_attempts": 49,
+          "deepseek_generations": 49,
+          "deepseek_input_tokens": 23274,
+          "deepseek_output_tokens": 3827,
+          "deepseek_historical_cny": "0.0254108",
+          "gigachat_embedding_tokens": 0,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        },
+        "calibration": {
+          "http_attempts": 20,
+          "deepseek_generations": 20,
+          "deepseek_input_tokens": 8465,
+          "deepseek_output_tokens": 1561,
+          "deepseek_historical_cny": "0.0096914",
+          "gigachat_embedding_tokens": 0,
+          "gigachat_cost": null,
+          "oauth_attempts": 0
+        }
+      },
+      "total_usage": {
+        "http_attempts": 547,
+        "deepseek_generations": 302,
+        "deepseek_input_tokens": 220641,
+        "deepseek_output_tokens": 15678,
+        "deepseek_historical_cny": "0.12141682",
+        "gigachat_embedding_tokens": 9607,
+        "gigachat_cost": null,
+        "oauth_attempts": 5
+      },
+      "evaluation_latency_including_judge": {
+        "total": 50,
+        "failed": 0,
+        "error_rate": 0.0,
+        "p50_ms": 7356.5,
+        "p95_ms": 10934.0,
+        "over_30_seconds": 0,
+        "percentile_method": "p50 median; p95 nearest rank; all terminal outcomes"
+      },
+      "bot_only_latency": null,
+      "faq_matched_cases": 0,
+      "cases_calling_tools": 16,
+      "answer_generation_attempts_per_case": {
+        "mean": 4.66,
+        "max": 7,
+        "denominator": 50
+      }
+    }
+  },
+  "total_usage": {
+    "http_attempts": 1826,
+    "deepseek_generations": 1375,
+    "deepseek_input_tokens": 992153,
+    "deepseek_output_tokens": 45549,
+    "deepseek_historical_cny": "0.74856644",
+    "gigachat_embedding_tokens": 18131,
+    "gigachat_cost": null,
+    "oauth_attempts": 10
+  },
+  "quality": {
+    "schema_version": 1,
+    "run_id": "full-20261110-02",
+    "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+    "decision_source": "https://github.com/nsu-abitur-bot/abitur-bot/pull/432#issuecomment-6794282105",
+    "scope": "Only explicit owner decisions applied. All other automatic outcomes retained.",
+    "inputs": {
+      "review_sha256": "f1a57f9ca9fa4612af8cf0e53cf9901a87d30153cc72f602416293c87e03733f",
+      "registry_sha256": "e4f51a35d7ad8c92653fa94f314136bc5f0f36dc482a7a704d1e52789de15671",
+      "with_kb_sha256": "402c08a05493c3b40277cedbba4bc408c33206b9085ae7475ce15b8f1df70cd0",
+      "empty_kb_sha256": "cbb1760b9994efa11c6d4eaf649ee4a4339a43add0147c3b7a42a034cdd3f731"
+    },
+    "conditions": {
+      "with_kb": {
+        "automatic": {
+          "document": {
+            "passed": 35,
+            "total": 45
+          },
+          "special": {
+            "passed": 2,
+            "total": 5
+          },
+          "total": {
+            "passed": 37,
+            "total": 50
+          }
+        },
+        "reviewed": {
+          "document": {
+            "passed": 29,
+            "total": 45
+          },
+          "special": {
+            "passed": 1,
+            "total": 5
+          },
+          "total": {
+            "passed": 30,
+            "total": 50
+          }
+        },
+        "changed_passes": [
+          "nsu-pre-scholar-03",
+          "nsu-pre-lang-03",
+          "nsu-pre-lang-04",
+          "nsu-pre-compare-03",
+          "nsu-pre-special-02",
+          "nsu-pre-general-01",
+          "nsu-paid-contact-03"
+        ]
+      },
+      "empty_kb": {
+        "automatic": {
+          "document": {
+            "passed": 0,
+            "total": 45
+          },
+          "special": {
+            "passed": 1,
+            "total": 5
+          },
+          "total": {
+            "passed": 1,
+            "total": 50
+          }
+        },
+        "reviewed": {
+          "document": {
+            "passed": 0,
+            "total": 45
+          },
+          "special": {
+            "passed": 0,
+            "total": 5
+          },
+          "total": {
+            "passed": 0,
+            "total": 50
+          }
+        },
+        "changed_passes": [
+          "nsu-pre-compare-03"
+        ]
+      }
+    },
+    "reviewed_document_delta_pp": 64.444444,
+    "confirmed_critical_cases": [
+      {
+        "condition": "with_kb",
+        "case_id": "nsu-paid-steps-01"
+      },
+      {
+        "condition": "with_kb",
+        "case_id": "nsu-paid-steps-02"
+      },
+      {
+        "condition": "with_kb",
+        "case_id": "nsu-pre-general-01"
+      }
+    ],
+    "targets": {
+      "document_required": 41,
+      "special_required": 5,
+      "critical_allowed": 0,
+      "document_met": false,
+      "special_met": false,
+      "critical_absence_confirmed": false
+    },
+    "release_readiness": "not established"
+  }
+}
