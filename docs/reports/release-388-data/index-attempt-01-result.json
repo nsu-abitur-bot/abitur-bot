@@ -1,0 +1,10 @@
+{
+  "proposal_id": "01a1b547-0f93-7a25-bf39-81f076b77a9e",
+  "approval_http_status": 503,
+  "elapsed_seconds": 89.43,
+  "source_chars": 5087,
+  "source_sha256": "94568796179ed9a81fdf36878fe902f8d734992fbda5fde6c9bf36647d9dacb2",
+  "attempts": 64,
+  "uncertain_failure": false,
+  "planning_reserve_deepseek_cny": 1.074024
+}

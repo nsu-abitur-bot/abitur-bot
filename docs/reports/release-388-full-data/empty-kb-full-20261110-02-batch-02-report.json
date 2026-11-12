@@ -1,0 +1,671 @@
+{
+  "schema_version": 1,
+  "mode": "live_full_batch",
+  "status": "completed",
+  "condition": "empty-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "fd457f5792a31a1cd45af2e1f27e6480fdf6f2a51948e1deed7b7904f511b318",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T15:02:22.285364+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-special-01",
+    "nsu-pre-special-02",
+    "nsu-pre-special-03",
+    "nsu-pre-chance-01",
+    "nsu-pre-chance-02",
+    "nsu-pre-chance-03",
+    "nsu-pre-building-01",
+    "nsu-pre-building-02",
+    "nsu-pre-building-03",
+    "nsu-pre-general-01"
+  ],
+  "results": [
+    {
+      "id": "nsu-pre-special-01",
+      "question": "Кроме разработки приложений, чем ещё можно заниматься на ПИиКН?",
+      "session_id": "eval:b9ecd8d366704c46bc2e396649a1cf73:nsu-pre-special-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, полное название направления или факультет — попробую найти данные по ним.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного из обязательных фактов (компьютерное зрение, биоинформатика, машинное обучение и др.) и вместо фактического ответа даёт общее перенаправление с уточнением, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталонный ответ не воспроизведён.",
+      "elapsed_seconds": 11.455,
+      "memory_before": {
+        "memory.current": 191066112,
+        "memory.peak": 191361024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1237232,
+        "process_maxrss_kib": 218112
+      },
+      "memory_after": {
+        "memory.current": 284184576,
+        "memory.peak": 284192768,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139512,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-special-02",
+      "question": "Когда на ТИПИ начинается практика с кураторами из IT-компаний?",
+      "session_id": "eval:cb54cc719966430e91f8b976aa09f5b3:nsu-pre-special-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Со второго семестра, уже на первом курсе» и вместо ответа даёт общий отказ/перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Фактическая информация из эталона отсутствует.",
+      "elapsed_seconds": 6.431,
+      "memory_before": {
+        "memory.current": 284168192,
+        "memory.peak": 284192768,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139512,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284217344,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142772,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-special-03",
+      "question": "С какого курса на ТИПИ обязательна стажировка в IT-компании?",
+      "session_id": "eval:5324ccb5ed46471a9884af700053b99a:nsu-pre-special-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «С третьего курса» и вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий (не заменять доступный фактический ответ общим перенаправлением/отказом).",
+      "elapsed_seconds": 7.875,
+      "memory_before": {
+        "memory.current": 284205056,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142776,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284237824,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142848,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "question": "У меня 280 баллов. Какие шансы пройти на бюджет ФИТ?",
+      "session_id": "eval:c23a4f3693fe490f94d6a100596d80a3:nsu-pre-chance-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nДанных о проходных баллах на бюджет по ФИТ у меня нет, поэтому оценить ваши шансы с 280 баллами я не могу.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ лишь констатирует отсутствие данных и не помогает абитуриенту: не объясняет, что одних баллов недостаточно, не уточняет программу и кампанию, не предлагает проверить текущие списки и условия конкурса. Это близко к простому отказу без помощи, что по критерию недостаточно; при этом ответ не выдумывает вероятность или гарантию зачисления.",
+      "elapsed_seconds": 6.998,
+      "memory_before": {
+        "memory.current": 284225536,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142848,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284000256,
+        "memory.peak": 284270592,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1145676,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-chance-02",
+      "question": "Я выше прошлогоднего проходного балла. Зачисление в этом году гарантировано?",
+      "session_id": "eval:be37b4942bd248299e0e49cc8cf2253a:nsu-pre-chance-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nЕсли уточните направление и факультет, я смогу проверить проходные баллы прошлых лет по ним.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не соответствует эталону: вместо прямого отрицания и объяснения, что прошлогодний балл не гарантирует зачисление, ассистент сообщает об отсутствии информации и просит уточнений. Критерий отказа/специального случая не выполнен, требуемая информация отсутствует.",
+      "elapsed_seconds": 9.616,
+      "memory_before": {
+        "memory.current": 284237824,
+        "memory.peak": 284270592,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1145680,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284282880,
+        "memory.peak": 284282880,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142640,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-chance-03",
+      "question": "Сегодня последний день подачи согласия на зачисление. Не могу выбрать между двумя вузами - что делать?",
+      "session_id": "eval:22b625c4d7a84389a1d51b7bd36739eb:nsu-pre-chance-03",
+      "passed": false,
+      "answer": "Я консультирую только по вопросам, связанным с Ваш вуз, поэтому не смогу помочь с выбором между вузами.\n\nЕсли у вас есть вопросы о наших направлениях, факультетах, проходных баллах или правилах приёма — спрашивайте, с радостью подскажу.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ без помощи, что прямо запрещено критерием («Простой отказ без помощи недостаточен»). Помощь в сопоставлении программ, приоритетов и конкурсной ситуации отсутствует, как и предложение проверить сроки и списки. Эталон не выполнен.",
+      "elapsed_seconds": 8.332,
+      "memory_before": {
+        "memory.current": 283992064,
+        "memory.peak": 284282880,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142640,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284315648,
+        "memory.peak": 284327936,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143952,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-building-01",
+      "question": "Я первокурсник ФИТ, гражданин РФ, зачислен в 2026 году. Куда идти за медицинским разрешением на общежитие?",
+      "session_id": "eval:c798babd54aa4d96b611efc871913b10:nsu-pre-building-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «ММЦИММТ НГУ, улица Ляпунова, 6» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 5.807,
+      "memory_before": {
+        "memory.current": 284274688,
+        "memory.peak": 284327936,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143956,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284073984,
+        "memory.peak": 284385280,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138944,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-building-02",
+      "question": "Где находится отдел воинского учёта НГУ для заселения в 2026 году?",
+      "session_id": "eval:e4af273bf2a84343b1174c90b4b5bea8:nsu-pre-building-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Пирогова, 2, кабинет 119» и вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 5.949,
+      "memory_before": {
+        "memory.current": 284119040,
+        "memory.peak": 284385280,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138948,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284286976,
+        "memory.peak": 284598272,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138984,
+        "process_maxrss_kib": 312188
+      }
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "question": "Где находится паспортный стол НГУ для оформления регистрации в общежитии в 2026 году?",
+      "session_id": "eval:7c9b657bc58143c7b8282c93ca9eb95f:nsu-pre-building-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nЯ консультирую только по вопросам, связанным с Ваш вуз (поступление, направления подготовки, баллы и т.п.). Вопросы оформления регистрации и работы паспортного стола лучше уточнить напрямую в вузе.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Пирогова, 4/1, общежитие №3» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталону противоречит.",
+      "elapsed_seconds": 5.796,
+      "memory_before": {
+        "memory.current": 284499968,
+        "memory.peak": 284598272,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138984,
+        "process_maxrss_kib": 312188
+      },
+      "memory_after": {
+        "memory.current": 284864512,
+        "memory.peak": 284893184,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1136704,
+        "process_maxrss_kib": 312316
+      }
+    },
+    {
+      "id": "nsu-pre-general-01",
+      "question": "Какие экзамены нужны после школы для поступления на ФИТ в 2026 году?",
+      "session_id": "eval:0798d63d35764ffa9e06a4e95aec1eba:nsu-pre-general-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, название факультета полностью — возможно, оно указано иначе.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Математика, русский язык и информатика либо физика» и вместо фактического ответа даёт общее перенаправление с уточнением, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталонный ответ полностью отсутствует.",
+      "elapsed_seconds": 8.778,
+      "memory_before": {
+        "memory.current": 284839936,
+        "memory.peak": 284893184,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1136724,
+        "process_maxrss_kib": 312316
+      },
+      "memory_after": {
+        "memory.current": 284798976,
+        "memory.peak": 285077504,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1137376,
+        "process_maxrss_kib": 312572
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно и полностью совпадает с эталоном: указан код 09.03.01 и название «Информатика и вычислительная техника». Все обязательные факты присутствуют, выдуманных сведений нет, ограничения поведения не нарушены.",
+      "elapsed_seconds": 2.061
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает ограничения «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и критериям отказа → 1.",
+      "elapsed_seconds": 1.386
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 1.397
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не оставляет выбор абитуриенту. Критерий не выполнен.",
+      "elapsed_seconds": 0.995
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 183988224,
+      "memory.peak": 184233984,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1245228,
+      "process_maxrss_kib": 210596
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 191074304,
+      "memory.peak": 191361024,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1237232,
+      "process_maxrss_kib": 218112
+    },
+    {
+      "phase": "nsu-pre-special-01",
+      "memory.current": 191066112,
+      "memory.peak": 191361024,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1237232,
+      "process_maxrss_kib": 218112
+    },
+    {
+      "phase": "nsu-pre-special-02",
+      "memory.current": 284168192,
+      "memory.peak": 284192768,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1139512,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-special-03",
+      "memory.current": 284205056,
+      "memory.peak": 284237824,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1142776,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-chance-01",
+      "memory.current": 284225536,
+      "memory.peak": 284237824,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1142848,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-chance-02",
+      "memory.current": 284237824,
+      "memory.peak": 284270592,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1145680,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-chance-03",
+      "memory.current": 283992064,
+      "memory.peak": 284282880,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1142640,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-building-01",
+      "memory.current": 284274688,
+      "memory.peak": 284327936,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1143956,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-building-02",
+      "memory.current": 284119040,
+      "memory.peak": 284385280,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1138948,
+      "process_maxrss_kib": 311932
+    },
+    {
+      "phase": "nsu-pre-building-03",
+      "memory.current": 284499968,
+      "memory.peak": 284598272,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1138984,
+      "process_maxrss_kib": 312188
+    },
+    {
+      "phase": "nsu-pre-general-01",
+      "memory.current": 284839936,
+      "memory.peak": 284893184,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1136724,
+      "process_maxrss_kib": 312316
+    },
+    {
+      "phase": "finished",
+      "memory.current": 284512256,
+      "memory.peak": 285077504,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1137376,
+      "process_maxrss_kib": 312572
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": true,
+  "peak_sampled_swap_bytes": 0,
+  "min_host_available_kib": 1135948,
+  "batch_index": 2,
+  "run_id": "full-20261110-02",
+  "root_run_id": "e0ae93da1273426e8257b9b20c795224",
+  "inspect_only": false,
+  "latest_memory": {
+    "memory.current": 284512256,
+    "memory.peak": 285077504,
+    "memory.swap.current": 0,
+    "memory.events": {
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 1137376,
+    "process_maxrss_kib": 312572
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "07d2baddce60a3e1ecf74b6894af656700f7ba99e2268ee742280329bc76f920",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 0,
+      "content_proposal": 0,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 90
+    },
+    "documents": [],
+    "graph_documents": 0,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 110,
+    "attempts_finished": 110,
+    "operation_counts": {
+      "generation": 61,
+      "oauth": 1,
+      "embedding": 48
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 2023624,
+    "reserved_peak_no_cache_micro_cny": 118054,
+    "embedding_input_bytes": 12151
+  },
+  "finished_at_utc": "2026-11-10T15:04:02.405634+00:00",
+  "unexecuted_ids": []
+}

@@ -1,0 +1,30 @@
+{
+  "status": "completed",
+  "source_id": "DOC-770b0c6ebb172dbe",
+  "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+  "integrity": {
+    "processed_source_ids": [
+      "DOC-3d63df62af354868",
+      "DOC-03ae446000cfbc45",
+      "DOC-2338f0807b9bc328",
+      "DOC-317c53d5b5ae2baf",
+      "DOC-6674be71e05b972c",
+      "DOC-770b0c6ebb172dbe"
+    ],
+    "documents": 6,
+    "vector_counts": {
+      "chunks": 70,
+      "entities": 1254,
+      "relationships": 1310
+    },
+    "graph_nodes": 1254,
+    "graph_edges": 1310
+  },
+  "backup_directory": "/app/data/recovery388-graph-replay-01",
+  "source_sha256": "ae3f569bc9fb9dca5747cfdfd0cd01a3f3943ac3689e062a1a74f10f47288d1e",
+  "prior_attempts": 2770,
+  "attempts": 3717,
+  "uncertain_failure": false,
+  "embedding_input_bytes": 5610954,
+  "peak_no_cache_reserve_cny": 7.292976
+}

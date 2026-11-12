@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "run_id": "full-20261110-02",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "decision_source": "https://github.com/nsu-abitur-bot/abitur-bot/pull/432#issuecomment-6794282105",
+  "scope": "Only explicit owner decisions applied. All other automatic outcomes retained.",
+  "inputs": {
+    "review_sha256": "f1a57f9ca9fa4612af8cf0e53cf9901a87d30153cc72f602416293c87e03733f",
+    "registry_sha256": "e4f51a35d7ad8c92653fa94f314136bc5f0f36dc482a7a704d1e52789de15671",
+    "with_kb_sha256": "402c08a05493c3b40277cedbba4bc408c33206b9085ae7475ce15b8f1df70cd0",
+    "empty_kb_sha256": "cbb1760b9994efa11c6d4eaf649ee4a4339a43add0147c3b7a42a034cdd3f731"
+  },
+  "conditions": {
+    "with_kb": {
+      "automatic": {
+        "document": {
+          "passed": 35,
+          "total": 45
+        },
+        "special": {
+          "passed": 2,
+          "total": 5
+        },
+        "total": {
+          "passed": 37,
+          "total": 50
+        }
+      },
+      "reviewed": {
+        "document": {
+          "passed": 29,
+          "total": 45
+        },
+        "special": {
+          "passed": 1,
+          "total": 5
+        },
+        "total": {
+          "passed": 30,
+          "total": 50
+        }
+      },
+      "changed_passes": [
+        "nsu-pre-scholar-03",
+        "nsu-pre-lang-03",
+        "nsu-pre-lang-04",
+        "nsu-pre-compare-03",
+        "nsu-pre-special-02",
+        "nsu-pre-general-01",
+        "nsu-paid-contact-03"
+      ]
+    },
+    "empty_kb": {
+      "automatic": {
+        "document": {
+          "passed": 0,
+          "total": 45
+        },
+        "special": {
+          "passed": 1,
+          "total": 5
+        },
+        "total": {
+          "passed": 1,
+          "total": 50
+        }
+      },
+      "reviewed": {
+        "document": {
+          "passed": 0,
+          "total": 45
+        },
+        "special": {
+          "passed": 0,
+          "total": 5
+        },
+        "total": {
+          "passed": 0,
+          "total": 50
+        }
+      },
+      "changed_passes": [
+        "nsu-pre-compare-03"
+      ]
+    }
+  },
+  "reviewed_document_delta_pp": 64.444444,
+  "confirmed_critical_cases": [
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-paid-steps-01"
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-paid-steps-02"
+    },
+    {
+      "condition": "with_kb",
+      "case_id": "nsu-pre-general-01"
+    }
+  ],
+  "targets": {
+    "document_required": 41,
+    "special_required": 5,
+    "critical_allowed": 0,
+    "document_met": false,
+    "special_met": false,
+    "critical_absence_confirmed": false
+  },
+  "release_readiness": "not established"
+}

@@ -1,0 +1,1 @@
+{"run_id": "c61c50692fc549bdbab7c4b154f9bbdc", "timeout_profile": "pilot", "timeout_seconds": 1200, "variant": "with-kb", "worker_exit_code": 1, "timed_out": false, "error_type": null, "cleanup_ok": true, "elapsed_seconds": 63.09, "host_available_before_kib": 1364712, "host_available_after_kib": 1380616, "api_server_started": false, "status": "failed"}

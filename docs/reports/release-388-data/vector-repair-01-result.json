@@ -1,0 +1,8 @@
+{
+  "status": "failed",
+  "error_type": "SafetyCheckFailed",
+  "check": "Missing graph nodes",
+  "attempts": 82,
+  "embedding_input_bytes": 312086,
+  "uncertain_failure": false
+}

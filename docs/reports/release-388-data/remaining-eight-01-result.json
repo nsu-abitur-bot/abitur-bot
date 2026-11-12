@@ -1,0 +1,55 @@
+{
+  "status": "started",
+  "sources": [
+    {
+      "id": "DOC-3d63df62af354868",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-03ae446000cfbc45",
+      "url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+      "status": "indexed",
+      "proposal_id": "01a1b623-296c-70d8-98b6-bb4415f20491",
+      "approval_http_status": 200,
+      "elapsed_seconds": 210.048,
+      "document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+    },
+    {
+      "id": "DOC-2338f0807b9bc328",
+      "url": "https://education.nsu.ru/tipi",
+      "status": "indexed",
+      "proposal_id": "01a1b626-5e72-710c-bb8d-ac0b01d66af1",
+      "approval_http_status": 200,
+      "elapsed_seconds": 180.301,
+      "document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+    },
+    {
+      "id": "DOC-317c53d5b5ae2baf",
+      "url": "https://education.nsu.ru/mechatronics/",
+      "status": "indexed",
+      "proposal_id": "01a1b629-1eee-772b-b5e6-f2d02ca4efd7",
+      "approval_http_status": 200,
+      "elapsed_seconds": 227.142,
+      "document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+    },
+    {
+      "id": "DOC-6674be71e05b972c",
+      "url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+      "status": "indexed",
+      "proposal_id": "01a1b62c-9655-71b6-868e-db5f31a3f9bf",
+      "approval_http_status": 200,
+      "elapsed_seconds": 147.217,
+      "document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+    },
+    {
+      "id": "DOC-770b0c6ebb172dbe",
+      "url": "https://education.nsu.ru/mathematics/",
+      "status": "started",
+      "proposal_id": "01a1b62e-d58f-71db-b2a3-ba3fd47b12e2"
+    }
+  ],
+  "attempts": 1675,
+  "uncertain_failure": false,
+  "peak_no_cache_reserve_cny": 1.278572,
+  "embedding_input_bytes": 421736
+}

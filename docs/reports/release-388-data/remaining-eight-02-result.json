@@ -1,0 +1,57 @@
+{
+  "status": "started",
+  "sources": [
+    {
+      "id": "DOC-3d63df62af354868",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-03ae446000cfbc45",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-2338f0807b9bc328",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-317c53d5b5ae2baf",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-6674be71e05b972c",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-770b0c6ebb172dbe",
+      "status": "already_indexed"
+    },
+    {
+      "id": "DOC-83001f87d00915c7",
+      "url": "https://www.nsu.ru/n/life/campus/check-in/",
+      "status": "started",
+      "proposal_id": "01a1b667-f47f-76fa-b18f-f735e309af67"
+    }
+  ],
+  "integrity": {
+    "processed_source_ids": [
+      "DOC-3d63df62af354868",
+      "DOC-03ae446000cfbc45",
+      "DOC-2338f0807b9bc328",
+      "DOC-317c53d5b5ae2baf",
+      "DOC-6674be71e05b972c",
+      "DOC-770b0c6ebb172dbe"
+    ],
+    "documents": 6,
+    "vector_counts": {
+      "chunks": 70,
+      "entities": 1254,
+      "relationships": 1310
+    },
+    "graph_nodes": 1254,
+    "graph_edges": 1310
+  },
+  "attempts": 3717,
+  "uncertain_failure": false,
+  "peak_no_cache_reserve_cny": 7.292976,
+  "embedding_input_bytes": 5610954
+}

@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "mode": "live_full_batch",
+  "status": "completed",
+  "condition": "empty-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "bd688f55f4c87b05490607fb38243e5d873b32b1a3e8f1ac7cf390c2050fdb34",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T15:00:04.327547+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-partner-01",
+    "nsu-pre-partner-02",
+    "nsu-pre-lang-01",
+    "nsu-pre-lang-02",
+    "nsu-pre-lang-03",
+    "nsu-pre-lang-04",
+    "nsu-pre-compare-01",
+    "nsu-pre-compare-02",
+    "nsu-pre-compare-03",
+    "nsu-pre-compare-04"
+  ],
+  "results": [
+    {
+      "id": "nsu-pre-partner-01",
+      "question": "Какие студенческие лаборатории есть на ФИТ?",
+      "session_id": "eval:be124426d705445d80961775a2165f8a:nsu-pre-partner-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (СберЛаб-НГУ, ШИФТ НГУ-ЦФТ, PGLab НГУ-Postgres Professional) и вместо фактического ответа даёт общее перенаправление, что нарушает ограничение поведения «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 13.345,
+      "memory_before": {
+        "memory.current": 191086592,
+        "memory.peak": 191365120,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1241808,
+        "process_maxrss_kib": 217956
+      },
+      "memory_after": {
+        "memory.current": 284131328,
+        "memory.peak": 284135424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142228,
+        "process_maxrss_kib": 311724
+      }
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "question": "ТИПИ разрабатывали вместе с IT-компаниями? Кто участвовал?",
+      "session_id": "eval:5f07b5d7d3a14f029f0b80d63c812597:nsu-pre-partner-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит требуемых фактов (ЦФТ, СКБ Контур, ДубльГИС и др.) и фактически отказывается отвечать, хотя эталонный ответ доступен. Это противоречит критерию «не заменять доступный фактический ответ общим перенаправлением» и не выполняет обязательные факты.",
+      "elapsed_seconds": 9.785,
+      "memory_before": {
+        "memory.current": 284119040,
+        "memory.peak": 284135424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142228,
+        "process_maxrss_kib": 311724
+      },
+      "memory_after": {
+        "memory.current": 284332032,
+        "memory.peak": 284348416,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140832,
+        "process_maxrss_kib": 311852
+      }
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "question": "Какие языки программирования изучают на ПИиКН?",
+      "session_id": "eval:77ef4fd03b744bf0afb3ce8f950f2c9e:nsu-pre-lang-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «C++, Java, C# и Python» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 9.416,
+      "memory_before": {
+        "memory.current": 284311552,
+        "memory.peak": 284348416,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140832,
+        "process_maxrss_kib": 311852
+      },
+      "memory_after": {
+        "memory.current": 284565504,
+        "memory.peak": 284594176,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146488,
+        "process_maxrss_kib": 312108
+      }
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "question": "Какие технологии изучают на курсе по C# на ФИТ?",
+      "session_id": "eval:de2c3e5330324b6899b6e92a84dddead:nsu-pre-lang-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов (язык C# и платформа .NET) и вместо доступного фактического ответа даёт общее перенаправление, что нарушает критерий. Эталону не соответствует.",
+      "elapsed_seconds": 8.371,
+      "memory_before": {
+        "memory.current": 284561408,
+        "memory.peak": 284594176,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146572,
+        "process_maxrss_kib": 312108
+      },
+      "memory_after": {
+        "memory.current": 284536832,
+        "memory.peak": 284778496,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144836,
+        "process_maxrss_kib": 312236
+      }
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "question": "На ФИТ есть курс по оптимизации программ? На каком языке там работают?",
+      "session_id": "eval:15b3b0baa8814cb186386cf27025690b:nsu-pre-lang-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов (наличие курса оптимизации производительности программ и язык Java), а вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 9.285,
+      "memory_before": {
+        "memory.current": 284762112,
+        "memory.peak": 284778496,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144840,
+        "process_maxrss_kib": 312236
+      },
+      "memory_after": {
+        "memory.current": 284938240,
+        "memory.peak": 284971008,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143116,
+        "process_maxrss_kib": 312364
+      }
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "question": "На ФИТ учат разработке мобильных приложений? Под какие платформы?",
+      "session_id": "eval:d70c203e2e354823aba2881f24e45035:nsu-pre-lang-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов («есть курс мобильной разработки», «Android») и заменяет доступный фактический ответ общим отказом, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 8.802,
+      "memory_before": {
+        "memory.current": 284966912,
+        "memory.peak": 284971008,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143116,
+        "process_maxrss_kib": 312364
+      },
+      "memory_after": {
+        "memory.current": 284995584,
+        "memory.peak": 285016064,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144176,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "question": "Что изучают на прикладной математике и информатике ММФ и для каких задач это нужно?",
+      "session_id": "eval:776a72c82bfd44d29d4b525ad73c9fca:nsu-pre-compare-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта из эталона (математические и вычислительные методы, применение к научным и индустриальным задачам, важность предметной области) и вместо ответа даёт общий отказ-перенаправление, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 4.914,
+      "memory_before": {
+        "memory.current": 284962816,
+        "memory.peak": 285016064,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144184,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 284831744,
+        "memory.peak": 285093888,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142436,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "question": "Как называется направление мехатроники в ИИР и какой у него код?",
+      "session_id": "eval:2cedba68b8284ec09085ebe6881a1a6b:nsu-pre-compare-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (15.03.06 и «Мехатроника и робототехника»), вместо ответа — отказ со ссылкой на базу знаний, что противоречит эталону и критерию полноты.",
+      "elapsed_seconds": 6.032,
+      "memory_before": {
+        "memory.current": 285052928,
+        "memory.peak": 285093888,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142436,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 285081600,
+        "memory.peak": 285122560,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1141940,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "question": "Сравни ФИТ и ФФ: куда мне лучше идти? Программы я ещё не выбрал.",
+      "session_id": "eval:3f703098fe774a60b1503706493036ca:nsu-pre-compare-03",
+      "passed": true,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nМогу помочь с конкретикой: назовите интересующие направления или уровень образования (бакалавриат/специалитет) — и я проверю, что есть в базе знаний.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ корректно не выбирает за абитуриента и просит уточнить программы/направления, что соответствует эталону. Однако он не уточняет критерии сравнения и формулировка об отсутствии информации в базе может быть нерелевантной, но критерий отказа не нарушен.",
+      "elapsed_seconds": 6.318,
+      "memory_before": {
+        "memory.current": 285057024,
+        "memory.peak": 285122560,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1141944,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 285052928,
+        "memory.peak": 285143040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140988,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "question": "Хочу заниматься программированием. Как выбрать между ПИиКН и КНиС на ФИТ?",
+      "session_id": "eval:20dd283112f24a8eb77bd9002bc48655:nsu-pre-compare-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ моём контексте нет данных ни о факультете ФИТ, ни о направлениях ПИиКН и КНиС, поэтому подсказать, чем они отличаются, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ и не выполняет критерий: не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не помогает сравнить варианты. Хотя он не выдумывает различия программ, этого недостаточно, так как критерий прямо указывает, что простой отказ выбирать недостаточен.",
+      "elapsed_seconds": 6.63,
+      "memory_before": {
+        "memory.current": 285073408,
+        "memory.peak": 285143040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140988,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 285130752,
+        "memory.peak": 285143040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143244,
+        "process_maxrss_kib": 312492
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно и полно воспроизводит обязательный факт из эталона: код 09.03.01 и название «Информатика и вычислительная техника». Нарушений ограничений поведения нет.",
+      "elapsed_seconds": 2.575
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает критерий «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и нарушение критерия отказа → 1.",
+      "elapsed_seconds": 1.647
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 1.364
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не помогает сравнить варианты. Критерий выбора между программами не выполнен.",
+      "elapsed_seconds": 1.639
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 183853056,
+      "memory.peak": 183857152,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1247584,
+      "process_maxrss_kib": 210064
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 191094784,
+      "memory.peak": 191365120,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1241808,
+      "process_maxrss_kib": 217956
+    },
+    {
+      "phase": "nsu-pre-partner-01",
+      "memory.current": 191086592,
+      "memory.peak": 191365120,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1241808,
+      "process_maxrss_kib": 217956
+    },
+    {
+      "phase": "nsu-pre-partner-02",
+      "memory.current": 284119040,
+      "memory.peak": 284135424,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1142228,
+      "process_maxrss_kib": 311724
+    },
+    {
+      "phase": "nsu-pre-lang-01",
+      "memory.current": 284311552,
+      "memory.peak": 284348416,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1140832,
+      "process_maxrss_kib": 311852
+    },
+    {
+      "phase": "nsu-pre-lang-02",
+      "memory.current": 284561408,
+      "memory.peak": 284594176,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1146572,
+      "process_maxrss_kib": 312108
+    },
+    {
+      "phase": "nsu-pre-lang-03",
+      "memory.current": 284762112,
+      "memory.peak": 284778496,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1144840,
+      "process_maxrss_kib": 312236
+    },
+    {
+      "phase": "nsu-pre-lang-04",
+      "memory.current": 284966912,
+      "memory.peak": 284971008,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1143116,
+      "process_maxrss_kib": 312364
+    },
+    {
+      "phase": "nsu-pre-compare-01",
+      "memory.current": 284962816,
+      "memory.peak": 285016064,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1144184,
+      "process_maxrss_kib": 312492
+    },
+    {
+      "phase": "nsu-pre-compare-02",
+      "memory.current": 285052928,
+      "memory.peak": 285093888,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1142436,
+      "process_maxrss_kib": 312492
+    },
+    {
+      "phase": "nsu-pre-compare-03",
+      "memory.current": 285057024,
+      "memory.peak": 285122560,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1141944,
+      "process_maxrss_kib": 312492
+    },
+    {
+      "phase": "nsu-pre-compare-04",
+      "memory.current": 285073408,
+      "memory.peak": 285143040,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1140988,
+      "process_maxrss_kib": 312492
+    },
+    {
+      "phase": "finished",
+      "memory.current": 284786688,
+      "memory.peak": 285143040,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1146608,
+      "process_maxrss_kib": 312620
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": true,
+  "peak_sampled_swap_bytes": 0,
+  "min_host_available_kib": 1138920,
+  "batch_index": 1,
+  "run_id": "full-20261110-02",
+  "root_run_id": "6e0e01c950a044a994b4a8e8a50daf13",
+  "inspect_only": false,
+  "latest_memory": {
+    "memory.current": 284786688,
+    "memory.peak": 285143040,
+    "memory.swap.current": 0,
+    "memory.events": {
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 1146608,
+    "process_maxrss_kib": 312620
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "8f850a11c8be0d415fef0f95b30dcf5aa495c3f4b038a88a29e81754ef46c763",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 0,
+      "content_proposal": 0,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 60
+    },
+    "documents": [],
+    "graph_documents": 0,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 116,
+    "attempts_finished": 116,
+    "operation_counts": {
+      "generation": 64,
+      "oauth": 1,
+      "embedding": 51
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 1896782,
+    "reserved_peak_no_cache_micro_cny": 126842,
+    "embedding_input_bytes": 11806
+  },
+  "finished_at_utc": "2026-11-10T15:01:51.820659+00:00",
+  "unexecuted_ids": []
+}

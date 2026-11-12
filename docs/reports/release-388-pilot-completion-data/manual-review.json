@@ -1,0 +1,167 @@
+{
+  "review_type": "assistant_source_and_criteria_check",
+  "human_approval": false,
+  "raw_judge_results_changed": false,
+  "records": [
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-flow-01",
+      "judge_score": 2,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Назван только ТИПИ, КНиС и ПИиКН пропущены."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-scholar-01",
+      "judge_score": 5,
+      "judge_passed": true,
+      "manual_status": "needs_review",
+      "note": "Обязательный ответ о NSU+ дан, но формулировка «стипендии ... в том числе NSU+» расширяет частное правило на все стипендии. Источник относится к специальной программе. Автоматический зачёт сохранён, требуется оценка границы утверждения."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-01",
+      "judge_score": 5,
+      "judge_passed": true,
+      "manual_status": "pass",
+      "note": "Все три обязательных положения есть, выбора за человека нет."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-02",
+      "judge_score": 5,
+      "judge_passed": true,
+      "manual_status": "pass",
+      "note": "Код и название верны. Упоминание ИИ есть на сохранённой странице программы."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-dorm-03",
+      "judge_score": 4,
+      "judge_passed": true,
+      "manual_status": "pass",
+      "note": "Обязательные шаги есть. Фото и ключи подтверждаются общей инструкцией, 400 рублей и срок оплаты - страницей ФИТ из девяти источников. Дополнительные сведения не отсутствуют в источниках лишь потому, что отсутствуют в кратком эталоне."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-building-03",
+      "judge_score": 5,
+      "judge_passed": true,
+      "manual_status": "pass",
+      "note": "Адрес и дополнительные часы/документы подтверждены шагом 6 сохранённой инструкции."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-steps-01",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Вместо 300 000 рублей за год приведены 205 000 и отказ подтвердить нужное направление."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-general-02",
+      "judge_score": 3,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Не указана страница приёма в бакалавриат, ответ заменён перенаправлением."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-04",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Отказ без уточнения интересов и предложения сравнить планы/проекты."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-chance-01",
+      "judge_score": 2,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Нет объяснения ограничений оценки по одним баллам и полезных шагов проверки конкурса."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-flow-01",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-scholar-01",
+      "judge_score": 2,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-01",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-02",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-dorm-03",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-building-03",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-steps-01",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-general-02",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-04",
+      "judge_score": 1,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Обязательные факты или полезные шаги отсутствуют. Это ожидаемо для документных вопросов без базы, но два специальных случая также не выполнены."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-chance-01",
+      "judge_score": 3,
+      "judge_passed": false,
+      "manual_status": "fail",
+      "note": "Программа уточняется, но отсутствуют объяснение ограничений оценки и проверка списков/условий конкурса. Неполный ответ, автоматический неуспех обоснован."
+    }
+  ]
+}

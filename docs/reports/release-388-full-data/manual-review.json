@@ -1,0 +1,808 @@
+{
+  "review_kind": "additional_source_and_criteria_check",
+  "human_approval": false,
+  "raw_scores_changed": false,
+  "critical_absence_confirmed": false,
+  "records": [
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-flow-01",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-flow-02",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-flow-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-flow-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-scholar-01",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-scholar-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-scholar-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Факты названы, затем отрицается наличие сведений именно о NSU+."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-dorm-01",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-dorm-02",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-dorm-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-partner-01",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-partner-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-lang-01",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-lang-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-lang-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Курс и Java названы, но принадлежность ФИТ не подтверждается самим ответом."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-lang-04",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Android назван, затем ответ отказывается подтвердить курсы ФИТ."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-01",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Уточняются программы, критерии выбора не уточняются. Судья зачёл в обоих условиях."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-compare-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-special-01",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-special-02",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Срок практики указан, но программа ТИПИ объявлена неизвестной."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-special-03",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-chance-01",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-chance-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-chance-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-building-01",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-building-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-building-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-general-01",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "critical_review_required",
+      "note": "Правильный основной набор дополнен неподтверждёнными собеседованием/портфолио для ФИТ. В девяти снимках такие испытания найдены на странице ММФ, а не ФИТ."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-general-02",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-pre-general-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-dorm-01",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-dorm-02",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-dorm-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-dorm-04",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-arrival-01",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-arrival-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-arrival-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-docs-01",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-docs-02",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-post-docs-03",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-contact-01",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-contact-02",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-contact-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Назван сайт НГУ без нужного раздела. Судья пишет о выдуманном факте, но выставляет проходной балл. Упомянутая оплата картами есть в источнике."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-steps-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "critical_review_required",
+      "note": "Вместо 300000 рублей за год приведены205000 с оговоркой. Сумма102500 за семестр в источниках относится к мехатронике."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-steps-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "critical_review_required",
+      "note": "Для ПИиКН/ФИТ приведены102500 вместо150000 рублей за семестр. Нельзя переносить цену другого направления."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-steps-03",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-steps-04",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "with-kb",
+      "case_id": "nsu-paid-steps-05",
+      "judge_score": 5,
+      "automatic_passed": true,
+      "manual_status": "consistent_with_reference",
+      "note": "Обязательные факты/действия присутствуют. Дополнительные сведения сопоставлены с сохранёнными источниками при их наличии."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-flow-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-flow-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-flow-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-flow-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-scholar-01",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-scholar-02",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-scholar-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-dorm-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-dorm-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-dorm-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-partner-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-partner-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-lang-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-lang-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-lang-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-lang-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-03",
+      "judge_score": 4,
+      "automatic_passed": true,
+      "manual_status": "needs_review",
+      "note": "Проходной балл за уточнение программы без критериев сравнения, нужен пересмотр оценки."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-compare-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-special-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-special-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-special-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-chance-01",
+      "judge_score": 2,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-chance-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-chance-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-building-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-building-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-building-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-general-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-general-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-pre-general-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-dorm-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-dorm-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-dorm-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-dorm-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-arrival-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-arrival-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-arrival-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-docs-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-docs-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-post-docs-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-contact-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-contact-02",
+      "judge_score": null,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-contact-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-steps-01",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-steps-02",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-steps-03",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-steps-04",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    },
+    {
+      "condition": "empty-kb",
+      "case_id": "nsu-paid-steps-05",
+      "judge_score": 1,
+      "automatic_passed": false,
+      "manual_status": "failure_matches_reference",
+      "note": "Обязательные факты/действия отсутствуют. Исходный неуспех сохранён."
+    }
+  ]
+}

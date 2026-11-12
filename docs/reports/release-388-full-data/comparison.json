@@ -1,0 +1,21 @@
+{
+  "groups": {
+    "document": {
+      "total": 45,
+      "with_kb_pass_rate": 0.7777777777777778,
+      "empty_kb_pass_rate": 0.0,
+      "delta": 0.7777777777777778,
+      "missing_with_kb": [],
+      "missing_empty_kb": []
+    },
+    "special": {
+      "total": 5,
+      "with_kb_pass_rate": 0.4,
+      "empty_kb_pass_rate": 0.2,
+      "delta": 0.2,
+      "missing_with_kb": [],
+      "missing_empty_kb": []
+    }
+  },
+  "acceptance": "pending agreed thresholds and human review"
+}

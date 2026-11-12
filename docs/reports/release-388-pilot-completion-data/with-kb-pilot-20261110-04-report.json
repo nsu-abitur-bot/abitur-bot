@@ -1,0 +1,760 @@
+{
+  "schema_version": 1,
+  "mode": "live_pilot",
+  "status": "completed",
+  "condition": "with-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "6bfebb1793e5790ca85a831bc1b9e21cbd60d5c9719fba486b403ab9f3003540",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T13:35:07.733054+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-flow-01",
+    "nsu-pre-scholar-01",
+    "nsu-pre-compare-01",
+    "nsu-pre-compare-02",
+    "nsu-post-dorm-03",
+    "nsu-pre-building-03",
+    "nsu-paid-steps-01",
+    "nsu-pre-general-02",
+    "nsu-pre-compare-04",
+    "nsu-pre-chance-01"
+  ],
+  "results": [
+    {
+      "id": "nsu-pre-flow-01",
+      "question": "Какие профили бакалавриата есть на ФИТ?",
+      "session_id": "eval:5d2bdfde0a0a4d8b8a15b673efc5d1b7:nsu-pre-flow-01",
+      "passed": false,
+      "answer": "В моей базе знаний есть информация только об одном профиле бакалавриата Факультета информационных технологий НГУ — «Технологии индустриальной программной инженерии» (направление 09.03.01 «Информатика и вычислительная техника»).\n\nПолный перечень профилей бакалавриата ФИТ я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит только один из трёх требуемых профилей (ТИПИ) и заявляет об отсутствии информации об остальных, тогда как эталон требует перечислить КНиС, ПИиКН и ТИПИ. Большая часть требуемой информации отсутствует, что соответствует существенной ошибке/пропуску.",
+      "elapsed_seconds": 15.797,
+      "memory_before": {
+        "memory.current": 211046400,
+        "memory.peak": 211320832,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1269256,
+        "process_maxrss_kib": 219124
+      },
+      "memory_after": {
+        "memory.current": 461058048,
+        "memory.peak": 509698048,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1076224,
+        "process_maxrss_kib": 497036
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "question": "Я поступаю по целевому договору. Могу получать NSU+ в 2026 году?",
+      "session_id": "eval:efa522b39fcc4df28c82091d3a9ffd03:nsu-pre-scholar-01",
+      "passed": true,
+      "answer": "Согласно правилам НГУ, стипендии не назначаются студентам, обучающимся по договорам о целевом обучении. Поэтому при поступлении по целевому договору стипендия (в том числе NSU+) вам не положена.\n\nЕсли у вас есть другие вопросы по поступлению — спрашивайте.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно соответствует эталону: указано, что NSU+ не назначается обучающимся по договорам целевого обучения. Обязательный факт присутствует, выдуманных сведений или переноса условий нет, ответ не заменён общим перенаправлением.",
+      "elapsed_seconds": 14.045,
+      "memory_before": {
+        "memory.current": 460410880,
+        "memory.peak": 509698048,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1076224,
+        "process_maxrss_kib": 497036
+      },
+      "memory_after": {
+        "memory.current": 463564800,
+        "memory.peak": 512806912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1077016,
+        "process_maxrss_kib": 497036
+      }
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "question": "Что изучают на прикладной математике и информатике ММФ и для каких задач это нужно?",
+      "session_id": "eval:536d5d0374d4468db8b8d3ce3966538d:nsu-pre-compare-01",
+      "passed": true,
+      "answer": "На направлении <b>«Прикладная математика и информатика»</b> (ММФ) студенты осваивают применение вычислительных, статистических и иных математических методов для решения научных и индустриальных задач, а также разработку программного обеспечения самого разного рода.\n\nКлючевая особенность направления — важность предметной области: прикладная математика и информатика являются неотъемлемой частью многих индустрий.\n\nВыпускники разбираются в том, как применять математические и вычислительные методы при решении задач в науке и промышленности, и разрабатывают ПО для этих целей.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: математические и вычислительные методы, применение к научным и индустриальным задачам, важность предметной области. Нет выдуманных сведений или гарантий, нет переноса условий, нет общего перенаправления, нет оценочных суждений о факультете. Ответ корректен и полон.",
+      "elapsed_seconds": 10.911,
+      "memory_before": {
+        "memory.current": 463020032,
+        "memory.peak": 512806912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1076768,
+        "process_maxrss_kib": 497036
+      },
+      "memory_after": {
+        "memory.current": 561004544,
+        "memory.peak": 666116096,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959808,
+        "process_maxrss_kib": 606264
+      }
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "question": "Как называется направление мехатроники в ИИР и какой у него код?",
+      "session_id": "eval:1ac5159e4e4e4935a1560c0c230128b0:nsu-pre-compare-02",
+      "passed": true,
+      "answer": "Направление в Институте интеллектуальной робототехники (ИИР НГУ) называется <b>«Мехатроника и робототехника»</b>, код — <b>15.03.06</b>. Это программа бакалавриата, ориентированная на искусственный интеллект.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит оба обязательных факта — код 15.03.06 и название «Мехатроника и робототехника», — соответствующие эталону. Дополнительное уточнение о программе бакалавриата не противоречит эталону и не является выдуманным фактом в контексте рубрики.",
+      "elapsed_seconds": 15.884,
+      "memory_before": {
+        "memory.current": 560758784,
+        "memory.peak": 666116096,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959808,
+        "process_maxrss_kib": 606264
+      },
+      "memory_after": {
+        "memory.current": 527933440,
+        "memory.peak": 671088640,
+        "memory.swap.current": 5545984,
+        "memory.events": {
+          "max": 428,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 984720,
+        "process_maxrss_kib": 650640
+      }
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. Все документы оформлены. Как получить пропуск в общежитие?",
+      "session_id": "eval:3eb86ccaa77742828eb94d78e703374f:nsu-post-dorm-03",
+      "passed": true,
+      "answer": "Чтобы получить пропуск и ключи, нужно сдать заведующему вашего общежития:\n\n<b>• направление с 2 печатями;\n• чек об оплате;\n• 2 фотографии 3×4.</b>\n\nПосле этого вы получаете пропуск и ключи — на этом заселение завершено.\n\nНапомню: оплату нужно произвести до 1 сентября (как абитуриенту — из расчёта 400 рублей в сутки за койко-место), а вторую печать в направлении ставят в паспортном столе НГУ при оформлении временной регистрации.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты: обращение к заведующему общежитием, передачу направления с двумя печатями и чека об оплате, получение пропуска после передачи документов. Однако добавлены не подтверждённые эталоном детали (2 фотографии 3×4, ключи, срок оплаты до 1 сентября, стоимость 400 рублей в сутки, вторая печать в паспортном столе), что является небольшим выходом за рамки эталона, но не противоречит ему напрямую.",
+      "elapsed_seconds": 11.027,
+      "memory_before": {
+        "memory.current": 527204352,
+        "memory.peak": 671088640,
+        "memory.swap.current": 5545984,
+        "memory.events": {
+          "max": 428,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 984720,
+        "process_maxrss_kib": 650640
+      },
+      "memory_after": {
+        "memory.current": 549793792,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14548992,
+        "memory.events": {
+          "max": 748,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 942608,
+        "process_maxrss_kib": 650640
+      }
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "question": "Где находится паспортный стол НГУ для оформления регистрации в общежитии в 2026 году?",
+      "session_id": "eval:e3376207007842729a46ba80d8d459d9:nsu-pre-building-03",
+      "passed": true,
+      "answer": "Паспортный стол НГУ находится по адресу: <b>ул. Пирогова, 4/1, Общежитие № 3</b>.\n\nЧасы приёма:\n• понедельник, вторник, четверг: с 9.00 до 17.00\n• среда — неприёмный день (работа с документами)\n• пятница: с 9.00 до 16.00\n• обед: с 13.00 до 14.00\n• суббота, воскресенье — выходной\n\nДля оформления временной регистрации нужно сдать: договор найма и его копию, заявление о временной регистрации, паспорт, а мужчинам — ещё и военный билет.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно указывает обязательный факт: «ул. Пирогова, 4/1, Общежитие № 3». Дополнительные сведения о часах приёма и документах не противоречат эталону и не нарушают ограничений; ответ корректен и полон.",
+      "elapsed_seconds": 11.994,
+      "memory_before": {
+        "memory.current": 549867520,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14548992,
+        "memory.events": {
+          "max": 748,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 943056,
+        "process_maxrss_kib": 650640
+      },
+      "memory_after": {
+        "memory.current": 588038144,
+        "memory.peak": 671088640,
+        "memory.swap.current": 11886592,
+        "memory.events": {
+          "max": 1081,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 877304,
+        "process_maxrss_kib": 668716
+      }
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "question": "Сколько стоит год обучения по 09.03.01 в НГУ в 2026/27?",
+      "session_id": "eval:69927f531e924eab80d8ba4663fb1317:nsu-paid-steps-01",
+      "passed": false,
+      "answer": "В базе знаний Ваш вуз есть стоимость обучения — <b>102 500 руб. в семестр</b>, то есть около <b>205 000 руб. за год</b>. Однако в контексте не указано, к какому именно направлению (коду 09.03.01) относится эта сумма, поэтому подтвердить стоимость именно по 09.03.01 я не могу.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз.\n\nУточнить стоимость по конкретному направлению можно в приёмной комиссии: +7 (383) 373-96-52 (пн-пт 10:00-18:00, обед 13:00-14:00; сб 10:00-13:00, время по НСК).",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ противоречит эталону: вместо обязательного факта «300 000 рублей за год» указана другая сумма (102 500 руб. в семестр / около 205 000 руб. за год) и заявлено, что подтвердить стоимость по 09.03.01 невозможно. Обязательный факт отсутствует, фактически приведены неверные сведения.",
+      "elapsed_seconds": 13.452,
+      "memory_before": {
+        "memory.current": 587956224,
+        "memory.peak": 671088640,
+        "memory.swap.current": 11886592,
+        "memory.events": {
+          "max": 1081,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 886180,
+        "process_maxrss_kib": 668716
+      },
+      "memory_after": {
+        "memory.current": 580939776,
+        "memory.peak": 671088640,
+        "memory.swap.current": 11767808,
+        "memory.events": {
+          "max": 1426,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 913336,
+        "process_maxrss_kib": 678040
+      }
+    },
+    {
+      "id": "nsu-pre-general-02",
+      "question": "Где найти образец договора на платное обучение в бакалавриате НГУ?",
+      "session_id": "eval:df41ad087cec4b34bfe4407776499393:nsu-pre-general-02",
+      "passed": false,
+      "answer": "В базе знаний НГУ указано, что образцы договоров об оказании платных образовательных услуг (в том числе приказы о стоимости обучения) размещены на сайте НГУ. Также упоминается, что оплатить обучение без комиссии можно на сайте НГУ.\n\nТочной прямой ссылки на страницу с образцом договора в базе знаний нет. За уточнением можно обратиться в приёмную комиссию:\n<b>Тел.:</b> +7 (383) 363-40-37\n<b>E-mail:</b> priem@nsu.ru",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 3,
+      "judge_reasoning": "Ответ частично верен: упоминает образцы договоров об оказании платных образовательных услуг на сайте НГУ, но не указывает обязательный факт — страницу приёма в бакалавриат НГУ, и вместо этого перенаправляет в приёмную комиссию. Существенный пропуск ключевого места размещения образца.",
+      "elapsed_seconds": 11.416,
+      "memory_before": {
+        "memory.current": 498409472,
+        "memory.peak": 671088640,
+        "memory.swap.current": 11767808,
+        "memory.events": {
+          "max": 1426,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 974852,
+        "process_maxrss_kib": 678040
+      },
+      "memory_after": {
+        "memory.current": 547434496,
+        "memory.peak": 671088640,
+        "memory.swap.current": 11665408,
+        "memory.events": {
+          "max": 1530,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 953144,
+        "process_maxrss_kib": 678040
+      }
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "question": "Хочу заниматься программированием. Как выбрать между ПИиКН и КНиС на ФИТ?",
+      "session_id": "eval:60288f89d69c4525be3b60103f71d51a:nsu-pre-compare-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ моём контексте нет данных ни о факультете ФИТ, ни о направлениях «ПИиКН» и «КНиС», поэтому подсказать, чем они отличаются, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ: сообщает об отсутствии данных и не предлагает никаких шагов выбора (уточнение интересов, сопоставление учебных планов и проектов). Критерий прямо указывает, что простой отказ недостаточен, поэтому ответ не соответствует эталону.",
+      "elapsed_seconds": 12.751,
+      "memory_before": {
+        "memory.current": 547430400,
+        "memory.peak": 671088640,
+        "memory.swap.current": 11657216,
+        "memory.events": {
+          "max": 1530,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 953144,
+        "process_maxrss_kib": 678040
+      },
+      "memory_after": {
+        "memory.current": 583770112,
+        "memory.peak": 671088640,
+        "memory.swap.current": 49451008,
+        "memory.events": {
+          "max": 1734,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 927968,
+        "process_maxrss_kib": 678040
+      }
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "question": "У меня 280 баллов. Какие шансы пройти на бюджет ФИТ?",
+      "session_id": "eval:74432c5c115445cbbbd8a8b6deba2ca3:nsu-pre-chance-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nДанных о проходных баллах на бюджет по ФИТ у меня нет, поэтому оценить шансы с 280 баллами я не могу.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит простой отказ без помощи: не объясняет, что одних баллов недостаточно, не уточняет программу и кампанию, не предлагает проверить текущие списки и условия конкурса. Хотя он корректно не выдумывает вероятность зачисления, большая часть требуемой информации и полезных шагов отсутствует.",
+      "elapsed_seconds": 17.537,
+      "memory_before": {
+        "memory.current": 583716864,
+        "memory.peak": 671088640,
+        "memory.swap.current": 49451008,
+        "memory.events": {
+          "max": 1734,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 928004,
+        "process_maxrss_kib": 678040
+      },
+      "memory_after": {
+        "memory.current": 603975680,
+        "memory.peak": 671088640,
+        "memory.swap.current": 53727232,
+        "memory.events": {
+          "max": 1767,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 957844,
+        "process_maxrss_kib": 678040
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно и полностью совпадает с эталоном: указан код 09.03.01 и название «Информатика и вычислительная техника». Все обязательные факты присутствуют, выдуманных сведений нет.",
+      "elapsed_seconds": 2.399
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает ограничения «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и нарушение критерия отказа/ограничений — оценка 1.",
+      "elapsed_seconds": 1.469
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 1.416
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не оставляет выбор абитуриенту. Критерий не выполнен.",
+      "elapsed_seconds": 1.324
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 201220096,
+      "memory.peak": 201596928,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1301156,
+      "process_maxrss_kib": 211240
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 211058688,
+      "memory.peak": 211320832,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1269256,
+      "process_maxrss_kib": 219124
+    },
+    {
+      "phase": "nsu-pre-flow-01",
+      "memory.current": 211046400,
+      "memory.peak": 211320832,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1269256,
+      "process_maxrss_kib": 219124
+    },
+    {
+      "phase": "nsu-pre-scholar-01",
+      "memory.current": 460410880,
+      "memory.peak": 509698048,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1076224,
+      "process_maxrss_kib": 497036
+    },
+    {
+      "phase": "nsu-pre-compare-01",
+      "memory.current": 463020032,
+      "memory.peak": 512806912,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1076768,
+      "process_maxrss_kib": 497036
+    },
+    {
+      "phase": "nsu-pre-compare-02",
+      "memory.current": 560758784,
+      "memory.peak": 666116096,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 959808,
+      "process_maxrss_kib": 606264
+    },
+    {
+      "phase": "nsu-post-dorm-03",
+      "memory.current": 527204352,
+      "memory.peak": 671088640,
+      "memory.swap.current": 5545984,
+      "memory.events": {
+        "max": 428,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 984720,
+      "process_maxrss_kib": 650640
+    },
+    {
+      "phase": "nsu-pre-building-03",
+      "memory.current": 549867520,
+      "memory.peak": 671088640,
+      "memory.swap.current": 14548992,
+      "memory.events": {
+        "max": 748,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 943056,
+      "process_maxrss_kib": 650640
+    },
+    {
+      "phase": "nsu-paid-steps-01",
+      "memory.current": 587956224,
+      "memory.peak": 671088640,
+      "memory.swap.current": 11886592,
+      "memory.events": {
+        "max": 1081,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 886180,
+      "process_maxrss_kib": 668716
+    },
+    {
+      "phase": "nsu-pre-general-02",
+      "memory.current": 498409472,
+      "memory.peak": 671088640,
+      "memory.swap.current": 11767808,
+      "memory.events": {
+        "max": 1426,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 974852,
+      "process_maxrss_kib": 678040
+    },
+    {
+      "phase": "nsu-pre-compare-04",
+      "memory.current": 547430400,
+      "memory.peak": 671088640,
+      "memory.swap.current": 11657216,
+      "memory.events": {
+        "max": 1530,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 953144,
+      "process_maxrss_kib": 678040
+    },
+    {
+      "phase": "nsu-pre-chance-01",
+      "memory.current": 583716864,
+      "memory.peak": 671088640,
+      "memory.swap.current": 49451008,
+      "memory.events": {
+        "max": 1734,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 928004,
+      "process_maxrss_kib": 678040
+    },
+    {
+      "phase": "finished",
+      "memory.current": 522428416,
+      "memory.peak": 671088640,
+      "memory.swap.current": 53727232,
+      "memory.events": {
+        "max": 1767,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 998756,
+      "process_maxrss_kib": 678040
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": false,
+  "peak_sampled_swap_bytes": 53776384,
+  "min_host_available_kib": 858232,
+  "inspect_only": false,
+  "root_run_id": "f4b8b9ff65ac4c59bd6692df4d40d0d6",
+  "latest_memory": {
+    "memory.current": 522428416,
+    "memory.peak": 671088640,
+    "memory.swap.current": 53727232,
+    "memory.events": {
+      "max": 1767,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 998756,
+    "process_maxrss_kib": 678040
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "edfa7cac2ceebe9aa010dc65f3801a0a153451df0cf25cac87dc0f90af88157f",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 9,
+      "content_proposal": 9,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 2
+    },
+    "documents": [
+      {
+        "id": "01a1b547-1029-7c3e-9577-554857174189",
+        "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+        "content_hash": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 09:24:02.205119",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      {
+        "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+        "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+        "source_url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+        "content_hash": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:15:30.079835",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+      },
+      {
+        "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+        "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+        "source_url": "https://education.nsu.ru/tipi",
+        "content_hash": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:18:30.589152",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+      },
+      {
+        "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+        "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+        "source_url": "https://education.nsu.ru/mechatronics/",
+        "content_hash": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:22:17.768391",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+      },
+      {
+        "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+        "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+        "content_hash": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:24:45.022448",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+      },
+      {
+        "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+        "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+        "source_url": "https://education.nsu.ru/mathematics/",
+        "content_hash": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 14:24:38.358039",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68"
+      },
+      {
+        "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+        "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+        "source_url": "https://www.nsu.ru/n/life/campus/check-in/",
+        "content_hash": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:00:30.770944",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c"
+      },
+      {
+        "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+        "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+        "source_url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+        "content_hash": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:18:23.481171",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b696-dfda-7e90-bea0-3a8f7914526a"
+      },
+      {
+        "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+        "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+        "source_url": "https://education.nsu.ru/information-technologies/",
+        "content_hash": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:29:57.749857",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7"
+      }
+    ],
+    "graph_documents": 9,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 252,
+    "attempts_finished": 252,
+    "operation_counts": {
+      "generation": 212,
+      "oauth": 1,
+      "embedding": 39
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 78108,
+    "reserved_peak_no_cache_micro_cny": 343076,
+    "embedding_input_bytes": 9371
+  },
+  "finished_at_utc": "2026-11-10T13:37:46.916540+00:00",
+  "unexecuted_ids": []
+}

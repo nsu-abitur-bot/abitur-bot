@@ -1,0 +1,20 @@
+{
+  "status": "recovered",
+  "source_id": "DOC-770b0c6ebb172dbe",
+  "document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+  "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+  "proposal_id": "01a1b62e-d58f-71db-b2a3-ba3fd47b12e2",
+  "completed_source_ids": [
+    "DOC-3d63df62af354868",
+    "DOC-03ae446000cfbc45",
+    "DOC-2338f0807b9bc328",
+    "DOC-317c53d5b5ae2baf",
+    "DOC-6674be71e05b972c",
+    "DOC-770b0c6ebb172dbe"
+  ],
+  "prior_usage_sha256": "3a1455fa7bd0239db33c246dbee504da8aa4f648853fc15b8529a3704dccd090",
+  "vector_repair_usage_sha256": "0bacf6ba22a9ad0ee89d65efe71fa32dcaaa6bbfcc1d00b2fd09e1090744a6df",
+  "graph_replay_usage_sha256": "063918375c8c5b0e5f6a431eaf8304bb81535f7586877411e47768685e332b9d",
+  "interruption_tail_uncertain": true,
+  "note": "Processed text, URL, chunks and vectors matched. SQL metadata was linked and authenticated API approval completed. No reindexing or provider calls."
+}

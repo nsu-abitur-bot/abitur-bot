@@ -1,0 +1,191 @@
+{
+  "mode": "completed_ten_case_pilot",
+  "full_run_started": false,
+  "conditions": {
+    "with-kb": {
+      "http_attempts": 252,
+      "deepseek_calls": 212,
+      "deepseek_prompt_tokens": 148994,
+      "deepseek_output_tokens": 5636,
+      "deepseek_cache_hit_tokens": 38391,
+      "gigachat_embedding_tokens": 1630,
+      "deepseek_cny_offpeak_cache": 0.13391482000000002,
+      "deepseek_cny_peak_cache": 0.26782964000000004,
+      "deepseek_cny_peak_no_cache": 0.343076,
+      "roles": {
+        "setup": {
+          "http_attempts": 0,
+          "deepseek_calls": 0,
+          "deepseek_prompt_tokens": 0,
+          "deepseek_output_tokens": 0,
+          "deepseek_cache_hit_tokens": 0,
+          "gigachat_embedding_tokens": 0,
+          "deepseek_cny_offpeak_cache": 0.0,
+          "deepseek_cny_peak_cache": 0.0,
+          "deepseek_cny_peak_no_cache": 0.0
+        },
+        "calibration": {
+          "http_attempts": 4,
+          "deepseek_calls": 4,
+          "deepseek_prompt_tokens": 1693,
+          "deepseek_output_tokens": 314,
+          "deepseek_cache_hit_tokens": 1024,
+          "gigachat_embedding_tokens": 0,
+          "deepseek_cny_offpeak_cache": 0.00194548,
+          "deepseek_cny_peak_cache": 0.00389096,
+          "deepseek_cny_peak_no_cache": 0.005898
+        },
+        "answer": {
+          "http_attempts": 238,
+          "deepseek_calls": 198,
+          "deepseek_prompt_tokens": 141967,
+          "deepseek_output_tokens": 4408,
+          "deepseek_cache_hit_tokens": 36855,
+          "gigachat_embedding_tokens": 1630,
+          "deepseek_cny_offpeak_cache": 0.12348110000000001,
+          "deepseek_cny_peak_cache": 0.24696220000000002,
+          "deepseek_cny_peak_no_cache": 0.319198
+        },
+        "judge": {
+          "http_attempts": 10,
+          "deepseek_calls": 10,
+          "deepseek_prompt_tokens": 5334,
+          "deepseek_output_tokens": 914,
+          "deepseek_cache_hit_tokens": 512,
+          "gigachat_embedding_tokens": 0,
+          "deepseek_cny_offpeak_cache": 0.00848824,
+          "deepseek_cny_peak_cache": 0.01697648,
+          "deepseek_cny_peak_no_cache": 0.01798
+        }
+      },
+      "document_passed": 5,
+      "document_total": 8,
+      "special_passed": 0,
+      "special_total": 2,
+      "calibration_passed": 4,
+      "case_latency_mean_seconds": 13.4814,
+      "case_latency_median_seconds": 13.1015,
+      "case_latency_max_seconds": 17.537,
+      "case_latency_sum_seconds": 134.814,
+      "wall_seconds": 159.183486,
+      "memory": {
+        "peak_mib": 640.0,
+        "peak_sampled_swap_mib": 51.28515625,
+        "min_host_available_mib": 838.1171875,
+        "oom": 0,
+        "oom_kill": 0,
+        "max_events": 1767
+      },
+      "streaming_calls": 14,
+      "stream_content_encodings": [
+        "zstd"
+      ]
+    },
+    "empty-kb": {
+      "http_attempts": 119,
+      "deepseek_calls": 67,
+      "deepseek_prompt_tokens": 51941,
+      "deepseek_output_tokens": 3732,
+      "deepseek_cache_hit_tokens": 39035,
+      "gigachat_embedding_tokens": 1918,
+      "deepseek_cny_offpeak_cache": 0.0286147,
+      "deepseek_cny_peak_cache": 0.0572294,
+      "deepseek_cny_peak_no_cache": 0.133738,
+      "roles": {
+        "setup": {
+          "http_attempts": 0,
+          "deepseek_calls": 0,
+          "deepseek_prompt_tokens": 0,
+          "deepseek_output_tokens": 0,
+          "deepseek_cache_hit_tokens": 0,
+          "gigachat_embedding_tokens": 0,
+          "deepseek_cny_offpeak_cache": 0.0,
+          "deepseek_cny_peak_cache": 0.0,
+          "deepseek_cny_peak_no_cache": 0.0
+        },
+        "calibration": {
+          "http_attempts": 4,
+          "deepseek_calls": 4,
+          "deepseek_prompt_tokens": 1693,
+          "deepseek_output_tokens": 302,
+          "deepseek_cache_hit_tokens": 1024,
+          "gigachat_embedding_tokens": 0,
+          "deepseek_cny_offpeak_cache": 0.00189748,
+          "deepseek_cny_peak_cache": 0.00379496,
+          "deepseek_cny_peak_no_cache": 0.005802
+        },
+        "answer": {
+          "http_attempts": 105,
+          "deepseek_calls": 53,
+          "deepseek_prompt_tokens": 45620,
+          "deepseek_output_tokens": 2621,
+          "deepseek_cache_hit_tokens": 35707,
+          "gigachat_embedding_tokens": 1918,
+          "deepseek_cny_offpeak_cache": 0.02111114,
+          "deepseek_cny_peak_cache": 0.04222228,
+          "deepseek_cny_peak_no_cache": 0.112208
+        },
+        "judge": {
+          "http_attempts": 10,
+          "deepseek_calls": 10,
+          "deepseek_prompt_tokens": 4628,
+          "deepseek_output_tokens": 809,
+          "deepseek_cache_hit_tokens": 2304,
+          "gigachat_embedding_tokens": 0,
+          "deepseek_cny_offpeak_cache": 0.00560608,
+          "deepseek_cny_peak_cache": 0.01121216,
+          "deepseek_cny_peak_no_cache": 0.015728
+        }
+      },
+      "document_passed": 0,
+      "document_total": 8,
+      "special_passed": 0,
+      "special_total": 2,
+      "calibration_passed": 4,
+      "case_latency_mean_seconds": 8.2873,
+      "case_latency_median_seconds": 7.8629999999999995,
+      "case_latency_max_seconds": 11.45,
+      "case_latency_sum_seconds": 82.873,
+      "wall_seconds": 106.769844,
+      "memory": {
+        "peak_mib": 322.06640625,
+        "peak_sampled_swap_mib": 0.0,
+        "min_host_available_mib": 1105.40625,
+        "oom": 0,
+        "oom_kill": 0,
+        "max_events": 0
+      },
+      "streaming_calls": 16,
+      "stream_content_encodings": [
+        "zstd"
+      ]
+    }
+  },
+  "forecast_method": "45/8 * observed document workload + 5/2 * special workload, plus calibration and setup once for each condition",
+  "forecast_50_plus_50": {
+    "http_attempts": 1799.875,
+    "deepseek_calls": 1338.625,
+    "deepseek_prompt_tokens": 972789.75,
+    "deepseek_output_tokens": 43846.0,
+    "deepseek_cache_hit_tokens": 362864.875,
+    "gigachat_embedding_tokens": 18029.375,
+    "deepseek_cny_offpeak_cache": 0.7925661725,
+    "deepseek_cny_peak_cache": 1.585132345,
+    "deepseek_cny_peak_no_cache": 2.2963475,
+    "deepseek_planning_budget_cny_2x_peak_no_cache": 4.592695,
+    "gigachat_planning_tokens_2x": 36059,
+    "sequential_workload_seconds": 1092.6260000000002
+  },
+  "pilot_totals": {
+    "http_attempts": 371,
+    "deepseek_calls": 279,
+    "deepseek_prompt_tokens": 200935,
+    "deepseek_output_tokens": 9368,
+    "deepseek_cache_hit_tokens": 77426,
+    "gigachat_embedding_tokens": 3548,
+    "deepseek_cny_offpeak_cache": 0.16252952,
+    "deepseek_cny_peak_cache": 0.32505904,
+    "deepseek_cny_peak_no_cache": 0.476814
+  },
+  "document_delta_pp": 62.5
+}

@@ -1,0 +1,2000 @@
+{
+  "schema_version": 1,
+  "mode": "live",
+  "condition": "with_kb",
+  "total": 50,
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "36ad40cb608f3c40f13c9490a1da376d460e0022216acc5203364fd91a709a6e",
+  "knowledge_manifest": {
+    "documents": [
+      {
+        "id": "01a1b547-1029-7c3e-9577-554857174189",
+        "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+        "content_hash": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 09:24:02.205119",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      {
+        "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+        "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+        "source_url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+        "content_hash": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:15:30.079835",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+      },
+      {
+        "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+        "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+        "source_url": "https://education.nsu.ru/tipi",
+        "content_hash": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:18:30.589152",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+      },
+      {
+        "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+        "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+        "source_url": "https://education.nsu.ru/mechatronics/",
+        "content_hash": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:22:17.768391",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+      },
+      {
+        "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+        "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+        "content_hash": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:24:45.022448",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+      },
+      {
+        "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+        "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+        "source_url": "https://education.nsu.ru/mathematics/",
+        "content_hash": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 14:24:38.358039",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68"
+      },
+      {
+        "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+        "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+        "source_url": "https://www.nsu.ru/n/life/campus/check-in/",
+        "content_hash": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:00:30.770944",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c"
+      },
+      {
+        "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+        "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+        "source_url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+        "content_hash": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:18:23.481171",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b696-dfda-7e90-bea0-3a8f7914526a"
+      },
+      {
+        "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+        "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+        "source_url": "https://education.nsu.ru/information-technologies/",
+        "content_hash": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:29:57.749857",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7"
+      }
+    ],
+    "graph_documents": 9,
+    "document_count": 9,
+    "proposal_count": 9,
+    "faq_count": 0
+  },
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "results": [
+    {
+      "id": "nsu-pre-flow-01",
+      "question": "Какие профили бакалавриата есть на ФИТ?",
+      "session_id": "eval:ca14c737d0d44139acd54f273e0b404a:nsu-pre-flow-01",
+      "passed": false,
+      "answer": "По базе знаний я могу подтвердить только один профиль бакалавриата Факультета информационных технологий НГУ — <b>«Технологии индустриальной программной инженерии»</b> (направление 09.03.01 «Информатика и вычислительная техника»).\n\nПолный перечень профилей бакалавриата ФИТ в моём контексте отсутствует, поэтому я не нашёл информации об этом в базе знаний Ваш вуз.\n\nЕсли хотите, расскажу подробнее о программе «Технологии индустриальной программной инженерии»: экзамены, партнёров-работодателей, форматы обучения.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит только один из трёх требуемых профилей (ТИПИ) и прямо заявляет об отсутствии полного перечня, тогда как эталон требует перечислить КНиС, ПИиКН и ТИПИ. Существенная часть требуемой информации отсутствует, критерий не выполнен.",
+      "elapsed_seconds": 13.954,
+      "memory_before": {
+        "memory.current": 191307776,
+        "memory.peak": 191336448,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1246788,
+        "process_maxrss_kib": 217836
+      },
+      "memory_after": {
+        "memory.current": 398823424,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1052432,
+        "process_maxrss_kib": 496000
+      }
+    },
+    {
+      "id": "nsu-pre-flow-02",
+      "question": "Какой код направления у ТИПИ и как оно называется?",
+      "session_id": "eval:b568f387f26748c5987ef9476607b82f:nsu-pre-flow-02",
+      "passed": false,
+      "answer": "Код направления — <b>09.03.01</b>, программа называется <b>«Технологии индустриальной программной инженерии»</b> (бакалавриат, очная форма).",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит верный код 09.03.01, но название направления указано неверно: вместо «Информатика и вычислительная техника» приведено название программы «Технологии индустриальной программной инженерии». Один из двух обязательных фактов искажён, что является существенной ошибкой.",
+      "elapsed_seconds": 8.043,
+      "memory_before": {
+        "memory.current": 398565376,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1052440,
+        "process_maxrss_kib": 496000
+      },
+      "memory_after": {
+        "memory.current": 402911232,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1065920,
+        "process_maxrss_kib": 496000
+      }
+    },
+    {
+      "id": "nsu-pre-flow-03",
+      "question": "Какие специализации есть на ТИПИ?",
+      "session_id": "eval:070d5afbe406451d8f3902718fd4e85a:nsu-pre-flow-03",
+      "passed": true,
+      "answer": "По контексту базы знаний, в рамках профиля «Технологии индустриальной программной инженерии» (направление 09.03.01 «Информатика и вычислительная техника», ФИТ НГУ) указаны следующие специализации (домены):\n\n<b>Разработчик системного программного обеспечения</b> и <b>Разработчик бизнес-приложений</b>.\n\nТакже указаны роли:\n• Опережающая роль — <b>Архитектор решений / Системный архитектор</b>\n• Дополнительная роль — <b>Менеджер проекта / программы</b>\n\nОсновная профессиональная роль — инженер-программист/разработчик.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных элемента эталона («Разработчик системного программного обеспечения» и «Разработчик бизнес-приложений»), эквивалентные формулировке «Разработка системного программного обеспечения и бизнес-приложений». Однако добавлены сведения о ролях (архитектор, менеджер проекта, инженер-программист) и привязка к ФИТ НГУ, которые не подтверждены переданным контекстом (контекст пуст), что является небольшим выходом за рамки подтверждённых данных. Критерий в целом выполнен, но есть неподтверждённые детали.",
+      "elapsed_seconds": 12.694,
+      "memory_before": {
+        "memory.current": 402063360,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1056196,
+        "process_maxrss_kib": 496000
+      },
+      "memory_after": {
+        "memory.current": 502161408,
+        "memory.peak": 608722944,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977560,
+        "process_maxrss_kib": 604592
+      }
+    },
+    {
+      "id": "nsu-pre-flow-04",
+      "question": "В чём особенность обучения на КНиС?",
+      "session_id": "eval:bd63c105c8234033a3970b9d5a1d3b49:nsu-pre-flow-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, полное название программы — так я смогу найти нужные сведения.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта о сочетании российской фундаментальной подготовки и британского подхода с практикой и постепенным усложнением материала, вместо этого заявляет об отсутствии информации и перенаправляет вопрос — это нарушает критерий «не заменять доступный фактический ответ общим перенаправлением» и не соответствует эталону.",
+      "elapsed_seconds": 12.153,
+      "memory_before": {
+        "memory.current": 502390784,
+        "memory.peak": 608722944,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977640,
+        "process_maxrss_kib": 604592
+      },
+      "memory_after": {
+        "memory.current": 525201408,
+        "memory.peak": 671088640,
+        "memory.swap.current": 10743808,
+        "memory.events": {
+          "max": 12,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964732,
+        "process_maxrss_kib": 649448
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "question": "Я поступаю по целевому договору. Могу получать NSU+ в 2026 году?",
+      "session_id": "eval:40ee7f6857bc4c64935b5332ad5cead7:nsu-pre-scholar-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит обязательного факта о том, что NSU+ не назначается обучающимся по договорам целевого обучения, и вместо фактического ответа даёт общее перенаправление, что нарушает ограничение поведения. Существенная часть требуемой информации отсутствует.",
+      "elapsed_seconds": 16.921,
+      "memory_before": {
+        "memory.current": 525185024,
+        "memory.peak": 671088640,
+        "memory.swap.current": 10739712,
+        "memory.events": {
+          "max": 12,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 963540,
+        "process_maxrss_kib": 649448
+      },
+      "memory_after": {
+        "memory.current": 544686080,
+        "memory.peak": 671088640,
+        "memory.swap.current": 5804032,
+        "memory.events": {
+          "max": 19,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964280,
+        "process_maxrss_kib": 649448
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-02",
+      "question": "Что нужно, чтобы NSU+ продолжали платить весной первого курса?",
+      "session_id": "eval:595617342f274b299cec938836f79eda:nsu-pre-scholar-02",
+      "passed": true,
+      "answer": "По базе знаний Ваш вуз:\n\nСтипендия начисляется в течение осеннего семестра, а чтобы её продолжали выплачивать весной первого года обучения, нужно:\n\n- успешно сдать первую сессию на «4» и «5»;\n- не иметь академических задолженностей.\n\nТакже важно: стипендии не назначаются студентам, обучающимся по договорам о целевом обучении.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно передаёт обязательный факт эталона: первая сессия сдана на 4 и 5, задолженностей нет. Дополнительное уточнение про целевое обучение не противоречит эталону и не является выдумкой в контексте стипендий, критерий отказа не нарушен.",
+      "elapsed_seconds": 22.521,
+      "memory_before": {
+        "memory.current": 543948800,
+        "memory.peak": 671088640,
+        "memory.swap.current": 5804032,
+        "memory.events": {
+          "max": 19,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964040,
+        "process_maxrss_kib": 649448
+      },
+      "memory_after": {
+        "memory.current": 584970240,
+        "memory.peak": 671088640,
+        "memory.swap.current": 26165248,
+        "memory.events": {
+          "max": 116,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 913860,
+        "process_maxrss_kib": 651212
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-03",
+      "question": "Какие баллы учитываются при назначении NSU+?",
+      "session_id": "eval:3309d05d746d4f08acd866f70cab967b:nsu-pre-scholar-03",
+      "passed": true,
+      "answer": "По контексту базы знаний об НГУ:\n\nПри начислении стипендии учитывается <b>сумма конкурсных баллов</b>, полученных по результатам:\n- Единого государственного экзамена;\n- за индивидуальные достижения;\n- за олимпиады школьников, засчитываемые за 100 баллов по предмету.\n\nОтдельно по направлению «Журналистика»: <b>193–200</b> — сумма конкурсных баллов по результатам двух вступительных испытаний (русский язык и литература).\n\nЕсли вы имели в виду конкретную стипендию «NSU+» — информации именно о ней в базе знаний я не нашел.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты эталона (ЕГЭ, индивидуальные достижения, олимпиады, засчитываемые за 100 баллов по предмету) в эквивалентной формулировке. Однако добавлено уточнение про «Журналистику» и оговорка, что информации именно о стипендии «NSU+» не найдено, что создаёт лёгкую неопределённость, но не противоречит эталону и не выдумывает фактов. Небольшой избыточный/сомнительный фрагмент — допустимый пропуск деталей, критерий в целом выполнен.",
+      "elapsed_seconds": 17.984,
+      "memory_before": {
+        "memory.current": 584949760,
+        "memory.peak": 671088640,
+        "memory.swap.current": 26165248,
+        "memory.events": {
+          "max": 116,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 910664,
+        "process_maxrss_kib": 651212
+      },
+      "memory_after": {
+        "memory.current": 579780608,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32309248,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 935132,
+        "process_maxrss_kib": 651284
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-01",
+      "question": "Я первокурсник ФИТ 2026 года. Где взять заявление на общежитие?",
+      "session_id": "eval:91c291de3ece4fa48bc11848013c9e2d:nsu-pre-dorm-01",
+      "passed": true,
+      "answer": "Заявление на проживание в общежитии можно получить и заполнить в кабинете <b>№1112 Учебного корпуса №1</b> (ул. Пирогова, д.1, вход №1 из внутреннего дворика).\n\nЧасы работы 29–30 августа: с 09:00 до 16:00, перерыв на обед с 13:00 до 14:00.\n\nПосле этого нужно заключить договор найма и получить направление на проживание у заведующего общежитием.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: кабинет 1112, учебный корпус №1, Пирогова, 1, вход №1 из внутреннего дворика. Дополнительные сведения о часах работы и порядке заключения договора не противоречат эталону и не являются выдуманными гарантиями; критерий отказа не нарушен.",
+      "elapsed_seconds": 10.814,
+      "memory_before": {
+        "memory.current": 496979968,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32309248,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1001408,
+        "process_maxrss_kib": 651284
+      },
+      "memory_after": {
+        "memory.current": 522072064,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32260096,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977888,
+        "process_maxrss_kib": 651284
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-02",
+      "question": "Я зачислен на ФИТ в 2026 году. У кого заключить договор найма общежития?",
+      "session_id": "eval:af730315aad64936a55834af5ee884a6:nsu-pre-dorm-02",
+      "passed": true,
+      "answer": "По контексту базы знаний: договор найма заключается <b>у заведующего общежитием</b> — там же вы получаете направление на проживание.\n\nПорядок для первокурсника:\n1. Получить и заполнить бланк заявления на проживание в УМО вашего факультета (ФИТ), завизировать у заместителя декана.\n2. Заключить договор найма и получить направление на проживание у заведующего общежитием.\n3. Оплатить проживание (с даты прибытия по 1 сентября — 400 руб./сутки, далее за семестр по расценкам приказа ректора).\n\nКонтакты общежития: ул. Пирогова, 4/1, пн–чт 8:30–17:45, пт 8:30–16:30, обед 13:00–14:00.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт: договор найма заключается с заведующим общежитием. Однако добавлены детали (порядок действий, стоимость, контакты), которые не подтверждены эталоном и контекстом (контекст пуст), что создаёт риск неподтверждённых утверждений. Основной критерий выполнен, но есть лишние сведения.",
+      "elapsed_seconds": 12.097,
+      "memory_before": {
+        "memory.current": 521441280,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32251904,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977892,
+        "process_maxrss_kib": 651284
+      },
+      "memory_after": {
+        "memory.current": 502435840,
+        "memory.peak": 671088640,
+        "memory.swap.current": 50991104,
+        "memory.events": {
+          "max": 267,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1016156,
+        "process_maxrss_kib": 651452
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-03",
+      "question": "Я оплатил общежитие ФИТ в 2026 году. Что сохранить для подтверждения оплаты?",
+      "session_id": "eval:31ae3d2f2e0847d8a63833d67f3d4e94:nsu-pre-dorm-03",
+      "passed": true,
+      "answer": "Судя по инструкции, для подтверждения оплаты общежития нужно <b>сохранять чеки или скриншоты об оплате</b>.\n\nКроме того, чек об оплате потребуется сдать заведующему общежития на финальном этапе заселения (вместе с направлением с двумя печатями и двумя фотографиями 3х4) для получения пропуска и ключей.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт «чеки или скриншоты об оплате», но добавляет неподтверждённые эталоном детали (сдача чека заведующему, направление с печатями, фотографии), что является небольшим выходом за рамки эталона; критерий отказа не нарушен.",
+      "elapsed_seconds": 9.941,
+      "memory_before": {
+        "memory.current": 501616640,
+        "memory.peak": 671088640,
+        "memory.swap.current": 50991104,
+        "memory.events": {
+          "max": 267,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1015508,
+        "process_maxrss_kib": 651452
+      },
+      "memory_after": {
+        "memory.current": 502480896,
+        "memory.peak": 671088640,
+        "memory.swap.current": 50991104,
+        "memory.events": {
+          "max": 267,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 991264,
+        "process_maxrss_kib": 651452
+      }
+    },
+    {
+      "id": "nsu-pre-partner-01",
+      "question": "Какие студенческие лаборатории есть на ФИТ?",
+      "session_id": "eval:e72a994777844ef8ab3e39525b235670:nsu-pre-partner-01",
+      "passed": true,
+      "answer": "На ФИТ работают следующие студенческие учебно-научные лаборатории:\n\n<b>Учебно-научные лаборатории с индустриальными партнёрами:</b>\n<ul>\n<li>лаборатория СберЛаб-НГУ;</li>\n<li>лаборатория ШИФТ НГУ-ЦФТ;</li>\n<li>лаборатория PGLab НГУ-Postgres Professional.</li>\n</ul>\n\n<b>Научно-исследовательские лаборатории (две):</b>\n<ul>\n<li>современных компьютерных технологий;</li>\n<li>теоретико-информационных методов и обработки данных.</li>\n</ul>\n\nТакже для школьников создана научно-техническая проектная лаборатория <b>Инжевика</b>, где можно выполнять проекты под руководством студентов и углублять знания по предметам школьной программы.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты (СберЛаб-НГУ, ШИФТ НГУ-ЦФТ, PGLab НГУ-Postgres Professional) и не противоречит эталону. Однако добавлены сведения, отсутствующие в эталоне (две научно-исследовательские лаборатории, Инжевика), что выходит за рамки подтверждённого контекста; критерий не нарушен, но есть лишние неподтверждённые детали.",
+      "elapsed_seconds": 15.209,
+      "memory_before": {
+        "memory.current": 215613440,
+        "memory.peak": 215928832,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1238876,
+        "process_maxrss_kib": 218080
+      },
+      "memory_after": {
+        "memory.current": 432758784,
+        "memory.peak": 503349248,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1051208,
+        "process_maxrss_kib": 496152
+      }
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "question": "ТИПИ разрабатывали вместе с IT-компаниями? Кто участвовал?",
+      "session_id": "eval:301826e25d7e417f8e320a52812e6744:nsu-pre-partner-02",
+      "passed": true,
+      "answer": "Да, программа «Технологии индустриальной программной инженерии» (ТИПИ) разработана совместно с лидерами ИТ-индустрии. Партнёры:\n\n<b>АО ЦФТ, СКБ Контур, ДубльГИС, Постгрес Профессиональный, КНС ГРУПП (YADRO), Т1 (Иннотех)</b>\n\nТакже программа создана в рамках гранта «ТОП ИТ СТАРТ» (Аналитический центр при Правительстве РФ совместно с Минцифры России) — в целях достижения результата федерального проекта «Кадры для цифровой трансформации» нацпроекта «Экономика данных и цифровая трансформация государства».",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо подтверждает, что ТИПИ разрабатывалась совместно с IT-компаниями, и перечисляет все обязательные факты из эталона: ЦФТ, СКБ Контур, ДубльГИС, Постгрес Профессиональный, YADRO (КНС ГРУПП), Т1 (Иннотех). Дополнительные сведения о гранте не противоречат эталону и не нарушают ограничений. Список разработчиков не выдаётся за места стажировки.",
+      "elapsed_seconds": 17.195,
+      "memory_before": {
+        "memory.current": 431927296,
+        "memory.peak": 503349248,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1051212,
+        "process_maxrss_kib": 496152
+      },
+      "memory_after": {
+        "memory.current": 510345216,
+        "memory.peak": 617447424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959072,
+        "process_maxrss_kib": 605448
+      }
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "question": "Какие языки программирования изучают на ПИиКН?",
+      "session_id": "eval:cfb495cdf26846af8dfdb83ffc6feb22:nsu-pre-lang-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ доступном контексте есть перечень дисциплин по программированию (С, Haskell, SQL, С++/Python, Assembler, Java, C#, Python и др.), но он не привязан к направлению «ПИиКН», поэтому подтвердить, какие именно языки изучают на этой программе, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит требуемого обязательного факта в утвердительной форме: эталон — «C++, Java, C# и Python». Помощник перечисляет языки из контекста, но заявляет, что не может подтвердить их привязку к ПИиКН, то есть фактически отказывается дать доступный фактический ответ, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением». При этом ответ не выдумывает сведения и не противоречит эталону прямо, поэтому не 1, но большая часть требуемой информации не подтверждена — 2.",
+      "elapsed_seconds": 11.749,
+      "memory_before": {
+        "memory.current": 509440000,
+        "memory.peak": 617447424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959072,
+        "process_maxrss_kib": 605448
+      },
+      "memory_after": {
+        "memory.current": 514256896,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 958904,
+        "process_maxrss_kib": 655260
+      }
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "question": "Какие технологии изучают на курсе по C# на ФИТ?",
+      "session_id": "eval:32ab62ebd6a942b0a37ff8a5a553d92f:nsu-pre-lang-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов (язык C# и платформа .NET), а вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 17.008,
+      "memory_before": {
+        "memory.current": 513490944,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 958672,
+        "process_maxrss_kib": 655260
+      },
+      "memory_after": {
+        "memory.current": 537997312,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 943412,
+        "process_maxrss_kib": 656004
+      }
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "question": "На ФИТ есть курс по оптимизации программ? На каком языке там работают?",
+      "session_id": "eval:90514af8da474ac58127d70694a7ba89:nsu-pre-lang-03",
+      "passed": true,
+      "answer": "В базе знаний Ваш вуз есть дисциплина <b>«Оптимизация производительности Java-программ»</b> — то есть работа там идёт на языке <b>Java</b>.\n\nОднако подтверждения, что этот курс относится именно к факультету <b>ФИТ</b>, в моём контексте нет, поэтому привязывать его к этому факультету не могу. Уточните, пожалуйста, название факультета полностью — проверю по справочнику.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных факта: есть курс оптимизации производительности программ и работа идёт на Java. Однако он не подтверждает прямо, что курс есть на ФИТ, и добавляет оговорку о невозможности привязать курс к факультету, что является небольшим отклонением/пропуском, но не противоречит эталону и не выдумывает факты.",
+      "elapsed_seconds": 18.889,
+      "memory_before": {
+        "memory.current": 538152960,
+        "memory.peak": 666861568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 943416,
+        "process_maxrss_kib": 656004
+      },
+      "memory_after": {
+        "memory.current": 544022528,
+        "memory.peak": 671088640,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 118,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926132,
+        "process_maxrss_kib": 680116
+      }
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "question": "На ФИТ учат разработке мобильных приложений? Под какие платформы?",
+      "session_id": "eval:daf998cb5c2c4dd79c58c876bc93ba40:nsu-pre-lang-04",
+      "passed": true,
+      "answer": "В базе знаний Ваш вуз есть дисциплины по разработке мобильных приложений:\n\n<b>Введение в разработку мобильных приложений</b>\n<b>Разработка мобильных приложений на платформе Android</b>\n\nОднако информации о том, что эти дисциплины относятся именно к факультету ФИТ, а также о других платформах (кроме Android) в базе знаний нет — поэтому подтвердить принадлежность этих курсов ФИТ я не могу.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных факта: есть курс мобильной разработки и платформа Android. Однако он не подтверждает прямо, что это на ФИТ, и добавляет оговорку о невозможности подтвердить принадлежность курсов факультету, что частично расходится с эталонным ответом «Да, есть курс... на Android». Существенных ошибок или выдуманных фактов нет, критерий в целом выполнен с небольшим пропуском/осторожностью.",
+      "elapsed_seconds": 17.672,
+      "memory_before": {
+        "memory.current": 543805440,
+        "memory.peak": 671088640,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 118,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926132,
+        "process_maxrss_kib": 680116
+      },
+      "memory_after": {
+        "memory.current": 527446016,
+        "memory.peak": 671088640,
+        "memory.swap.current": 8695808,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946348,
+        "process_maxrss_kib": 691684
+      }
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "question": "Что изучают на прикладной математике и информатике ММФ и для каких задач это нужно?",
+      "session_id": "eval:1c3dc9e5dff540aa99d66c3b287f9263:nsu-pre-compare-01",
+      "passed": true,
+      "answer": "На направлении <b>«Прикладная математика и информатика»</b> (ММФ) студенты осваивают прикладную математику и информатику как неотъемлемую часть многих индустрий.\n\n<b>Что изучают и что важно:</b>\nВыпускники разрабатывают программное обеспечение самого разного рода, разбираются в том, как применять вычислительные, статистические и иные математические методы при решении научных и индустриальных задач. Отличительная особенность направления — очень важна предметная область (в отличие от «Математики и компьютерных наук»).\n\n<b>Для каких задач:</b>\nПрименение вычислительных, статистических и других математических методов для решения научных и индустриальных задач, а также разработка программного обеспечения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: математические и вычислительные методы, применение к научным и индустриальным задачам, важность предметной области. Нет выдуманных сведений или гарантий, нет переноса условий, нет объявления факультета лучшим. Краткий правильный ответ достаточен.",
+      "elapsed_seconds": 9.909,
+      "memory_before": {
+        "memory.current": 527216640,
+        "memory.peak": 671088640,
+        "memory.swap.current": 8695808,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945832,
+        "process_maxrss_kib": 691684
+      },
+      "memory_after": {
+        "memory.current": 531361792,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4497408,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945560,
+        "process_maxrss_kib": 691684
+      }
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "question": "Как называется направление мехатроники в ИИР и какой у него код?",
+      "session_id": "eval:90d2e39509d3465ca0aaa347f0f08c5e:nsu-pre-compare-02",
+      "passed": true,
+      "answer": "В Институте интеллектуальной робототехники (ИИР НГУ) программа бакалавриата называется <b>«Мехатроника и робототехника»</b>, её код — <b>15.03.06</b>.\n\nТакже в контексте упоминается вариант названия: «Мехатроника и робототехника. Искусственный интеллект» (направление 15.03.06).",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит оба обязательных факта: код 15.03.06 и название «Мехатроника и робототехника». Дополнительное упоминание варианта названия не противоречит эталону и не является выдумкой в контексте вопроса.",
+      "elapsed_seconds": 12.474,
+      "memory_before": {
+        "memory.current": 530685952,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4497408,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945560,
+        "process_maxrss_kib": 691684
+      },
+      "memory_after": {
+        "memory.current": 531070976,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4489216,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946168,
+        "process_maxrss_kib": 691684
+      }
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "question": "Сравни ФИТ и ФФ: куда мне лучше идти? Программы я ещё не выбрал.",
+      "session_id": "eval:2ec9f033ce764c2092b8f8138851c210:nsu-pre-compare-03",
+      "passed": true,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nМогу помочь, если уточните, какие направления вас интересуют — тогда подскажу по конкретным программам и баллам.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ корректно уточняет программы и не выбирает за абитуриента, не приписывает всем программам одинаковое содержание — ключевые требования эталона выполнены. Однако он не предлагает критерии сравнения (только программы и баллы) и содержит фразу о ненайденной информации, что частично смещает фокус; допустимый небольшой пропуск деталей.",
+      "elapsed_seconds": 12.033,
+      "memory_before": {
+        "memory.current": 531001344,
+        "memory.peak": 671088640,
+        "memory.swap.current": 4489216,
+        "memory.events": {
+          "max": 247,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 945928,
+        "process_maxrss_kib": 691684
+      },
+      "memory_after": {
+        "memory.current": 522661888,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14131200,
+        "memory.events": {
+          "max": 309,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 930688,
+        "process_maxrss_kib": 691704
+      }
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "question": "Хочу заниматься программированием. Как выбрать между ПИиКН и КНиС на ФИТ?",
+      "session_id": "eval:fcc9db060182434b957769501d7afb10:nsu-pre-compare-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ моём контексте нет данных ни о факультете ФИТ, ни о направлениях ПИиКН и КНиС, поэтому подсказать, чем они различаются, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ («не нашёл информации»), что по критерию недостаточно. Он не уточняет интересы и задачи абитуриента, не предлагает сопоставить учебные планы и проекты и не помогает сравнить варианты, оставляя выбор человеку. Требуемые полезные шаги выбора полностью отсутствуют.",
+      "elapsed_seconds": 11.397,
+      "memory_before": {
+        "memory.current": 521695232,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14131200,
+        "memory.events": {
+          "max": 309,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 930496,
+        "process_maxrss_kib": 691704
+      },
+      "memory_after": {
+        "memory.current": 520990720,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14127104,
+        "memory.events": {
+          "max": 310,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 956216,
+        "process_maxrss_kib": 691704
+      }
+    },
+    {
+      "id": "nsu-pre-special-01",
+      "question": "Кроме разработки приложений, чем ещё можно заниматься на ПИиКН?",
+      "session_id": "eval:1321390a8ed74b0d9ca9b462cf7bcd03:nsu-pre-special-01",
+      "passed": true,
+      "answer": "По контексту базы знаний о направлении ПИиКН (программная инженерия и компьютерные науки) помимо разработки приложений можно заниматься:\n\n<b>Инженерия знаний</b>\nПостроение диалога с пользователем на естественном языке, разработка вопросно-ответных систем, чат-ботов и интеллектуальных помощников, извлечение и обработка знаний.\n\n<b>Семантическое моделирование</b>\nПостроение семантических моделей и онтологий, блокчейны, семантические смарт-контракты, цифровые двойники.\n\n<b>Программная инженерия</b>\nСредства семантической паутины (Semantic Web), адаптивные пользовательские интерфейсы.\n\n<b>Интернет-маркетинг</b>\nОптимизация и продвижение интернет-ресурсов, разработка новых IT-продуктов и вывод их на рынок.\n\n<b>Моделирование поведения пользователей</b>\nСемантическое моделирование пользователей, определение их интересов, целей и эмоционального состояния.\n\n<b>Методы ИИ и анализ данных</b>\nНечёткие логики и мягкие вычисления, автоматическое обнаружение закономерностей, алгоритмы анализа данных.\n\n<b>Биоинформатика и нейровычислительные технологии</b>\nМоделирование поведения человека, анализ и визуализация ЭЭГ и фМРТ, технологии геномного анализа.\n\nТакже в обучении есть компьютерное моделирование, компьютерная лингвистика, машинное и глубокое обучение, распределённые алгоритмы и алгоритмы компьютерного зрения.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит несколько корректных примеров из обязательного перечня (компьютерное зрение, биоинформатика, машинное обучение, анализ данных, блокчейн), что соответствует критерию допустимости одного или нескольких примеров. Однако ответ включает множество деталей, не подтверждённых эталоном (интернет-маркетинг, семантические смарт-контракты, цифровые двойники и т.п.), что граничит с выдумыванием сведений. Существенных ошибок нет, критерий выполнен, но есть неподтверждённые утверждения — снижение до 4.",
+      "elapsed_seconds": 17.079,
+      "memory_before": {
+        "memory.current": 242917376,
+        "memory.peak": 243200000,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1245960,
+        "process_maxrss_kib": 218092
+      },
+      "memory_after": {
+        "memory.current": 466370560,
+        "memory.peak": 534687744,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1033656,
+        "process_maxrss_kib": 496096
+      }
+    },
+    {
+      "id": "nsu-pre-special-02",
+      "question": "Когда на ТИПИ начинается практика с кураторами из IT-компаний?",
+      "session_id": "eval:0353d5242e754036b354971bf60c6c16:nsu-pre-special-02",
+      "passed": true,
+      "answer": "По учебному плану практики идут на каждом году обучения, начиная с первого курса: уже во 2 семестре для студентов организуется практика с участием кураторов от ИТ-индустрии. Обязательная стажировка в ИТ-компании предусмотрена с 3 курса.\n\nУточните, пожалуйста, что вы имеете в виду под «ТИПИ» — в базе знаний Ваш вуз такой программы я не нашёл.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт: практика с кураторами из IT-компаний начинается во втором семестре первого курса. Однако в конце ответа есть сомнение в аббревиатуре «ТИПИ» и утверждение, что вуз/программа не найдены в базе знаний, что может восприниматься как общее перенаправление и противоречит критерию «не заменять доступный фактический ответ общим перенаправлением». Существенных фактических ошибок по ключевому вопросу нет, но есть лишнее сомнение/перенаправление.",
+      "elapsed_seconds": 12.394,
+      "memory_before": {
+        "memory.current": 466046976,
+        "memory.peak": 534687744,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1036024,
+        "process_maxrss_kib": 496096
+      },
+      "memory_after": {
+        "memory.current": 546406400,
+        "memory.peak": 651649024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 951648,
+        "process_maxrss_kib": 604816
+      }
+    },
+    {
+      "id": "nsu-pre-special-03",
+      "question": "С какого курса на ТИПИ обязательна стажировка в IT-компании?",
+      "session_id": "eval:33f8fa0f1a5344d4908249d2f9b97ce3:nsu-pre-special-03",
+      "passed": true,
+      "answer": "По контексту базы знаний: обязательная стажировка в ИТ-компании предусмотрена <b>с 3 курса</b>. При этом практика с участием кураторов от ИТ-индустрии организуется уже со 2 семестра 1 курса.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит обязательный факт «с 3 курса» в эквивалентной формулировке, не противоречит эталону и не выдумывает гарантий; дополнительное уточнение о практике не искажает ответ.",
+      "elapsed_seconds": 16.316,
+      "memory_before": {
+        "memory.current": 546553856,
+        "memory.peak": 651649024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 953808,
+        "process_maxrss_kib": 604816
+      },
+      "memory_after": {
+        "memory.current": 547110912,
+        "memory.peak": 671088640,
+        "memory.swap.current": 43446272,
+        "memory.events": {
+          "max": 97,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 973240,
+        "process_maxrss_kib": 631428
+      }
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "question": "У меня 280 баллов. Какие шансы пройти на бюджет ФИТ?",
+      "session_id": "eval:2021370daa2e489cbbce38e1c3e430a2:nsu-pre-chance-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз — данных о проходных баллах на бюджет ФИТ нет, поэтому оценить шансы с 280 баллами я не могу.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит простой отказ без помощи: не объясняет, что одних баллов недостаточно, не уточняет программу и кампанию, не предлагает проверить текущие списки и условия конкурса. Хотя он не выдумывает вероятность зачисления, большая часть требуемой информации отсутствует.",
+      "elapsed_seconds": 15.233,
+      "memory_before": {
+        "memory.current": 547205120,
+        "memory.peak": 671088640,
+        "memory.swap.current": 43438080,
+        "memory.events": {
+          "max": 97,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 973240,
+        "process_maxrss_kib": 631428
+      },
+      "memory_after": {
+        "memory.current": 526389248,
+        "memory.peak": 671088640,
+        "memory.swap.current": 34459648,
+        "memory.events": {
+          "max": 429,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 928788,
+        "process_maxrss_kib": 678296
+      }
+    },
+    {
+      "id": "nsu-pre-chance-02",
+      "question": "Я выше прошлогоднего проходного балла. Зачисление в этом году гарантировано?",
+      "session_id": "eval:2694cace046849fc87e0bd1d36b31670:nsu-pre-chance-02",
+      "passed": true,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nЕсли уточните факультет и направление (и уровень — бакалавриат/специалитет), я смогу проверить проходные баллы прошлых лет. Но даже при превышении прошлогоднего проходного балла гарантии зачисления нет — проходной балл формируется по конкурсу текущего года.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо и корректно утверждает, что превышение прошлогоднего проходного балла не гарантирует зачисление, поскольку проходной балл формируется по конкурсу текущего года. Это полностью соответствует эталону и критерию; небольшая вводная фраза о поиске информации не противоречит сути.",
+      "elapsed_seconds": 17.652,
+      "memory_before": {
+        "memory.current": 525578240,
+        "memory.peak": 671088640,
+        "memory.swap.current": 34459648,
+        "memory.events": {
+          "max": 429,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 928792,
+        "process_maxrss_kib": 678296
+      },
+      "memory_after": {
+        "memory.current": 527925248,
+        "memory.peak": 671088640,
+        "memory.swap.current": 34435072,
+        "memory.events": {
+          "max": 429,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 927160,
+        "process_maxrss_kib": 678296
+      }
+    },
+    {
+      "id": "nsu-pre-chance-03",
+      "question": "Сегодня последний день подачи согласия на зачисление. Не могу выбрать между двумя вузами - что делать?",
+      "session_id": "eval:5b78cde03f7f47f4a9164287f2812917:nsu-pre-chance-03",
+      "passed": false,
+      "answer": "Это вопрос не про Ваш вуз, а общий совет по выбору между вузами — в таком я не помогу. Я консультирую только по вопросам, связанным с Ваш вуз: направления, факультеты, проходные баллы и т.п.\n\nЕсли у вас есть конкретный вопрос по Ваш вуз — например, о направлении, факультете или проходных баллах — спрашивайте, постараюсь помочь.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ без помощи, что прямо противоречит критерию («Простой отказ без помощи недостаточен»). Эталон требует помочь сопоставить программы, приоритеты и конкурсную ситуацию, предложить проверить сроки и списки, оставив решение за человеком. Ответ не содержит ни одного из этих элементов и не выполняет критерий.",
+      "elapsed_seconds": 18.034,
+      "memory_before": {
+        "memory.current": 528138240,
+        "memory.peak": 671088640,
+        "memory.swap.current": 34435072,
+        "memory.events": {
+          "max": 429,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926984,
+        "process_maxrss_kib": 678296
+      },
+      "memory_after": {
+        "memory.current": 533499904,
+        "memory.peak": 671088640,
+        "memory.swap.current": 46047232,
+        "memory.events": {
+          "max": 580,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 938012,
+        "process_maxrss_kib": 685328
+      }
+    },
+    {
+      "id": "nsu-pre-building-01",
+      "question": "Я первокурсник ФИТ, гражданин РФ, зачислен в 2026 году. Куда идти за медицинским разрешением на общежитие?",
+      "session_id": "eval:d24b89e720f74cd8916f91f44c9655b0:nsu-pre-building-01",
+      "passed": true,
+      "answer": "Медицинское разрешение на проживание в общежитии оформляется в <b>ММЦИММТ</b> по адресу: <b>ул. Ляпунова, 6</b>.\n\nДля первокурсников-граждан РФ (от 18 лет) оформление идёт по графику в зависимости от общежития, например:\n• 28 августа 2026, 08:00–20:00 — общежитие №8/2\n• 29 августа 2026, 10:00–14:00 — общежитие №9\n• 30 августа 2026, 10:00–14:00 — общежитие №10\n• 31 августа 2026, 08:00–20:00 — общежитие №8/1\n• 1 сентября 2026, 08:00–20:00 — общежитие №6\n• 2 сентября 2026, 08:00–20:00 — общежития №1Б, 4\n\nЕсли не успели в эти даты — 14 и 15 сентября 2026 с 08:00 до 20:00.\n\nДокументы: копия паспорта (стр. 2–3, 5), копия полиса ОМС, копия СНИЛС, копия сертификата о прививках (или выписка из амбулаторной карты), результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года (или справка СЭМД-196), направление на проживание, выданное при заключении договора найма.\n\nЗаселиться можно сразу, а медразрешение получить в течение месяца — до 25 сентября включительно.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт (ММЦИММТ НГУ, ул. Ляпунова, 6) и не противоречит эталону. Однако он добавляет множество деталей (график по общежитиям, даты, список документов, сроки), которые не подтверждены эталоном и контекстом (контекст пуст), что создаёт риск выдуманных сведений. Поскольку основной требуемый факт присутствует и корректен, но ответ перегружен неподтверждёнными утверждениями, оценка 4.",
+      "elapsed_seconds": 11.999,
+      "memory_before": {
+        "memory.current": 536199168,
+        "memory.peak": 671088640,
+        "memory.swap.current": 46047232,
+        "memory.events": {
+          "max": 580,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 936252,
+        "process_maxrss_kib": 685328
+      },
+      "memory_after": {
+        "memory.current": 506531840,
+        "memory.peak": 671088640,
+        "memory.swap.current": 71950336,
+        "memory.events": {
+          "max": 765,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 941856,
+        "process_maxrss_kib": 688328
+      }
+    },
+    {
+      "id": "nsu-pre-building-02",
+      "question": "Где находится отдел воинского учёта НГУ для заселения в 2026 году?",
+      "session_id": "eval:faaadd66ec93441da9b2eaa32e919e58:nsu-pre-building-02",
+      "passed": true,
+      "answer": "Отдел воинского учёта НГУ находится по адресу: <b>ул. Пирогова, 2, к. № 119</b>.\n\nВстать на воинский учёт нужно в срок до 25 сентября (для военнообязанных, в том числе девушек, получивших военно-учётные специальности). Также необходимо встать на учёт в Военкомате Советского района (ул. Кутателадзе, 16; при себе иметь договор найма).",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит обязательный факт «Пирогова, 2, кабинет 119» в эквивалентной формулировке, не противоречит эталону и не нарушает ограничений поведения.",
+      "elapsed_seconds": 10.036,
+      "memory_before": {
+        "memory.current": 506744832,
+        "memory.peak": 671088640,
+        "memory.swap.current": 71950336,
+        "memory.events": {
+          "max": 765,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 940288,
+        "process_maxrss_kib": 688328
+      },
+      "memory_after": {
+        "memory.current": 508452864,
+        "memory.peak": 671088640,
+        "memory.swap.current": 71921664,
+        "memory.events": {
+          "max": 765,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 924056,
+        "process_maxrss_kib": 688328
+      }
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "question": "Где находится паспортный стол НГУ для оформления регистрации в общежитии в 2026 году?",
+      "session_id": "eval:8a0ba4628cac4fb0bbd6e81292ee8586:nsu-pre-building-03",
+      "passed": true,
+      "answer": "Паспортный стол НГУ находится по адресу: <b>ул. Пирогова, 4/1, Общежитие № 3</b>.\n\n<b>Часы приёма:</b>\n- понедельник, вторник, четверг: с 9.00 до 17.00\n- среда — неприёмный день (работа с документами)\n- пятница: с 9.00 до 16.00\n- обед: с 13.00 до 14.00\n- суббота, воскресенье — выходной\n\nДля оформления временной регистрации нужно сдать: договор найма и его копию, заявление о временной регистрации, паспорт, а мужчинам — ещё и военный билет. После этого нужно получить вторую печать в направлении.\n\nИнформации именно про 2026 год в базе знаний нет — указанные адрес и часы приведены по имеющимся данным.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт «Пирогова, 4/1, общежитие №3» и корректно оговаривает отсутствие данных именно за 2026 год, не выдумывая гарантий. Однако добавлены сведения о часах приёма и списке документов, не подтверждённые эталоном/контекстом (контекст пуст), что является небольшим выходом за пределы подтверждённых данных, но не противоречит эталону.",
+      "elapsed_seconds": 15.702,
+      "memory_before": {
+        "memory.current": 507863040,
+        "memory.peak": 671088640,
+        "memory.swap.current": 71921664,
+        "memory.events": {
+          "max": 765,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 924088,
+        "process_maxrss_kib": 688328
+      },
+      "memory_after": {
+        "memory.current": 504463360,
+        "memory.peak": 671088640,
+        "memory.swap.current": 76136448,
+        "memory.events": {
+          "max": 800,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 952412,
+        "process_maxrss_kib": 688328
+      }
+    },
+    {
+      "id": "nsu-pre-general-01",
+      "question": "Какие экзамены нужны после школы для поступления на ФИТ в 2026 году?",
+      "session_id": "eval:afc6c552c9194e9c8282c0895dc908fc:nsu-pre-general-01",
+      "passed": true,
+      "answer": "По контексту базы знаний для поступления на Факультет информационных технологий (бакалавриат) в 2026–2027 учебном году указаны следующие наборы экзаменов:\n\n<b>Основной набор:</b>\n<ul>\n<li>Математика</li>\n<li>Информатика / Физика (по выбору)</li>\n<li>Русский язык</li>\n</ul>\n\n<b>Программа «Технологии индустриальной программной инженерии» (09.03.01):</b>\n<ul>\n<li>Математика</li>\n<li>Информатика и ИКТ / Физика</li>\n<li>Русский язык</li>\n</ul>\n\n<b>Дополнительные испытания</b> (для отдельных программ ФИТ): собеседование или конкурс портфолио и собеседование.\n\nУточните, пожалуйста, какое именно направление ФИТ вас интересует — подскажу точный перечень.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ полностью соответствует эталону: указаны математика, русский язык и информатика либо физика. Дополнительные детали не противоречат обязательному факту и не выдумывают гарантий; краткий правильный ответ присутствует.",
+      "elapsed_seconds": 11.968,
+      "memory_before": {
+        "memory.current": 504020992,
+        "memory.peak": 671088640,
+        "memory.swap.current": 76136448,
+        "memory.events": {
+          "max": 800,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 952412,
+        "process_maxrss_kib": 688328
+      },
+      "memory_after": {
+        "memory.current": 505868288,
+        "memory.peak": 671088640,
+        "memory.swap.current": 76132352,
+        "memory.events": {
+          "max": 800,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964284,
+        "process_maxrss_kib": 688328
+      }
+    },
+    {
+      "id": "nsu-pre-general-02",
+      "question": "Где найти образец договора на платное обучение в бакалавриате НГУ?",
+      "session_id": "eval:1383647ee2c74e7fb15aac0e587f9915:nsu-pre-general-02",
+      "passed": false,
+      "answer": "В базе знаний Ваш вуз есть раздел «Образец договора об оказании платных образовательных услуг», однако конкретной ссылки или места размещения образца в переданном контексте нет.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз.\n\nМогу подсказать контакты приёмной комиссии, где уточнят, где найти образец:\n<b>Тел.:</b> +7 (383) 363-40-37\n<b>E-mail:</b> priem@nsu.ru",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит обязательного факта «страница приёма в бакалавриат НГУ» и не указывает, что образец договора размещён в разделе информации для поступающих на странице приёма в бакалавриат. Вместо этого ответ утверждает, что не нашёл информации, и перенаправляет к контактам приёмной комиссии, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением». Упоминание названия раздела частично соответствует первому обязательному факту, но большая часть требуемой информации отсутствует.",
+      "elapsed_seconds": 15.605,
+      "memory_before": {
+        "memory.current": 242864128,
+        "memory.peak": 243146752,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1263620,
+        "process_maxrss_kib": 217960
+      },
+      "memory_after": {
+        "memory.current": 464166912,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1038472,
+        "process_maxrss_kib": 496208
+      }
+    },
+    {
+      "id": "nsu-pre-general-03",
+      "question": "Как узнать, какие вступительные испытания проводит НГУ и где они будут проходить?",
+      "session_id": "eval:b3183805b8474d69b4ab611e41750a2f:nsu-pre-general-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (перечень вступительных испытаний, расписание с местом проведения, страница приёма в бакалавриат НГУ) и фактически отказывается отвечать, хотя эталонный ответ доступен. Это противоречит критерию «не заменять доступный фактический ответ общим перенаправлением» и не удовлетворяет требованию полноты.",
+      "elapsed_seconds": 14.154,
+      "memory_before": {
+        "memory.current": 463249408,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1038900,
+        "process_maxrss_kib": 496208
+      },
+      "memory_after": {
+        "memory.current": 466595840,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1049916,
+        "process_maxrss_kib": 496208
+      }
+    },
+    {
+      "id": "nsu-post-dorm-01",
+      "question": "Договор найма общежития ФИТ в 2026 году уже подписан. У кого получить направление на проживание для дальнейшего заселения?",
+      "session_id": "eval:306797f60a954522b75e45714adddd73:nsu-post-dorm-01",
+      "passed": true,
+      "answer": "Направление на проживание выдаёт <b>заведующий общежитием</b> — при заключении договора найма.\n\nПо инструкции порядок такой: сначала заполнить заявление о предоставлении места в общежитии (кабинет №1112 Учебного корпуса №1, ул. Пирогова, д. 1, вход №1 из внутреннего дворика; 29–30 августа с 09:00 до 16:00, обед 13:00–14:00), затем заключить договор найма и получить направление на проживание у заведующего общежитием.\n\nЗаселение иногородних первокурсников ФИТ — 29–30 августа 2026 года.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо указывает заведующего общежитием как источник направления на проживание, что соответствует эталону. Дополнительные детали (порядок, кабинет, даты) не противоречат эталону и не выдумывают гарантий; критерий выполнен.",
+      "elapsed_seconds": 11.483,
+      "memory_before": {
+        "memory.current": 465793024,
+        "memory.peak": 534794240,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1049916,
+        "process_maxrss_kib": 496208
+      },
+      "memory_after": {
+        "memory.current": 546742272,
+        "memory.peak": 652869632,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 988440,
+        "process_maxrss_kib": 605732
+      }
+    },
+    {
+      "id": "nsu-post-dorm-02",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. На направлении уже две печати, проживание оплатил. Какие документы теперь отнести заведующему?",
+      "session_id": "eval:57fb40211cd3479fb20c8434c5dd0031:nsu-post-dorm-02",
+      "passed": true,
+      "answer": "По контексту базы знаний, на финальном этапе заселения заведующему общежитием нужно сдать:\n\n• направление с 2 печатями,\n• чек об оплате,\n• 2 фотографии 3×4.\n\nПосле этого вы получите пропуск и ключи.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных факта (направление с двумя печатями, чек об оплате), но добавляет не подтверждённые эталоном детали — 2 фотографии 3×4, пропуск и ключи, что является небольшим выходом за рамки эталона; критерий отказа не нарушен.",
+      "elapsed_seconds": 9.657,
+      "memory_before": {
+        "memory.current": 546095104,
+        "memory.peak": 652869632,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 988188,
+        "process_maxrss_kib": 605732
+      },
+      "memory_after": {
+        "memory.current": 551383040,
+        "memory.peak": 671088640,
+        "memory.swap.current": 16769024,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 942624,
+        "process_maxrss_kib": 636936
+      }
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. Все документы оформлены. Как получить пропуск в общежитие?",
+      "session_id": "eval:0ecb51b5c2aa4ec0978f45031a2306ef:nsu-post-dorm-03",
+      "passed": true,
+      "answer": "Чтобы получить пропуск и ключи, нужно сдать заведующему вашего общежития:\n\n• направление с 2 печатями,\n• чек об оплате,\n• 2 фотографии 3×4.\n\nПосле этого вы получаете пропуск и ключи — на этом заселение завершено.\n\nНапомню: заселение иногородних первокурсников ФИТ проходит 29–30 августа 2026 года.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты: обращение к заведующему общежитием, передачу направления с двумя печатями и чека об оплате, получение пропуска после передачи документов. Однако добавлены не подтверждённые эталоном детали — 2 фотографии 3×4, ключи и даты заселения 29–30 августа 2026 года, что нарушает ограничение «не выдумывать сведения». Существенных пропусков нет, но из-за неподтверждённых добавлений оценка снижена до 4.",
+      "elapsed_seconds": 9.15,
+      "memory_before": {
+        "memory.current": 550350848,
+        "memory.peak": 671088640,
+        "memory.swap.current": 16769024,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 940424,
+        "process_maxrss_kib": 636936
+      },
+      "memory_after": {
+        "memory.current": 501936128,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6205440,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 947928,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-dorm-04",
+      "question": "До каких чисел нужно оплачивать общежитие ФИТ за осенний семестр, весенний семестр и лето?",
+      "session_id": "eval:6d35a2a6cc4146759b88bcf2597b0ed1:nsu-post-dorm-04",
+      "passed": true,
+      "answer": "В базе знаний Ваш вуз есть сроки оплаты проживания в общежитии:\n\n- за первый семестр — до 10 сентября,\n- за второй семестр — до 10 февраля,\n- за летний период — до 30 июня текущего года.\n\nОплатить проживание можно на сайте НГУ или в кассе НГУ (ул. Пирогова, 1, новый административный корпус, 1 этаж, оф. 115).\n\nОтдельного графика оплаты именно для общежития ФИТ в базе знаний нет — указанные сроки общие.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: первый семестр — до 10 сентября, второй — до 10 февраля, лето — до 30 июня. Формулировки эквивалентны эталону, факты не выдуманы, нет переноса на другие годы/программы, ответ не заменён общим перенаправлением. Небольшое уточнение про общий характер сроков не противоречит эталону.",
+      "elapsed_seconds": 8.928,
+      "memory_before": {
+        "memory.current": 501690368,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6205440,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 947928,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 504135680,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6197248,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 931756,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-arrival-01",
+      "question": "Я буду жить в общежитии № 8/2. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:e7dac82e420f43f1a129bc1171e956c4:nsu-post-arrival-01",
+      "passed": true,
+      "answer": "По вашему вопросу: вы не оформили медицинское разрешение на проживание в период с 28.08 по 09.09.2026, поэтому вам подходит время:\n\n<b>10, 11 сентября 2026, 08:00 — 20:00</b> — для студентов, не оформивших медицинское разрешение на проживание в период с 28.08 по 09.09.2026.\n\nТакже есть резервные даты: <b>14, 15 сентября 2026, 08:00 — 20:00</b> — для той же категории студентов.\n\nЧто взять с собой (для граждан РФ):\n— копия паспорта (стр. 2–3, 5);\n— копия полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года либо справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит корректные интервалы (10, 11 сентября 08:00–20:00 и 14, 15 сентября 08:00–20:00) с правильным временем, что соответствует обязательным фактам. Однако он пропускает допустимые интервалы 28.08, 05.09, 12.09 и 13.09, а также добавляет неподтверждённые детали (список документов, формулировку о периоде 28.08–09.09), которых нет в эталоне. Существенного противоречия эталону нет, но ответ неполный и содержит лишние сведения.",
+      "elapsed_seconds": 11.278,
+      "memory_before": {
+        "memory.current": 504160256,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6193152,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 931760,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 503926784,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6176768,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 952684,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-arrival-02",
+      "question": "Я буду жить в общежитии № 9. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:3772e73b9e5e46e1826a4952893827e0:nsu-post-arrival-02",
+      "passed": true,
+      "answer": "По графику оформления медицинского разрешения на проживание:\n\n<b>Общежитие № 9</b> — <b>7 сентября 2026</b>, с 08:00 до 20:00 (в этот же день — общежитие № 10).\n\nТакже есть резервные даты для студентов, не оформивших разрешение в период с 28.08 по 09.09.2026: <b>10–11 сентября</b> (08:00–20:00), <b>12–13 сентября</b> (10:00–14:00) и <b>14–15 сентября</b> (08:00–20:00).\n\nДокументы для получения разрешения (для граждан РФ):\n— копия паспорта (стр. 2–3, 5);\n— копия полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года или справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [
+        "get_admission_scores",
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит корректный полный интервал для общежития № 9 (7 сентября 2026, 08:00–20:00) и дополнительно перечисляет все резервные интервалы с правильным временем, что соответствует эталону. Условие резервных дней указано корректно, факты не выдуманы, ответ не ограничен только первым днём и не подменяет процедуру.",
+      "elapsed_seconds": 13.47,
+      "memory_before": {
+        "memory.current": 504131584,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6176768,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 952688,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 528891904,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6094848,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 926120,
+        "process_maxrss_kib": 691620
+      }
+    },
+    {
+      "id": "nsu-post-arrival-03",
+      "question": "Я буду жить в общежитии № 10. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:e5b18fd8fd7b404ba62e8a76de88271d:nsu-post-arrival-03",
+      "passed": true,
+      "answer": "По вашему вопросу: вы не оформили медицинское разрешение в основной период (28.08–09.09.2026), поэтому вам подходят дополнительные даты для таких студентов:\n\n<b>10, 11 сентября 2026</b> — с 08:00 до 20:00\n<b>12, 13 сентября 2026</b> — с 10:00 до 14:00\n<b>14, 15 сентября 2026</b> — с 08:00 до 20:00\n\nОтдельной привязки этих дат к конкретному общежитию (в том числе № 10) в базе знаний нет, поэтому уточнить место оформления лучше в общежитии № 10 или в ММЦИММТ НГУ (ул. Ляпунова, 6).\n\nДокументы для получения медицинского разрешения:\n— копия паспорта (стр. 2–3, 5);\n— копия страхового медицинского полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года или справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные интервалы резервных дней (10–15 сентября) с правильным временем, что соответствует эталону. Однако он добавляет неподтверждённое утверждение об основном периоде 28.08–09.09.2026 и не упоминает подходящие интервалы 30.08 и 07.09, хотя они не обязательны. Также присутствует лишняя информация о документах и месте оформления, не требуемая вопросом, но не противоречащая эталону. Существенных ошибок нет, критерий выполнен.",
+      "elapsed_seconds": 12.244,
+      "memory_before": {
+        "memory.current": 528695296,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6094848,
+        "memory.events": {
+          "max": 543,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 925928,
+        "process_maxrss_kib": 691620
+      },
+      "memory_after": {
+        "memory.current": 521523200,
+        "memory.peak": 671088640,
+        "memory.swap.current": 13221888,
+        "memory.events": {
+          "max": 596,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 929252,
+        "process_maxrss_kib": 691636
+      }
+    },
+    {
+      "id": "nsu-post-docs-01",
+      "question": "Я первокурсник ФИТ, гражданин РФ. Какие страницы паспорта копировать для медразрешения на общежитие в 2026 году?",
+      "session_id": "eval:72804efe2ab64b488e6b9c14d0896b88:nsu-post-docs-01",
+      "passed": true,
+      "answer": "Для получения медицинского разрешения на вселение нужна <b>копия паспорта (страницы 2–3 и 5)</b>.\n\nПомимо этого, понадобятся:\n<ul>\n<li>копия страхового медицинского полиса ОМС;</li>\n<li>копия СНИЛС;</li>\n<li>копия сертификата о профилактических прививках или выписка о прививках из амбулаторной карты;</li>\n<li>результаты флюорографии или рентгенографии органов грудной клетки давностью не более 1 года либо справка формы СЭМД-196;</li>\n<li>направление на проживание, выданное при заключении договора найма специализированного жилого помещения.</li>\n</ul>",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно указывает обязательный факт — копии страниц 2–3 и 5 паспорта; дополнительная информация не противоречит эталону и не содержит выдуманных гарантий или переноса условий на другой год/категорию.",
+      "elapsed_seconds": 11.69,
+      "memory_before": {
+        "memory.current": 521809920,
+        "memory.peak": 671088640,
+        "memory.swap.current": 13221888,
+        "memory.events": {
+          "max": 596,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 927488,
+        "process_maxrss_kib": 691636
+      },
+      "memory_after": {
+        "memory.current": 523431936,
+        "memory.peak": 671088640,
+        "memory.swap.current": 13221888,
+        "memory.events": {
+          "max": 596,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 927612,
+        "process_maxrss_kib": 691636
+      }
+    },
+    {
+      "id": "nsu-post-docs-02",
+      "question": "Я первокурсник ФИТ, гражданин РФ. Чем заменить сертификат прививок для медразрешения на общежитие в 2026 году?",
+      "session_id": "eval:7da883139165403cb50538a8001e47ff:nsu-post-docs-02",
+      "passed": true,
+      "answer": "По контексту базы знаний для получения медицинского разрешения на вселение вместо сертификата о профилактических прививках можно предоставить <b>выписку о прививках из амбулаторной карты</b>.\n\nПолный список документов для граждан РФ:\n— копия паспорта (стр. 2–3, 5);\n— копия страхового медицинского полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках <i>или</i> выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года или справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо содержит обязательный факт «выписку о прививках из амбулаторной карты» как замену сертификату прививок, что соответствует эталону. Дополнительный список документов не противоречит эталону и не содержит выдуманных гарантий; критерий отказа не нарушен.",
+      "elapsed_seconds": 16.287,
+      "memory_before": {
+        "memory.current": 243126272,
+        "memory.peak": 243159040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1243184,
+        "process_maxrss_kib": 218096
+      },
+      "memory_after": {
+        "memory.current": 465412096,
+        "memory.peak": 534822912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1015000,
+        "process_maxrss_kib": 495932
+      }
+    },
+    {
+      "id": "nsu-post-docs-03",
+      "question": "Я иностранный первокурсник ФИТ 2026 года. Какие документы нужны для медицинского разрешения на общежитие?",
+      "session_id": "eval:1bde0cc4332f4a5aa48dff7b37d5c4ae:nsu-post-docs-03",
+      "passed": true,
+      "answer": "Для иностранных граждан и лиц без гражданства медицинское разрешение на проживание в общежитиях оформляется в <b>ММЦИММТ НГУ</b> (ул. Ляпунова, 6) в часы приёма врача-терапевта МНОЦИМ.\n\nДля получения разрешения нужно предоставить:\n• паспорт;\n• сведения о профилактических прививках;\n• результаты ФЛГ-обследования или рентгенографии органов грудной клетки давностью не более 1 года;\n• направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: паспорт, сведения о прививках, флюорографию/рентгенографию не старше года и направление на проживание. Формулировки эквивалентны эталону, дополнительных выдуманных сведений или гарантий нет, условия не переносятся на другие категории.",
+      "elapsed_seconds": 11.142,
+      "memory_before": {
+        "memory.current": 465649664,
+        "memory.peak": 534822912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1020172,
+        "process_maxrss_kib": 495932
+      },
+      "memory_after": {
+        "memory.current": 545980416,
+        "memory.peak": 653058048,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946464,
+        "process_maxrss_kib": 606020
+      }
+    },
+    {
+      "id": "nsu-paid-contact-01",
+      "question": "Где можно оплатить обучение в НГУ онлайн без комиссии?",
+      "session_id": "eval:b0a342cbce1c4273bbafac86f0bd0c85:nsu-paid-contact-01",
+      "passed": true,
+      "answer": "Оплатить обучение без комиссии можно на <b>сайте НГУ</b> с помощью платёжных систем <b>Visa, Mastercard и Мир</b>.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ указывает на сайт НГУ как место оплаты без комиссии, что соответствует обязательному факту «официальная страница онлайн-оплаты услуг НГУ» в эквивалентной краткой формулировке. Нарушений ограничений поведения нет. Небольшой недостаток: не уточнено, что это именно официальная страница онлайн-оплаты услуг, а упоминание платёжных систем является дополнительной деталью, не противоречащей эталону.",
+      "elapsed_seconds": 17.313,
+      "memory_before": {
+        "memory.current": 545943552,
+        "memory.peak": 653058048,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946464,
+        "process_maxrss_kib": 606020
+      },
+      "memory_after": {
+        "memory.current": 549666816,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14680064,
+        "memory.events": {
+          "max": 109,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 939688,
+        "process_maxrss_kib": 637696
+      }
+    },
+    {
+      "id": "nsu-paid-contact-02",
+      "question": "Какой банк участвует в программе образовательного кредита с господдержкой для оплаты учёбы в НГУ?",
+      "session_id": "eval:567cb11b736f474ca1489cf07e763a92:nsu-paid-contact-02",
+      "passed": true,
+      "answer": "По контексту базы знаний, для полной или частичной оплаты высшего образования действует программа <b>«Образовательный кредит с государственной поддержкой»</b> от <b>ПАО Сбербанк</b>.\n\nТакже уточнить информацию об образовательном кредите можно в: ПАО «Сбербанк России», АКБ «Алмазэргиэнбанк» АО, «Банк РНКБ» ПАО, «Т-банк» АО.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "regex",
+          "passed": true
+        }
+      ],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт «Сбербанк» (ПАО Сбербанк), что соответствует эталону. Однако дополнительно перечислены другие банки (Алмазэргиэнбанк, РНКБ, Т-банк) без подтверждения в контексте, что может вводить в заблуждение относительно участия именно в программе для НГУ; это небольшое неподтверждённое дополнение, но основной факт верен и критерий выполнен.",
+      "elapsed_seconds": 17.542,
+      "memory_before": {
+        "memory.current": 548933632,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14680064,
+        "memory.events": {
+          "max": 109,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 938324,
+        "process_maxrss_kib": 637696
+      },
+      "memory_after": {
+        "memory.current": 530092032,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6578176,
+        "memory.events": {
+          "max": 490,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 919296,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-contact-03",
+      "question": "Где найти приказы о стоимости обучения и образцы договоров НГУ?",
+      "session_id": "eval:0edb7207ee6c4f1ca0dbf7ef4a728463:nsu-paid-contact-03",
+      "passed": true,
+      "answer": "Приказы о стоимости обучения и образцы договоров об оказании платных образовательных услуг размещены на сайте НГУ.\n\nТам же можно оплатить обучение без комиссии с помощью платёжных систем Visa, Mastercard и Мир.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт: приказы о стоимости обучения и образцы договоров размещены на сайте НГУ, что эквивалентно указанию на раздел на странице стоимости обучения. Однако ответ не уточняет конкретный раздел/страницу, а также добавляет неподтверждённую информацию об оплате без комиссии через Visa, Mastercard и Мир, что является выдуманным фактом и нарушает ограничение «Не выдумывать сведения».",
+      "elapsed_seconds": 12.342,
+      "memory_before": {
+        "memory.current": 529874944,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6578176,
+        "memory.events": {
+          "max": 490,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 919300,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 504803328,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29949952,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 962736,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "question": "Сколько стоит год обучения по 09.03.01 в НГУ в 2026/27?",
+      "session_id": "eval:9e5cd046600240ec82ddcb114be69e7c:nsu-paid-steps-01",
+      "passed": false,
+      "answer": "В базе знаний Ваш вуз указана стоимость <b>102 500 руб. в семестр</b> (то есть около <b>205 000 руб. за год</b>) — но в контексте она не привязана к конкретному коду 09.03.01, поэтому подтвердить, что это цена именно этого направления, я не могу.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз — точной стоимости обучения по 09.03.01 в 2026/27 учебном году там нет.\n\nУточнить стоимость можно в приёмной комиссии: +7 (383) 373-96-52 (пн-пт 10:00-18:00, обед 13:00-14:00; сб 10:00-13:00, время по НСК).",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Эталонный ответ — 300 000 рублей за год. Ответ помощника называет другую сумму (102 500 руб. в семестр / около 205 000 руб. за год) и заявляет, что точной стоимости по 09.03.01 нет, то есть противоречит эталону и не содержит обязательного факта. Кроме того, ответ заменяет доступный фактический ответ перенаправлением в приёмную комиссию, что нарушает ограничение поведения.",
+      "elapsed_seconds": 12.31,
+      "memory_before": {
+        "memory.current": 504328192,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29949952,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 962752,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 481546240,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 949428,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-02",
+      "question": "Сколько стоит семестр на ПИиКН ФИТ в 2026/27?",
+      "session_id": "eval:31b5597784bc43d4b852429a7c115ab4:nsu-paid-steps-02",
+      "passed": false,
+      "answer": "В контексте базы знаний указана стоимость <b>102 500 руб. в семестр</b> (2026-27 уч. год) для программы факультета информационных технологий, но прямой привязки этой цифры именно к «ПИиКН» в контексте нет.\n\nУточните, пожалуйста, полное название программы — тогда смогу ответить точнее.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Эталонный ответ — 150 000 рублей в семестр. Ответ называет другую сумму (102 500 руб.) и не содержит обязательного факта, то есть противоречит эталону и содержит неподтверждённые сведения.",
+      "elapsed_seconds": 9.342,
+      "memory_before": {
+        "memory.current": 480862208,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 949440,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 480731136,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 978784,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-03",
+      "question": "Сколько стоит год обучения на мехатронике и робототехнике 15.03.06 в НГУ в 2026/27?",
+      "session_id": "eval:96d709c3eff74fcb90b9f19493535336:nsu-paid-steps-03",
+      "passed": true,
+      "answer": "По данным базы знаний, стоимость обучения на 1 курсе бакалавриата в 2026-2027 учебном году по направлению <b>15.03.06 «Мехатроника и робототехника. Искусственный интеллект»</b> для граждан РФ и СНГ составляет <b>205 000 руб./год</b>.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно указывает обязательный факт — 205 000 рублей за год — для нужного направления, года и категории (граждане РФ), без выдуманных сведений и нарушений ограничений поведения.",
+      "elapsed_seconds": 11.474,
+      "memory_before": {
+        "memory.current": 480935936,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 978788,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 506789888,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29802496,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 954600,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-04",
+      "question": "Можно ли образовательным кредитом с господдержкой оплатить только часть стоимости учёбы в НГУ?",
+      "session_id": "eval:2964d3ce65dc4cf9a54cea0e99b12795:nsu-paid-steps-04",
+      "passed": true,
+      "answer": "Да, можно. По данным базы знаний, программа «Образовательный кредит с государственной поддержкой» от ПАО Сбербанк действует для <b>полной или частичной</b> оплаты стоимости высшего образования.\n\nБолее подробную информацию об образовательном кредите можно получить в ПАО «Сбербанк России», АКБ «Алмазэргиэнбанк» АО, «Банк РНКБ» ПАО и «Т-банк» АО.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо подтверждает, что образовательный кредит с господдержкой допускает полную или частичную оплату, что соответствует обязательному факту эталона. Дополнительные сведения не противоречат эталону и не нарушают ограничений.",
+      "elapsed_seconds": 15.943,
+      "memory_before": {
+        "memory.current": 506724352,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29802496,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 954600,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 508153856,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29765632,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 950884,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-05",
+      "question": "Какими платёжными системами можно оплатить учёбу в НГУ онлайн без комиссии?",
+      "session_id": "eval:75b0ca7ae13342f7a6c6c879db55b64c:nsu-paid-steps-05",
+      "passed": true,
+      "answer": "Оплатить обучение без комиссии можно на сайте НГУ с помощью платёжных систем <b>Visa</b>, <b>Mastercard</b> и <b>Мир</b>.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно содержит все обязательные факты (Visa, Mastercard, Мир), не выдумывает сведения и не нарушает ограничения поведения; краткий правильный ответ достаточен.",
+      "elapsed_seconds": 12.129,
+      "memory_before": {
+        "memory.current": 508329984,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29765632,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 950620,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 508899328,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29765632,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959792,
+        "process_maxrss_kib": 691828
+      }
+    }
+  ]
+}

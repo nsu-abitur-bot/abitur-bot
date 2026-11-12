@@ -1,0 +1,10 @@
+{
+  "checked_at": "2026-11-10",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "unchanged_since_semantic_source_check": "2026-11-07",
+  "source_snapshots_rechecked": 9,
+  "cases_in_source_audit": 50,
+  "internal_confirmed": 0,
+  "expert_confirmed": 0,
+  "method": "Повторная сверка SHA набора и девяти исходных снимков с проверкой от 07.11. Нового подтверждения от имени коллег нет."
+}

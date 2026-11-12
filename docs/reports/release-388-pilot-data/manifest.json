@@ -1,0 +1,58 @@
+{
+  "status": "pilot_incomplete",
+  "full_run_started": false,
+  "completed_comparisons": 0,
+  "question_attempts": 1,
+  "calibrations_completed": 4,
+  "known_deepseek_prompt": 9877,
+  "known_deepseek_output": 513,
+  "known_deepseek_cache_hit": 640,
+  "deepseek_offpeak_estimate_cny": 0.011301799999999999,
+  "deepseek_peak_estimate_cny": 0.022603599999999998,
+  "unknown_attempts": 2,
+  "unknown_attempts_planning_reserve_cny": 0.05223,
+  "known_gigachat_tokens": 113,
+  "gigachat_package_equivalent_rub": 0.001582,
+  "files": [
+    {
+      "file": "with-kb-pilot-20261110-00-report.json",
+      "sha256": "693395861f9d15caba03d84c43b40d7cb4b040dcaa46eb15ae8d79a162433999"
+    },
+    {
+      "file": "empty-kb-pilot-20261110-00-report.json",
+      "sha256": "f5a95188e16493d69e0939db2e32acd440ec1252892f6b47bdc392256573f0e4"
+    },
+    {
+      "file": "with-kb-pilot-20261110-01-report.json",
+      "sha256": "dadea7c39e14dc456ddb74d339e9b1b26095df765bf90273b59b81c47ff4d780"
+    },
+    {
+      "file": "with-kb-pilot-20261110-01-usage.jsonl",
+      "sha256": "16a807a93c9bc388a3b3a75f27d529ed70aec398ac2e5641ee5be3433f2dc108"
+    },
+    {
+      "file": "with-kb-pilot-20261110-01-intents.jsonl",
+      "sha256": "81490732df6d83d8f83bc53056af0ade61af07fb8e8808e150c713ea212b63a2"
+    },
+    {
+      "file": "with-kb-pilot-20261110-02-report.json",
+      "sha256": "56f671d8c5b4ca331701cea8ab38d273e49d1273f74717389deaa10b667eafb0"
+    },
+    {
+      "file": "with-kb-pilot-20261110-02-usage.jsonl",
+      "sha256": "20e13ac6a5f41206c23d890d065eb619d127a4ac8674b47bd4f32b1f95a7be27"
+    },
+    {
+      "file": "with-kb-pilot-20261110-02-intents.jsonl",
+      "sha256": "bea9596925c180e60653cc51a748fcaf18855437629d1f0bcc32038b19c9c28c"
+    },
+    {
+      "file": "pilot-20261110-controller-with-kb-controller.json",
+      "sha256": "8dca664d3b1eb7720b71f36b8bc5a6a861f567c45e5ad67b134a83ffd1436580"
+    },
+    {
+      "file": "pilot-20261110-controller-02-with-kb-controller.json",
+      "sha256": "534504cbf593373c6a17b4442aa291fd6881f9c21750c2f90fafb60e82d83048"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "remaining_sources": 8,
+  "pilot_chunk_tokenizer_tokens": 1555,
+  "remaining_chunk_tokenizer_tokens": 40099,
+  "size_ratio": 25.787138263665597,
+  "tokenizer": "o200k_base, LightRAG gpt-4o-mini tokenizer; not provider billing tokens",
+  "basis": "Суммарные реальные расходы двух попыток, включая неудачную. Линейная оценка по объёму исходного текста в токенах.",
+  "deepseek_cny": {
+    "same_cache_offpeak": 3.003824599755627,
+    "same_cache_peak": 6.007649199511254,
+    "no_cache_peak": 10.14806409517685,
+    "same_cache_offpeak_reserve_3x": 9.01147379926688,
+    "no_cache_peak_reserve_2x": 20.2961281903537,
+    "no_cache_peak_stress_3x": 30.444192285530548
+  },
+  "gigachat": {
+    "input_tokens_linear": 350860,
+    "input_tokens_reserve_3x": 1052579,
+    "package_equivalent_rub_linear": 4.912037245016077,
+    "package_equivalent_rub_reserve_3x": 14.736111735048233
+  },
+  "sources": [
+    {
+      "url": "https://education.nsu.ru/information-technologies/",
+      "chunk_tokenizer_tokens": 9731
+    },
+    {
+      "url": "https://education.nsu.ru/tipi",
+      "chunk_tokenizer_tokens": 2929
+    },
+    {
+      "url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+      "chunk_tokenizer_tokens": 1555
+    },
+    {
+      "url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+      "chunk_tokenizer_tokens": 2910
+    },
+    {
+      "url": "https://education.nsu.ru/mathematics/",
+      "chunk_tokenizer_tokens": 10874
+    },
+    {
+      "url": "https://education.nsu.ru/mechatronics/",
+      "chunk_tokenizer_tokens": 3348
+    },
+    {
+      "url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+      "chunk_tokenizer_tokens": 5308
+    },
+    {
+      "url": "https://www.nsu.ru/n/life/campus/check-in/",
+      "chunk_tokenizer_tokens": 3270
+    },
+    {
+      "url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+      "chunk_tokenizer_tokens": 1729
+    }
+  ],
+  "limitations": [
+    "Это не замер остальных восьми документов и не гарантированный предел цены.",
+    "Плотность сущностей, связи между документами, кэш и повторы могут изменить расход.",
+    "Текстовый пилот не оценивает PDF/Gemini, ответы бота, LLM-судью или прогоны 50 вопросов.",
+    "Резерв 2-3x — плановый запас, не статистический доверительный интервал.",
+    "Пилотный скрипт фиксирован на одном документе, лимиты для больших источников нужно калибровать отдельно."
+  ]
+}

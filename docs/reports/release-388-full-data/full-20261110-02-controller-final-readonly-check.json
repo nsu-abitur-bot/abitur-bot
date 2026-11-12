@@ -1,0 +1,37 @@
+{
+  "checked_at_utc": "2026-11-10T15:16:01.990087+00:00",
+  "endpoints": [
+    {
+      "port": 18001,
+      "http_code": "200",
+      "curl_exit": 0
+    },
+    {
+      "port": 18002,
+      "http_code": "000",
+      "curl_exit": 7
+    },
+    {
+      "port": 18003,
+      "http_code": "200",
+      "curl_exit": 0
+    },
+    {
+      "port": 13001,
+      "http_code": "200",
+      "curl_exit": 0
+    },
+    {
+      "port": 13002,
+      "http_code": "000",
+      "curl_exit": 7
+    },
+    {
+      "port": 13003,
+      "http_code": "200",
+      "curl_exit": 0
+    }
+  ],
+  "host_available_kib": 1464064,
+  "full_run_started": true
+}

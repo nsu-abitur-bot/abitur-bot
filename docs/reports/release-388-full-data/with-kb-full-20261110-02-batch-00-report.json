@@ -1,0 +1,764 @@
+{
+  "schema_version": 1,
+  "mode": "live_full_batch",
+  "status": "completed",
+  "condition": "with-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "5f476e090af4937b01e4bd9d10f675fa712e568d09618d542971d063d978d672",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T14:41:52.186818+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-pre-flow-01",
+    "nsu-pre-flow-02",
+    "nsu-pre-flow-03",
+    "nsu-pre-flow-04",
+    "nsu-pre-scholar-01",
+    "nsu-pre-scholar-02",
+    "nsu-pre-scholar-03",
+    "nsu-pre-dorm-01",
+    "nsu-pre-dorm-02",
+    "nsu-pre-dorm-03"
+  ],
+  "results": [
+    {
+      "id": "nsu-pre-flow-01",
+      "question": "Какие профили бакалавриата есть на ФИТ?",
+      "session_id": "eval:ca14c737d0d44139acd54f273e0b404a:nsu-pre-flow-01",
+      "passed": false,
+      "answer": "По базе знаний я могу подтвердить только один профиль бакалавриата Факультета информационных технологий НГУ — <b>«Технологии индустриальной программной инженерии»</b> (направление 09.03.01 «Информатика и вычислительная техника»).\n\nПолный перечень профилей бакалавриата ФИТ в моём контексте отсутствует, поэтому я не нашёл информации об этом в базе знаний Ваш вуз.\n\nЕсли хотите, расскажу подробнее о программе «Технологии индустриальной программной инженерии»: экзамены, партнёров-работодателей, форматы обучения.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит только один из трёх требуемых профилей (ТИПИ) и прямо заявляет об отсутствии полного перечня, тогда как эталон требует перечислить КНиС, ПИиКН и ТИПИ. Существенная часть требуемой информации отсутствует, критерий не выполнен.",
+      "elapsed_seconds": 13.954,
+      "memory_before": {
+        "memory.current": 191307776,
+        "memory.peak": 191336448,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1246788,
+        "process_maxrss_kib": 217836
+      },
+      "memory_after": {
+        "memory.current": 398823424,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1052432,
+        "process_maxrss_kib": 496000
+      }
+    },
+    {
+      "id": "nsu-pre-flow-02",
+      "question": "Какой код направления у ТИПИ и как оно называется?",
+      "session_id": "eval:b568f387f26748c5987ef9476607b82f:nsu-pre-flow-02",
+      "passed": false,
+      "answer": "Код направления — <b>09.03.01</b>, программа называется <b>«Технологии индустриальной программной инженерии»</b> (бакалавриат, очная форма).",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ содержит верный код 09.03.01, но название направления указано неверно: вместо «Информатика и вычислительная техника» приведено название программы «Технологии индустриальной программной инженерии». Один из двух обязательных фактов искажён, что является существенной ошибкой.",
+      "elapsed_seconds": 8.043,
+      "memory_before": {
+        "memory.current": 398565376,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1052440,
+        "process_maxrss_kib": 496000
+      },
+      "memory_after": {
+        "memory.current": 402911232,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1065920,
+        "process_maxrss_kib": 496000
+      }
+    },
+    {
+      "id": "nsu-pre-flow-03",
+      "question": "Какие специализации есть на ТИПИ?",
+      "session_id": "eval:070d5afbe406451d8f3902718fd4e85a:nsu-pre-flow-03",
+      "passed": true,
+      "answer": "По контексту базы знаний, в рамках профиля «Технологии индустриальной программной инженерии» (направление 09.03.01 «Информатика и вычислительная техника», ФИТ НГУ) указаны следующие специализации (домены):\n\n<b>Разработчик системного программного обеспечения</b> и <b>Разработчик бизнес-приложений</b>.\n\nТакже указаны роли:\n• Опережающая роль — <b>Архитектор решений / Системный архитектор</b>\n• Дополнительная роль — <b>Менеджер проекта / программы</b>\n\nОсновная профессиональная роль — инженер-программист/разработчик.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит оба обязательных элемента эталона («Разработчик системного программного обеспечения» и «Разработчик бизнес-приложений»), эквивалентные формулировке «Разработка системного программного обеспечения и бизнес-приложений». Однако добавлены сведения о ролях (архитектор, менеджер проекта, инженер-программист) и привязка к ФИТ НГУ, которые не подтверждены переданным контекстом (контекст пуст), что является небольшим выходом за рамки подтверждённых данных. Критерий в целом выполнен, но есть неподтверждённые детали.",
+      "elapsed_seconds": 12.694,
+      "memory_before": {
+        "memory.current": 402063360,
+        "memory.peak": 473178112,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1056196,
+        "process_maxrss_kib": 496000
+      },
+      "memory_after": {
+        "memory.current": 502161408,
+        "memory.peak": 608722944,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977560,
+        "process_maxrss_kib": 604592
+      }
+    },
+    {
+      "id": "nsu-pre-flow-04",
+      "question": "В чём особенность обучения на КНиС?",
+      "session_id": "eval:bd63c105c8234033a3970b9d5a1d3b49:nsu-pre-flow-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, полное название программы — так я смогу найти нужные сведения.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта о сочетании российской фундаментальной подготовки и британского подхода с практикой и постепенным усложнением материала, вместо этого заявляет об отсутствии информации и перенаправляет вопрос — это нарушает критерий «не заменять доступный фактический ответ общим перенаправлением» и не соответствует эталону.",
+      "elapsed_seconds": 12.153,
+      "memory_before": {
+        "memory.current": 502390784,
+        "memory.peak": 608722944,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977640,
+        "process_maxrss_kib": 604592
+      },
+      "memory_after": {
+        "memory.current": 525201408,
+        "memory.peak": 671088640,
+        "memory.swap.current": 10743808,
+        "memory.events": {
+          "max": 12,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964732,
+        "process_maxrss_kib": 649448
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "question": "Я поступаю по целевому договору. Могу получать NSU+ в 2026 году?",
+      "session_id": "eval:40ee7f6857bc4c64935b5332ad5cead7:nsu-pre-scholar-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит обязательного факта о том, что NSU+ не назначается обучающимся по договорам целевого обучения, и вместо фактического ответа даёт общее перенаправление, что нарушает ограничение поведения. Существенная часть требуемой информации отсутствует.",
+      "elapsed_seconds": 16.921,
+      "memory_before": {
+        "memory.current": 525185024,
+        "memory.peak": 671088640,
+        "memory.swap.current": 10739712,
+        "memory.events": {
+          "max": 12,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 963540,
+        "process_maxrss_kib": 649448
+      },
+      "memory_after": {
+        "memory.current": 544686080,
+        "memory.peak": 671088640,
+        "memory.swap.current": 5804032,
+        "memory.events": {
+          "max": 19,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964280,
+        "process_maxrss_kib": 649448
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-02",
+      "question": "Что нужно, чтобы NSU+ продолжали платить весной первого курса?",
+      "session_id": "eval:595617342f274b299cec938836f79eda:nsu-pre-scholar-02",
+      "passed": true,
+      "answer": "По базе знаний Ваш вуз:\n\nСтипендия начисляется в течение осеннего семестра, а чтобы её продолжали выплачивать весной первого года обучения, нужно:\n\n- успешно сдать первую сессию на «4» и «5»;\n- не иметь академических задолженностей.\n\nТакже важно: стипендии не назначаются студентам, обучающимся по договорам о целевом обучении.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно передаёт обязательный факт эталона: первая сессия сдана на 4 и 5, задолженностей нет. Дополнительное уточнение про целевое обучение не противоречит эталону и не является выдумкой в контексте стипендий, критерий отказа не нарушен.",
+      "elapsed_seconds": 22.521,
+      "memory_before": {
+        "memory.current": 543948800,
+        "memory.peak": 671088640,
+        "memory.swap.current": 5804032,
+        "memory.events": {
+          "max": 19,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 964040,
+        "process_maxrss_kib": 649448
+      },
+      "memory_after": {
+        "memory.current": 584970240,
+        "memory.peak": 671088640,
+        "memory.swap.current": 26165248,
+        "memory.events": {
+          "max": 116,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 913860,
+        "process_maxrss_kib": 651212
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-03",
+      "question": "Какие баллы учитываются при назначении NSU+?",
+      "session_id": "eval:3309d05d746d4f08acd866f70cab967b:nsu-pre-scholar-03",
+      "passed": true,
+      "answer": "По контексту базы знаний об НГУ:\n\nПри начислении стипендии учитывается <b>сумма конкурсных баллов</b>, полученных по результатам:\n- Единого государственного экзамена;\n- за индивидуальные достижения;\n- за олимпиады школьников, засчитываемые за 100 баллов по предмету.\n\nОтдельно по направлению «Журналистика»: <b>193–200</b> — сумма конкурсных баллов по результатам двух вступительных испытаний (русский язык и литература).\n\nЕсли вы имели в виду конкретную стипендию «NSU+» — информации именно о ней в базе знаний я не нашел.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит все обязательные факты эталона (ЕГЭ, индивидуальные достижения, олимпиады, засчитываемые за 100 баллов по предмету) в эквивалентной формулировке. Однако добавлено уточнение про «Журналистику» и оговорка, что информации именно о стипендии «NSU+» не найдено, что создаёт лёгкую неопределённость, но не противоречит эталону и не выдумывает фактов. Небольшой избыточный/сомнительный фрагмент — допустимый пропуск деталей, критерий в целом выполнен.",
+      "elapsed_seconds": 17.984,
+      "memory_before": {
+        "memory.current": 584949760,
+        "memory.peak": 671088640,
+        "memory.swap.current": 26165248,
+        "memory.events": {
+          "max": 116,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 910664,
+        "process_maxrss_kib": 651212
+      },
+      "memory_after": {
+        "memory.current": 579780608,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32309248,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 935132,
+        "process_maxrss_kib": 651284
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-01",
+      "question": "Я первокурсник ФИТ 2026 года. Где взять заявление на общежитие?",
+      "session_id": "eval:91c291de3ece4fa48bc11848013c9e2d:nsu-pre-dorm-01",
+      "passed": true,
+      "answer": "Заявление на проживание в общежитии можно получить и заполнить в кабинете <b>№1112 Учебного корпуса №1</b> (ул. Пирогова, д.1, вход №1 из внутреннего дворика).\n\nЧасы работы 29–30 августа: с 09:00 до 16:00, перерыв на обед с 13:00 до 14:00.\n\nПосле этого нужно заключить договор найма и получить направление на проживание у заведующего общежитием.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: кабинет 1112, учебный корпус №1, Пирогова, 1, вход №1 из внутреннего дворика. Дополнительные сведения о часах работы и порядке заключения договора не противоречат эталону и не являются выдуманными гарантиями; критерий отказа не нарушен.",
+      "elapsed_seconds": 10.814,
+      "memory_before": {
+        "memory.current": 496979968,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32309248,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1001408,
+        "process_maxrss_kib": 651284
+      },
+      "memory_after": {
+        "memory.current": 522072064,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32260096,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977888,
+        "process_maxrss_kib": 651284
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-02",
+      "question": "Я зачислен на ФИТ в 2026 году. У кого заключить договор найма общежития?",
+      "session_id": "eval:af730315aad64936a55834af5ee884a6:nsu-pre-dorm-02",
+      "passed": true,
+      "answer": "По контексту базы знаний: договор найма заключается <b>у заведующего общежитием</b> — там же вы получаете направление на проживание.\n\nПорядок для первокурсника:\n1. Получить и заполнить бланк заявления на проживание в УМО вашего факультета (ФИТ), завизировать у заместителя декана.\n2. Заключить договор найма и получить направление на проживание у заведующего общежитием.\n3. Оплатить проживание (с даты прибытия по 1 сентября — 400 руб./сутки, далее за семестр по расценкам приказа ректора).\n\nКонтакты общежития: ул. Пирогова, 4/1, пн–чт 8:30–17:45, пт 8:30–16:30, обед 13:00–14:00.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт: договор найма заключается с заведующим общежитием. Однако добавлены детали (порядок действий, стоимость, контакты), которые не подтверждены эталоном и контекстом (контекст пуст), что создаёт риск неподтверждённых утверждений. Основной критерий выполнен, но есть лишние сведения.",
+      "elapsed_seconds": 12.097,
+      "memory_before": {
+        "memory.current": 521441280,
+        "memory.peak": 671088640,
+        "memory.swap.current": 32251904,
+        "memory.events": {
+          "max": 155,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 977892,
+        "process_maxrss_kib": 651284
+      },
+      "memory_after": {
+        "memory.current": 502435840,
+        "memory.peak": 671088640,
+        "memory.swap.current": 50991104,
+        "memory.events": {
+          "max": 267,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1016156,
+        "process_maxrss_kib": 651452
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-03",
+      "question": "Я оплатил общежитие ФИТ в 2026 году. Что сохранить для подтверждения оплаты?",
+      "session_id": "eval:31ae3d2f2e0847d8a63833d67f3d4e94:nsu-pre-dorm-03",
+      "passed": true,
+      "answer": "Судя по инструкции, для подтверждения оплаты общежития нужно <b>сохранять чеки или скриншоты об оплате</b>.\n\nКроме того, чек об оплате потребуется сдать заведующему общежития на финальном этапе заселения (вместе с направлением с двумя печатями и двумя фотографиями 3х4) для получения пропуска и ключей.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт «чеки или скриншоты об оплате», но добавляет неподтверждённые эталоном детали (сдача чека заведующему, направление с печатями, фотографии), что является небольшим выходом за рамки эталона; критерий отказа не нарушен.",
+      "elapsed_seconds": 9.941,
+      "memory_before": {
+        "memory.current": 501616640,
+        "memory.peak": 671088640,
+        "memory.swap.current": 50991104,
+        "memory.events": {
+          "max": 267,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1015508,
+        "process_maxrss_kib": 651452
+      },
+      "memory_after": {
+        "memory.current": 502480896,
+        "memory.peak": 671088640,
+        "memory.swap.current": 50991104,
+        "memory.events": {
+          "max": 267,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 991264,
+        "process_maxrss_kib": 651452
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно и полностью совпадает с эталоном: указан код 09.03.01 и название «Информатика и вычислительная техника». Все обязательные факты присутствуют, выдуманных сведений нет.",
+      "elapsed_seconds": 2.487
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает ограничения «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и нарушение критерия отказа — оценка 1.",
+      "elapsed_seconds": 1.325
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 1.233
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не оставляет окончательный выбор абитуриенту. Критерий отказа/нейтральности нарушен.",
+      "elapsed_seconds": 1.563
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 183951360,
+      "memory.peak": 184057856,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1256512,
+      "process_maxrss_kib": 210260
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 191320064,
+      "memory.peak": 191336448,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1246788,
+      "process_maxrss_kib": 217836
+    },
+    {
+      "phase": "nsu-pre-flow-01",
+      "memory.current": 191307776,
+      "memory.peak": 191336448,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1246788,
+      "process_maxrss_kib": 217836
+    },
+    {
+      "phase": "nsu-pre-flow-02",
+      "memory.current": 398565376,
+      "memory.peak": 473178112,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1052440,
+      "process_maxrss_kib": 496000
+    },
+    {
+      "phase": "nsu-pre-flow-03",
+      "memory.current": 402063360,
+      "memory.peak": 473178112,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1056196,
+      "process_maxrss_kib": 496000
+    },
+    {
+      "phase": "nsu-pre-flow-04",
+      "memory.current": 502390784,
+      "memory.peak": 608722944,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 977640,
+      "process_maxrss_kib": 604592
+    },
+    {
+      "phase": "nsu-pre-scholar-01",
+      "memory.current": 525185024,
+      "memory.peak": 671088640,
+      "memory.swap.current": 10739712,
+      "memory.events": {
+        "max": 12,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 963540,
+      "process_maxrss_kib": 649448
+    },
+    {
+      "phase": "nsu-pre-scholar-02",
+      "memory.current": 543948800,
+      "memory.peak": 671088640,
+      "memory.swap.current": 5804032,
+      "memory.events": {
+        "max": 19,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 964040,
+      "process_maxrss_kib": 649448
+    },
+    {
+      "phase": "nsu-pre-scholar-03",
+      "memory.current": 584949760,
+      "memory.peak": 671088640,
+      "memory.swap.current": 26165248,
+      "memory.events": {
+        "max": 116,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 910664,
+      "process_maxrss_kib": 651212
+    },
+    {
+      "phase": "nsu-pre-dorm-01",
+      "memory.current": 496979968,
+      "memory.peak": 671088640,
+      "memory.swap.current": 32309248,
+      "memory.events": {
+        "max": 155,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1001408,
+      "process_maxrss_kib": 651284
+    },
+    {
+      "phase": "nsu-pre-dorm-02",
+      "memory.current": 521441280,
+      "memory.peak": 671088640,
+      "memory.swap.current": 32251904,
+      "memory.events": {
+        "max": 155,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 977892,
+      "process_maxrss_kib": 651284
+    },
+    {
+      "phase": "nsu-pre-dorm-03",
+      "memory.current": 501616640,
+      "memory.peak": 671088640,
+      "memory.swap.current": 50991104,
+      "memory.events": {
+        "max": 267,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1015508,
+      "process_maxrss_kib": 651452
+    },
+    {
+      "phase": "finished",
+      "memory.current": 502116352,
+      "memory.peak": 671088640,
+      "memory.swap.current": 50954240,
+      "memory.events": {
+        "max": 267,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 993928,
+      "process_maxrss_kib": 651452
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": true,
+  "peak_sampled_swap_bytes": 50995200,
+  "min_host_available_kib": 861740,
+  "batch_index": 0,
+  "run_id": "full-20261110-02",
+  "root_run_id": "e95aecfb9a76431f8c918aa21e60bac7",
+  "inspect_only": false,
+  "latest_memory": {
+    "memory.current": 502116352,
+    "memory.peak": 671088640,
+    "memory.swap.current": 50954240,
+    "memory.events": {
+      "max": 267,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 993928,
+    "process_maxrss_kib": 651452
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "c73b3d3436fa9f6eaf27e2b7ba193e3e2822b45fcc43788b965c97b859688d0c",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 9,
+      "content_proposal": 9,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 32
+    },
+    "documents": [
+      {
+        "id": "01a1b547-1029-7c3e-9577-554857174189",
+        "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+        "content_hash": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 09:24:02.205119",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      {
+        "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+        "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+        "source_url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+        "content_hash": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:15:30.079835",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+      },
+      {
+        "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+        "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+        "source_url": "https://education.nsu.ru/tipi",
+        "content_hash": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:18:30.589152",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+      },
+      {
+        "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+        "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+        "source_url": "https://education.nsu.ru/mechatronics/",
+        "content_hash": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:22:17.768391",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+      },
+      {
+        "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+        "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+        "content_hash": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:24:45.022448",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+      },
+      {
+        "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+        "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+        "source_url": "https://education.nsu.ru/mathematics/",
+        "content_hash": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 14:24:38.358039",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68"
+      },
+      {
+        "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+        "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+        "source_url": "https://www.nsu.ru/n/life/campus/check-in/",
+        "content_hash": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:00:30.770944",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c"
+      },
+      {
+        "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+        "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+        "source_url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+        "content_hash": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:18:23.481171",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b696-dfda-7e90-bea0-3a8f7914526a"
+      },
+      {
+        "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+        "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+        "source_url": "https://education.nsu.ru/information-technologies/",
+        "content_hash": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:29:57.749857",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7"
+      }
+    ],
+    "graph_documents": 9,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 249,
+    "attempts_finished": 249,
+    "operation_counts": {
+      "generation": 209,
+      "oauth": 1,
+      "embedding": 39
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 0,
+    "reserved_peak_no_cache_micro_cny": 351700,
+    "embedding_input_bytes": 8553
+  },
+  "finished_at_utc": "2026-11-10T14:44:32.642500+00:00",
+  "unexecuted_ids": []
+}

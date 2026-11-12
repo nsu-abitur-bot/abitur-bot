@@ -1,0 +1,1 @@
+{"attempt": 1, "provider": "deepseek", "operation": "generation", "request_model": "deepseek-flash", "input_count": null, "started_at": "2026-11-10T09:59:33.245091+00:00", "reserved_micro_cny": 10926, "phase": "calibration", "case_id": "correct", "elapsed_seconds": 16.8989, "http_status": 500, "error_type": null, "usage": {}, "usage_complete": false}

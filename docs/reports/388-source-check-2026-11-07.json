@@ -1,0 +1,1385 @@
+{
+  "checked_at": "2026-11-07",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "method": "Сверка смысла эталонов с разделами локальных снимков и автоматическая проверка SHA/опорных терминов. Совпадение терминов само по себе не доказывает правильность ответа.",
+  "scope": "Редакции страниц от 05.11.2026, условия кампании 2026. Актуальность будущих кампаний не проверялась.",
+  "human_confirmation": "Не добавлялась от имени Марата. Отдельное экспертное подтверждение также не проводилось.",
+  "sources": [
+    {
+      "id": "DOC-de8ef06e37fe496b",
+      "url": "https://education.nsu.ru/information-technologies/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+      "extracted_utf8_sha256": "3f931adf34d07d4b654a8dd2021a61ab3d155e4e206e74da893460735edef1a6",
+      "extracted_chars": 36284
+    },
+    {
+      "id": "DOC-2338f0807b9bc328",
+      "url": "https://education.nsu.ru/tipi",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+      "extracted_utf8_sha256": "90af72b971a85868be88c4406987ecb53be6e2b1ada14aa918b79b41886ffd02",
+      "extracted_chars": 9294
+    },
+    {
+      "id": "DOC-3d63df62af354868",
+      "url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+      "extracted_utf8_sha256": "865eaad95bc86dd5fe7c5d3d93fbb1db3752e93dbdc9d50550a9bd08f86c7d9f",
+      "extracted_chars": 5087
+    },
+    {
+      "id": "DOC-03ae446000cfbc45",
+      "url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+      "extracted_utf8_sha256": "44bac5698c4f1d32ce87be1b9e5bbc22ac6cd677b6be7e9c37bee0069e2a5d0f",
+      "extracted_chars": 8846
+    },
+    {
+      "id": "DOC-770b0c6ebb172dbe",
+      "url": "https://education.nsu.ru/mathematics/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+      "extracted_utf8_sha256": "1b23f9cac77f39328126131c25214dcef68d686f24ad2565c48a4978caefc63e",
+      "extracted_chars": 40067
+    },
+    {
+      "id": "DOC-317c53d5b5ae2baf",
+      "url": "https://education.nsu.ru/mechatronics/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+      "extracted_utf8_sha256": "4ff6cb6abe1ff34153146cc751c79008b846d09d75495fb6159310065afc083d",
+      "extracted_chars": 13197
+    },
+    {
+      "id": "DOC-be8ca7262223f1f8",
+      "url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+      "extracted_utf8_sha256": "1a946b3856317215dad95d8d15f90a1c2e20e69e29ec19bf94b0d0998abcc52b",
+      "extracted_chars": 19902
+    },
+    {
+      "id": "DOC-83001f87d00915c7",
+      "url": "https://www.nsu.ru/n/life/campus/check-in/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+      "extracted_utf8_sha256": "1e7f55cb37c2118eb8f569282933caaae313c59df40595829ab0561d9a0eb65c",
+      "extracted_chars": 8579
+    },
+    {
+      "id": "DOC-6674be71e05b972c",
+      "url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+      "snapshot_date": "2026-11-05",
+      "raw_sha256": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+      "extracted_utf8_sha256": "4fa56c026aa29c5fee1bbbb3a7c0525300746ee2186b2aa0f12046614dbf85c5",
+      "extracted_chars": 5135
+    }
+  ],
+  "cases": [
+    {
+      "id": "nsu-pre-flow-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b",
+        "DOC-2338f0807b9bc328"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "КОМПЬЮТЕРНЫЕ НАУКИ И СИСТЕМОТЕХНИКА",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 1888
+            }
+          ]
+        },
+        {
+          "anchor": "ПРОГРАММНАЯ ИНЖЕНЕРИЯ И КОМПЬЮТЕРНЫЕ НАУКИ",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 1924
+            }
+          ]
+        },
+        {
+          "anchor": "ТЕХНОЛОГИИ ИНДУСТРИАЛЬНОЙ ПРОГРАММНОЙ ИНЖЕНЕРИИ",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 0
+            }
+          ]
+        }
+      ],
+      "note": "Страница ФИТ перечисляет ПИиКН и КНиС, отдельная страница ФИТ описывает ТИПИ. Для полного перечня профилей в эталон добавлен ТИПИ и второй источник."
+    },
+    {
+      "id": "nsu-pre-flow-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "09.03.01",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 577
+            }
+          ]
+        },
+        {
+          "anchor": "Информатика и вычислительная техника",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 1666
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-flow-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "системного программного обеспечения",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 1913
+            }
+          ]
+        },
+        {
+          "anchor": "бизнес-приложений",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 1963
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-flow-04",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "российской и британской",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 5232
+            }
+          ]
+        },
+        {
+          "anchor": "спиральной",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 5808
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-3d63df62af354868"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "не назначаются",
+          "locations": [
+            {
+              "source_id": "DOC-3d63df62af354868",
+              "normalized_offset": 2996
+            }
+          ]
+        },
+        {
+          "anchor": "целевом",
+          "locations": [
+            {
+              "source_id": "DOC-3d63df62af354868",
+              "normalized_offset": 3049
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-scholar-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-3d63df62af354868"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "весеннего семестра",
+          "locations": [
+            {
+              "source_id": "DOC-3d63df62af354868",
+              "normalized_offset": 3214
+            }
+          ]
+        },
+        {
+          "anchor": "отсутствия задолженностей",
+          "locations": [
+            {
+              "source_id": "DOC-3d63df62af354868",
+              "normalized_offset": 3177
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-scholar-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-3d63df62af354868"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "индивидуальные достижения",
+          "locations": [
+            {
+              "source_id": "DOC-3d63df62af354868",
+              "normalized_offset": 3385
+            }
+          ]
+        },
+        {
+          "anchor": "100 баллов",
+          "locations": [
+            {
+              "source_id": "DOC-3d63df62af354868",
+              "normalized_offset": 3462
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-dorm-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "1112",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3607
+            }
+          ]
+        },
+        {
+          "anchor": "внутреннего дворика",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3663
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-dorm-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "заведующего общежитием",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3154
+            }
+          ]
+        },
+        {
+          "anchor": "Договор найма",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3766
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-dorm-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "чеки",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3433
+            }
+          ]
+        },
+        {
+          "anchor": "скриншоты",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3442
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-partner-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "СберЛаб",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 7441
+            }
+          ]
+        },
+        {
+          "anchor": "ШИФТ",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 7466
+            }
+          ]
+        },
+        {
+          "anchor": "PGLab",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 7492
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "ЦФТ",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 155
+            }
+          ]
+        },
+        {
+          "anchor": "СКБ Контур",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 160
+            }
+          ]
+        },
+        {
+          "anchor": "ДубльГИС",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 172
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "C++",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 2750
+            }
+          ]
+        },
+        {
+          "anchor": "Java",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 2755
+            }
+          ]
+        },
+        {
+          "anchor": "C#",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 2761
+            }
+          ]
+        },
+        {
+          "anchor": "Python",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 2765
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": ".NET",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 21058
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "производительности Java",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 20579
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Android",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 20730
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-770b0c6ebb172dbe"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "предметная область",
+          "locations": [
+            {
+              "source_id": "DOC-770b0c6ebb172dbe",
+              "normalized_offset": 4823
+            }
+          ]
+        },
+        {
+          "anchor": "статистические",
+          "locations": [
+            {
+              "source_id": "DOC-770b0c6ebb172dbe",
+              "normalized_offset": 3593
+            }
+          ]
+        }
+      ],
+      "note": "Проверен абзац именно о прикладной математике и информатике, а не описание соседнего профиля инженерной школы."
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-317c53d5b5ae2baf"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "15.03.06",
+          "locations": [
+            {
+              "source_id": "DOC-317c53d5b5ae2baf",
+              "normalized_offset": 189
+            }
+          ]
+        },
+        {
+          "anchor": "машинного обучения",
+          "locations": [
+            {
+              "source_id": "DOC-317c53d5b5ae2baf",
+              "normalized_offset": 694
+            }
+          ]
+        }
+      ],
+      "note": "На странице есть как краткое название, так и расширенное с искусственным интеллектом. Краткое название эталона допустимо."
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "evaluation_group": "special",
+      "result": "behavior_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [],
+      "note": "Проверена полезная нейтральная помощь без выдуманных вероятностей, гарантий и решения за человека. Это правило ответа, а не цитата с сайта."
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "evaluation_group": "special",
+      "result": "behavior_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [],
+      "note": "Проверена полезная нейтральная помощь без выдуманных вероятностей, гарантий и решения за человека. Это правило ответа, а не цитата с сайта."
+    },
+    {
+      "id": "nsu-pre-special-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "компьютерное зрение",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 2928
+            }
+          ]
+        },
+        {
+          "anchor": "биоинформатика",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 3027
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-special-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "2 семестре",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 5811
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-special-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-2338f0807b9bc328"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "с 3 курса",
+          "locations": [
+            {
+              "source_id": "DOC-2338f0807b9bc328",
+              "normalized_offset": 5948
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "evaluation_group": "special",
+      "result": "behavior_checked",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "anchor_locations": [],
+      "note": "Проверена полезная нейтральная помощь без выдуманных вероятностей, гарантий и решения за человека. Это правило ответа, а не цитата с сайта."
+    },
+    {
+      "id": "nsu-pre-chance-02",
+      "evaluation_group": "special",
+      "result": "behavior_checked",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "anchor_locations": [],
+      "note": "Проверена полезная нейтральная помощь без выдуманных вероятностей, гарантий и решения за человека. Это правило ответа, а не цитата с сайта."
+    },
+    {
+      "id": "nsu-pre-chance-03",
+      "evaluation_group": "special",
+      "result": "behavior_checked",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "anchor_locations": [],
+      "note": "Проверена полезная нейтральная помощь без выдуманных вероятностей, гарантий и решения за человека. Это правило ответа, а не цитата с сайта."
+    },
+    {
+      "id": "nsu-pre-building-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Ляпунова,6",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 6094
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-building-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Пирогова, 2",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 4656
+            }
+          ]
+        },
+        {
+          "anchor": "119",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 4674
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-83001f87d00915c7"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Пирогова, 4/1",
+          "locations": [
+            {
+              "source_id": "DOC-83001f87d00915c7",
+              "normalized_offset": 3122
+            }
+          ]
+        }
+      ],
+      "note": "Адрес паспортного стола взят из шага 6 общей инструкции. Первое упоминание Пирогова, 4/1 относится к другому шагу и само по себе не доказывает адрес паспортного стола."
+    },
+    {
+      "id": "nsu-pre-general-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Математика",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 180
+            }
+          ]
+        },
+        {
+          "anchor": "Русский язык",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 191
+            }
+          ]
+        },
+        {
+          "anchor": "Информатика / Физика",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 204
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-general-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Образец договора",
+          "locations": [
+            {
+              "source_id": "DOC-be8ca7262223f1f8",
+              "normalized_offset": 16749
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-pre-general-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-be8ca7262223f1f8"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Перечень вступительных испытаний",
+          "locations": [
+            {
+              "source_id": "DOC-be8ca7262223f1f8",
+              "normalized_offset": 10734
+            }
+          ]
+        },
+        {
+          "anchor": "места проведения",
+          "locations": [
+            {
+              "source_id": "DOC-be8ca7262223f1f8",
+              "normalized_offset": 18550
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-dorm-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "направление на проживание",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3815
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-dorm-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "2 печатями",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 8660
+            }
+          ]
+        },
+        {
+          "anchor": "чек об оплате",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3286
+            }
+          ]
+        }
+      ],
+      "note": "Для ФИТ используется факультетская инструкция. Общая инструкция дополнительно перечисляет фотографии, факультетская их в финальном шаге не перечисляет. Для фактического заселения нужно уточнять актуальный перечень у общежития."
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Получить пропуск.",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 8687
+            }
+          ]
+        }
+      ],
+      "note": "Эталон воспроизводит финальный шаг инструкции ФИТ. Общая инструкция содержит дополнительные фотографии и ключи. Оценка допускает полезные дополнения, если обязательные действия ФИТ выполнены."
+    },
+    {
+      "id": "nsu-post-dorm-04",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "10 сентября",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 4209
+            }
+          ]
+        },
+        {
+          "anchor": "10 февраля",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 4245
+            }
+          ]
+        },
+        {
+          "anchor": "30 июня",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 4279
+            }
+          ]
+        }
+      ],
+      "note": "Это повторяющийся семестровый график из инструкции кампании 2026. Он не означает три платежа в одном календарном году."
+    },
+    {
+      "id": "nsu-post-arrival-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "28 августа 2026",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 6149
+            }
+          ]
+        },
+        {
+          "anchor": "08:00 до 20:00",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 6167
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-arrival-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "29 августа 2026",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 6212
+            }
+          ]
+        },
+        {
+          "anchor": "10:00 до 14:00",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 6230
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-arrival-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "30 августа 2026",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 2290
+            }
+          ]
+        },
+        {
+          "anchor": "10:00 до 14:00",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 6230
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-docs-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "стр-2-3, 5",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 7506
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-docs-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "выписку о прививках",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 2594
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-post-docs-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-03ae446000cfbc45"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "паспорт;",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 8329
+            }
+          ]
+        },
+        {
+          "anchor": "сведения о профилактических прививках;",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 8338
+            }
+          ]
+        },
+        {
+          "anchor": "направление на проживание",
+          "locations": [
+            {
+              "source_id": "DOC-03ae446000cfbc45",
+              "normalized_offset": 3815
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-paid-contact-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "без комиссии",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4625
+            }
+          ]
+        },
+        {
+          "anchor": "сайте НГУ",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4647
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-paid-contact-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "ПАО Сбербанк",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4502
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-paid-contact-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Приказы о стоимости обучения и образцы договоров",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4516
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "09.03.01",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4013
+            }
+          ]
+        },
+        {
+          "anchor": "300 000",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4059
+            }
+          ]
+        },
+        {
+          "anchor": "руб./год",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 2991
+            }
+          ]
+        }
+      ],
+      "note": "Годовая таблица относится к 1 курсу 2026/27 граждан РФ и СНГ. Эта категория добавлена в history, чтобы не переносить цену на старшие курсы и другие категории."
+    },
+    {
+      "id": "nsu-paid-steps-02",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-de8ef06e37fe496b"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "150 000",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 136
+            }
+          ]
+        },
+        {
+          "anchor": "рублей в семестр",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 144
+            }
+          ]
+        },
+        {
+          "anchor": "2026-27",
+          "locations": [
+            {
+              "source_id": "DOC-de8ef06e37fe496b",
+              "normalized_offset": 163
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-paid-steps-03",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "15.03.06",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4217
+            }
+          ]
+        },
+        {
+          "anchor": "205 000",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4279
+            }
+          ]
+        }
+      ],
+      "note": "Годовая таблица относится к 1 курсу 2026/27 граждан РФ и СНГ. Эта категория добавлена в history. Название строки включает искусственный интеллект, код совпадает."
+    },
+    {
+      "id": "nsu-paid-steps-04",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "полной или частичной",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4367
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    },
+    {
+      "id": "nsu-paid-steps-05",
+      "evaluation_group": "document",
+      "result": "source_checked",
+      "source_ids": [
+        "DOC-6674be71e05b972c"
+      ],
+      "anchor_locations": [
+        {
+          "anchor": "Visa, Mastercard и Мир",
+          "locations": [
+            {
+              "source_id": "DOC-6674be71e05b972c",
+              "normalized_offset": 4684
+            }
+          ]
+        }
+      ],
+      "note": "Проверены факты и применимость по указанным разделам снимка."
+    }
+  ]
+}

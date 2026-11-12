@@ -1,0 +1,763 @@
+{
+  "schema_version": 1,
+  "mode": "live_full_batch",
+  "status": "completed",
+  "condition": "with-kb",
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "plan_sha256": "f0d4e8c634f9e5c70a32af5c54b664e0d53841a4bd4028faaa4d714429dc633f",
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "started_at_utc": "2026-11-10T14:54:36.094130+00:00",
+  "total": 10,
+  "selected_ids": [
+    "nsu-post-docs-02",
+    "nsu-post-docs-03",
+    "nsu-paid-contact-01",
+    "nsu-paid-contact-02",
+    "nsu-paid-contact-03",
+    "nsu-paid-steps-01",
+    "nsu-paid-steps-02",
+    "nsu-paid-steps-03",
+    "nsu-paid-steps-04",
+    "nsu-paid-steps-05"
+  ],
+  "results": [
+    {
+      "id": "nsu-post-docs-02",
+      "question": "Я первокурсник ФИТ, гражданин РФ. Чем заменить сертификат прививок для медразрешения на общежитие в 2026 году?",
+      "session_id": "eval:7da883139165403cb50538a8001e47ff:nsu-post-docs-02",
+      "passed": true,
+      "answer": "По контексту базы знаний для получения медицинского разрешения на вселение вместо сертификата о профилактических прививках можно предоставить <b>выписку о прививках из амбулаторной карты</b>.\n\nПолный список документов для граждан РФ:\n— копия паспорта (стр. 2–3, 5);\n— копия страхового медицинского полиса ОМС;\n— копия СНИЛС;\n— копия сертификата о профилактических прививках <i>или</i> выписка о прививках из амбулаторной карты;\n— результаты флюорографии/рентгенографии грудной клетки давностью не более 1 года или справка формы СЭМД-196;\n— направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо содержит обязательный факт «выписку о прививках из амбулаторной карты» как замену сертификату прививок, что соответствует эталону. Дополнительный список документов не противоречит эталону и не содержит выдуманных гарантий; критерий отказа не нарушен.",
+      "elapsed_seconds": 16.287,
+      "memory_before": {
+        "memory.current": 243126272,
+        "memory.peak": 243159040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1243184,
+        "process_maxrss_kib": 218096
+      },
+      "memory_after": {
+        "memory.current": 465412096,
+        "memory.peak": 534822912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1015000,
+        "process_maxrss_kib": 495932
+      }
+    },
+    {
+      "id": "nsu-post-docs-03",
+      "question": "Я иностранный первокурсник ФИТ 2026 года. Какие документы нужны для медицинского разрешения на общежитие?",
+      "session_id": "eval:1bde0cc4332f4a5aa48dff7b37d5c4ae:nsu-post-docs-03",
+      "passed": true,
+      "answer": "Для иностранных граждан и лиц без гражданства медицинское разрешение на проживание в общежитиях оформляется в <b>ММЦИММТ НГУ</b> (ул. Ляпунова, 6) в часы приёма врача-терапевта МНОЦИМ.\n\nДля получения разрешения нужно предоставить:\n• паспорт;\n• сведения о профилактических прививках;\n• результаты ФЛГ-обследования или рентгенографии органов грудной клетки давностью не более 1 года;\n• направление на проживание, выданное при заключении договора найма специализированного жилого помещения.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ содержит все обязательные факты: паспорт, сведения о прививках, флюорографию/рентгенографию не старше года и направление на проживание. Формулировки эквивалентны эталону, дополнительных выдуманных сведений или гарантий нет, условия не переносятся на другие категории.",
+      "elapsed_seconds": 11.142,
+      "memory_before": {
+        "memory.current": 465649664,
+        "memory.peak": 534822912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1020172,
+        "process_maxrss_kib": 495932
+      },
+      "memory_after": {
+        "memory.current": 545980416,
+        "memory.peak": 653058048,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946464,
+        "process_maxrss_kib": 606020
+      }
+    },
+    {
+      "id": "nsu-paid-contact-01",
+      "question": "Где можно оплатить обучение в НГУ онлайн без комиссии?",
+      "session_id": "eval:b0a342cbce1c4273bbafac86f0bd0c85:nsu-paid-contact-01",
+      "passed": true,
+      "answer": "Оплатить обучение без комиссии можно на <b>сайте НГУ</b> с помощью платёжных систем <b>Visa, Mastercard и Мир</b>.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ указывает на сайт НГУ как место оплаты без комиссии, что соответствует обязательному факту «официальная страница онлайн-оплаты услуг НГУ» в эквивалентной краткой формулировке. Нарушений ограничений поведения нет. Небольшой недостаток: не уточнено, что это именно официальная страница онлайн-оплаты услуг, а упоминание платёжных систем является дополнительной деталью, не противоречащей эталону.",
+      "elapsed_seconds": 17.313,
+      "memory_before": {
+        "memory.current": 545943552,
+        "memory.peak": 653058048,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 946464,
+        "process_maxrss_kib": 606020
+      },
+      "memory_after": {
+        "memory.current": 549666816,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14680064,
+        "memory.events": {
+          "max": 109,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 939688,
+        "process_maxrss_kib": 637696
+      }
+    },
+    {
+      "id": "nsu-paid-contact-02",
+      "question": "Какой банк участвует в программе образовательного кредита с господдержкой для оплаты учёбы в НГУ?",
+      "session_id": "eval:567cb11b736f474ca1489cf07e763a92:nsu-paid-contact-02",
+      "passed": true,
+      "answer": "По контексту базы знаний, для полной или частичной оплаты высшего образования действует программа <b>«Образовательный кредит с государственной поддержкой»</b> от <b>ПАО Сбербанк</b>.\n\nТакже уточнить информацию об образовательном кредите можно в: ПАО «Сбербанк России», АКБ «Алмазэргиэнбанк» АО, «Банк РНКБ» ПАО, «Т-банк» АО.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "regex",
+          "passed": true
+        }
+      ],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт «Сбербанк» (ПАО Сбербанк), что соответствует эталону. Однако дополнительно перечислены другие банки (Алмазэргиэнбанк, РНКБ, Т-банк) без подтверждения в контексте, что может вводить в заблуждение относительно участия именно в программе для НГУ; это небольшое неподтверждённое дополнение, но основной факт верен и критерий выполнен.",
+      "elapsed_seconds": 17.542,
+      "memory_before": {
+        "memory.current": 548933632,
+        "memory.peak": 671088640,
+        "memory.swap.current": 14680064,
+        "memory.events": {
+          "max": 109,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 938324,
+        "process_maxrss_kib": 637696
+      },
+      "memory_after": {
+        "memory.current": 530092032,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6578176,
+        "memory.events": {
+          "max": 490,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 919296,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-contact-03",
+      "question": "Где найти приказы о стоимости обучения и образцы договоров НГУ?",
+      "session_id": "eval:0edb7207ee6c4f1ca0dbf7ef4a728463:nsu-paid-contact-03",
+      "passed": true,
+      "answer": "Приказы о стоимости обучения и образцы договоров об оказании платных образовательных услуг размещены на сайте НГУ.\n\nТам же можно оплатить обучение без комиссии с помощью платёжных систем Visa, Mastercard и Мир.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ содержит обязательный факт: приказы о стоимости обучения и образцы договоров размещены на сайте НГУ, что эквивалентно указанию на раздел на странице стоимости обучения. Однако ответ не уточняет конкретный раздел/страницу, а также добавляет неподтверждённую информацию об оплате без комиссии через Visa, Mastercard и Мир, что является выдуманным фактом и нарушает ограничение «Не выдумывать сведения».",
+      "elapsed_seconds": 12.342,
+      "memory_before": {
+        "memory.current": 529874944,
+        "memory.peak": 671088640,
+        "memory.swap.current": 6578176,
+        "memory.events": {
+          "max": 490,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 919300,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 504803328,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29949952,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 962736,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "question": "Сколько стоит год обучения по 09.03.01 в НГУ в 2026/27?",
+      "session_id": "eval:9e5cd046600240ec82ddcb114be69e7c:nsu-paid-steps-01",
+      "passed": false,
+      "answer": "В базе знаний Ваш вуз указана стоимость <b>102 500 руб. в семестр</b> (то есть около <b>205 000 руб. за год</b>) — но в контексте она не привязана к конкретному коду 09.03.01, поэтому подтвердить, что это цена именно этого направления, я не могу.\n\nЯ не нашел информации об этом в базе знаний Ваш вуз — точной стоимости обучения по 09.03.01 в 2026/27 учебном году там нет.\n\nУточнить стоимость можно в приёмной комиссии: +7 (383) 373-96-52 (пн-пт 10:00-18:00, обед 13:00-14:00; сб 10:00-13:00, время по НСК).",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Эталонный ответ — 300 000 рублей за год. Ответ помощника называет другую сумму (102 500 руб. в семестр / около 205 000 руб. за год) и заявляет, что точной стоимости по 09.03.01 нет, то есть противоречит эталону и не содержит обязательного факта. Кроме того, ответ заменяет доступный фактический ответ перенаправлением в приёмную комиссию, что нарушает ограничение поведения.",
+      "elapsed_seconds": 12.31,
+      "memory_before": {
+        "memory.current": 504328192,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29949952,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 962752,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 481546240,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 949428,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-02",
+      "question": "Сколько стоит семестр на ПИиКН ФИТ в 2026/27?",
+      "session_id": "eval:31b5597784bc43d4b852429a7c115ab4:nsu-paid-steps-02",
+      "passed": false,
+      "answer": "В контексте базы знаний указана стоимость <b>102 500 руб. в семестр</b> (2026-27 уч. год) для программы факультета информационных технологий, но прямой привязки этой цифры именно к «ПИиКН» в контексте нет.\n\nУточните, пожалуйста, полное название программы — тогда смогу ответить точнее.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Эталонный ответ — 150 000 рублей в семестр. Ответ называет другую сумму (102 500 руб.) и не содержит обязательного факта, то есть противоречит эталону и содержит неподтверждённые сведения.",
+      "elapsed_seconds": 9.342,
+      "memory_before": {
+        "memory.current": 480862208,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 949440,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 480731136,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 978784,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-03",
+      "question": "Сколько стоит год обучения на мехатронике и робототехнике 15.03.06 в НГУ в 2026/27?",
+      "session_id": "eval:96d709c3eff74fcb90b9f19493535336:nsu-paid-steps-03",
+      "passed": true,
+      "answer": "По данным базы знаний, стоимость обучения на 1 курсе бакалавриата в 2026-2027 учебном году по направлению <b>15.03.06 «Мехатроника и робототехника. Искусственный интеллект»</b> для граждан РФ и СНГ составляет <b>205 000 руб./год</b>.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно указывает обязательный факт — 205 000 рублей за год — для нужного направления, года и категории (граждане РФ), без выдуманных сведений и нарушений ограничений поведения.",
+      "elapsed_seconds": 11.474,
+      "memory_before": {
+        "memory.current": 480935936,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29859840,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 978788,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 506789888,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29802496,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 954600,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-04",
+      "question": "Можно ли образовательным кредитом с господдержкой оплатить только часть стоимости учёбы в НГУ?",
+      "session_id": "eval:2964d3ce65dc4cf9a54cea0e99b12795:nsu-paid-steps-04",
+      "passed": true,
+      "answer": "Да, можно. По данным базы знаний, программа «Образовательный кредит с государственной поддержкой» от ПАО Сбербанк действует для <b>полной или частичной</b> оплаты стоимости высшего образования.\n\nБолее подробную информацию об образовательном кредите можно получить в ПАО «Сбербанк России», АКБ «Алмазэргиэнбанк» АО, «Банк РНКБ» ПАО и «Т-банк» АО.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ прямо подтверждает, что образовательный кредит с господдержкой допускает полную или частичную оплату, что соответствует обязательному факту эталона. Дополнительные сведения не противоречат эталону и не нарушают ограничений.",
+      "elapsed_seconds": 15.943,
+      "memory_before": {
+        "memory.current": 506724352,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29802496,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 954600,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 508153856,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29765632,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 950884,
+        "process_maxrss_kib": 691828
+      }
+    },
+    {
+      "id": "nsu-paid-steps-05",
+      "question": "Какими платёжными системами можно оплатить учёбу в НГУ онлайн без комиссии?",
+      "session_id": "eval:75b0ca7ae13342f7a6c6c879db55b64c:nsu-paid-steps-05",
+      "passed": true,
+      "answer": "Оплатить обучение без комиссии можно на сайте НГУ с помощью платёжных систем <b>Visa</b>, <b>Mastercard</b> и <b>Мир</b>.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 5,
+      "judge_reasoning": "Ответ точно и полно содержит все обязательные факты (Visa, Mastercard, Мир), не выдумывает сведения и не нарушает ограничения поведения; краткий правильный ответ достаточен.",
+      "elapsed_seconds": 12.129,
+      "memory_before": {
+        "memory.current": 508329984,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29765632,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 950620,
+        "process_maxrss_kib": 691828
+      },
+      "memory_after": {
+        "memory.current": 508899328,
+        "memory.peak": 671088640,
+        "memory.swap.current": 29765632,
+        "memory.events": {
+          "max": 649,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 959792,
+        "process_maxrss_kib": 691828
+      }
+    }
+  ],
+  "calibration": [
+    {
+      "id": "correct",
+      "expected_pass": true,
+      "matches": true,
+      "score": 5,
+      "reasoning": "Ответ точно и полностью совпадает с эталоном: указан код 09.03.01 и название «Информатика и вычислительная техника». Все обязательные факты присутствуют, выдуманных сведений нет.",
+      "elapsed_seconds": 2.477
+    },
+    {
+      "id": "wrong-category",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ содержит обязательный факт «300 000 рублей за год», но добавляет выдуманное утверждение о гарантии для всех курсов и гражданств в 2030/31 году, что нарушает критерии «Не выдумывать сведения или гарантии» и «Не переносить условия на другой год, программу или категорию». Противоречие эталону и нарушение ограничений поведения — оценка 1.",
+      "elapsed_seconds": 1.007
+    },
+    {
+      "id": "referral",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и заменяет фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 1.347
+    },
+    {
+      "id": "decision",
+      "expected_pass": false,
+      "matches": true,
+      "score": 1,
+      "reasoning": "Ответ прямо противоречит эталону: принимает решение за человека («Выбирай ПИиКН»), не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не оставляет выбора абитуриенту. Критерий не выполнен.",
+      "elapsed_seconds": 1.375
+    }
+  ],
+  "phases": [
+    {
+      "phase": "preflight_complete",
+      "memory.current": 232800256,
+      "memory.peak": 232800256,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1272708,
+      "process_maxrss_kib": 210364
+    },
+    {
+      "phase": "calibration_completed",
+      "memory.current": 243138560,
+      "memory.peak": 243159040,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1243184,
+      "process_maxrss_kib": 218096
+    },
+    {
+      "phase": "nsu-post-docs-02",
+      "memory.current": 243126272,
+      "memory.peak": 243159040,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1243184,
+      "process_maxrss_kib": 218096
+    },
+    {
+      "phase": "nsu-post-docs-03",
+      "memory.current": 465649664,
+      "memory.peak": 534822912,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 1020172,
+      "process_maxrss_kib": 495932
+    },
+    {
+      "phase": "nsu-paid-contact-01",
+      "memory.current": 545943552,
+      "memory.peak": 653058048,
+      "memory.swap.current": 0,
+      "memory.events": {
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 946464,
+      "process_maxrss_kib": 606020
+    },
+    {
+      "phase": "nsu-paid-contact-02",
+      "memory.current": 548933632,
+      "memory.peak": 671088640,
+      "memory.swap.current": 14680064,
+      "memory.events": {
+        "max": 109,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 938324,
+      "process_maxrss_kib": 637696
+    },
+    {
+      "phase": "nsu-paid-contact-03",
+      "memory.current": 529874944,
+      "memory.peak": 671088640,
+      "memory.swap.current": 6578176,
+      "memory.events": {
+        "max": 490,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 919300,
+      "process_maxrss_kib": 691828
+    },
+    {
+      "phase": "nsu-paid-steps-01",
+      "memory.current": 504328192,
+      "memory.peak": 671088640,
+      "memory.swap.current": 29949952,
+      "memory.events": {
+        "max": 649,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 962752,
+      "process_maxrss_kib": 691828
+    },
+    {
+      "phase": "nsu-paid-steps-02",
+      "memory.current": 480862208,
+      "memory.peak": 671088640,
+      "memory.swap.current": 29859840,
+      "memory.events": {
+        "max": 649,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 949440,
+      "process_maxrss_kib": 691828
+    },
+    {
+      "phase": "nsu-paid-steps-03",
+      "memory.current": 480935936,
+      "memory.peak": 671088640,
+      "memory.swap.current": 29859840,
+      "memory.events": {
+        "max": 649,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 978788,
+      "process_maxrss_kib": 691828
+    },
+    {
+      "phase": "nsu-paid-steps-04",
+      "memory.current": 506724352,
+      "memory.peak": 671088640,
+      "memory.swap.current": 29802496,
+      "memory.events": {
+        "max": 649,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 954600,
+      "process_maxrss_kib": 691828
+    },
+    {
+      "phase": "nsu-paid-steps-05",
+      "memory.current": 508329984,
+      "memory.peak": 671088640,
+      "memory.swap.current": 29765632,
+      "memory.events": {
+        "max": 649,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 950620,
+      "process_maxrss_kib": 691828
+    },
+    {
+      "phase": "finished",
+      "memory.current": 508506112,
+      "memory.peak": 671088640,
+      "memory.swap.current": 29753344,
+      "memory.events": {
+        "max": 649,
+        "oom": 0,
+        "oom_kill": 0
+      },
+      "host_available_kib": 959792,
+      "process_maxrss_kib": 691828
+    }
+  ],
+  "phase": "finished",
+  "case_timeout_seconds": 90,
+  "concurrency": 1,
+  "case_retries": 0,
+  "full_run_started": true,
+  "peak_sampled_swap_bytes": 29966336,
+  "min_host_available_kib": 830300,
+  "batch_index": 4,
+  "run_id": "full-20261110-02",
+  "root_run_id": "b9c610a01dda4e839269f6b47950193e",
+  "inspect_only": false,
+  "latest_memory": {
+    "memory.current": 508506112,
+    "memory.peak": 671088640,
+    "memory.swap.current": 29753344,
+    "memory.events": {
+      "max": 649,
+      "oom": 0,
+      "oom_kill": 0
+    },
+    "host_available_kib": 959792,
+    "process_maxrss_kib": 691828
+  },
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "5d4d5345cca3b30ecc324159e7744a0091379d8efe47a611f44e466c6bf30ca5",
+  "knowledge_manifest": {
+    "counts": {
+      "document": 9,
+      "content_proposal": 9,
+      "faq_entry": 0,
+      "user": 0,
+      "message": 0,
+      "message_logs": 152
+    },
+    "documents": [
+      {
+        "id": "01a1b547-1029-7c3e-9577-554857174189",
+        "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/scholarship/",
+        "content_hash": "7e60d214b4bb4db622802051d80360d9c8da20c061b8250642f9b5162efdcc75",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 09:24:02.205119",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b547-1029-7c3e-9577-554857174189"
+      },
+      {
+        "id": "01a1b623-2a2f-782f-b538-968e26bae0a0",
+        "rag_doc_id": "01a1b623-2a44-762c-ad54-6d17d9b16029",
+        "source_url": "https://www.nsu.ru/n/information-technologies-department/students/freshmen/campus.php",
+        "content_hash": "0884b28ce1dcf688e4399e611986e49acbcf3c35a4063697307425d4ab02caa0",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:15:30.079835",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b623-2a2f-782f-b538-968e26bae0a0"
+      },
+      {
+        "id": "01a1b626-5f1d-7df6-a94d-3950b36992ba",
+        "rag_doc_id": "01a1b626-5f2a-7ae5-970f-a2778d7a34be",
+        "source_url": "https://education.nsu.ru/tipi",
+        "content_hash": "91c12544551ffbbd7a4f6caadf295ba8dd58c6c9e282242177927ad46d869d73",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:18:30.589152",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b626-5f1d-7df6-a94d-3950b36992ba"
+      },
+      {
+        "id": "01a1b629-1f97-7369-98a6-f36dfefcbe37",
+        "rag_doc_id": "01a1b629-1fa3-7676-b1a7-5bbf7f2246ff",
+        "source_url": "https://education.nsu.ru/mechatronics/",
+        "content_hash": "ec165e1701a0f2adca844746c6d489c8f58d01795ac94af83a8b02a46d7cb3ff",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:22:17.768391",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b629-1f97-7369-98a6-f36dfefcbe37"
+      },
+      {
+        "id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7",
+        "rag_doc_id": "01a1b62c-96e1-7732-aee9-8ea40043db60",
+        "source_url": "https://www.nsu.ru/n/education/apply-info/stoimost1/",
+        "content_hash": "99669bb93530fc2ac408d631d5a4136a545a680b7f10a5901dbaaeb2edd7efa6",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 13:24:45.022448",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62c-96d2-77b5-ae86-3c9ac06ab8b7"
+      },
+      {
+        "id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68",
+        "rag_doc_id": "01a1b62e-d624-7c20-a21f-d3cecb390bce",
+        "source_url": "https://education.nsu.ru/mathematics/",
+        "content_hash": "a9369236b437b085620c9887645876088fca642fff3c10e7b595fecacedc4bd3",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 14:24:38.358039",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b62e-d61d-751d-a1d8-d74b9f67da68"
+      },
+      {
+        "id": "01a1b667-f51a-7230-95b9-4f7aae69a64c",
+        "rag_doc_id": "01a1b667-f531-70f8-bb71-f02357955c09",
+        "source_url": "https://www.nsu.ru/n/life/campus/check-in/",
+        "content_hash": "8ed0f540f2fef9736b53cd479baa1d38be0ff10939e759e104b2ec9ae1e5cea9",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:00:30.770944",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b667-f51a-7230-95b9-4f7aae69a64c"
+      },
+      {
+        "id": "01a1b696-dfda-7e90-bea0-3a8f7914526a",
+        "rag_doc_id": "01a1b691-2f26-78aa-a14d-369d79326750",
+        "source_url": "https://www.nsu.ru/n/education/apply/bakalavriat-cpetsialitet/",
+        "content_hash": "30b868086d1adce347d776f3737d4646cdb430bbcc04f0c50580cd5e27da32ec",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:18:23.481171",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b696-dfda-7e90-bea0-3a8f7914526a"
+      },
+      {
+        "id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7",
+        "rag_doc_id": "01a1b698-40da-752d-b272-a6966f99c8ba",
+        "source_url": "https://education.nsu.ru/information-technologies/",
+        "content_hash": "547ecea197ed7a243163c16e46670c965ad9b68b9c055bc67b3d1041dc21e1d7",
+        "graph_id": "abitur_kb",
+        "last_indexed_at": "2026-11-07 15:29:57.749857",
+        "proposal_status": "approved",
+        "proposal_document_id": "01a1b6a1-77d7-76ee-851b-a0ef7b1c2fa7"
+      }
+    ],
+    "graph_documents": 9,
+    "redis_keys": 0
+  },
+  "providers": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS"
+  },
+  "accounting": {
+    "attempts_started": 251,
+    "attempts_finished": 251,
+    "operation_counts": {
+      "generation": 211,
+      "oauth": 1,
+      "embedding": 39
+    },
+    "uncertain_failure": false,
+    "halted": false,
+    "prior_reserve_micro_cny": 1446214,
+    "reserved_peak_no_cache_micro_cny": 335778,
+    "embedding_input_bytes": 10813
+  },
+  "finished_at_utc": "2026-11-10T14:57:16.612906+00:00",
+  "unexecuted_ids": []
+}

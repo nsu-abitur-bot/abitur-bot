@@ -1,0 +1,1906 @@
+{
+  "schema_version": 1,
+  "mode": "live",
+  "condition": "empty_kb",
+  "total": 50,
+  "dataset_sha256": "fa073f338684b73ee5947697c46b3fe876eccc9de1bb80ee3653b2ecbd3d2448",
+  "configuration_sha256": "870df059344be10f3d9815da2e491e95fdd5a26b3db14c6c5b0c8f65b958cddb",
+  "kb_manifest_sha256": "b24ba064bab64d72a2b11cf3a594983d853005cf42e21b335f539812c3a3cdb5",
+  "knowledge_manifest": {
+    "documents": [],
+    "graph_documents": 0,
+    "document_count": 0,
+    "proposal_count": 0,
+    "faq_count": 0
+  },
+  "image_revision": "bfe4f8a088076f8b94056815ca27c613712e1a03",
+  "results": [
+    {
+      "id": "nsu-pre-flow-01",
+      "question": "Какие профили бакалавриата есть на ФИТ?",
+      "session_id": "eval:c30c266396b94115b19a7e52ce0b10dd:nsu-pre-flow-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ сообщает об отсутствии информации и не перечисляет ни одного из трёх требуемых профилей (КНиС, ПИиКН, ТИПИ), то есть фактически не отвечает на вопрос и противоречит эталону.",
+      "elapsed_seconds": 9.375,
+      "memory_before": {
+        "memory.current": 246489088,
+        "memory.peak": 246509568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1244024,
+        "process_maxrss_kib": 217968
+      },
+      "memory_after": {
+        "memory.current": 341385216,
+        "memory.peak": 341626880,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1170172,
+        "process_maxrss_kib": 304444
+      }
+    },
+    {
+      "id": "nsu-pre-flow-02",
+      "question": "Какой код направления у ТИПИ и как оно называется?",
+      "session_id": "eval:d6a9978bb2cf415180f289a7bebe8963:nsu-pre-flow-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «09.03.01, Информатика и вычислительная техника» и вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 8.276,
+      "memory_before": {
+        "memory.current": 341630976,
+        "memory.peak": 341630976,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1170172,
+        "process_maxrss_kib": 304444
+      },
+      "memory_after": {
+        "memory.current": 352456704,
+        "memory.peak": 352464896,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1149440,
+        "process_maxrss_kib": 313260
+      }
+    },
+    {
+      "id": "nsu-pre-flow-03",
+      "question": "Какие специализации есть на ТИПИ?",
+      "session_id": "eval:50986b75d8634398b35c380698c14f08:nsu-pre-flow-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, название подразделения — по аббревиатуре «ТИПИ» в справочнике ничего не нашлось.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Разработка системного программного обеспечения и бизнес-приложений» и вместо ответа даёт общее перенаправление, что прямо запрещено критерием («Не заменять доступный фактический ответ общим перенаправлением»). Эталонный ответ известен, но не воспроизведён — существенное противоречие эталону.",
+      "elapsed_seconds": 8.828,
+      "memory_before": {
+        "memory.current": 352448512,
+        "memory.peak": 352464896,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152252,
+        "process_maxrss_kib": 313260
+      },
+      "memory_after": {
+        "memory.current": 352661504,
+        "memory.peak": 352673792,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152336,
+        "process_maxrss_kib": 313388
+      }
+    },
+    {
+      "id": "nsu-pre-flow-04",
+      "question": "В чём особенность обучения на КНиС?",
+      "session_id": "eval:111a2295991447cf9d58e2d42933afa2:nsu-pre-flow-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта о сочетании российской фундаментальной подготовки и британского подхода с практикой и постепенным усложнением материала; вместо ответа — отказ со ссылкой на отсутствие информации, что противоречит эталону и критерию (не заменять доступный фактический ответ общим перенаправлением/отказом).",
+      "elapsed_seconds": 9.16,
+      "memory_before": {
+        "memory.current": 352649216,
+        "memory.peak": 352673792,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152336,
+        "process_maxrss_kib": 313388
+      },
+      "memory_after": {
+        "memory.current": 352772096,
+        "memory.peak": 352784384,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1154548,
+        "process_maxrss_kib": 313516
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-01",
+      "question": "Я поступаю по целевому договору. Могу получать NSU+ в 2026 году?",
+      "session_id": "eval:4b75707b6b3849709b45cb21f2962584:nsu-pre-scholar-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит обязательного факта о том, что NSU+ не назначается обучающимся по договорам целевого обучения, и вместо фактического ответа даёт общее перенаправление/сообщение об отсутствии информации, что нарушает ограничение поведения. Существенная часть требуемой информации отсутствует.",
+      "elapsed_seconds": 6.288,
+      "memory_before": {
+        "memory.current": 352763904,
+        "memory.peak": 352784384,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1154552,
+        "process_maxrss_kib": 313516
+      },
+      "memory_after": {
+        "memory.current": 352534528,
+        "memory.peak": 352821248,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152952,
+        "process_maxrss_kib": 313516
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-02",
+      "question": "Что нужно, чтобы NSU+ продолжали платить весной первого курса?",
+      "session_id": "eval:0c0b7aa0d68a4d379d4568625d5166c1:nsu-pre-scholar-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ не содержит обязательного факта («Первая сессия сдана на 4 и 5, задолженностей нет») и вместо фактического ответа даёт общее перенаправление, что нарушает ограничение поведения. Существенная часть требуемой информации отсутствует.",
+      "elapsed_seconds": 7.821,
+      "memory_before": {
+        "memory.current": 352813056,
+        "memory.peak": 352821248,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152952,
+        "process_maxrss_kib": 313516
+      },
+      "memory_after": {
+        "memory.current": 352567296,
+        "memory.peak": 352845824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152640,
+        "process_maxrss_kib": 313516
+      }
+    },
+    {
+      "id": "nsu-pre-scholar-03",
+      "question": "Какие баллы учитываются при назначении NSU+?",
+      "session_id": "eval:6122f9ea63704060a2e1f3c3719e0ce5:nsu-pre-scholar-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта из эталона (ЕГЭ, индивидуальные достижения, олимпиады за 100 баллов) и вместо ответа даёт общее перенаправление, что прямо запрещено критерием поведения. Фактическая информация отсутствует полностью.",
+      "elapsed_seconds": 8.503,
+      "memory_before": {
+        "memory.current": 352796672,
+        "memory.peak": 352845824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1151576,
+        "process_maxrss_kib": 313516
+      },
+      "memory_after": {
+        "memory.current": 352931840,
+        "memory.peak": 352931840,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1151516,
+        "process_maxrss_kib": 313644
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-01",
+      "question": "Я первокурсник ФИТ 2026 года. Где взять заявление на общежитие?",
+      "session_id": "eval:7f82ed30947948d7bb5af32af34b19df:nsu-pre-dorm-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (кабинет 1112, учебный корпус №1, Пирогова, 1, вход №1 из внутреннего дворика) и вместо фактического ответа даёт общее перенаправление, что прямо запрещено критерием. Эталону не соответствует.",
+      "elapsed_seconds": 8.296,
+      "memory_before": {
+        "memory.current": 352874496,
+        "memory.peak": 352931840,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1151516,
+        "process_maxrss_kib": 313644
+      },
+      "memory_after": {
+        "memory.current": 352649216,
+        "memory.peak": 352940032,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152320,
+        "process_maxrss_kib": 313644
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-02",
+      "question": "Я зачислен на ФИТ в 2026 году. У кого заключить договор найма общежития?",
+      "session_id": "eval:1ef5409ddbb847949c5c06b51c136428:nsu-pre-dorm-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта («договор найма заключают с заведующим общежитием»), вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий (не заменять доступный фактический ответ общим перенаправлением).",
+      "elapsed_seconds": 8.337,
+      "memory_before": {
+        "memory.current": 352870400,
+        "memory.peak": 352940032,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1152328,
+        "process_maxrss_kib": 313644
+      },
+      "memory_after": {
+        "memory.current": 352714752,
+        "memory.peak": 353005568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1148608,
+        "process_maxrss_kib": 313644
+      }
+    },
+    {
+      "id": "nsu-pre-dorm-03",
+      "question": "Я оплатил общежитие ФИТ в 2026 году. Что сохранить для подтверждения оплаты?",
+      "session_id": "eval:35d17ab3ba33418f9c3ad56d842d757b:nsu-pre-dorm-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «чек или скриншот об оплате» и вместо доступного фактического ответа даёт общее перенаправление, что нарушает критерий.",
+      "elapsed_seconds": 7.297,
+      "memory_before": {
+        "memory.current": 352927744,
+        "memory.peak": 353005568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1148608,
+        "process_maxrss_kib": 313644
+      },
+      "memory_after": {
+        "memory.current": 352989184,
+        "memory.peak": 353005568,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1150464,
+        "process_maxrss_kib": 313644
+      }
+    },
+    {
+      "id": "nsu-pre-partner-01",
+      "question": "Какие студенческие лаборатории есть на ФИТ?",
+      "session_id": "eval:be124426d705445d80961775a2165f8a:nsu-pre-partner-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (СберЛаб-НГУ, ШИФТ НГУ-ЦФТ, PGLab НГУ-Postgres Professional) и вместо фактического ответа даёт общее перенаправление, что нарушает ограничение поведения «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 13.345,
+      "memory_before": {
+        "memory.current": 191086592,
+        "memory.peak": 191365120,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1241808,
+        "process_maxrss_kib": 217956
+      },
+      "memory_after": {
+        "memory.current": 284131328,
+        "memory.peak": 284135424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142228,
+        "process_maxrss_kib": 311724
+      }
+    },
+    {
+      "id": "nsu-pre-partner-02",
+      "question": "ТИПИ разрабатывали вместе с IT-компаниями? Кто участвовал?",
+      "session_id": "eval:5f07b5d7d3a14f029f0b80d63c812597:nsu-pre-partner-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит требуемых фактов (ЦФТ, СКБ Контур, ДубльГИС и др.) и фактически отказывается отвечать, хотя эталонный ответ доступен. Это противоречит критерию «не заменять доступный фактический ответ общим перенаправлением» и не выполняет обязательные факты.",
+      "elapsed_seconds": 9.785,
+      "memory_before": {
+        "memory.current": 284119040,
+        "memory.peak": 284135424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142228,
+        "process_maxrss_kib": 311724
+      },
+      "memory_after": {
+        "memory.current": 284332032,
+        "memory.peak": 284348416,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140832,
+        "process_maxrss_kib": 311852
+      }
+    },
+    {
+      "id": "nsu-pre-lang-01",
+      "question": "Какие языки программирования изучают на ПИиКН?",
+      "session_id": "eval:77ef4fd03b744bf0afb3ce8f950f2c9e:nsu-pre-lang-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «C++, Java, C# и Python» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 9.416,
+      "memory_before": {
+        "memory.current": 284311552,
+        "memory.peak": 284348416,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140832,
+        "process_maxrss_kib": 311852
+      },
+      "memory_after": {
+        "memory.current": 284565504,
+        "memory.peak": 284594176,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146488,
+        "process_maxrss_kib": 312108
+      }
+    },
+    {
+      "id": "nsu-pre-lang-02",
+      "question": "Какие технологии изучают на курсе по C# на ФИТ?",
+      "session_id": "eval:de2c3e5330324b6899b6e92a84dddead:nsu-pre-lang-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов (язык C# и платформа .NET) и вместо доступного фактического ответа даёт общее перенаправление, что нарушает критерий. Эталону не соответствует.",
+      "elapsed_seconds": 8.371,
+      "memory_before": {
+        "memory.current": 284561408,
+        "memory.peak": 284594176,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146572,
+        "process_maxrss_kib": 312108
+      },
+      "memory_after": {
+        "memory.current": 284536832,
+        "memory.peak": 284778496,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144836,
+        "process_maxrss_kib": 312236
+      }
+    },
+    {
+      "id": "nsu-pre-lang-03",
+      "question": "На ФИТ есть курс по оптимизации программ? На каком языке там работают?",
+      "session_id": "eval:15b3b0baa8814cb186386cf27025690b:nsu-pre-lang-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов (наличие курса оптимизации производительности программ и язык Java), а вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 9.285,
+      "memory_before": {
+        "memory.current": 284762112,
+        "memory.peak": 284778496,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144840,
+        "process_maxrss_kib": 312236
+      },
+      "memory_after": {
+        "memory.current": 284938240,
+        "memory.peak": 284971008,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143116,
+        "process_maxrss_kib": 312364
+      }
+    },
+    {
+      "id": "nsu-pre-lang-04",
+      "question": "На ФИТ учат разработке мобильных приложений? Под какие платформы?",
+      "session_id": "eval:d70c203e2e354823aba2881f24e45035:nsu-pre-lang-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов («есть курс мобильной разработки», «Android») и заменяет доступный фактический ответ общим отказом, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 8.802,
+      "memory_before": {
+        "memory.current": 284966912,
+        "memory.peak": 284971008,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143116,
+        "process_maxrss_kib": 312364
+      },
+      "memory_after": {
+        "memory.current": 284995584,
+        "memory.peak": 285016064,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144176,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-01",
+      "question": "Что изучают на прикладной математике и информатике ММФ и для каких задач это нужно?",
+      "session_id": "eval:776a72c82bfd44d29d4b525ad73c9fca:nsu-pre-compare-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта из эталона (математические и вычислительные методы, применение к научным и индустриальным задачам, важность предметной области) и вместо ответа даёт общий отказ-перенаправление, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 4.914,
+      "memory_before": {
+        "memory.current": 284962816,
+        "memory.peak": 285016064,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144184,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 284831744,
+        "memory.peak": 285093888,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142436,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-02",
+      "question": "Как называется направление мехатроники в ИИР и какой у него код?",
+      "session_id": "eval:2cedba68b8284ec09085ebe6881a1a6b:nsu-pre-compare-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (15.03.06 и «Мехатроника и робототехника»), вместо ответа — отказ со ссылкой на базу знаний, что противоречит эталону и критерию полноты.",
+      "elapsed_seconds": 6.032,
+      "memory_before": {
+        "memory.current": 285052928,
+        "memory.peak": 285093888,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142436,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 285081600,
+        "memory.peak": 285122560,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1141940,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-03",
+      "question": "Сравни ФИТ и ФФ: куда мне лучше идти? Программы я ещё не выбрал.",
+      "session_id": "eval:3f703098fe774a60b1503706493036ca:nsu-pre-compare-03",
+      "passed": true,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nМогу помочь с конкретикой: назовите интересующие направления или уровень образования (бакалавриат/специалитет) — и я проверю, что есть в базе знаний.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 4,
+      "judge_reasoning": "Ответ корректно не выбирает за абитуриента и просит уточнить программы/направления, что соответствует эталону. Однако он не уточняет критерии сравнения и формулировка об отсутствии информации в базе может быть нерелевантной, но критерий отказа не нарушен.",
+      "elapsed_seconds": 6.318,
+      "memory_before": {
+        "memory.current": 285057024,
+        "memory.peak": 285122560,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1141944,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 285052928,
+        "memory.peak": 285143040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140988,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-compare-04",
+      "question": "Хочу заниматься программированием. Как выбрать между ПИиКН и КНиС на ФИТ?",
+      "session_id": "eval:20dd283112f24a8eb77bd9002bc48655:nsu-pre-compare-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ моём контексте нет данных ни о факультете ФИТ, ни о направлениях ПИиКН и КНиС, поэтому подсказать, чем они отличаются, я не могу.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ и не выполняет критерий: не уточняет интересы и задачи, не предлагает сопоставить учебные планы и проекты, не помогает сравнить варианты. Хотя он не выдумывает различия программ, этого недостаточно, так как критерий прямо указывает, что простой отказ выбирать недостаточен.",
+      "elapsed_seconds": 6.63,
+      "memory_before": {
+        "memory.current": 285073408,
+        "memory.peak": 285143040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140988,
+        "process_maxrss_kib": 312492
+      },
+      "memory_after": {
+        "memory.current": 285130752,
+        "memory.peak": 285143040,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143244,
+        "process_maxrss_kib": 312492
+      }
+    },
+    {
+      "id": "nsu-pre-special-01",
+      "question": "Кроме разработки приложений, чем ещё можно заниматься на ПИиКН?",
+      "session_id": "eval:b9ecd8d366704c46bc2e396649a1cf73:nsu-pre-special-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, полное название направления или факультет — попробую найти данные по ним.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного из обязательных фактов (компьютерное зрение, биоинформатика, машинное обучение и др.) и вместо фактического ответа даёт общее перенаправление с уточнением, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталонный ответ не воспроизведён.",
+      "elapsed_seconds": 11.455,
+      "memory_before": {
+        "memory.current": 191066112,
+        "memory.peak": 191361024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1237232,
+        "process_maxrss_kib": 218112
+      },
+      "memory_after": {
+        "memory.current": 284184576,
+        "memory.peak": 284192768,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139512,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-special-02",
+      "question": "Когда на ТИПИ начинается практика с кураторами из IT-компаний?",
+      "session_id": "eval:cb54cc719966430e91f8b976aa09f5b3:nsu-pre-special-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Со второго семестра, уже на первом курсе» и вместо ответа даёт общий отказ/перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Фактическая информация из эталона отсутствует.",
+      "elapsed_seconds": 6.431,
+      "memory_before": {
+        "memory.current": 284168192,
+        "memory.peak": 284192768,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139512,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284217344,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142772,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-special-03",
+      "question": "С какого курса на ТИПИ обязательна стажировка в IT-компании?",
+      "session_id": "eval:5324ccb5ed46471a9884af700053b99a:nsu-pre-special-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «С третьего курса» и вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий (не заменять доступный фактический ответ общим перенаправлением/отказом).",
+      "elapsed_seconds": 7.875,
+      "memory_before": {
+        "memory.current": 284205056,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142776,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284237824,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142848,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-chance-01",
+      "question": "У меня 280 баллов. Какие шансы пройти на бюджет ФИТ?",
+      "session_id": "eval:c23a4f3693fe490f94d6a100596d80a3:nsu-pre-chance-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nДанных о проходных баллах на бюджет по ФИТ у меня нет, поэтому оценить ваши шансы с 280 баллами я не могу.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 2,
+      "judge_reasoning": "Ответ лишь констатирует отсутствие данных и не помогает абитуриенту: не объясняет, что одних баллов недостаточно, не уточняет программу и кампанию, не предлагает проверить текущие списки и условия конкурса. Это близко к простому отказу без помощи, что по критерию недостаточно; при этом ответ не выдумывает вероятность или гарантию зачисления.",
+      "elapsed_seconds": 6.998,
+      "memory_before": {
+        "memory.current": 284225536,
+        "memory.peak": 284237824,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142848,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284000256,
+        "memory.peak": 284270592,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1145676,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-chance-02",
+      "question": "Я выше прошлогоднего проходного балла. Зачисление в этом году гарантировано?",
+      "session_id": "eval:be37b4942bd248299e0e49cc8cf2253a:nsu-pre-chance-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nЕсли уточните направление и факультет, я смогу проверить проходные баллы прошлых лет по ним.",
+      "tools_called": [
+        "get_admission_scores"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не соответствует эталону: вместо прямого отрицания и объяснения, что прошлогодний балл не гарантирует зачисление, ассистент сообщает об отсутствии информации и просит уточнений. Критерий отказа/специального случая не выполнен, требуемая информация отсутствует.",
+      "elapsed_seconds": 9.616,
+      "memory_before": {
+        "memory.current": 284237824,
+        "memory.peak": 284270592,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1145680,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284282880,
+        "memory.peak": 284282880,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142640,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-chance-03",
+      "question": "Сегодня последний день подачи согласия на зачисление. Не могу выбрать между двумя вузами - что делать?",
+      "session_id": "eval:22b625c4d7a84389a1d51b7bd36739eb:nsu-pre-chance-03",
+      "passed": false,
+      "answer": "Я консультирую только по вопросам, связанным с Ваш вуз, поэтому не смогу помочь с выбором между вузами.\n\nЕсли у вас есть вопросы о наших направлениях, факультетах, проходных баллах или правилах приёма — спрашивайте, с радостью подскажу.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ представляет собой простой отказ без помощи, что прямо запрещено критерием («Простой отказ без помощи недостаточен»). Помощь в сопоставлении программ, приоритетов и конкурсной ситуации отсутствует, как и предложение проверить сроки и списки. Эталон не выполнен.",
+      "elapsed_seconds": 8.332,
+      "memory_before": {
+        "memory.current": 283992064,
+        "memory.peak": 284282880,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1142640,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284315648,
+        "memory.peak": 284327936,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143952,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-building-01",
+      "question": "Я первокурсник ФИТ, гражданин РФ, зачислен в 2026 году. Куда идти за медицинским разрешением на общежитие?",
+      "session_id": "eval:c798babd54aa4d96b611efc871913b10:nsu-pre-building-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «ММЦИММТ НГУ, улица Ляпунова, 6» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 5.807,
+      "memory_before": {
+        "memory.current": 284274688,
+        "memory.peak": 284327936,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1143956,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284073984,
+        "memory.peak": 284385280,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138944,
+        "process_maxrss_kib": 311932
+      }
+    },
+    {
+      "id": "nsu-pre-building-02",
+      "question": "Где находится отдел воинского учёта НГУ для заселения в 2026 году?",
+      "session_id": "eval:e4af273bf2a84343b1174c90b4b5bea8:nsu-pre-building-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Пирогова, 2, кабинет 119» и вместо этого сообщает об отсутствии информации, что противоречит эталону и нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 5.949,
+      "memory_before": {
+        "memory.current": 284119040,
+        "memory.peak": 284385280,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138948,
+        "process_maxrss_kib": 311932
+      },
+      "memory_after": {
+        "memory.current": 284286976,
+        "memory.peak": 284598272,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138984,
+        "process_maxrss_kib": 312188
+      }
+    },
+    {
+      "id": "nsu-pre-building-03",
+      "question": "Где находится паспортный стол НГУ для оформления регистрации в общежитии в 2026 году?",
+      "session_id": "eval:7c9b657bc58143c7b8282c93ca9eb95f:nsu-pre-building-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nЯ консультирую только по вопросам, связанным с Ваш вуз (поступление, направления подготовки, баллы и т.п.). Вопросы оформления регистрации и работы паспортного стола лучше уточнить напрямую в вузе.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Пирогова, 4/1, общежитие №3» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталону противоречит.",
+      "elapsed_seconds": 5.796,
+      "memory_before": {
+        "memory.current": 284499968,
+        "memory.peak": 284598272,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138984,
+        "process_maxrss_kib": 312188
+      },
+      "memory_after": {
+        "memory.current": 284864512,
+        "memory.peak": 284893184,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1136704,
+        "process_maxrss_kib": 312316
+      }
+    },
+    {
+      "id": "nsu-pre-general-01",
+      "question": "Какие экзамены нужны после школы для поступления на ФИТ в 2026 году?",
+      "session_id": "eval:0798d63d35764ffa9e06a4e95aec1eba:nsu-pre-general-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nУточните, пожалуйста, название факультета полностью — возможно, оно указано иначе.",
+      "tools_called": [
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Математика, русский язык и информатика либо физика» и вместо фактического ответа даёт общее перенаправление с уточнением, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталонный ответ полностью отсутствует.",
+      "elapsed_seconds": 8.778,
+      "memory_before": {
+        "memory.current": 284839936,
+        "memory.peak": 284893184,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1136724,
+        "process_maxrss_kib": 312316
+      },
+      "memory_after": {
+        "memory.current": 284798976,
+        "memory.peak": 285077504,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1137376,
+        "process_maxrss_kib": 312572
+      }
+    },
+    {
+      "id": "nsu-pre-general-02",
+      "question": "Где найти образец договора на платное обучение в бакалавриате НГУ?",
+      "session_id": "eval:8448b1364555404b894ed072ed08a91b:nsu-pre-general-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта и фактически отказывается отвечать, тогда как эталон указывает конкретное место — страницу приёма в бакалавриат НГУ с образцом договора об оказании платных образовательных услуг. Это противоречит эталону и критерию «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 8.011,
+      "memory_before": {
+        "memory.current": 191111168,
+        "memory.peak": 191377408,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1232408,
+        "process_maxrss_kib": 218068
+      },
+      "memory_after": {
+        "memory.current": 276176896,
+        "memory.peak": 276213760,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146652,
+        "process_maxrss_kib": 303624
+      }
+    },
+    {
+      "id": "nsu-pre-general-03",
+      "question": "Как узнать, какие вступительные испытания проводит НГУ и где они будут проходить?",
+      "session_id": "eval:63fea7da720e42639c2bfb09b7ed7594:nsu-pre-general-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (перечень вступительных испытаний, расписание с местом проведения, страница приёма в бакалавриат НГУ) и вместо фактического ответа даёт общий отказ, что нарушает ограничение «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 7.39,
+      "memory_before": {
+        "memory.current": 275910656,
+        "memory.peak": 276213760,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146652,
+        "process_maxrss_kib": 303624
+      },
+      "memory_after": {
+        "memory.current": 285184000,
+        "memory.peak": 285458432,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1110760,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-dorm-01",
+      "question": "Договор найма общежития ФИТ в 2026 году уже подписан. У кого получить направление на проживание для дальнейшего заселения?",
+      "session_id": "eval:1b2943e448854c139c9c25177859dcda:nsu-post-dorm-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «заведующий общежитием» и вместо доступного фактического ответа даёт общее перенаправление/отказ, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 6.1,
+      "memory_before": {
+        "memory.current": 285429760,
+        "memory.peak": 285458432,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1113144,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285200384,
+        "memory.peak": 285466624,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1131656,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-dorm-02",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. На направлении уже две печати, проживание оплатил. Какие документы теперь отнести заведующему?",
+      "session_id": "eval:f34de7ab573a4025a0a788666e34d721:nsu-post-dorm-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательных фактов («направление с двумя печатями», «чек об оплате») и заменяет доступный фактический ответ общим отказом, что нарушает ограничение поведения «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 6.073,
+      "memory_before": {
+        "memory.current": 285437952,
+        "memory.peak": 285466624,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1131656,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285200384,
+        "memory.peak": 285478912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1135352,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-dorm-03",
+      "question": "Я заселяюсь в общежитие ФИТ в 2026 году. Все документы оформлены. Как получить пропуск в общежитие?",
+      "session_id": "eval:f8eaa41565424ca6b190dc2d7e337b49:nsu-post-dorm-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (обращение к заведующему, передача направления с двумя печатями и чека, получение пропуска) и заменяет доступный фактический ответ общим перенаправлением, что прямо запрещено критерием.",
+      "elapsed_seconds": 4.345,
+      "memory_before": {
+        "memory.current": 285478912,
+        "memory.peak": 285478912,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1135352,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285466624,
+        "memory.peak": 285503488,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139156,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-dorm-04",
+      "question": "До каких чисел нужно оплачивать общежитие ФИТ за осенний семестр, весенний семестр и лето?",
+      "session_id": "eval:eac462ae6b83492dadf7f02d92ce7a88:nsu-post-dorm-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного из трёх обязательных фактов (до 10 сентября, до 10 февраля, до 30 июня) и вместо фактического ответа даёт общее перенаправление, что прямо нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталону не соответствует.",
+      "elapsed_seconds": 5.62,
+      "memory_before": {
+        "memory.current": 285437952,
+        "memory.peak": 285503488,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139108,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285507584,
+        "memory.peak": 285569024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138300,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-arrival-01",
+      "question": "Я буду жить в общежитии № 8/2. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:a17a5dae14984a21b71bdaff7d5709f7:nsu-post-arrival-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного из требуемых интервалов и вместо фактического ответа даёт общий отказ («не нашёл информации»), что нарушает критерий «не заменять доступный фактический ответ общим перенаправлением» и полностью противоречит эталону.",
+      "elapsed_seconds": 5.86,
+      "memory_before": {
+        "memory.current": 285511680,
+        "memory.peak": 285569024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1138324,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285536256,
+        "memory.peak": 285569024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139284,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-arrival-02",
+      "question": "Я буду жить в общежитии № 9. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:e27e595b9e7e41b180e071caf4297c71:nsu-post-arrival-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного из требуемых интервалов и вместо фактического ответа даёт общий отказ («не нашел информации»), что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением» и не выполняет обязательный факт о подходящих интервалах.",
+      "elapsed_seconds": 5.529,
+      "memory_before": {
+        "memory.current": 285495296,
+        "memory.peak": 285569024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1139284,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285556736,
+        "memory.peak": 285569024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1137852,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-arrival-03",
+      "question": "Я буду жить в общежитии № 10. Когда мне приходить за медицинским разрешением на проживание?",
+      "session_id": "eval:608f5e0e5bc44c5ab535f1c1d1f81c91:nsu-post-arrival-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного из требуемых интервалов и вместо фактического ответа даёт общий отказ («не нашел информации»), что нарушает критерий «не заменять доступный фактический ответ общим перенаправлением» и не выполняет обязательный факт о подходящих датах/времени.",
+      "elapsed_seconds": 5.214,
+      "memory_before": {
+        "memory.current": 285532160,
+        "memory.peak": 285569024,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1137852,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285278208,
+        "memory.peak": 285601792,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1137780,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-docs-01",
+      "question": "Я первокурсник ФИТ, гражданин РФ. Какие страницы паспорта копировать для медразрешения на общежитие в 2026 году?",
+      "session_id": "eval:456cb0052b944f9baa03ab5d74436962:nsu-post-docs-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Страницы 2-3 и 5» и вместо доступного фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 5.937,
+      "memory_before": {
+        "memory.current": 285589504,
+        "memory.peak": 285601792,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1137780,
+        "process_maxrss_kib": 312880
+      },
+      "memory_after": {
+        "memory.current": 285339648,
+        "memory.peak": 285605888,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1136524,
+        "process_maxrss_kib": 312880
+      }
+    },
+    {
+      "id": "nsu-post-docs-02",
+      "question": "Я первокурсник ФИТ, гражданин РФ. Чем заменить сертификат прививок для медразрешения на общежитие в 2026 году?",
+      "session_id": "eval:8a8d960ece9b49d0a27dd41c34040cdb:nsu-post-docs-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «Выпиской о прививках из амбулаторной карты» и вместо доступного фактического ответа даёт общее перенаправление, что нарушает критерий. Существенная ошибка/пропуск всей требуемой информации.",
+      "elapsed_seconds": 10.934,
+      "memory_before": {
+        "memory.current": 191324160,
+        "memory.peak": 191344640,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1239380,
+        "process_maxrss_kib": 218012
+      },
+      "memory_after": {
+        "memory.current": 284098560,
+        "memory.peak": 284110848,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1151676,
+        "process_maxrss_kib": 311792
+      }
+    },
+    {
+      "id": "nsu-post-docs-03",
+      "question": "Я иностранный первокурсник ФИТ 2026 года. Какие документы нужны для медицинского разрешения на общежитие?",
+      "session_id": "eval:0e7dfc79630b40199f4b00489eb2dfaa:nsu-post-docs-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (паспорт, сведения о прививках, флюорография/рентгенография не старше года, направление на проживание) и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 7.369,
+      "memory_before": {
+        "memory.current": 284082176,
+        "memory.peak": 284110848,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1151676,
+        "process_maxrss_kib": 311792
+      },
+      "memory_after": {
+        "memory.current": 284119040,
+        "memory.peak": 284135424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1147088,
+        "process_maxrss_kib": 311792
+      }
+    },
+    {
+      "id": "nsu-paid-contact-01",
+      "question": "Где можно оплатить обучение в НГУ онлайн без комиссии?",
+      "session_id": "eval:134edc996c6342f68dd4c018b5f57ab9:nsu-paid-contact-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «официальная страница онлайн-оплаты услуг НГУ» и вместо этого сообщает об отсутствии информации, что противоречит эталону и не выполняет критерий.",
+      "elapsed_seconds": 7.391,
+      "memory_before": {
+        "memory.current": 284102656,
+        "memory.peak": 284135424,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1147092,
+        "process_maxrss_kib": 311792
+      },
+      "memory_after": {
+        "memory.current": 284139520,
+        "memory.peak": 284151808,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1149456,
+        "process_maxrss_kib": 311792
+      }
+    },
+    {
+      "id": "nsu-paid-contact-02",
+      "question": "Какой банк участвует в программе образовательного кредита с господдержкой для оплаты учёбы в НГУ?",
+      "session_id": "eval:860a7e34950e4f8c935ebe36319d3986:nsu-paid-contact-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [
+        {
+          "kind": "regex",
+          "passed": false
+        }
+      ],
+      "elapsed_seconds": 6.421,
+      "memory_before": {
+        "memory.current": 284127232,
+        "memory.peak": 284151808,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1149456,
+        "process_maxrss_kib": 311792
+      },
+      "memory_after": {
+        "memory.current": 284147712,
+        "memory.peak": 284160000,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146492,
+        "process_maxrss_kib": 311792
+      }
+    },
+    {
+      "id": "nsu-paid-contact-03",
+      "question": "Где найти приказы о стоимости обучения и образцы договоров НГУ?",
+      "session_id": "eval:adef29d785de480b9f2dd7a19d6ea752:nsu-paid-contact-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта о разделе приказов о стоимости и образцов договоров на странице стоимости обучения НГУ, вместо этого заявляет об отсутствии информации, что противоречит эталону и нарушает критерий (замена доступного фактического ответа отказом).",
+      "elapsed_seconds": 6.654,
+      "memory_before": {
+        "memory.current": 284127232,
+        "memory.peak": 284160000,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1146500,
+        "process_maxrss_kib": 311792
+      },
+      "memory_after": {
+        "memory.current": 283897856,
+        "memory.peak": 284196864,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1145168,
+        "process_maxrss_kib": 311792
+      }
+    },
+    {
+      "id": "nsu-paid-steps-01",
+      "question": "Сколько стоит год обучения по 09.03.01 в НГУ в 2026/27?",
+      "session_id": "eval:413c87f88865484fa97c313a6a2bf1c1:nsu-paid-steps-01",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «300 000 рублей за год» и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением». Эталону не соответствует.",
+      "elapsed_seconds": 4.671,
+      "memory_before": {
+        "memory.current": 284151808,
+        "memory.peak": 284196864,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1145168,
+        "process_maxrss_kib": 311792
+      },
+      "memory_after": {
+        "memory.current": 284184576,
+        "memory.peak": 284196864,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144960,
+        "process_maxrss_kib": 311792
+      }
+    },
+    {
+      "id": "nsu-paid-steps-02",
+      "question": "Сколько стоит семестр на ПИиКН ФИТ в 2026/27?",
+      "session_id": "eval:bc8c9da90b094c3bbf83f045e098af90:nsu-paid-steps-02",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nСтоимость обучения за семестр на направлении ПИиКН (ФИТ) в 2026/27 году в базе знаний отсутствует.",
+      "tools_called": [
+        "get_admission_scores",
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «150 000 рублей в семестр» и утверждает, что информация отсутствует, что противоречит эталону. Кроме того, это общее перенаправление вместо доступного фактического ответа, что нарушает ограничение поведения.",
+      "elapsed_seconds": 7.344,
+      "memory_before": {
+        "memory.current": 284143616,
+        "memory.peak": 284196864,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1144772,
+        "process_maxrss_kib": 311792
+      },
+      "memory_after": {
+        "memory.current": 284061696,
+        "memory.peak": 284356608,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1134976,
+        "process_maxrss_kib": 311920
+      }
+    },
+    {
+      "id": "nsu-paid-steps-03",
+      "question": "Сколько стоит год обучения на мехатронике и робототехнике 15.03.06 в НГУ в 2026/27?",
+      "session_id": "eval:1eeaef4c01ce4f3693bb7d81d09a5f71:nsu-paid-steps-03",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.\n\nВ моём контексте нет данных ни о стоимости обучения на направлении 15.03.06 «Мехатроника и робототехника», ни о наличии такой программы в справочнике. Уточнить стоимость года обучения для приёма 2026/27 можно в приёмной комиссии вуза.",
+      "tools_called": [
+        "get_admission_scores",
+        "get_education_programs"
+      ],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта «205 000 рублей за год» и вместо этого утверждает, что данных нет, что противоречит эталону. Также нарушено ограничение «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 6.99,
+      "memory_before": {
+        "memory.current": 284344320,
+        "memory.peak": 284356608,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1134976,
+        "process_maxrss_kib": 311920
+      },
+      "memory_after": {
+        "memory.current": 284381184,
+        "memory.peak": 284442624,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140700,
+        "process_maxrss_kib": 311920
+      }
+    },
+    {
+      "id": "nsu-paid-steps-04",
+      "question": "Можно ли образовательным кредитом с господдержкой оплатить только часть стоимости учёбы в НГУ?",
+      "session_id": "eval:c8841117d60f43f3847d13ac2286efd0:nsu-paid-steps-04",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит обязательного факта о том, что образовательный кредит с господдержкой допускает полную или частичную оплату, и вместо ответа даёт общее перенаправление, что нарушает критерий «не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 7.8,
+      "memory_before": {
+        "memory.current": 284356608,
+        "memory.peak": 284442624,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140028,
+        "process_maxrss_kib": 311920
+      },
+      "memory_after": {
+        "memory.current": 284418048,
+        "memory.peak": 284684288,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140172,
+        "process_maxrss_kib": 312176
+      }
+    },
+    {
+      "id": "nsu-paid-steps-05",
+      "question": "Какими платёжными системами можно оплатить учёбу в НГУ онлайн без комиссии?",
+      "session_id": "eval:7fd744df1f074c6b984de088037931dc:nsu-paid-steps-05",
+      "passed": false,
+      "answer": "Я не нашел информации об этом в базе знаний Ваш вуз.",
+      "tools_called": [],
+      "faq_matched": false,
+      "checks": [],
+      "judge_score": 1,
+      "judge_reasoning": "Ответ не содержит ни одного обязательного факта (Visa, Mastercard, Мир) и вместо фактического ответа даёт общее перенаправление, что нарушает критерий «Не заменять доступный фактический ответ общим перенаправлением».",
+      "elapsed_seconds": 5.898,
+      "memory_before": {
+        "memory.current": 284631040,
+        "memory.peak": 284684288,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140172,
+        "process_maxrss_kib": 312176
+      },
+      "memory_after": {
+        "memory.current": 284856320,
+        "memory.peak": 284893184,
+        "memory.swap.current": 0,
+        "memory.events": {
+          "max": 0,
+          "oom": 0,
+          "oom_kill": 0
+        },
+        "host_available_kib": 1140416,
+        "process_maxrss_kib": 312432
+      }
+    }
+  ]
+}

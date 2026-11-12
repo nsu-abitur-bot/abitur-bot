@@ -1,0 +1,157 @@
+{
+  "variant": "with-kb",
+  "container_hostname": "a38b918cd0f0",
+  "database_host": "postgres",
+  "database_server": "172.30.88.4/32",
+  "database_name": "eval388",
+  "settings": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-flash",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-flash",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_LLM_MODEL": null,
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "FAQ_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS",
+    "PDF_PARSER_PROVIDER": "openai",
+    "TELEGRAM_ENABLED": "false",
+    "MAX_ENABLED": "false",
+    "LIGHTRAG_STORAGE": "json",
+    "LIGHTRAG_WORKSPACE_BASE": "/app/data/lightrag",
+    "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks"
+  },
+  "settings_revision": 2,
+  "credential_configured": {
+    "DEEPSEEK_API_KEY": true,
+    "GIGACHAT_API_KEY": true
+  },
+  "environment_nonsecret_settings": {
+    "LLM_PROVIDER": "deepseek",
+    "DEEPSEEK_MODEL": "deepseek-chat",
+    "DEEPSEEK_GRAPH_MODEL": "deepseek-chat",
+    "LIGHTRAG_LLM_PROVIDER": "deepseek",
+    "LIGHTRAG_LLM_MODEL": null,
+    "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+    "FAQ_EMBEDDING_PROVIDER": "gigachat",
+    "GIGACHAT_EMBEDDING_MODEL": "EmbeddingsGigaR",
+    "GIGACHAT_SCOPE": "GIGACHAT_API_PERS",
+    "PDF_PARSER_PROVIDER": null,
+    "TELEGRAM_ENABLED": "false",
+    "MAX_ENABLED": "false",
+    "LIGHTRAG_STORAGE": "json",
+    "LIGHTRAG_WORKSPACE_BASE": "/app/data/lightrag",
+    "GIGACHAT_LOCK_DIRECTORY": "/app/provider-locks"
+  },
+  "row_counts": {
+    "document": 1,
+    "content_proposal": 1,
+    "faq_entry": 0,
+    "user": 0,
+    "message": 0,
+    "message_logs": 0,
+    "admins": 1
+  },
+  "mounts": [
+    {
+      "root": "/home/mihail/abitur-evals/388-20261107",
+      "target": "/evaluation",
+      "options": "ro,relatime"
+    },
+    {
+      "root": "/home/mihail/abitur-evals/388-reports/with-kb",
+      "target": "/reports",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_files/_data",
+      "target": "/app/data",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_logs/_data",
+      "target": "/app/logs",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-eval388-with-kb_branding/_data",
+      "target": "/app/branding-media",
+      "options": "rw,relatime"
+    },
+    {
+      "root": "/var/lib/docker/volumes/abitur-provider-locks/_data",
+      "target": "/app/provider-locks",
+      "options": "rw,relatime"
+    }
+  ],
+  "data_files": [
+    {
+      "path": "lightrag/abitur_kb/vdb_chunks.json",
+      "bytes": 106735
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_doc_status.json",
+      "bytes": 1222
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_full_entities.json",
+      "bytes": 4957
+    },
+    {
+      "path": "lightrag/abitur_kb/vdb_entities.json",
+      "bytes": 2210769
+    },
+    {
+      "path": "lightrag/abitur_kb/vdb_relationships.json",
+      "bytes": 2004419
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_text_chunks.json",
+      "bytes": 13250
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_relation_chunks.json",
+      "bytes": 30488
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_full_docs.json",
+      "bytes": 9727
+    },
+    {
+      "path": "lightrag/abitur_kb/graph_chunk_entity_relation.graphml",
+      "bytes": 113640
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_full_relations.json",
+      "bytes": 9724
+    },
+    {
+      "path": "lightrag/abitur_kb/llm_cache_clear.marker",
+      "bytes": 18
+    },
+    {
+      "path": "lightrag/abitur_kb/kv_store_entity_chunks.json",
+      "bytes": 27942
+    }
+  ],
+  "graph_document_status_counts": {
+    "processed": 1
+  },
+  "documents": [
+    {
+      "id": "01a1b547-1029-7c3e-9577-554857174189",
+      "rag_doc_id": "01a1b550-b6f1-7750-ac53-44a515b62515",
+      "source_proposal_id": "01a1b547-0f93-7a25-bf39-81f076b77a9e",
+      "status": "проиндексирован",
+      "last_indexed_at": "2026-11-07T09:24:02.205119"
+    }
+  ],
+  "redis_keys": 0,
+  "redis_run_id": "54043f3fa04746f14f459c07d48d666769970809",
+  "resources": {
+    "memory.max": "671088640",
+    "memory.current": "172097536",
+    "memory.swap.max": "268435456",
+    "cpu.max": "75000 100000"
+  }
+}
