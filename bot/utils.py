@@ -52,7 +52,7 @@ def _encode_url_parts(url: str) -> str:
 
     safe_path = quote(parts.path, safe="/%:@&=+$,;~*'()!-._")
     safe_query = quote(parts.query, safe="=&%+;:@/?-._~")
-    safe_fragment = quote(parts.fragment, safe="%!-._~")
+    safe_fragment = quote(parts.fragment, safe="=&%!-._~")
 
     return urlunsplit((parts.scheme, safe_netloc, safe_path, safe_query, safe_fragment))
 

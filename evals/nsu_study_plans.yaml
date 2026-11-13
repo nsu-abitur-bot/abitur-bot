@@ -1,0 +1,41 @@
+schema_version: 1
+scenarios:
+  - id: nsu_piikn_discrete_mathematics_2026
+    question: В каком семестре у набора 2026 ПИиКН дискретная математика и обязательна ли она?
+    reference_answer: >-
+      Дискретная математика входит в обязательную часть учебного плана ПИиКН
+      для набора 2026 (Б1.Б.11) и изучается в 3-м семестре. Источник — PDF, стр. 2.
+    topic: study-plans
+    source: &plan_page https://www.nsu.ru/n/information-technologies-department/education_fit/programs/OOP/09-03-01/piikn/UP_09.03.01_2026_PIiKN.pdf#page=2
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: contains, value: Дискретная математика}
+      - {kind: regex, value: '3(?:-\w+)?\s+семестр'}
+      - {kind: contains, value: обязательн}
+      - {kind: source_contains, value: *plan_page}
+      - {kind: regex, value: '(?:стр\.?|страниц[аеы])\s*2\b'}
+  - id: nsu_piikn_discrete_mathematics_other_cohort
+    question: >-
+      В каком семестре у набора 2025 ПИиКН дискретная математика и обязательна ли она?
+      Сверь с этим PDF:
+      https://www.nsu.ru/n/information-technologies-department/education_fit/programs/OOP/09-03-01/piikn/UP_09.03.01_2026_PIiKN.pdf
+    reference_answer: >-
+      План относится к другому набору, 2026. По нему дискретная математика
+      обязательна и изучается в 3-м семестре. Для набора 2025 эти сведения
+      не подтверждены. Источник — PDF, стр. 2.
+    topic: study-plans
+    source: *plan_page
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: contains, value: Дискретная математика}
+      - {kind: regex, value: '3(?:-\w+)?\s+семестр'}
+      - {kind: contains, value: обязательн}
+      - {kind: source_contains, value: *plan_page}
+      - {kind: regex, value: '(?:стр\.?|страниц[аеы])\s*2\b'}
+      - {kind: contains, value: '2025'}
+      - {kind: contains, value: '2026'}
+      - {kind: regex, value: 'друг(?:ого|ому|ой) набор(?:а|у)?'}

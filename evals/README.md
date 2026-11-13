@@ -63,6 +63,16 @@ uv run python -m evals.evaluator --scenarios evals/sibsiu_program_exams.yaml \
 uv run pytest tests/rag/test_document_indexer_integration.py -k program_exam_cards
 ```
 
+Проверка учебного плана ПИиКН использует публичный PDF НГУ. Первый сценарий
+проверяет обязательность, третий семестр и ссылку на страницу 2 для набора 2026.
+Второй проверяет, что эти сведения не выдаются за подтверждение для набора 2025.
+Набор исключён из `--offline`, поскольку требует загрузки документа по сети.
+
+```bash
+uv run python -m evals.evaluator --scenarios evals/nsu_study_plans.yaml \
+  --baseline evals/nsu_study_plans_baseline.json
+```
+
 ## Формат сценария v1 (необходимая основа #245)
 
 Документ содержит `schema_version: 1` и непустой список `scenarios`.
