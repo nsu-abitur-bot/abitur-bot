@@ -70,12 +70,22 @@ def summarize_usage(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def calculate() -> dict[str, Any]:
     manifest = json.loads((DATA / "manifest.json").read_text(encoding="utf-8"))
     fingerprints = {}
+    verified: dict[str, bytes] = {}
     for spec in manifest["files"]:
         name = spec["file"]
         require(Path(name).name == name and name not in fingerprints, "Invalid manifest")
-        digest = hashlib.sha256((DATA / name).read_bytes()).hexdigest()
+        raw = (DATA / name).read_bytes()
+        digest = hashlib.sha256(raw).hexdigest()
         require(digest == spec["sha256"], "Evidence SHA mismatch: " + name)
         fingerprints[name] = digest
+        verified[name] = raw
+    required = {
+        f"{condition}-{RUN}-batch-{batch:02}-{kind}"
+        for condition in ("with-kb", "empty-kb")
+        for batch in range(5)
+        for kind in ("report.json", "usage.jsonl", "intents.jsonl")
+    } | {"with-kb-aggregate.json", "empty-kb-aggregate.json"}
+    require(required <= verified.keys(), "Missing required evidence")
     conditions = {}
     all_rows = []
     for condition in ("with-kb", "empty-kb"):
@@ -83,27 +93,31 @@ def calculate() -> dict[str, Any]:
         rows = []
         for batch in range(5):
             prefix = f"{condition}-{RUN}-batch-{batch:02}"
-            report = json.loads(
-                (DATA / (prefix + "-report.json")).read_text(encoding="utf-8")
-            )
+            report = json.loads(verified[prefix + "-report.json"])
             require(
                 report["status"] == "completed" and report["total"] == 10, "Bad batch"
             )
             usage = [
                 json.loads(line)
-                for line in (DATA / (prefix + "-usage.jsonl"))
-                .read_text(encoding="utf-8")
-                .splitlines()
+                for line in verified[prefix + "-usage.jsonl"].splitlines()
             ]
             intents = [
                 json.loads(line)
-                for line in (DATA / (prefix + "-intents.jsonl"))
-                .read_text(encoding="utf-8")
-                .splitlines()
+                for line in verified[prefix + "-intents.jsonl"].splitlines()
             ]
             require(len(usage) == len(intents), "Unsettled intents")
+            require(
+                all(
+                    type(r["attempt"]) is int and r["attempt"] > 0
+                    for r in usage + intents
+                ),
+                "Invalid attempt ID",
+            )
             by_attempt = {r["attempt"]: r for r in usage}
+            by_intent = {r["attempt"]: r for r in intents}
             require(len(by_attempt) == len(usage), "Duplicate attempt")
+            require(len(by_intent) == len(intents), "Duplicate intent")
+            require(by_attempt.keys() == by_intent.keys(), "Attempt ID sets differ")
             for intent in intents:
                 require(intent["attempt"] in by_attempt, "Missing attempt")
                 row = by_attempt[intent["attempt"]]
