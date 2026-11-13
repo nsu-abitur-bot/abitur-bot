@@ -1,0 +1,31 @@
+{
+    "checked_at_utc":  "2026-11-12T16:55:46.519943+00:00",
+    "host":  "nsu.abitur.site",
+    "ssh_host_key_sha256":  "zHSpV6gyMh6xzvZhJSWcNF3VwrhnBoMBBWOBT/3NkHE",
+    "readonly":  true,
+    "model_requests":  0,
+    "memory_kib":  {
+                       "MemAvailable":  1431828,
+                       "SwapFree":  7931848
+                   },
+    "wrapper_sha256":  "33d70a2a6c8909587f63ea21cfc6a8fa51c75b0aa9d4cc58f08f075b7a89d77b",
+    "allowed_privileged_wrapper":  "/usr/local/sbin/abitur-eval388",
+    "test_projects":  {
+                          "with-kb":  {
+                                          "exit_code":  0,
+                                          "container_rows":  0
+                                      },
+                          "empty-kb":  {
+                                           "exit_code":  0,
+                                           "container_rows":  0
+                                       }
+                      },
+    "free_disk_bytes":  47989661696,
+    "standalone_postgres_tools":  {
+                                      "initdb":  false,
+                                      "pg_ctl":  false,
+                                      "pg_dump":  false,
+                                      "pg_restore":  false
+                                  },
+    "scope":  "No start/stop/reset, shared database queries, credentials or runtime logs"
+}
