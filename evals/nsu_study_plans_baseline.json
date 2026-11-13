@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "cases": {
+    "nsu_piikn_discrete_mathematics_2026": {"passed": true},
+    "nsu_piikn_discrete_mathematics_other_cohort": {"passed": true}
+  }
+}
