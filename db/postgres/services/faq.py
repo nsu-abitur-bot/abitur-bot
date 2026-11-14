@@ -7,6 +7,8 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.content_gate import content_write
+
 from ..models import FaqEntry, normalize_question, timestamp
 
 logger = logging.getLogger(__name__)
@@ -35,6 +37,7 @@ class FaqDbService:
             logger.error(f"Ошибка получения всех FAQ: {e}")
             return []
 
+    @content_write()
     async def create(
         self,
         question: str,
@@ -59,6 +62,7 @@ class FaqDbService:
             logger.error(f"Ошибка создания FAQ: {e}")
             raise
 
+    @content_write()
     async def upsert_many(self, items: list[dict]) -> tuple[list[FaqEntry], int, int]:
         """Массовый импорт FAQ с UPSERT по нормализованному вопросу (#295).
 
@@ -149,6 +153,7 @@ class FaqDbService:
         )
         return result.scalar_one_or_none()
 
+    @content_write()
     async def update(
         self,
         item_id: str,
@@ -177,6 +182,7 @@ class FaqDbService:
             raise
         return entry
 
+    @content_write()
     async def delete(self, item_id: str) -> bool:
         entry = await self.get(item_id)
         if not entry:

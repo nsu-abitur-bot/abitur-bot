@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.services.popular_questions import get_popular_questions
 from config import instance
+from config.instance import pinned_settings
 from db.postgres.config import DATABASE_URL
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.message_log import MessageLogService
@@ -137,6 +138,7 @@ class PopularStatistics:
             except (RedisError, WatchError):
                 logger.warning("Could not renew statistics refresh lease")
 
+    @pinned_settings()
     async def refresh(self, raw_limit: int = 500, threshold: float = 0.86) -> None:
         key = self._key(raw_limit, threshold)
         owner = uuid4().hex

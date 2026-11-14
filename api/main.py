@@ -5,13 +5,14 @@ import re
 from contextlib import asynccontextmanager, suppress
 from datetime import date, datetime
 from pathlib import Path
-from typing import List, Optional
+from typing import AsyncGenerator, List, Optional
 
-from fastapi import Depends, FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.responses import JSONResponse
 
 from abbrev.expander import get_abbrev_expander
 from api.auth.dependencies import get_current_admin, require_admin
@@ -26,14 +27,17 @@ from api.routes.faq import router as faq_router
 from api.routes.feedback_report import router as feedback_report_router
 from api.routes.instance_settings import router as instance_settings_router
 from api.routes.message_log import router as message_log_router
+from api.routes.model_settings import router as model_settings_router
 from api.routes.rag import router as rag_router
 from api.routes.settings import router as settings_router
 from api.routes.stats import router as stats_router
 from api.routes.system_logs import router as system_logs_router
 from api.routes.topic import router as topic_router
+from api.services.model_migration import run_migrations
 from api.services.popular_statistics import run_popular_statistics
 from api.services.rag_import_queue import run_import_queue
 from bootstrap.runtime_settings import runtime_settings
+from config.content_gate import ModelMigrationBusy, content_write
 from db.postgres.db import AsyncSessionLocal, get_async_session
 from db.postgres.models import Admin, Message
 from db.postgres.services.abbrev import AbbrevDbService
@@ -100,9 +104,13 @@ async def lifespan(app: FastAPI):
                 logger.exception("Ошибка загрузки FAQ/аббревиатур из БД при старте")
         import_worker = asyncio.create_task(run_import_queue())
         statistics_worker = asyncio.create_task(run_popular_statistics())
+        model_worker = asyncio.create_task(run_migrations())
         try:
             yield
         finally:
+            model_worker.cancel()
+            with suppress(asyncio.CancelledError):
+                await model_worker
             import_worker.cancel()
             statistics_worker.cancel()
             with suppress(asyncio.CancelledError):
@@ -112,6 +120,21 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Abitur API", lifespan=lifespan)
+
+
+@app.exception_handler(ModelMigrationBusy)
+async def migration_busy_handler(
+    request: Request, exc: ModelMigrationBusy
+) -> JSONResponse:
+    return JSONResponse(status_code=423, content={"detail": str(exc)})
+
+
+async def fence_content_mutations(request: Request) -> AsyncGenerator[None, None]:
+    if request.method in {"GET", "HEAD", "OPTIONS"}:
+        yield
+        return
+    async with content_write():
+        yield
 
 
 @app.get("/health")
@@ -147,6 +170,7 @@ app.add_middleware(
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(branding_router, prefix="/api/v1")
 app.include_router(instance_settings_router, prefix="/api/v1")
+app.include_router(model_settings_router, prefix="/api/v1")
 
 # Все остальные роутеры требуют аутентификации
 # Мутации (abbrev, faq, rag, evals) требуют роль admin или superadmin
@@ -159,7 +183,7 @@ app.include_router(
 app.include_router(
     faq_router,
     prefix="/api/v1",
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin), Depends(fence_content_mutations)],
 )
 app.include_router(
     faculty_router,
@@ -174,7 +198,7 @@ app.include_router(
 app.include_router(
     content_proposal_router,
     prefix="/api/v1",
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin), Depends(fence_content_mutations)],
 )
 app.include_router(
     message_log_router,
@@ -196,7 +220,7 @@ app.include_router(
 app.include_router(
     rag_router,
     prefix="/api/v1",
-    dependencies=[Depends(require_admin)],
+    dependencies=[Depends(require_admin), Depends(fence_content_mutations)],
 )
 app.include_router(
     evals_router,

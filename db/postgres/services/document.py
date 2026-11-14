@@ -5,6 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from uuid6 import uuid7
 
+from config.content_gate import content_write
 from db.postgres.models import Document, timestamp
 
 DOCUMENT_STATUS_INDEXED = "проиндексирован"
@@ -125,6 +126,7 @@ class DocumentService:
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
+    @content_write()
     async def create_or_update_for_source(
         self,
         *,
@@ -185,6 +187,7 @@ class DocumentService:
         await self.session.refresh(document)
         return document
 
+    @content_write()
     async def mark_indexed(
         self,
         document_id: str,
@@ -217,6 +220,7 @@ class DocumentService:
         await self.session.refresh(document)
         return document
 
+    @content_write()
     async def mark_error(self, document_id: str) -> bool:
         document = await self.get_by_id(document_id)
         if document is None:
@@ -226,6 +230,7 @@ class DocumentService:
         await self.session.commit()
         return True
 
+    @content_write()
     async def mark_deleted(self, document_id: str) -> bool:
         document = await self.get_by_id(document_id)
         if document is None:
@@ -234,6 +239,7 @@ class DocumentService:
         await self.session.commit()
         return True
 
+    @content_write()
     async def update_metadata(
         self,
         document_id: str,
@@ -271,6 +277,7 @@ class DocumentService:
         await self.session.refresh(document)
         return document
 
+    @content_write()
     async def save_check_results(self, results: Sequence[dict]) -> None:
         checked_at = timestamp()
         # Один IN-запрос вместо SELECT на каждый результат (#300).

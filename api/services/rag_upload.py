@@ -1,3 +1,4 @@
+import asyncio
 import csv
 import io
 import json
@@ -13,7 +14,7 @@ from api.services.document_update import first_http_url
 from config.instance import get_setting
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.services.content_proposal import ContentProposalService
-from parser.pdf import pdf_to_base64_images
+from parser.pdf import extract_pdf_text, pdf_to_base64_images
 from parser.utils import extract_sources
 from parser.vision import parse_images_with_llm
 from pipeline.preprocessor import generate_title_from_text
@@ -193,6 +194,9 @@ class RagUploadService:
 
     async def _extract_text(self, raw: bytes, extension: str, max_pages: int = 50) -> str:
         if extension == ".pdf":
+            text = await asyncio.to_thread(extract_pdf_text, raw, max_pages)
+            if text:
+                return text
             images = pdf_to_base64_images(raw, max_pages=max_pages)
             if not images:
                 raise ValueError("Could not extract images from PDF")

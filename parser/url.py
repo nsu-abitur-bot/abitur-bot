@@ -1,10 +1,11 @@
+import asyncio
 import logging
 from typing import Optional
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 
-from parser.pdf import pdf_to_base64_images
+from parser.pdf import extract_pdf_text, pdf_to_base64_images
 from parser.safe_fetch import fetch_url_async
 from parser.vision import parse_images_with_llm
 
@@ -40,7 +41,10 @@ async def process_url(url: str) -> Optional[str]:
 
 async def process_pdf_bytes(pdf_bytes: bytes) -> str:
     """Преобразует байты PDF в изображения и отправляет в LLM."""
-    images = pdf_to_base64_images(pdf_bytes)
+    text = await asyncio.to_thread(extract_pdf_text, pdf_bytes)
+    if text:
+        return text
+    images = await asyncio.to_thread(pdf_to_base64_images, pdf_bytes)
     if not images:
         logger.warning("Не удалось извлечь изображения из PDF")
         return ""

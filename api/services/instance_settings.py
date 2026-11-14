@@ -32,7 +32,8 @@ def merge_changes(
     if unknown:
         raise ConfigurationError("Неизвестный параметр")
     values = {
-        name: current.values.get(name, spec.default) for name, spec in SPECS.items()
+        **current.values,
+        **{name: current.values.get(name, spec.default) for name, spec in SPECS.items()},
     }
     for name, value in changes.items():
         spec = SPECS[name]
@@ -51,6 +52,15 @@ def merge_changes(
     for channel, token in (("TELEGRAM", "BOT_TOKEN"), ("MAX", "MAX_BOT_TOKEN")):
         if values[channel + "_ENABLED"] == "true" and not values[token]:
             raise ConfigurationError(f"Для включения {channel} нужен токен")
+    if current.values.get("_model_settings_version") == "2":
+        from config.model_settings import materialize_models
+
+        materialized = materialize_models(values)
+        # Internal legacy routes cannot reintroduce independent assignments.
+        for name in changes:
+            if values[name] != materialized[name]:
+                raise ConfigurationError("Изменяйте модель через раздел «Модели»")
+        values = materialized
     return values
 
 
