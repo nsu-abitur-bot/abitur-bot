@@ -1,0 +1,19 @@
+flowchart TB
+    Applicants["Абитуриенты: Telegram / MAX"] --> Bot["Адаптеры мессенджеров и BotCore"]
+    Bot --> Answers["Обработка ответа"]
+    Staff["Сотрудники университета"] --> Panel["Панель Nuxt"]
+    Panel --> API["FastAPI: доступ и содержимое"]
+    API --> SQL[("PostgreSQL: содержимое, подтверждения, версия публикации")]
+    API -. "Задание публикации: релиз 2" .-> Worker["Обработчик публикаций"]
+    Worker --> SQL
+    Worker --> Snapshots[("LightRAG: действующие и подготовленные области")]
+    Worker --> Models
+    Answers --> Cache["Локальный снимок FAQ, сокращений и правил"]
+    Cache -. "Проверка версии: проект" .-> SQL
+    Answers --> Retrieval["Поиск и CRAG"]
+    Retrieval --> Snapshots
+    Answers --> Models["Провайдеры моделей и эмбеддингов"]
+    Answers --> Tools["Инструменты данных"]
+    Tools --> SQL
+    Answers --> Redis[("Redis: контекст диалога")]
+    Answers --> SQL

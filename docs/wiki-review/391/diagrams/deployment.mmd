@@ -1,0 +1,30 @@
+flowchart LR
+    Messengers["API Telegram / MAX"] <--> Bot
+    Staff["Браузер сотрудника"] --> HTTPS["HTTPS-прокси: требование"]
+    HTTPS --> UI["Панель Nuxt"]
+    HTTPS --> API
+    subgraph Server["Сервер университета: приложение и хранилища"]
+        HTTPS
+        UI
+        subgraph App["Процессы приложения"]
+            Bot["bot: один polling-процесс на токен"]
+            API["api: FastAPI"]
+            Scheduler["scheduler: списки, релиз 3"]
+            Worker["Публикации: релиз 2"]
+        end
+        SQL[("PostgreSQL: внутренняя сеть")]
+        Redis[("Redis: внутренняя сеть")]
+        Volume[("Общий том LightRAG: версии рабочих областей")]
+        Bot --> SQL
+        API --> SQL
+        Scheduler --> SQL
+        Worker --> SQL
+        Bot --> Redis
+        API --> Redis
+        Bot --> Volume
+        API --> Volume
+        Worker --> Volume
+    end
+    Bot --> Providers["Внешние модели и эмбеддинги"]
+    API --> Providers
+    Worker --> Providers

@@ -1,0 +1,37 @@
+{
+  "checked_on": "2026-11-14",
+  "method": "Local CLI render and visual inspection of all three PNGs",
+  "mermaid_cli": "12.2.0",
+  "mermaid": "12.3.0",
+  "browser": "Microsoft Edge 157.0.4341.46",
+  "sad_sha256": "ca8a6c264942caa3f1246a5bd46b3ba4fd5412bdd709eb1ce66dc0eab012f0bf",
+  "diagrams": [
+    {
+      "name": "components",
+      "source_sha256": "d7875b08f6a178479318433c7834d535d8872f58d46ec2ea80c11b7e970edd1b",
+      "png_sha256": "5e3c479a7dc2ba29e79fbfca8680f3ed95e2d19b4590b35207ed1731a1a327ea",
+      "svg_sha256": "c81cc03d6c63f61b765a0c534be358925137441af35fa2b674eb4f8891c17ea4",
+      "png_width": 2400,
+      "png_height": 2104,
+      "layout_change": null
+    },
+    {
+      "name": "deployment",
+      "source_sha256": "fbfb60e26865061715f575c0fb9e29b72c712217d37684b23777170056bc3a1b",
+      "png_sha256": "cf03d3ea86eb3623d54f296015e199b708935a8f112d1dd4600e51ca81eeac40",
+      "svg_sha256": "c95646704edfadc43c0f750a73d9d0f1bfa9e8b5317a226666c78d9c5f49204f",
+      "png_width": 3000,
+      "png_height": 1647,
+      "layout_change": "TB to LR, same nodes and edges"
+    },
+    {
+      "name": "question-answer",
+      "source_sha256": "20367764931dc6c315f67ae056e1317961726e766392620facc696e7ae92d5a5",
+      "png_sha256": "26ad2515ddc8a1ba1c12a789fd2a4d9dbe924e384436acb17edccf24fbadfadd",
+      "svg_sha256": "ced063f95e693771c0a2f3a4567567ca7fefdf86a7c46c5a6db0aaf9f178aaeb",
+      "png_width": 2400,
+      "png_height": 2005,
+      "layout_change": null
+    }
+  ]
+}

@@ -1,14 +1,14 @@
 {
-    "Gantt-chart.md":  "b245077d0558cd9ad07db15d17352816c99b6bf538dee09fd94770e52b2b945d",
-    "Home.md":  "608d32d955555f9456bef1c23e94095650cd14035468e7170d2342db8969d059",
-    "Installing-a-local-copy.md":  "e5a512972305ec1ec4af952a72c918ad010228d582349f2542882a3109a78be4",
-    "Project-Schedule.md":  "e7401679e2eced0a5092208e25992d8af446a23806cf9612d6a1e0a3d380c2ff",
-    "Risk-table.md":  "6a6baf40f55240961189318c984d0333e2cf3138986619b5a9539fea2e3e2627",
-    "SAD.md":  "89ea9a7d1dd8acada0233974aa0555ec87448c43f3ccf196a6cfcfa7efc754f9",
-    "Software-Requirements-Specification.md":  "0aab50427de98ca53b71cb0c2c6dba697eda8862c5dee619dd1dd3aaff799e0e",
-    "System-deployment.md":  "1233b18eab21dbc607b3c3b850d02ae8a562b7307655426e974132fa18f4b4db",
-    "Vision.md":  "b9d5f30db8135f49a3ba8f211a4b3e678b4aa831d50e9a032027048b9eb17e74",
-    "Лимиты-LLM.md":  "0fd420fddd111a0278586213925097d11178b17e87c1e90ea6ef3eda4e3bdce6",
-    "План-релиза.md":  "a4afa8b5e9d5801e8b318d69598247f03660dd0959fa6ac6cdf3c74284c15ac9",
-    "Эталонный-набор.md":  "d0311a25798be5ddf1010ceacfa4ec34f81a0bac908be68d6d952d5c9fb2a7f8"
+  "Gantt-chart.md": "b245077d0558cd9ad07db15d17352816c99b6bf538dee09fd94770e52b2b945d",
+  "Home.md": "608d32d955555f9456bef1c23e94095650cd14035468e7170d2342db8969d059",
+  "Installing-a-local-copy.md": "e5a512972305ec1ec4af952a72c918ad010228d582349f2542882a3109a78be4",
+  "Project-Schedule.md": "e7401679e2eced0a5092208e25992d8af446a23806cf9612d6a1e0a3d380c2ff",
+  "Risk-table.md": "6a6baf40f55240961189318c984d0333e2cf3138986619b5a9539fea2e3e2627",
+  "SAD.md": "ca8a6c264942caa3f1246a5bd46b3ba4fd5412bdd709eb1ce66dc0eab012f0bf",
+  "Software-Requirements-Specification.md": "0aab50427de98ca53b71cb0c2c6dba697eda8862c5dee619dd1dd3aaff799e0e",
+  "System-deployment.md": "1233b18eab21dbc607b3c3b850d02ae8a562b7307655426e974132fa18f4b4db",
+  "Vision.md": "b9d5f30db8135f49a3ba8f211a4b3e678b4aa831d50e9a032027048b9eb17e74",
+  "Лимиты-LLM.md": "0fd420fddd111a0278586213925097d11178b17e87c1e90ea6ef3eda4e3bdce6",
+  "План-релиза.md": "a4afa8b5e9d5801e8b318d69598247f03660dd0959fa6ac6cdf3c74284c15ac9",
+  "Эталонный-набор.md": "d0311a25798be5ddf1010ceacfa4ec34f81a0bac908be68d6d952d5c9fb2a7f8"
 }
