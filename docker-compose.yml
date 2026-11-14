@@ -89,6 +89,9 @@ services:
       - DATABASE_URL=postgresql+asyncpg://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@postgres:5432/${DB_NAME:-abitur}
       - DB_HOST=postgres
       - DB_PASSWORD=${DB_PASSWORD:-postgres}
+      # Алерты дежурному (#243): API внутри compose-сети по имени сервиса.
+      - ALERT_ENABLED=${ALERT_ENABLED:-false}
+      - ALERT_API_BASE=http://api:8000
     volumes:
       - ./logs:/app/logs
     depends_on:
