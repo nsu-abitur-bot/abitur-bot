@@ -19,14 +19,18 @@
 import asyncio
 import json
 import logging
+import math
 import os
 import re
 import time
+from contextlib import asynccontextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass, field
-from typing import Awaitable, Callable, Optional, Sequence
+from typing import AsyncGenerator, Awaitable, Callable, Optional, Sequence
 
 from langchain_core.messages import HumanMessage, SystemMessage
 
+from config.instance import revision as settings_revision
 from config.latency import stage, timed
 from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Faculty
@@ -36,6 +40,31 @@ from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
 
 logger = logging.getLogger(__name__)
+
+_GradeKey = tuple[str, str, float, int, int]
+_grade_memo: ContextVar[dict[_GradeKey, tuple[object, bool]] | None] = ContextVar(
+    "crag_grade_memo", default=None
+)
+
+
+@asynccontextmanager
+async def _grading_scope() -> AsyncGenerator[None, None]:
+    token = _grade_memo.set({})
+    try:
+        yield
+    finally:
+        _grade_memo.reset(token)
+
+
+def _cacheable_grade(raw: str) -> bool:
+    match = re.search(r"\{[\s\S]*\}", raw)
+    if match is None:
+        return False
+    try:
+        score = json.loads(match.group(0))["score"]
+        return not isinstance(score, bool) and math.isfinite(float(score))
+    except (ValueError, TypeError, KeyError):
+        return False
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -522,6 +551,17 @@ async def grade_chunk(
         question, hint, chunk, conversation_history=conversation_history
     )
     provider = get_llm_provider()
+    memo = _grade_memo.get()
+    key = (
+        system_prompt,
+        user_prompt,
+        config.relevance_threshold,
+        settings_revision(),
+        id(provider),
+    )
+    if memo is not None and key in memo:
+        logger.info("CRAG grade reused: chunk #%d", chunk.index)
+        return memo[key][1]
     try:
         with stage("crag_model_call"):
             raw = await provider.generate(
@@ -547,6 +587,9 @@ async def grade_chunk(
         relevant,
         keep,
     )
+    if memo is not None and _cacheable_grade(raw):
+        # Retain the provider so its id cannot be reused within this request.
+        memo[key] = (provider, keep)
     return keep
 
 
@@ -678,6 +721,7 @@ CragRetrieveFn = Callable[[str], Awaitable[list[CragChunk]]]
 
 
 @timed("crag_total")
+@_grading_scope()
 async def run_crag(
     question: str,
     chunks: list[CragChunk],
