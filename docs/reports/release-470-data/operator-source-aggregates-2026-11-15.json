@@ -1,0 +1,11 @@
+{
+    "from":  "2026-11-01T04:42:17.015381",
+    "to":  "2026-11-12T04:58:30.226981",
+    "rows":  226,
+    "distinct_users_including_test_traffic":  7,
+    "latency_samples":  15,
+    "collected_at":  "2026-11-15T17:25:13.299532+00:00",
+    "test_traffic_excluded":  false,
+    "channel_uptime_month_available":  false,
+    "limitation":  "Existing monitor checks components and HTTP; no confirmed historical channel delivery availability series. No monthly uptime claim."
+}

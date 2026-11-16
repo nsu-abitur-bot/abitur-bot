@@ -1,0 +1,36 @@
+{
+    "checked_at":  "2026-11-15T17:25:26.517352+00:00",
+    "scope":  "isolated sanitized test content only; no model calls or Telegram messages",
+    "backup_seconds":  8.419,
+    "restore_command_seconds":  5.116,
+    "row_counts":  {
+                       "primary":  {
+                                       "documents":  13,
+                                       "faq":  1,
+                                       "faculties":  10,
+                                       "programs":  31,
+                                       "scores":  55,
+                                       "users":  0,
+                                       "messages":  0,
+                                       "feedback":  0,
+                                       "admins":  1
+                                   },
+                       "restore":  {
+                                       "documents":  13,
+                                       "faq":  1,
+                                       "faculties":  10,
+                                       "programs":  31,
+                                       "scores":  55,
+                                       "users":  0,
+                                       "messages":  0,
+                                       "feedback":  0,
+                                       "admins":  1
+                                   }
+                   },
+    "kb_hashes_verified":  11,
+    "original_388_untouched":  true,
+    "backup_directory":  "/home/mihail/abitur-evals/470-reports/backups/abitur-20261115-172508",
+    "end_to_end_rto_measured":  false,
+    "rpo_measured":  false,
+    "note":  "SQL/files restored successfully; RTO to delivered answer, RPO and budgeted live retrieval remain unmeasured"
+}
