@@ -27,6 +27,7 @@ from db.postgres.models import Document
 from db.postgres.services.document import ACTIVE_DOCUMENT_STATUSES
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from llm.providers.cloudru import CloudRuEmbedding
 from llm.providers.deepseek_graph_adapters import DeepSeekLLM
 from llm.providers.gemini_graph_adapters import GeminiEmbedding, GeminiLLM
 from llm.providers.gigachat import GigaChatEmbedding
@@ -203,6 +204,8 @@ def graph_configuration() -> tuple:
             "OPENAI_GRAPH_EMBEDDING_MODEL",
             "GEMINI_GRAPH_EMBEDDING_MODEL",
             "GIGACHAT_EMBEDDING_MODEL",
+            "CLOUDRU_EMBEDDING_MODEL",
+            "CLOUDRU_API_KEY",
             "LIGHTRAG_EMBEDDING_WORKERS",
             "LIGHTRAG_LLM_WORKERS",
         )
@@ -510,12 +513,14 @@ class GraphMemory:
                             "gemini-embedding-2-preview",
                         ),
                     )
-                elif graph_llm_provider == "gigachat":
+                elif graph_llm_provider == "cloudru":
+                    embedding_adapter = CloudRuEmbedding()
+                elif graph_llm_provider in {"gigachat", "cloudru"}:
                     embedding_adapter = GigaChatEmbedding()
                 else:
                     raise RuntimeError(
                         f"LIGHTRAG_LLM_PROVIDER='{graph_llm_provider}' не поддерживается."
-                        "Допустимые значения: openai, gemini, gigachat"
+                        "Допустимые значения: openai, gemini, gigachat, cloudru"
                     )
 
                 await embedding_adapter.aclose()
@@ -523,7 +528,7 @@ class GraphMemory:
                 embedding_provider = graph_llm_provider
                 embedding_model = (
                     embedding_adapter.model
-                    if graph_llm_provider == "gigachat"
+                    if graph_llm_provider in {"gigachat", "cloudru"}
                     else get_setting(
                         "OPENAI_GRAPH_EMBEDDING_MODEL"
                         if embedding_provider == "openai"
@@ -545,6 +550,8 @@ class GraphMemory:
                             api_key=get_setting("OPENAI_API_KEY", ""),
                             model=embedding_model,
                         )
+                    elif provider == "cloudru":
+                        adapter = CloudRuEmbedding(model=embedding_model)
                     elif provider == "gigachat":
                         adapter = GigaChatEmbedding(model=embedding_model)
                     else:

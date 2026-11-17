@@ -91,6 +91,8 @@ def get_faq_provider() -> BaseLLMProvider:
                 "OPENAI_SOCKS5_PROXY",
                 "GEMINI_API_KEY",
                 "GEMINI_BASE_URL",
+                "CLOUDRU_API_KEY",
+                "CLOUDRU_EMBEDDING_MODEL",
                 "GIGACHAT_API_KEY",
                 "GIGACHAT_SCOPE",
                 "GIGACHAT_EMBEDDING_MODEL",
@@ -102,6 +104,10 @@ def get_faq_provider() -> BaseLLMProvider:
             from llm.providers.openai import OpenAIProvider
 
             _faq_provider = OpenAIProvider()
+        elif name == "cloudru":
+            from llm.providers.cloudru import CloudRuProvider
+
+            _faq_provider = CloudRuProvider()
         elif name == "gigachat":
             from llm.providers.gigachat import GigaChatProvider
 
