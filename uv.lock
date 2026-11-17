@@ -50,6 +50,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
+    { name = "deepseek-recipe", marker = "sys_platform == 'linux'" },
     { name = "fakeredis" },
     { name = "pyrefly" },
     { name = "pytest" },
@@ -98,6 +99,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
+    { name = "deepseek-recipe", marker = "sys_platform == 'linux'", specifier = "==0.2.0" },
     { name = "fakeredis", extras = ["asyncio"] },
     { name = "pyrefly", specifier = ">=0.56.0" },
     { name = "pytest" },
@@ -749,6 +751,17 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/10/bf/8d6ebc7dded797bd0f0160d52188021211f011a2b164ef0ae1dac4587465/cryptography-50.0.2-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:7a8701d6b584d76e909e3d305b7d126b41439876a5aaf76cddc67fc230eafa2e", size = 4897738, upload-time = "2026-09-30T15:29:43.106Z" },
     { url = "https://files.pythonhosted.org/packages/d4/aa/f3f6e0de7e6253b8baa8b2d8fb9d50924fa75cee3d4624bd4bc1208ee923/cryptography-50.0.2-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:ce47f66801c20ec6c6632453bb5960fe38939e9306970b48b3a5a26de7745d94", size = 5058280, upload-time = "2026-09-30T15:29:44.827Z" },
     { url = "https://files.pythonhosted.org/packages/f6/b6/a1faf3a27ae9405fb34b1713cc73b2d8a26b04d5c561578fa2e6ef3e5bb9/cryptography-50.0.2-cp39-abi3-win_amd64.whl", hash = "sha256:4e81d95e5bafc2d6e34e4bed780e53e4d5b9a2f928573428aa4d35fbec1eb0de", size = 3854095, upload-time = "2026-09-30T15:29:46.782Z" },
+]
+
+[[package]]
+name = "deepseek-recipe"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/86/9d/0b86feb9f32d35ff93f9404fb797a4ab40eb6d9616f87ed5c5b3613e26d3/deepseek_recipe-0.2.0.tar.gz", hash = "sha256:5dfd65dc201004f6382b13c8432a406cd2af7188831944ac5cef22f260111f68", size = 249190, upload-time = "2026-10-20T05:15:50.31Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/57/56cbc6d4084460ed5866804c775c9cff7919e2567c71a5e3e0bc8cc2fabd/deepseek_recipe-0.2.0-cp310-abi3-manylinux_2_28_aarch64.whl", hash = "sha256:7c31fa6ed6ff8319670fa6efdf682e724f4e78f76218f6d08dfc4c0d6f47a071", size = 11358225, upload-time = "2026-10-20T05:15:39.608Z" },
+    { url = "https://files.pythonhosted.org/packages/f5/50/bfc176a196e438509e5821b9b5e668d866ccc791aefc01fa1119e857d8e9/deepseek_recipe-0.2.0-cp310-abi3-manylinux_2_28_x86_64.whl", hash = "sha256:259812bf382bc82668b672707c5922095cc4f5f60a6c514ff89640bb62a746f7", size = 12846711, upload-time = "2026-10-20T05:15:29.717Z" },
+    { url = "https://files.pythonhosted.org/packages/21/e8/5b30c76e4f17ab2bf2c1d8abeff28cf41f62e8bd8571b6eee45c074db251/deepseek_recipe-0.2.0-cp310-abi3-manylinux_2_39_riscv64.whl", hash = "sha256:622e222aa6290be1bea38f021549a05eddb0c84096663e5424acff0a9d528c9d", size = 10567523, upload-time = "2026-10-20T05:15:46.53Z" },
 ]
 
 [[package]]
