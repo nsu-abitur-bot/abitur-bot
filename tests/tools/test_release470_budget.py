@@ -48,6 +48,42 @@ class ReleaseBudgetTests(unittest.TestCase):
             None,
         )
 
+    def test_oauth_form_is_metered_without_json_decoding(self) -> None:
+        calls = []
+
+        def dispatch(request):
+            calls.append(request)
+            self.assertEqual(request.content, b"scope=GIGACHAT_API_PERS")
+            return httpx.Response(200, json={"access_token": "synthetic"})
+
+        request = httpx.Request(
+            "POST",
+            "https://ngw.devices.sberbank.ru:9443/api/v2/oauth",
+            data={"scope": "GIGACHAT_API_PERS"},
+        )
+        self.ledger.context("setup", "setup")
+        with (
+            self.ledger.capture(),
+            httpx.Client(transport=httpx.MockTransport(dispatch)) as client,
+        ):
+            self.assertEqual(client.send(request).status_code, 200)
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(self.ledger.sequence, 1)
+        self.assertEqual(self.ledger.completed, 1)
+        self.assertFalse(self.ledger.halted)
+        self.assertEqual(self.ledger.totals, {"input": 0, "output": 0, "embedding": 0})
+
+    def test_provider_output_uses_remaining_question_allowance(self) -> None:
+        from llm.providers.deepseek import DeepSeekProvider
+
+        row = self.ledger.begin(self.request())
+        self.finish(row)
+        provider = object.__new__(DeepSeekProvider)
+        provider.model_name = "deepseek-flash"
+        with self.ledger.capture():
+            self.assertEqual(provider._params(None)["max_tokens"], 1014)
+        self.assertEqual(provider._params(None)["max_tokens"], 1024)
+
     def test_outstanding_output_is_reserved_before_next_attempt(self) -> None:
         row = self.ledger.begin(self.request())
         with self.assertRaises(IndexingLimit):

@@ -6,7 +6,10 @@ account currency and conservative input bounds still require preflight review.
 
 import json
 import threading
+from collections.abc import Generator
+from contextlib import contextmanager
 from pathlib import Path
+from unittest.mock import patch
 
 from tools.admission_pilot import PilotLedger
 from tools.admission_usage import IndexingLimit
@@ -29,13 +32,49 @@ class Release470Ledger(PilotLedger):
             raise IndexingLimit("Unknown release pilot context")
         super().context(phase, case_id)
 
+    def output_limit(self, requested: int) -> int:
+        """Reserve is still checked atomically by begin before transport."""
+        with self.budget_lock:
+            if self.halted or self.case_id not in CASES:
+                raise IndexingLimit("Pilot context is halted or missing")
+            per = self.cases.get(self.case_id, {})
+            case_cap = 10000 if self.case_id == "setup" else 1024
+            remaining = min(
+                10000 - self.totals["output"],
+                case_cap - per.get("output", 0),
+                requested,
+                1024,
+            )
+            if remaining < 1:
+                raise IndexingLimit("Release output allowance exhausted")
+            return remaining
+
+    @contextmanager
+    def capture(self) -> Generator[None, None, None]:
+        from llm.providers.deepseek import DeepSeekProvider
+
+        original = DeepSeekProvider._params
+        ledger = self
+
+        def parameters(provider, profile):
+            params = original(provider, profile)
+            params["max_tokens"] = ledger.output_limit(params["max_tokens"])
+            return params
+
+        with super().capture(), patch.object(DeepSeekProvider, "_params", parameters):
+            yield
+
     def begin(self, request) -> dict:
         with self.budget_lock:
             if self.case_id not in CASES:
                 raise IndexingLimit("Missing release pilot context")
-            payload = json.loads(request.content) if request.content else {}
             generation = request.url.host == "api.deepseek.com"
             embedding = request.url.path == "/v1/embeddings"
+            payload = (
+                json.loads(request.content)
+                if request.content and (generation or embedding)
+                else {}
+            )
             reserve = {
                 "input": len(request.content) + 512 if generation else 0,
                 "output": payload.get("max_tokens", 1024) if generation else 0,
