@@ -12,6 +12,7 @@ import tempfile
 import unittest
 from contextlib import closing
 from pathlib import Path
+from unittest.mock import patch
 
 import httpx
 from openai import AsyncOpenAI
@@ -71,6 +72,9 @@ def response(prompt=100, output=10, **changes):
 
 class BudgetFixture(unittest.TestCase):
     def setUp(self):
+        dotenv_guard = patch.dict(os.environ, {"PYTHON_DOTENV_DISABLED": "1"})
+        dotenv_guard.start()
+        self.addCleanup(dotenv_guard.stop)
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
