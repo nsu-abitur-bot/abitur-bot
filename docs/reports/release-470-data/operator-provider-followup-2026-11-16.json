@@ -1,0 +1,29 @@
+{
+    "checked_at":  "2026-11-16T06:02:21.758865+00:00",
+    "hostname":  "api.deepseek.com",
+    "requested_model":  "deepseek-chat",
+    "graph_requested_model":  "deepseek-chat",
+    "provider_response_model":  null,
+    "live_generation_called":  false,
+    "note":  "Actual served model cannot be asserted without provider response; old alias requires confirmation against current official documentation.",
+    "thinking":  "disabled (explicit extra_body.thinking.type in pinned deployed DeepSeekProvider; graph adapter delegates to same provider)",
+    "current_documented_model":  "deepseek-flash",
+    "current_documented_version":  "DeepSeek-V4.1-Flash-1017",
+    "official_pricing_url":  "https://api-docs.deepseek.com/quick_start/pricing/",
+    "legacy_retirement_url":  "https://api-docs.deepseek.com/news/news260424/",
+    "pricing_per_million_usd":  {
+                                    "peak_input_cache_miss":  0.3,
+                                    "peak_input_cache_hit":  0.006,
+                                    "peak_output":  1.2,
+                                    "off_peak_input_cache_miss":  0.15,
+                                    "off_peak_input_cache_hit":  0.003,
+                                    "off_peak_output":  0.6
+                                },
+    "pricing_applies_to":  "documented deepseek-flash, not an assertion about legacy deepseek-chat",
+    "budget_currency_caveat":  "Budget is CNY; do not equate USD price with CNY or silently invent an exchange rate.",
+    "provider_listed_model_ids":  [
+                                      "deepseek-flash",
+                                      "deepseek-v4-pro"
+                                  ],
+    "model_list_success":  true
+}
