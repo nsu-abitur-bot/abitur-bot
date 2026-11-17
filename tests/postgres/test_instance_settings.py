@@ -570,7 +570,7 @@ async def test_offline_gigachat_migration_rebuilds_index_before_switching_settin
 
     monkeypatch.setattr(
         reembed_gigachat,
-        "GigaChatEmbedding" if provider == provider else "CloudRuEmbedding",
+        "GigaChatEmbedding" if provider == "gigachat" else "CloudRuEmbedding",
         Embeddings,
     )
     await InstanceSettingsService(session).write(
