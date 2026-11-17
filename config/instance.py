@@ -100,6 +100,14 @@ for provider in ("OPENAI", "GEMINI"):
         )
 define("DEEPSEEK_API_KEY", "API-ключ", "DeepSeek", secret=True)
 define("DEEPSEEK_BASE_URL", "Адрес API (пусто — официальный)", "DeepSeek", kind="url")
+define("CLOUDRU_API_KEY", "API-ключ", "Cloud.ru", secret=True)
+define(
+    "CLOUDRU_EMBEDDING_MODEL",
+    "Модель эмбеддингов",
+    "Cloud.ru",
+    "ai-sage/Giga-Embeddings-instruct-3B",
+    choices=("ai-sage/Giga-Embeddings-instruct-3B",),
+)
 define("GIGACHAT_API_KEY", "Ключ авторизации", "GigaChat", secret=True)
 define(
     "GIGACHAT_SCOPE",
@@ -139,7 +147,7 @@ for name, label, default in (
         default,
         choices=("openai", "gemini", "deepseek")
         if name in {"LLM_PROVIDER", "LIGHTRAG_LLM_PROVIDER"}
-        else ("openai", "gemini", "gigachat")
+        else ("openai", "gemini", "gigachat", "cloudru")
         if name in {"FAQ_EMBEDDING_PROVIDER", "LIGHTRAG_EMBEDDING_PROVIDER"}
         else ("openai", "gemini"),
     )

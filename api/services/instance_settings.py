@@ -134,6 +134,7 @@ async def guard_embeddings(
         "OPENAI_GRAPH_EMBEDDING_MODEL",
         "GEMINI_GRAPH_EMBEDDING_MODEL",
         "GIGACHAT_EMBEDDING_MODEL",
+        "CLOUDRU_EMBEDDING_MODEL",
         "OPENAI_BASE_URL",
         "GEMINI_BASE_URL",
     }
@@ -183,6 +184,17 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
                 finally:
                     await bot_max.close_session()
             provider, purpose = target.split(":", 1)
+            if provider == "cloudru":
+                if purpose not in {"embedding", "graph_embedding"}:
+                    raise ConfigurationError("Cloud.ru доступен только для эмбеддингов")
+                from llm.providers.cloudru import CloudRuEmbedding
+
+                adapter_cloud = CloudRuEmbedding(
+                    api_key=values["CLOUDRU_API_KEY"],
+                    model=values["CLOUDRU_EMBEDDING_MODEL"],
+                )
+                await adapter_cloud(["Проверка подключения"])
+                return "Подключение и доступ к модели проверены"
             if provider == "gigachat":
                 if purpose not in {"embedding", "graph_embedding"}:
                     raise ConfigurationError("GigaChat доступен только для эмбеддингов")
@@ -293,7 +305,7 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
 
 def required_checks(changes: dict[str, str | None], values: dict[str, str]) -> set[str]:
     targets = set()
-    for provider in ("openai", "gemini", "deepseek", "gigachat"):
+    for provider in ("openai", "gemini", "deepseek", "gigachat", "cloudru"):
         prefix = provider.upper() + "_"
         changed = any(k.startswith(prefix) for k in changes)
         active = (

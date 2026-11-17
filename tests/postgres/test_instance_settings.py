@@ -459,7 +459,9 @@ async def test_deepseek_secret_is_encrypted_and_masked(session):
     ] == "deepseek-private-fixture"
 
 
-async def test_gigachat_key_is_encrypted_and_both_embedding_selectors_supported(session):
+@pytest.mark.parametrize("provider", ["gigachat", "cloudru"])
+async def test_embedding_key_is_encrypted_and_both_selectors_supported(session, provider):
+    key_name = provider.upper() + "_API_KEY"
     from api.routes.instance_settings import describe
     from api.services.instance_settings import required_checks
 
@@ -467,17 +469,15 @@ async def test_gigachat_key_is_encrypted_and_both_embedding_selectors_supported(
     values = merge_changes(
         before,
         {
-            "GIGACHAT_API_KEY": "gigachat-private-fixture",
-            "FAQ_EMBEDDING_PROVIDER": "gigachat",
-            "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+            key_name: "embedding-private-fixture",
+            "FAQ_EMBEDDING_PROVIDER": provider,
+            "LIGHTRAG_EMBEDDING_PROVIDER": provider,
         },
     )
     await InstanceSettingsService(session).write(values, 0)
     raw = await session.scalar(select(Settings.value).where(Settings.key == SETTINGS_KEY))
-    assert "gigachat-private-fixture" not in raw
-    key = next(
-        s for s in (await describe(session))["settings"] if s["key"] == "GIGACHAT_API_KEY"
-    )
+    assert "embedding-private-fixture" not in raw
+    key = next(s for s in (await describe(session))["settings"] if s["key"] == key_name)
     assert key["secret"] and key["configured"] and key["value"] is None
     # Only GigaChat selectors changed; existing unrelated providers need no recheck.
     values["LLM_PROVIDER"] = "deepseek"
@@ -485,12 +485,12 @@ async def test_gigachat_key_is_encrypted_and_both_embedding_selectors_supported(
     values["LIGHTRAG_LLM_PROVIDER"] = "deepseek"
     values["PDF_PARSER_PROVIDER"] = "gemini"
     values["GEMINI_API_KEY"] = "vision-fixture"
-    assert required_checks({"GIGACHAT_API_KEY": "new-fixture"}, values) == {
-        "gigachat:embedding",
-        "gigachat:graph_embedding",
+    assert required_checks({key_name: "new-fixture"}, values) == {
+        provider + ":embedding",
+        provider + ":graph_embedding",
     }
     with pytest.raises(ConfigurationError):
-        merge_changes(before, {"LLM_PROVIDER": "gigachat"})
+        merge_changes(before, {"LLM_PROVIDER": provider})
 
 
 async def test_gigachat_model_change_requires_full_reembedding(session, tmp_path):
@@ -507,11 +507,12 @@ async def test_gigachat_model_change_requires_full_reembedding(session, tmp_path
         await guard_embeddings(session, before, after)
 
 
+@pytest.mark.parametrize("provider", ["gigachat", "cloudru"])
 @pytest.mark.parametrize(
     "pending_status", [None, "pending", "processing", "preprocessed"]
 )
 async def test_offline_gigachat_migration_rebuilds_index_before_switching_settings(
-    session, test_engine, monkeypatch, tmp_path, pending_status
+    session, test_engine, monkeypatch, tmp_path, pending_status, provider
 ):
     import numpy as np
     from nano_vectordb import NanoVectorDB
@@ -567,7 +568,11 @@ async def test_offline_gigachat_migration_rebuilds_index_before_switching_settin
         async def __call__(self, texts):
             return self.embed_documents(texts)
 
-    monkeypatch.setattr(reembed_gigachat, "GigaChatEmbedding", Embeddings)
+    monkeypatch.setattr(
+        reembed_gigachat,
+        "GigaChatEmbedding" if provider == provider else "CloudRuEmbedding",
+        Embeddings,
+    )
     await InstanceSettingsService(session).write(
         {
             "LLM_PROVIDER": "deepseek",
@@ -581,13 +586,17 @@ async def test_offline_gigachat_migration_rebuilds_index_before_switching_settin
             json.dumps({"document": {"status": pending_status}})
         )
         with pytest.raises(ValueError, match="LightRAG"):
-            await reembed_gigachat.migrate({"GIGACHAT_API_KEY": "migration-fixture"})
+            await reembed_gigachat.migrate(
+                {provider.upper() + "_API_KEY": "migration-fixture"}, provider=provider
+            )
         assert (await InstanceSettingsService(session).read()).revision == 1
         assert (
             json.loads((workspace / "vdb_chunks.json").read_text())["embedding_dim"] == 2
         )
         return
-    result = await reembed_gigachat.migrate({"GIGACHAT_API_KEY": "migration-fixture"})
+    result = await reembed_gigachat.migrate(
+        {provider.upper() + "_API_KEY": "migration-fixture"}, provider=provider
+    )
     assert result["revision"] == 2
     assert result["dimensions"] == 3
     values = (await InstanceSettingsService(session).read()).values
@@ -596,7 +605,7 @@ async def test_offline_gigachat_migration_rebuilds_index_before_switching_settin
     assert (
         values["FAQ_EMBEDDING_PROVIDER"]
         == values["LIGHTRAG_EMBEDDING_PROVIDER"]
-        == "gigachat"
+        == provider
     )
     assert json.loads((workspace / "vdb_chunks.json").read_text())["embedding_dim"] == 3
     from pathlib import Path
