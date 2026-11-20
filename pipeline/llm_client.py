@@ -40,6 +40,7 @@ from pipeline.score_guard import (
     SCORES_UNAVAILABLE,
     ScoreGuard,
 )
+from pipeline.study_plans import answer_study_plan
 from pipeline.tools import (
     ADMISSION_SCORES_TOOL,
     CONTENT_PROPOSAL_TOOL,
@@ -1058,6 +1059,23 @@ async def ask_local_llm(
         history_text = _build_history_text(history_entries)
 
         await ctx.emit_status(STATUS_RAG)
+        plan_answer = await answer_study_plan(expanded_message)
+        if plan_answer is not None:
+            ctx.log(
+                "llm_response",
+                _strip_markup(plan_answer.text),
+                response_length=len(plan_answer.text),
+                provider="study_plan",
+                no_answer=not plan_answer.sources,
+                latency_ms=ctx.latency_ms(),
+            )
+            if not plan_answer.sources:
+                ctx.log("no_answer", message)
+            _store_answer(plan_answer.text, message, redis_client, ctx)
+            return LlmAnswer(
+                text=plan_answer.text, sources=plan_answer.sources, trace=ctx.trace
+            )
+
         rag = await _retrieve_context(expanded_message, history_text, ctx)
 
         content, answer_sources = await _generate_answer(

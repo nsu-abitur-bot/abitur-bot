@@ -83,3 +83,13 @@ class TestSources:
     def test_source_without_title_gets_default(self):
         result = render_sources_plain([{"url": "https://nsu.ru/x"}])
         assert "Источник информации — https://nsu.ru/x" in result
+
+
+def test_pdf_page_fragment_survives_both_channels():
+    url = "https://nsu.ru/plan.pdf#page=2"
+    sources = [{"url": url, "title": "Учебный план, стр. 2"}]
+    telegram = format_for_channel("Дискретная математика", sources, "telegram")
+    max_answer = format_for_channel("Дискретная математика", sources, "max")
+
+    assert f'href="{url}"' in telegram
+    assert url in max_answer

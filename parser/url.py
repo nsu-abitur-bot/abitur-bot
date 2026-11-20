@@ -1,10 +1,13 @@
+import asyncio
 import logging
+from dataclasses import replace
 from typing import Optional
 from urllib.parse import urlparse
 
 from bs4 import BeautifulSoup
 
-from parser.pdf import pdf_to_base64_images
+from config.instance import get_setting
+from parser.pdf import PdfPage, pdf_to_base64_images, read_pdf_pages
 from parser.safe_fetch import fetch_url_async
 from parser.vision import parse_images_with_llm
 
@@ -60,3 +63,22 @@ def process_html(html_text: str) -> str:
     # Убираем лишние пустые строки
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     return "\n\n".join(lines)
+
+
+async def extract_pdf_pages(pdf_bytes: bytes) -> list[PdfPage]:
+    """Keep physical PDF page numbers through native extraction and OCR."""
+    limit = int(get_setting("MAX_DOCUMENT_PAGES", "50"))
+    native_pages = await asyncio.to_thread(read_pdf_pages, pdf_bytes, limit)
+    return [
+        replace(page, text=(await parse_images_with_llm([image])).strip())
+        if image
+        else page
+        for page, image in native_pages
+    ]
+
+
+async def fetch_pdf_pages(url: str) -> list[PdfPage]:
+    """Download a public PDF with the same URL checks and limits as RAG import."""
+    response = await fetch_url_async(url)
+    response.raise_for_status()
+    return await extract_pdf_pages(response.content)
