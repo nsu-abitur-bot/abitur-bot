@@ -44,8 +44,13 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "pytest", "pytest-asyncio", "fakeredis[asyncio]", "pyrefly>=0.56.0", "ruff",
+    "pytest",
+    "pytest-asyncio",
+    "fakeredis[asyncio]",
+    "pyrefly>=0.56.0",
+    "ruff",
     "deepseek-recipe==0.2.0; sys_platform == 'linux'",
+    "tokenizers==0.22.2",
 ]
 
 

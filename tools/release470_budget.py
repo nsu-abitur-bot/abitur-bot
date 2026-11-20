@@ -16,6 +16,18 @@ import httpx
 
 from tools.admission_evaluation_usage import _MeteredStream
 from tools.admission_usage import IndexingLimit, complete_usage, usage_counts
+from tools.release470_cloudru import (
+    HOST as CLOUD_HOST,
+)
+from tools.release470_cloudru import (
+    MODEL as CLOUD_MODEL,
+)
+from tools.release470_cloudru import (
+    CloudCounter,
+    cost_micro_rub,
+    final_usage,
+    validate_request,
+)
 from tools.release470_gate import TransportGate
 from tools.release470_store import BudgetStore
 from tools.release470_tokens import OfficialCounter
@@ -27,12 +39,26 @@ MODELS = {"deepseek-flash", "DeepSeek-V4.1-Flash-1017"}
 class Release470Ledger:
     """Every process attaches the same explicitly initialized local budget file."""
 
-    def __init__(self, directory: Path, *, budget_path: Path, counter=None) -> None:
+    def __init__(
+        self,
+        directory: Path,
+        *,
+        budget_path: Path,
+        counter=None,
+        embedding_counter=None,
+        cloud_tokenizer_path: Path | None = None,
+    ) -> None:
         self.store = BudgetStore(budget_path)
         self.directory = directory  # Report directories cannot create/reset budgets.
-        if counter is not None and not self.store.policy["offline_only"]:
+        if (
+            counter is not None or embedding_counter is not None
+        ) and not self.store.policy["offline_only"]:
             raise IndexingLimit("Injected counters are only for offline tests")
         self.counter = counter
+        self.embedding_counter = embedding_counter
+        self.cloud_tokenizer_path = cloud_tokenizer_path or Path(
+            "/evaluation/cloudru-tokenizer.json"
+        )
         self._case = contextvars.ContextVar("release470_case", default="unassigned")
 
     def context(self, phase: str, case_id: str) -> None:
@@ -66,7 +92,9 @@ class Release470Ledger:
             or request.url.port not in (None, 443)
         ):
             raise IndexingLimit("Unapproved provider request")
-        # Cloud.ru/RUB and the old GigaChat package have no approved policy here.
+        if request.url.host == CLOUD_HOST and request.url.path == "/v1/embeddings":
+            return self._begin_cloud(request)
+        # The old GigaChat package is never an implicit Cloud.ru permission.
         if request.url.host != "api.deepseek.com" or request.url.path not in {
             "/chat/completions",
             "/v1/chat/completions",
@@ -114,7 +142,50 @@ class Release470Ledger:
             "operation": "generation",
         }
 
+    def _begin_cloud(self, request: httpx.Request) -> dict:
+        settings = self.store.policy["cloudru"]
+        if not settings["approved"]:
+            raise IndexingLimit("Cloud.ru budget is not explicitly approved")
+        try:
+            payload = json.loads(request.content)
+        except ValueError:
+            raise IndexingLimit("Invalid Cloud.ru JSON") from None
+        validate_request(payload)
+        if self.embedding_counter is None:
+            self.embedding_counter = CloudCounter(self.cloud_tokenizer_path, settings)
+        tokens = self.embedding_counter(payload)
+        if type(tokens) is not int or tokens < 1:
+            raise IndexingLimit("Unknown Cloud.ru token bound")
+        held = {
+            "input": 0,
+            "output": 0,
+            "embedding": tokens,
+            "micro_cny": 0,
+            "micro_rub": cost_micro_rub(tokens, settings["rate_hundredths"]),
+        }
+        fingerprint = hashlib.sha256(request.content).hexdigest()
+        attempt = self.store.reserve(
+            self._case.get(),
+            "embedding",
+            held,
+            fingerprint,
+            self.embedding_counter.evidence,
+        )
+        return {
+            "attempt": attempt,
+            "fingerprint": fingerprint,
+            "case_id": self._case.get(),
+            "streaming": False,
+            "started_monotonic": time.monotonic(),
+            "provider": "cloudru",
+            "operation": "embedding",
+            "input_count": len(payload["input"]),
+        }
+
     def finish(self, row, response, error) -> None:
+        if row["provider"] == "cloudru":
+            self._finish_cloud(row, response, error)
+            return
         usage, model, body = {}, None, {}
         if response is not None:
             try:
@@ -160,6 +231,8 @@ class Release470Ledger:
             }
         )
         receipt = {
+            "provider": "deepseek",
+            "currency": "CNY",
             "status": response.status_code if response is not None else None,
             "usage": usage,
             "response_model": model,
@@ -172,6 +245,52 @@ class Release470Ledger:
         self.store.settle(row["attempt"], row["fingerprint"], actual, receipt, uncertain)
         if self.store.snapshot()["halted"]:
             raise IndexingLimit("Uncertain provider outcome; shared budget halted")
+
+    def _finish_cloud(self, row, response, error) -> None:
+        body = {}
+        if response is not None:
+            try:
+                body = response.json()
+            except ValueError:
+                pass
+        usage, complete, valid_vectors = final_usage(body, row["input_count"])
+        uncertain = (
+            error is not None
+            or response is None
+            or not response.is_success
+            or not complete
+            or not valid_vectors
+        )
+        actual = (
+            None
+            if not complete
+            else {
+                "input": 0,
+                "output": 0,
+                "embedding": usage["prompt_tokens"],
+                "micro_cny": 0,
+                "micro_rub": cost_micro_rub(
+                    usage["prompt_tokens"],
+                    self.store.policy["cloudru"]["rate_hundredths"],
+                ),
+            }
+        )
+        receipt = {
+            "provider": "cloudru",
+            "currency": "RUB",
+            "status": response.status_code if response is not None else None,
+            "usage": usage,
+            "usage_complete": complete,
+            "vectors_valid": valid_vectors,
+            "response_model": CLOUD_MODEL
+            if isinstance(body, dict) and body.get("model") == CLOUD_MODEL
+            else None,
+            "error": error is not None,
+            "elapsed_seconds": round(time.monotonic() - row["started_monotonic"], 4),
+        }
+        self.store.settle(row["attempt"], row["fingerprint"], actual, receipt, uncertain)
+        if self.store.snapshot()["halted"]:
+            raise IndexingLimit("Uncertain Cloud.ru outcome; shared budget halted")
 
     def accounting(self) -> dict:
         state = self.store.snapshot()

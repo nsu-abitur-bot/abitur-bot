@@ -12,7 +12,7 @@ from typing import Any
 from tools.admission_usage import IndexingLimit
 
 POLICY = {
-    "schema": 1,
+    "schema": 2,
     "scope": "release470",
     "currency": "CNY",
     "caps": {
@@ -20,12 +20,72 @@ POLICY = {
         "output": 10000,
         "embedding": 10000,
         "micro_cny": 3000000,
+        "micro_rub": 0,
         "attempts": 512,
     },
     "question": {"input": 32000, "output": 1024, "embedding": 512, "generations": 40},
     "rates_micro_cny": {"input": 2, "output": 8},
 }
-KINDS = ("input", "output", "embedding", "micro_cny")
+KINDS = ("input", "output", "embedding", "micro_cny", "micro_rub")
+
+
+def cloud_policy(settings: dict | None = None) -> dict:
+    """No Cloud.ru permission is inherited from the old GigaChat package."""
+    if settings is None:
+        return {
+            "approved": False,
+            "micro_rub_limit": 0,
+            "embedding_limit": 0,
+            "rate_hundredths": 0,
+            "tokenizer_sha256": "",
+            "tokenizer_revision": "",
+        }
+    fields = {
+        "approved",
+        "micro_rub_limit",
+        "embedding_limit",
+        "rate_hundredths",
+        "tokenizer_sha256",
+        "tokenizer_revision",
+    }
+    if (
+        not isinstance(settings, dict)
+        or set(settings) != fields
+        or type(settings["approved"]) is not bool
+    ):
+        raise IndexingLimit(
+            "Explicit Cloud.ru currency, rate, tokenizer and limits required"
+        )
+    if any(
+        type(settings[k]) is not int or settings[k] <= 0
+        for k in ("micro_rub_limit", "embedding_limit", "rate_hundredths")
+    ):
+        raise IndexingLimit("Cloud.ru limits must be positive integers")
+    if settings["embedding_limit"] > 10000:
+        raise IndexingLimit("This policy is a small pilot, not index rebuilding")
+    if (
+        not isinstance(settings["tokenizer_sha256"], str)
+        or not re.fullmatch(r"[0-9a-f]{64}", settings["tokenizer_sha256"])
+        or not isinstance(settings["tokenizer_revision"], str)
+        or not settings["tokenizer_revision"].strip()
+    ):
+        raise IndexingLimit("Reviewed Cloud.ru tokenizer binding required")
+    return dict(settings)
+
+
+def effective_policy(cloudru: dict) -> dict:
+    caps = {
+        **POLICY["caps"],
+        "micro_rub": cloudru["micro_rub_limit"] if cloudru["approved"] else 0,
+    }
+    if cloudru["approved"]:
+        caps["embedding"] = cloudru["embedding_limit"]
+    return {
+        **POLICY,
+        "currency": "CNY and RUB separately",
+        "caps": caps,
+        "cloudru": cloudru,
+    }
 
 
 def canonical(value: Any) -> str:
@@ -37,10 +97,15 @@ class BudgetStore:
 
     @staticmethod
     def create(
-        path: Path, *, offline_only: bool = True, case_plan: dict | None = None
+        path: Path,
+        *,
+        offline_only: bool = True,
+        case_plan: dict | None = None,
+        cloudru: dict | None = None,
     ) -> None:
         """Explicit owner initialization, once, before attaching any process."""
         plan = case_plan or {}
+        selected = effective_policy(cloud_policy(cloudru))
         ids = {"faq-1", "faq-2", "rag-1", "rag-2", "tools-1", "tools-2"}
         if (
             type(offline_only) is not bool
@@ -72,10 +137,14 @@ class BudgetStore:
             """)
             db.execute(
                 "INSERT INTO metadata VALUES (1,?)",
-                (canonical({**POLICY, "offline_only": offline_only, "case_plan": plan}),),
+                (
+                    canonical(
+                        {**selected, "offline_only": offline_only, "case_plan": plan}
+                    ),
+                ),
             )
             policy = canonical(
-                {**POLICY, "offline_only": offline_only, "case_plan": plan}
+                {**selected, "offline_only": offline_only, "case_plan": plan}
             )
             body = canonical(
                 {
@@ -108,7 +177,16 @@ class BudgetStore:
             self.policy = json.loads(
                 db.execute("SELECT policy FROM metadata WHERE id=1").fetchone()[0]
             )
-            if any(self.policy.get(k) != v for k, v in POLICY.items()):
+            stored_cloud = self.policy.get("cloudru")
+            expected_cloud = (
+                cloud_policy()
+                if stored_cloud == cloud_policy()
+                else cloud_policy(stored_cloud)
+            )
+            if any(
+                self.policy.get(k) != v
+                for k, v in effective_policy(expected_cloud).items()
+            ):
                 raise IndexingLimit("Pilot policy differs from the initialized budget")
             self._verify(db)
 
@@ -221,6 +299,7 @@ class BudgetStore:
     def reserve(
         self, case_id: str, operation: str, held: dict, fingerprint: str, evidence: dict
     ) -> int:
+        held = {**held, "micro_rub": held.get("micro_rub", 0)}
         with self.transaction() as db:
             self._verify(db)
             state = self._snapshot(db)
@@ -231,11 +310,11 @@ class BudgetStore:
             if state["attempts_started"] >= POLICY["caps"]["attempts"]:
                 raise IndexingLimit("Physical attempt cap reached")
             case = state["cases"].get(case_id, {})
-            per = POLICY["caps"] if case_id == "setup" else POLICY["question"]
+            per = self.policy["caps"] if case_id == "setup" else self.policy["question"]
             for kind in KINDS:
                 if type(held[kind]) is not int or held[kind] < 0:
                     raise IndexingLimit("Invalid reservation")
-                if state["totals"][kind] + held[kind] > POLICY["caps"][kind]:
+                if state["totals"][kind] + held[kind] > self.policy["caps"][kind]:
                     raise IndexingLimit("Global pilot budget exhausted")
                 if kind in per and case.get(kind, 0) + held[kind] > per[kind]:
                     raise IndexingLimit("Question token budget exhausted")
@@ -292,6 +371,7 @@ class BudgetStore:
                 return
             held = json.loads(row["held"])
             if actual is not None:
+                actual = {**actual, "micro_rub": actual.get("micro_rub", 0)}
                 for kind in KINDS:
                     if type(actual[kind]) is not int or actual[kind] < 0:
                         raise IndexingLimit("Invalid final usage")
