@@ -170,11 +170,20 @@ _LEVEL_MARKERS: dict[str, tuple[str, ...]] = {
 def detect_level(question: str) -> Optional[str]:
     """Определяет уровень образования по тексту вопроса (или None)."""
     lowered = question.lower()
-    if re.search(r"\bспо\b|\bсредн\w*\s+профессиональн\w*\s+образовани\w*", lowered):
+    if re.search(
+        r"\bспо\b|\bсредн\w*\s+профессиональн\w*\s+образовани\w*|"
+        r"\bпосле\s+9(?:\s*-?\s*го)?(?:\s+класс\w*)?|\b9\s*-?\s*й?\s+класс\w*",
+        lowered,
+    ):
         return "spo"
     for level, markers in _LEVEL_MARKERS.items():
         if any(marker in lowered for marker in markers):
             return level
+    if re.search(
+        r"\bпосле\s+11(?:\s*-?\s*го)?(?:\s+класс\w*)?|\b11\s*-?\s*й?\s+класс\w*",
+        lowered,
+    ):
+        return "bachelor"
     return None
 
 
