@@ -1,14 +1,37 @@
 from typing import List
 
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from db.postgres.db import get_db
-from db.postgres.models import MessageLog, Topic
+from db.postgres.models import Leaderboard, MessageLog, Topic
 
 router = APIRouter(prefix="/stats", tags=["stats"])
+
+
+class ParsingStatsResponse(BaseModel):
+    last_parsed_at: str | None = None
+    total_lists: int = 0
+
+
+@router.get("/parsing", response_model=ParsingStatsResponse)
+async def get_parsing_stats(db: AsyncSession = Depends(get_db)):
+    """Получить статистику парсинга рейтинговых списков."""
+    stmt = select(
+        func.max(Leaderboard.updated_at).label("last_parsed_at"),
+        func.count(Leaderboard.id).label("total_lists"),
+    ).where(Leaderboard.is_active)
+    result = await db.execute(stmt)
+    row = result.one_or_none()
+    last_parsed_at = row.last_parsed_at if row else None
+    total_lists = row.total_lists if row else 0
+    return ParsingStatsResponse(
+        last_parsed_at=last_parsed_at.isoformat() if last_parsed_at else None,
+        total_lists=total_lists,
+    )
 
 
 @router.get("/topics", response_model=List[dict])
