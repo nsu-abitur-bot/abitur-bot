@@ -38,8 +38,8 @@ VERSIONED_PROMPTS = [
 # подними версию в pipeline/prompts.py и обнови обе колонки здесь.
 PINNED = {
     "system": (
-        "3.0",
-        "e3835bd984d1fd9772ebe3f5e86fe10ac8e40679d780b7d5f9d4d21fe4468a8a",
+        "4.0",
+        "e3d6cbd470af523d1afffe222f0f66a7c70c72c894090a6aed45c7cea7d2753e",
     ),
     "sources_hint": (
         "1.0",
@@ -145,3 +145,9 @@ def test_empty_program_catalog_does_not_override_knowledge_base() -> None:
         "Пустой результат get_education_programs относится только к справочнику"
         in SYSTEM_PROMPT_BASE
     )
+
+
+def test_program_selection_rule_in_system_prompt() -> None:
+    assert "подбор направлений" in SYSTEM_PROMPT_BASE
+    assert "Не требуй от пользователя заранее" in SYSTEM_PROMPT_BASE
+    assert "Перечисляй доступные по уровню" in SYSTEM_PROMPT_BASE

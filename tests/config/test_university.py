@@ -27,7 +27,7 @@ def test_nsu_prompt_matches_snapshot():
     instance.install({}, 0)
     assert (
         hashlib.sha256(render().encode()).hexdigest()
-        == "727e44fc1b9e0f0f5288e4e8332466e1a316b69a944baacf0b0c006426235f56"
+        == "3cdf728f9cefd211e380d538aa600757531ec642be25971be896697b741cf464"
     )
     assert is_nsu()
 
