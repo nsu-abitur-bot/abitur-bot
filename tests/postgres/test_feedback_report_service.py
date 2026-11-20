@@ -189,3 +189,37 @@ async def test_answer_rating_creates_report_for_rated_answer(
     assert report.question == candidate.question
     assert report.bot_response == candidate.bot_response
     assert report.status == "open"
+
+
+@pytest.mark.asyncio
+async def test_negative_by_question_groups_and_orders(session: AsyncSession):
+    """«Где бот отвечает плохо»: негативные оценки по вопросам (#262)."""
+    from db.postgres.services.answer_feedback import AnswerFeedbackService
+
+    service = AnswerFeedbackService(session)
+    plan = [
+        ("Как подать апелляцию?", "negative"),
+        ("Как подать апелляцию?", "negative"),
+        ("Как подать апелляцию?", "positive"),
+        ("Есть ли общежитие?", "positive"),
+        ("Есть ли стипендия?", "negative"),
+        ("Без оценки", None),
+    ]
+    for index, (question, rating) in enumerate(plan, start=1):
+        candidate = await service.create_candidate(
+            user_id=index, session_id=f"s-{index}", channel="telegram",
+            question=question, bot_response="ответ",
+        )
+        if rating is not None:
+            assert await service.rate(candidate.id, index, rating) is True
+
+    rows = await service.negative_by_question(start=None, end=None, limit=10)
+
+    assert [row["question"] for row in rows] == [
+        "Как подать апелляцию?",
+        "Есть ли стипендия?",
+    ]
+    assert rows[0]["negative"] == 2
+    assert rows[0]["rated"] == 3
+    assert rows[1]["negative"] == 1
+    assert rows[1]["rated"] == 1
