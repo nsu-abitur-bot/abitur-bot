@@ -431,6 +431,7 @@ def test_deploy_aborts_rollback_when_previous_image_incompatible_with_migrations
     assert host.stage == "rollback-migration-check"
     assert host.failed_target == "nsu"
     assert host.failed_service == "migrate"
+    assert host.recovery_instructions is not None
     assert "Incompatible database migration" in host.recovery_instructions
     # Рабочие процессы со старым кодом НЕ перезапущены
     # (up вызван только 1 раз в попытке деплоя)
@@ -454,6 +455,7 @@ def test_manual_rollback_aborts_when_target_image_incompatible_with_migrations(
     assert host.stage == "rollback-migration-check"
     assert host.failed_target == "nsu"
     assert host.failed_service == "migrate"
+    assert host.recovery_instructions is not None
     assert "Incompatible database migration" in host.recovery_instructions
     assert not any("up" in call for call in host.calls)
     pins = json.loads(d.PINS.read_text())
