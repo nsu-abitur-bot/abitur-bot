@@ -1,0 +1,7 @@
+{
+    "telegram_send_accepted":  true,
+    "seconds":  0.061,
+    "messages_sent":  1,
+    "llm_calls":  0,
+    "note":  "Bot API accepted sendMessage; human receipt/read and full answer pipeline are not measured."
+}

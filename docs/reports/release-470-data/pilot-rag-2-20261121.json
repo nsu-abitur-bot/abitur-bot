@@ -1,0 +1,85 @@
+{
+    "case_id":  "rag-2",
+    "completed":  true,
+    "ingress":  "synthetic worker; real pipeline/formatting/Telegram delivery",
+    "telegram_polling_verified":  false,
+    "botcore_prefix_path_verified":  false,
+    "budget_before":  {
+                          "totals":  {
+                                         "input":  15321,
+                                         "output":  391,
+                                         "embedding":  112,
+                                         "micro_cny":  33770,
+                                         "micro_rub":  3611
+                                     },
+                          "cases":  {
+                                        "rag-1":  {
+                                                      "input":  15321,
+                                                      "output":  391,
+                                                      "embedding":  112,
+                                                      "micro_cny":  33770,
+                                                      "micro_rub":  3611,
+                                                      "generations":  16
+                                                  }
+                                    },
+                          "attempts_started":  20,
+                          "attempts_finished":  20,
+                          "pending_or_uncertain":  [
+
+                                                   ],
+                          "halted":  false
+                      },
+    "setup_finished_at_utc":  "2026-11-21T15:54:04.483872+00:00",
+    "rag_stage_entered":  true,
+    "question_started_at_utc":  "2026-11-21T15:54:04.484003+00:00",
+    "delivered_parts":  1,
+    "faq_matched":  false,
+    "tools_called":  [
+                         "get_education_programs"
+                     ],
+    "source_count":  0,
+    "answer_sha256":  "0670aae8b517de7f65be71430ac5aabdac0bd3895bd82fbc8be45a7e3a545f66",
+    "answer_characters":  211,
+    "last_bot_api_accept_at_utc":  "2026-11-21T15:54:56.344142+00:00",
+    "full_delivery_seconds":  51.8603,
+    "budget_after":  {
+                         "totals":  {
+                                        "input":  37173,
+                                        "output":  964,
+                                        "embedding":  308,
+                                        "micro_cny":  82058,
+                                        "micro_rub":  9930
+                                    },
+                         "cases":  {
+                                       "rag-1":  {
+                                                     "input":  15321,
+                                                     "output":  391,
+                                                     "embedding":  112,
+                                                     "micro_cny":  33770,
+                                                     "micro_rub":  3611,
+                                                     "generations":  16
+                                                 },
+                                       "rag-2":  {
+                                                     "input":  21852,
+                                                     "output":  573,
+                                                     "embedding":  196,
+                                                     "micro_cny":  48288,
+                                                     "micro_rub":  6319,
+                                                     "generations":  30
+                                                 }
+                                   },
+                         "attempts_started":  57,
+                         "attempts_finished":  57,
+                         "pending_or_uncertain":  [
+
+                                                  ],
+                         "halted":  false
+                     },
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  91.424,
+                   "minimum_host_available_mib":  876.6,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}

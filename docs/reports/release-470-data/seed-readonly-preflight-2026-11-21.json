@@ -1,0 +1,25 @@
+{
+    "observed_on":  "2026-11-21",
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  1.504,
+                   "minimum_host_available_mib":  1372.9,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               },
+    "probe":  {
+                  "scope":  "read-only public seed file hashes and topic presence",
+                  "chunks_sha256":  "90fab4be507b675a92f5220a22e756f3c4db8a825bc5b571a143080108db008e",
+                  "chunk_count":  82,
+                  "tokenizer_sha256_matches":  true,
+                  "topic_presence_only":  {
+                                              "profiles":  3,
+                                              "programming_languages":  9
+                                          },
+                  "answer_facts_verified":  false,
+                  "pilot_budget_exists":  false,
+                  "provider_calls":  0,
+                  "messages_sent":  0,
+                  "storage_writes":  0
+              }
+}

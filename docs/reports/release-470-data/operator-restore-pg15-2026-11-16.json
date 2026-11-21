@@ -1,0 +1,29 @@
+{
+    "checked_at":  "2026-11-16T06:02:47.299997+00:00",
+    "server_version":  "PostgreSQL 15.19 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
+    "dump_client":  "pg_dump (PostgreSQL) 15.19",
+    "source":  "preserved sanitized PG15 test copy; not live production",
+    "source_rows":  {
+                        "documents":  13,
+                        "faq":  1,
+                        "programs":  31,
+                        "scores":  55,
+                        "users":  0,
+                        "messages":  0
+                    },
+    "restored_rows":  {
+                          "documents":  13,
+                          "faq":  1,
+                          "programs":  31,
+                          "scores":  55,
+                          "users":  0,
+                          "messages":  0
+                      },
+    "lightrag_files_verified":  11,
+    "backup_seconds":  3.597,
+    "restore_seconds":  1.487,
+    "sql_edited":  false,
+    "rto_to_delivered_answer_measured":  false,
+    "rpo_measured":  false,
+    "production_touched":  false
+}

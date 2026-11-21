@@ -1,0 +1,42 @@
+{
+  "verified": true,
+  "settings_revision": 3,
+  "embedding_providers": {
+    "FAQ_EMBEDDING_PROVIDER": "cloudru",
+    "LIGHTRAG_EMBEDDING_PROVIDER": "cloudru"
+  },
+  "model": "ai-sage/Giga-Embeddings-instruct-3B",
+  "stores": {
+    "abitur_kb/vdb_chunks.json": {
+      "rows": 82,
+      "dimensions": 2048
+    },
+    "abitur_kb/vdb_entities.json": {
+      "rows": 935,
+      "dimensions": 2048
+    },
+    "abitur_kb/vdb_relationships.json": {
+      "rows": 1664,
+      "dimensions": 2048
+    }
+  },
+  "faq_unique_vectors": 3,
+  "faq_dimensions": 2048,
+  "canonical_files_identical_to_backup": null,
+  "seed_hashes_verified": true,
+  "kb_hashes": {
+    "abitur_kb/graph_chunk_entity_relation.graphml": "1eefd1020423d3e6eaf647c32716ae3122ded1e0720f749391657590aebdd20a",
+    "abitur_kb/kv_store_doc_status.json": "342cb2cf8c8e88f835c7c969302130ce8e1f4b5c66990073a49f02827c872c3e",
+    "abitur_kb/kv_store_entity_chunks.json": "3130f5ffca26ebed4f00e5d5846d923d0393f64d77b40d7e801fd92fd5e1b215",
+    "abitur_kb/kv_store_full_docs.json": "5e9a61ce41e50dd2436e1367c6bddff43a2b38d5e1da79ea73bb3d7a9a783da6",
+    "abitur_kb/kv_store_full_entities.json": "989faf5d4ea57972ed17c86cb653a73e90360e84681ab6f4950f5b1f767df96a",
+    "abitur_kb/kv_store_full_relations.json": "8aa29d7c667d994d8854eefe78deadfa78aeb2c6e025e976acbc14fa82719c73",
+    "abitur_kb/kv_store_relation_chunks.json": "fd33acf27083b3e06a0b1d617d7d2b7a08dc4ba05af8438c58b96294fe557a09",
+    "abitur_kb/kv_store_text_chunks.json": "90fab4be507b675a92f5220a22e756f3c4db8a825bc5b571a143080108db008e",
+    "abitur_kb/vdb_chunks.json": "cf79d071f921648c2cd486fe0e98dce9215f0b6b053304a3d991fb0ac96bc1dc",
+    "abitur_kb/vdb_entities.json": "0dd7b8e9c78b1e9a1bc4e321fc3153cecb45c65304801220bdd39bdbfc397d8d",
+    "abitur_kb/vdb_relationships.json": "282d123a23970bbf1722c330280a1f2803d14c188b2e36afb0a0afca574c44a7"
+  },
+  "provider_calls": 0,
+  "pilot_started": false
+}

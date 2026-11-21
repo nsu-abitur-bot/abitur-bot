@@ -1,0 +1,162 @@
+{
+    "baseline_admin_count":  1,
+    "checks":  [
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "login_superadmin",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "login_admin",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "login_viewer",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  401,
+                       "expected":  401,
+                       "name":  "anonymous_me",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  401,
+                       "expected":  401,
+                       "name":  "anonymous_faq",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  403,
+                       "expected":  403,
+                       "name":  "viewer_faq_denied",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "admin_faq_read",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  403,
+                       "expected":  403,
+                       "name":  "viewer_admin_list_denied",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  403,
+                       "expected":  403,
+                       "name":  "admin_admin_list_denied",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "superadmin_admin_list",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "viewer_identity",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "viewer_topics_read",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  401,
+                       "expected":  401,
+                       "name":  "invalid_jwt",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  401,
+                       "expected":  401,
+                       "name":  "wrong_password",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  400,
+                       "expected":  400,
+                       "name":  "register_without_invite",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  403,
+                       "expected":  403,
+                       "name":  "admin_cannot_invite",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  201,
+                       "expected":  201,
+                       "name":  "superadmin_invite",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  [
+                                      201,
+                                      400
+                                  ],
+                       "expected":  [
+                                        201,
+                                        400
+                                    ],
+                       "name":  "single_use_invite_race",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  "viewer",
+                       "expected":  "viewer",
+                       "name":  "invite_role_preserved",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "demote_admin",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  403,
+                       "expected":  403,
+                       "name":  "old_jwt_obeys_new_role",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  200,
+                       "expected":  200,
+                       "name":  "deactivate_viewer",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  401,
+                       "expected":  401,
+                       "name":  "old_jwt_inactive_rejected",
+                       "passed":  true
+                   },
+                   {
+                       "actual":  401,
+                       "expected":  401,
+                       "name":  "inactive_login_rejected",
+                       "passed":  true
+                   }
+               ],
+    "cleanup_verified":  true,
+    "final_admin_count":  1,
+    "messages_sent":  0,
+    "observed_at":  "2026-11-16T05:27:23.458440+00:00",
+    "passed":  true,
+    "provider_calls":  0,
+    "scope":  "real app ASGI routes + isolated PostgreSQL; lifespan not started"
+}

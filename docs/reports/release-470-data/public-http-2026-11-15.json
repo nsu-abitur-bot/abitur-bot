@@ -1,0 +1,20 @@
+{
+  "observations": [
+    {
+      "url": "https://nsu.abitur.site/login",
+      "started_at": "2026-11-15T09:05:41.867418+00:00",
+      "scope": "public HTTP headers only, not channel availability",
+      "tls_verified": true,
+      "status_code": 200,
+      "duration_to_headers_ms": 431.393
+    },
+    {
+      "url": "https://api.nsu.abitur.site/health",
+      "started_at": "2026-11-15T09:05:42.301344+00:00",
+      "scope": "public HTTP headers only, not channel availability",
+      "tls_verified": true,
+      "status_code": 200,
+      "duration_to_headers_ms": 484.353
+    }
+  ]
+}

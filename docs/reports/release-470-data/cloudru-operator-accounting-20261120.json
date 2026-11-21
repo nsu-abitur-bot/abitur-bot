@@ -1,0 +1,22 @@
+{
+  "approved_cap_rub": 10,
+  "attempts": 172,
+  "settled_attempts": 172,
+  "prompt_tokens": 149621,
+  "total_rub_at_api_advertised_rate": 4.820876,
+  "rate_rub_per_million": "32.22",
+  "by_phase": {
+    "diagnostic": {
+      "attempts": 1,
+      "prompt_tokens": 34,
+      "rub": 0.001096
+    },
+    "index-rebuild": {
+      "attempts": 171,
+      "prompt_tokens": 149587,
+      "rub": 4.81978
+    }
+  },
+  "pilot_started": false,
+  "pilot_budget_created": false
+}
