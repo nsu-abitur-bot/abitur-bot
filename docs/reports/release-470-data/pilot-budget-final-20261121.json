@@ -1,0 +1,86 @@
+{
+    "policy_sha256":  "78531e1d41ba70bd16dc4a5823974261d598910d51fef569fd8eb384589baf58",
+    "snapshot":  {
+                     "totals":  {
+                                    "input":  37173,
+                                    "output":  964,
+                                    "embedding":  402,
+                                    "micro_cny":  82058,
+                                    "micro_rub":  12959
+                                },
+                     "cases":  {
+                                   "rag-1":  {
+                                                 "input":  15321,
+                                                 "output":  391,
+                                                 "embedding":  112,
+                                                 "micro_cny":  33770,
+                                                 "micro_rub":  3611,
+                                                 "generations":  16
+                                             },
+                                   "rag-2":  {
+                                                 "input":  21852,
+                                                 "output":  573,
+                                                 "embedding":  196,
+                                                 "micro_cny":  48288,
+                                                 "micro_rub":  6319,
+                                                 "generations":  30
+                                             },
+                                   "setup":  {
+                                                 "input":  0,
+                                                 "output":  0,
+                                                 "embedding":  94,
+                                                 "micro_cny":  0,
+                                                 "micro_rub":  3029,
+                                                 "generations":  0
+                                             }
+                               },
+                     "attempts_started":  58,
+                     "attempts_finished":  58,
+                     "pending_or_uncertain":  [
+                                                  58
+                                              ],
+                     "halted":  true
+                 },
+    "confirmed_settled_totals":  {
+                                     "input":  37173,
+                                     "output":  964,
+                                     "embedding":  308,
+                                     "micro_cny":  82058,
+                                     "micro_rub":  9930
+                                 },
+    "uncertain_reserves_not_confirmed_spend":  [
+                                                   {
+                                                       "id":  58,
+                                                       "case_id":  "setup",
+                                                       "operation":  "embedding",
+                                                       "held_reserve":  {
+                                                                            "embedding":  94,
+                                                                            "input":  0,
+                                                                            "micro_cny":  0,
+                                                                            "micro_rub":  3029,
+                                                                            "output":  0
+                                                                        },
+                                                       "receipt":  {
+                                                                       "provider":  "cloudru",
+                                                                       "currency":  "RUB",
+                                                                       "status":  null,
+                                                                       "usage":  {
+
+                                                                                 },
+                                                                       "usage_complete":  false,
+                                                                       "vectors_valid":  false,
+                                                                       "response_model":  null,
+                                                                       "error":  true,
+                                                                       "elapsed_seconds":  5.3574
+                                                                   }
+                                                   }
+                                               ],
+    "journal_digest":  "d547fb2ccb6a20a044062a6d51b278fdd46667d2a24638a35e6404191815fc06",
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  4.26,
+                   "minimum_host_available_mib":  1349.4,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}
