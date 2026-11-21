@@ -1,0 +1,19 @@
+{
+  "observed_on": "2026-11-21",
+  "operation": "fixed runner pg15-source probe initializer --initialize",
+  "runner": {
+    "returncode": 0,
+    "seconds": 6.014,
+    "minimum_host_available_mib": 1208.8,
+    "stop_reason": null,
+    "output_truncated": false
+  },
+  "initializer": {
+    "policy_sha256": "78531e1d41ba70bd16dc4a5823974261d598910d51fef569fd8eb384589baf58",
+    "budget_created": true
+  },
+  "budget_path_inside_runtime": "/reports/release470-budget.sqlite3",
+  "provider_calls": 0,
+  "messages_sent": 0,
+  "operator_egress_still_required": true
+}
