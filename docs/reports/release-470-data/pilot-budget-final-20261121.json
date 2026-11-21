@@ -72,14 +72,24 @@
                                                                        "response_model":  null,
                                                                        "error":  true,
                                                                        "elapsed_seconds":  5.3574
-                                                                   }
+                                                                   },
+                                                       "accounting_events":  [
+                                                                                 {
+                                                                                     "event":  "reserve",
+                                                                                     "at_utc":  "2026-11-21T16:08:19.582003+00:00"
+                                                                                 },
+                                                                                 {
+                                                                                     "event":  "final",
+                                                                                     "at_utc":  "2026-11-21T16:08:24.953192+00:00"
+                                                                                 }
+                                                                             ]
                                                    }
                                                ],
     "journal_digest":  "d547fb2ccb6a20a044062a6d51b278fdd46667d2a24638a35e6404191815fc06",
     "runner":  {
                    "returncode":  0,
-                   "seconds":  4.26,
-                   "minimum_host_available_mib":  1349.4,
+                   "seconds":  4.259,
+                   "minimum_host_available_mib":  1340.1,
                    "stop_reason":  null,
                    "output_truncated":  false
                }

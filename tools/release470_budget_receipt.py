@@ -4,6 +4,7 @@ import hashlib
 import json
 import sqlite3
 from contextlib import closing
+from datetime import UTC, datetime
 from pathlib import Path
 
 from tools.release470_store import BudgetStore, canonical
@@ -24,6 +25,7 @@ RECEIPT_FIELDS = (
 
 def receipt(path: Path) -> dict:
     store = BudgetStore(path)
+    events = store.journal()
     settled = dict.fromkeys(FIELDS, 0)
     uncertain = []
     with closing(sqlite3.connect(f"file:{path}?mode=ro", uri=True)) as db:
@@ -44,6 +46,16 @@ def receipt(path: Path) -> dict:
                         "operation": row["operation"],
                         "held_reserve": held,
                         "receipt": {key: final.get(key) for key in RECEIPT_FIELDS},
+                        "accounting_events": [
+                            {
+                                "event": event.get("event"),
+                                "at_utc": datetime.fromtimestamp(
+                                    event["at"], UTC
+                                ).isoformat(),
+                            }
+                            for event in events
+                            if event.get("attempt") == row["id"]
+                        ],
                     }
                 )
         journal_digest = db.execute(
