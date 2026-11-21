@@ -131,6 +131,9 @@ class Host:
     def __init__(self, config: str) -> None:
         self.env = {**os.environ, "DOCKER_CONFIG": config}
         self.stage = "request"
+        self.failed_target: str | None = None
+        self.failed_service: str | None = None
+        self.recovery_instructions: str | None = None
         self.targets = load_targets(TARGETS_FILE)
 
     def run(self, *args: str, stdin: str | None = None) -> str:
@@ -142,11 +145,15 @@ class Host:
                 "inspect": "container-state",
             }.get(args[1], "docker")
         elif args[0] in {target.compose for target in self.targets}:
-            self.stage = (
-                ("migration" if args[-1] == "migrate" else "permissions")
-                if args[1] == "run"
-                else "services"
-            )
+            if len(args) > 1 and args[1] == "config":
+                self.stage = "overlay-check"
+            elif len(args) > 1 and args[1] == "run":
+                if "migrate" in args:
+                    self.stage = "migration-check" if len(args) > 7 else "migration"
+                else:
+                    self.stage = "permissions"
+            else:
+                self.stage = "services"
         # Never forward command output: docker errors may contain credentials.
         result = subprocess.run(
             args,
@@ -160,6 +167,25 @@ class Host:
         if result.returncode:
             raise ProcessFailure(result.returncode)
         return result.stdout.strip()
+
+    def check_migration_compatibility(self, target: Target, previous_image: str) -> None:
+        self.stage = "rollback-migration-check"
+        self.run(
+            target.compose,
+            "run",
+            "--rm",
+            "--no-deps",
+            "--pull",
+            "never",
+            "api",
+            "python",
+            "-c",
+            (
+                "from alembic.config import Config; "
+                "from alembic import command; "
+                "command.current(Config('alembic.ini'))"
+            ),
+        )
 
     def current_sha(self, component: str, token: str) -> str:
         self.stage = "main-freshness"
@@ -188,18 +214,33 @@ class Host:
         deadline = time.monotonic() + HEALTH_TIMEOUT
         stable = None
         consecutive = 0
+        last_failure_service = "api" if component == "backend" else "web"
+        last_failure_reason = "Health check timed out"
         while time.monotonic() < deadline:
             try:
-                with urllib.request.urlopen(url, timeout=3) as response:
-                    if response.status != 200:
-                        raise RuntimeError("Unhealthy HTTP status")
+                try:
+                    with urllib.request.urlopen(url, timeout=3) as response:
+                        if response.status != 200:
+                            last_failure_service = (
+                                "api" if component == "backend" else "web"
+                            )
+                            last_failure_reason = f"HTTP status {response.status}"
+                            raise RuntimeError(last_failure_reason)
+                except Exception as http_err:
+                    last_failure_service = "api" if component == "backend" else "web"
+                    last_failure_reason = f"HTTP check failed: {type(http_err).__name__}"
+                    raise
                 if component == "backend" and target.bot:
                     container = self.run(target.compose, "ps", "-q", "bot")
                     if not container:
-                        raise RuntimeError("Bot absent")
+                        last_failure_service = "bot"
+                        last_failure_reason = "Bot container absent"
+                        raise RuntimeError(last_failure_reason)
                     state = json.loads(self.run("docker", "inspect", container))[0]
                     if not state["State"]["Running"] or state["State"].get("Restarting"):
-                        raise RuntimeError("Bot not running")
+                        last_failure_service = "bot"
+                        last_failure_reason = "Bot container not running"
+                        raise RuntimeError(last_failure_reason)
                     observation = (state["Id"], state["RestartCount"])
                     consecutive = consecutive + 1 if observation == stable else 1
                     stable = observation
@@ -210,7 +251,64 @@ class Host:
             except (OSError, ValueError, RuntimeError):
                 consecutive = 0
                 time.sleep(HEALTH_INTERVAL)
-        raise RuntimeError("Health deadline exceeded")
+        self.failed_target = target.name
+        self.failed_service = last_failure_service
+        raise RuntimeError(
+            f"Health deadline exceeded for target '{target.name}', "
+            f"service '{last_failure_service}': {last_failure_reason}"
+        )
+
+
+def check_runtime_overlays(host: Host, component: str) -> None:
+    host.stage = "overlay-check"
+    for target in host.targets:
+        raw = host.run(target.compose, "config", "--format", "json")
+        if not raw.strip():
+            continue
+        try:
+            config = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        services = config.get("services", {})
+        for service_name in SERVICES[component]:
+            service = services.get(service_name)
+            if not isinstance(service, dict):
+                continue
+            for vol in service.get("volumes", []):
+                is_bind = False
+                source = ""
+                dest = ""
+                if isinstance(vol, dict):
+                    if vol.get("type") == "bind":
+                        is_bind = True
+                        source = vol.get("source", "")
+                        dest = vol.get("target", "")
+                elif isinstance(vol, str):
+                    parts = vol.split(":")
+                    if len(parts) >= 2 and parts[0].startswith(("/", "./", "../", "~")):
+                        is_bind = True
+                        source = parts[0]
+                        dest = parts[1]
+                if is_bind:
+                    host.failed_target = target.name
+                    host.failed_service = service_name
+                    raise RuntimeError(
+                        f"Stale runtime overlay detected for target '{target.name}', "
+                        f"service '{service_name}': {source} -> {dest}"
+                    )
+
+
+def verify_rollback_migrations(host: Host, previous: dict, previous_image: str) -> bool:
+    host.stage = "rollback-migration-check"
+    atomic_json(PINS, previous)
+    try:
+        for target in host.targets:
+            host.check_migration_compatibility(target, previous_image)
+        return True
+    except Exception:
+        host.failed_target = getattr(host, "failed_target", None) or host.targets[0].name
+        host.failed_service = "migrate"
+        return False
 
 
 def start(host: Host, component: str, *, migrate: bool) -> None:
@@ -289,13 +387,31 @@ def deploy(component: str, data: dict[str, str], host: Host) -> str:
     # Pull may be slow; check again immediately before changing the running pin.
     if host.current_sha(component, data["registry_token"]) != data["sha"]:
         return "Skipped outdated main revision after pull"
+    check_runtime_overlays(host, component)
     for service in SERVICES[component]:
         pins["services"][service] = {"image": data["image"]}
     atomic_json(PINS, pins)
     try:
         start(host, component, migrate=True)
-    except Exception:
+    except Exception as deploy_error:
         failed_stage = getattr(host, "stage", "deploy")
+        if component == "backend":
+            previous_image = previous["services"]["api"]["image"]
+            compatible = verify_rollback_migrations(host, previous, previous_image)
+            if not compatible:
+                atomic_json(PINS, pins)
+                host.stage = "rollback-migration-check"
+                host.recovery_instructions = (
+                    f"Incompatible database migration on target '{host.failed_target}': "
+                    "previous image does not recognize current database revision. "
+                    "Automatic rollback aborted to prevent crash loop. "
+                    "Fix forward or inspect database."
+                )
+                raise RuntimeError(
+                    f"Automatic rollback aborted: previous image '{previous_image}' "
+                    f"is incompatible with applied database migrations "
+                    f"on target '{host.failed_target}'."
+                ) from deploy_error
         atomic_json(PINS, previous)
         start(host, component, migrate=False)
         host.stage = failed_stage
@@ -345,9 +461,26 @@ def rollback(component: str, host: Host) -> str:
         '{{index .Config.Labels "org.opencontainers.image.revision"}}',
         previous_image,
     )
+    check_runtime_overlays(host, component)
     previous = json.loads(json.dumps(pins))
     for service in SERVICES[component]:
         pins["services"][service] = {"image": previous_image}
+    if component == "backend":
+        compatible = verify_rollback_migrations(host, pins, previous_image)
+        if not compatible:
+            atomic_json(PINS, previous)
+            host.stage = "rollback-migration-check"
+            host.recovery_instructions = (
+                f"Incompatible database migration on target '{host.failed_target}': "
+                "target image does not recognize current database revision. "
+                "Rollback aborted to prevent crash loop. "
+                "Inspect database or fix forward."
+            )
+            raise RuntimeError(
+                f"Rollback aborted: previous image '{previous_image}' "
+                f"is incompatible with applied database migrations "
+                f"on target '{host.failed_target}'."
+            )
     atomic_json(PINS, pins)
     try:
         start(host, component, migrate=False)
@@ -420,6 +553,12 @@ def main() -> int:
             "returncode": error.returncode if isinstance(error, ProcessFailure) else None,
             "failed_at": int(time.time()),
         }
+        if getattr(host, "failed_target", None):
+            detail["target"] = host.failed_target
+        if getattr(host, "failed_service", None):
+            detail["service"] = host.failed_service
+        if getattr(host, "recovery_instructions", None):
+            detail["recovery_instructions"] = host.recovery_instructions
         if data is not None:
             detail.update({"sha": data["sha"], "image": data["image"]})
             try:
