@@ -14,12 +14,17 @@ def payload() -> dict[str, str]:
 
 
 class FakeHost(d.Host):
-    def __init__(self) -> None:
+    def __init__(self, config: str = "") -> None:
         self.calls: list[tuple[str, ...]] = []
         self.fresh = [SHA, SHA]
         self.revision = SHA
         self.fail = ""
         self.health_failures = 0
+        self.failed_target = None
+        self.failed_service = None
+        self.recovery_instructions = None
+        self.stage = "request"
+        self.targets = (d.DEFAULT_TARGET,)
 
     def current_sha(self, component: str, token: str) -> str:
         self.calls.append(("freshness",))
@@ -28,7 +33,7 @@ class FakeHost(d.Host):
     def run(self, *args: str, stdin: str | None = None) -> str:
         self.calls.append(args)
         assert "secret" not in args
-        if self.fail and self.fail in args:
+        if self.fail and any(self.fail in arg for arg in args):
             raise RuntimeError("fake failure")
         if "pull" in args:
             assert "old-backend" in d.PINS.read_text()
@@ -368,3 +373,122 @@ def test_rollback_same_image_is_noop(rolled_state: dict) -> None:
     host = FakeHost()
     assert d.rollback("backend", host) == "Already rolled back"
     assert not any("up" in call for call in host.calls)
+
+
+def test_deploy_aborts_on_stale_runtime_overlay(state: dict) -> None:
+    host = FakeHost()
+    overlay_config = json.dumps(
+        {
+            "services": {
+                "api": {
+                    "volumes": [
+                        {
+                            "type": "bind",
+                            "source": "/var/hotfix/fractional-admission/models.py",
+                            "target": "/app/db/postgres/models.py",
+                        }
+                    ]
+                }
+            }
+        }
+    )
+
+    original_run = host.run
+
+    def run_with_overlay(*args: str, stdin: str | None = None) -> str:
+        if len(args) > 1 and args[1] == "config":
+            return overlay_config
+        return original_run(*args, stdin=stdin)
+
+    host.run = run_with_overlay
+
+    with pytest.raises(
+        RuntimeError,
+        match="Stale runtime overlay detected for target 'nsu', service 'api'",
+    ):
+        d.deploy("backend", payload(), host)
+
+    assert host.stage == "overlay-check"
+    assert host.failed_target == "nsu"
+    assert host.failed_service == "api"
+    assert json.loads(d.PINS.read_text()) == state
+    assert not any("up" in call for call in host.calls)
+    assert not any("migrate" in call for call in host.calls)
+
+
+def test_deploy_aborts_rollback_when_previous_image_incompatible_with_migrations(
+    state: dict,
+) -> None:
+    host = FakeHost()
+    host.health_failures = 1
+    host.fail = "alembic.ini"
+
+    with pytest.raises(
+        RuntimeError, match="Automatic rollback aborted: previous image.*is incompatible"
+    ):
+        d.deploy("backend", payload(), host)
+
+    assert host.stage == "rollback-migration-check"
+    assert host.failed_target == "nsu"
+    assert host.failed_service == "migrate"
+    assert "Incompatible database migration" in host.recovery_instructions
+    # Рабочие процессы со старым кодом НЕ перезапущены
+    # (up вызван только 1 раз в попытке деплоя)
+    assert sum("up" in call for call in host.calls) == 1
+    # Pin остался на новом образе, чтобы не уходить в crash loop
+    pins = json.loads(d.PINS.read_text())
+    assert pins["services"]["api"]["image"] == IMAGE
+
+
+def test_manual_rollback_aborts_when_target_image_incompatible_with_migrations(
+    rolled_state: dict,
+) -> None:
+    host = FakeHost()
+    host.fail = "alembic.ini"
+
+    with pytest.raises(
+        RuntimeError, match="Rollback aborted: previous image.*is incompatible"
+    ):
+        d.rollback("backend", host)
+
+    assert host.stage == "rollback-migration-check"
+    assert host.failed_target == "nsu"
+    assert host.failed_service == "migrate"
+    assert "Incompatible database migration" in host.recovery_instructions
+    assert not any("up" in call for call in host.calls)
+    pins = json.loads(d.PINS.read_text())
+    assert pins["services"]["api"]["image"] == CUR
+
+
+def test_health_deadline_failure_names_target_and_service(
+    state: dict,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture,
+) -> None:
+    import io
+    import signal
+    import sys
+
+    monkeypatch.setattr(d, "HEALTH_TIMEOUT", 0.05)
+    monkeypatch.setattr(d, "HEALTH_INTERVAL", 0.01)
+
+    class UnhealthyHttpHost(FakeHost):
+        def healthy(self, component: str) -> None:
+            super(FakeHost, self).healthy(component)
+
+    monkeypatch.setattr(d, "LOCK", tmp_path / "lock")
+    monkeypatch.setattr(d, "FAILURE", tmp_path / "failure.json")
+    monkeypatch.setattr(d, "Host", UnhealthyHttpHost)
+    monkeypatch.setattr(signal, "signal", lambda *args: None)
+    monkeypatch.setattr(sys, "argv", ["deploy", "backend"])
+    monkeypatch.setattr(sys, "stdin", io.StringIO(json.dumps(payload())))
+
+    assert d.main() == 1
+    failure = json.loads(d.FAILURE.read_text())
+    assert failure["stage"] == "health"
+    assert failure["target"] == "nsu"
+    assert failure["service"] == "api"
+    output = capsys.readouterr().err
+    assert '"target": "nsu"' in output
+    assert '"service": "api"' in output
