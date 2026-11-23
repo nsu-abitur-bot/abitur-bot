@@ -56,7 +56,12 @@ async def api_call(
     return status, json.loads(content) if content else {}
 
 
-async def operate(operation: str) -> dict:
+async def operate(
+    operation: str,
+    *,
+    manifest_path: Path | None = None,
+    refresh_before: bool = True,
+) -> dict:
     from sqlalchemy import func, select
 
     from api.auth.security import hash_password
@@ -70,7 +75,7 @@ async def operate(operation: str) -> dict:
     if (engine.url.host, engine.url.database) != ("postgres", "eval470"):
         raise RuntimeError("Unexpected API test target")
     plan = json.loads(Path("/reports/pilot-plan-approved-2026-11-21.json").read_text())
-    private_manifest = Path("/reports/faq-serial-records-20261121.json")
+    private_manifest = manifest_path or Path("/reports/faq-serial-records-20261121.json")
     if operation == "create":
         descriptor = os.open(
             private_manifest, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600
@@ -123,7 +128,7 @@ async def operate(operation: str) -> dict:
                 raise RuntimeError("Synthetic API login failed")
             token = response["access_token"]
             # Cleanup must remain provider-free even after the lease is revoked.
-            if operation != "cleanup":
+            if operation != "cleanup" and refresh_before:
                 matcher = get_faq_matcher()
                 await matcher.refresh_from_db()
             payload = {
@@ -138,6 +143,7 @@ async def operate(operation: str) -> dict:
                     raise RuntimeError("Synthetic FAQ creation failed")
                 manifest["faq_id"] = body["id"]
             elif operation == "update":
+                matcher = get_faq_matcher()
                 status, _ = await api_call(
                     app, "PUT", f"/api/v1/faq/{manifest['faq_id']}", payload, token
                 )
