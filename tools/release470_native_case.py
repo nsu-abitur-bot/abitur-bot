@@ -30,7 +30,7 @@ def load(name, filename):
     return module
 
 
-async def run(case, plan, ledger, row, save):
+async def run(case, plan, ledger, row, save, *, resume_faq1=False):
     from aiogram import Bot
     from aiogram.client.session.aiohttp import AiohttpSession
 
@@ -45,17 +45,31 @@ async def run(case, plan, ledger, row, save):
 
     if (engine.url.host, engine.url.database) != ("postgres", "eval470"):
         raise RuntimeError("Unexpected isolated database")
-    if any(ledger.store.snapshot()["cases"].get(case, {}).values()):
+    previous = ledger.store.snapshot()["cases"].get(case, {})
+    expected_interrupted = {
+        "input": 169,
+        "output": 13,
+        "embedding": 0,
+        "micro_cny": 442,
+        "micro_rub": 0,
+        "generations": 1,
+    }
+    if resume_faq1:
+        if case != "faq-1" or previous != expected_interrupted:
+            raise RuntimeError("Explicit continuation differs from the interrupted case")
+        row["resumes_interrupted_pair"] = True
+        row["previous_delivery_unconfirmed"] = True
+    elif any(previous.values()):
         raise RuntimeError("Case already has accounted requests; no automatic repeat")
     continuation = load("eval470_continuation", "release470_continue.py")
     helper = load("eval470_faq", "release470_faq_api.py")
-    manifest = Path("/reports/faq-single-records-20261123.json")
-    application = continuation.faq_application() if case == "faq-2" else None
+    manifest = Path(f"/reports/faq-single-{case}-records-20261123.json")
+    application = continuation.faq_application() if case.startswith("faq-") else None
     created = False
     watcher = None
     bot = None
     try:
-        if case == "faq-2":
+        if case.startswith("faq-"):
             row["api_create"] = await helper.operate(
                 "create", manifest_path=manifest, application=application
             )
@@ -177,10 +191,10 @@ async def run(case, plan, ledger, row, save):
                     await asyncio.gather(*tasks)
                 if "pipeline_returned_at_utc" not in row:
                     raise RuntimeError("BotCore did not reach the pipeline")
-                if case == "faq-2":
+                if case.startswith("faq-"):
                     row["expected_faq_answer_present"] = (
-                        "EVAL470 synthetic answer v2" in reply.text
-                    )
+                        "EVAL470 synthetic answer v" + ("1" if case == "faq-1" else "2")
+                    ) in reply.text
                 await streamer.finalize(
                     reply.text,
                     parse_mode=reply.parse_mode,
@@ -207,7 +221,10 @@ async def run(case, plan, ledger, row, save):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--case", choices=("faq-2", "tools-1", "tools-2"), required=True)
+    parser.add_argument(
+        "--case", choices=("faq-1", "faq-2", "tools-1", "tools-2"), required=True
+    )
+    parser.add_argument("--resume-faq1", action="store_true")
     args = parser.parse_args()
     logging.disable(logging.CRITICAL)
     os.environ["PYTHON_DOTENV_DISABLED"] = "1"
@@ -235,7 +252,7 @@ def main():
 
     try:
         save()
-        asyncio.run(run(args.case, plan, ledger, row, save))
+        asyncio.run(run(args.case, plan, ledger, row, save, resume_faq1=args.resume_faq1))
     except BaseException as error:
         row["failed"] = type(error).__name__
     finally:
