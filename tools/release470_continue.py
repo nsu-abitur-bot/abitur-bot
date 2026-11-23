@@ -311,7 +311,7 @@ def main():
         "cases": [],
         "budget_before": ledger.store.snapshot(),
         "api_bot_separate_processes": True,
-        "provider_guard": "operator capture + additional owner ceilings",
+        "provider_guard": "operator capture + active ledger policy guard",
     }
     context = multiprocessing.get_context("fork")
     parent, child = context.Pipe()
