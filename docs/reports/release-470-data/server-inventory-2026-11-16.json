@@ -1,0 +1,55 @@
+{
+    "application_data_read":  false,
+    "entrypoints":  {
+                        "eval388":  {
+                                        "executable":  true,
+                                        "exists":  true,
+                                        "kind":  "file",
+                                        "mode":  "0755",
+                                        "owner_uid":  0,
+                                        "readable":  true
+                                    },
+                        "eval470":  {
+                                        "executable":  true,
+                                        "exists":  true,
+                                        "kind":  "file",
+                                        "mode":  "0755",
+                                        "owner_uid":  0,
+                                        "readable":  true
+                                    },
+                        "nsu_compose":  {
+                                            "executable":  true,
+                                            "exists":  true,
+                                            "kind":  "file",
+                                            "mode":  "0755",
+                                            "owner_uid":  0,
+                                            "readable":  true
+                                        },
+                        "nsu_probe":  {
+                                          "exists":  false
+                                      }
+                    },
+    "memory_kib":  {
+                       "MemAvailable":  1427448,
+                       "MemTotal":  3472864,
+                       "SwapFree":  8072540,
+                       "SwapTotal":  8089596
+                   },
+    "nsu_runtime_configuration_checked":  false,
+    "observed_at":  "2026-11-16T05:28:52.901520+00:00",
+    "root_disk_bytes":  {
+                            "free":  47067131904,
+                            "total":  79929139200
+                        },
+    "scope":  "unprivileged host metadata; no app, DB, logs or model calls",
+    "services_started":  false,
+    "sudo":  {
+                 "explicit_paths_listed":  {
+                                               "eval388":  true,
+                                               "eval470":  true,
+                                               "nsu_compose":  false,
+                                               "nsu_probe":  false
+                                           },
+                 "query_exit_code":  0
+             }
+}

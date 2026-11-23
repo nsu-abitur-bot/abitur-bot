@@ -1,0 +1,51 @@
+{
+    "application_data_read":  false,
+    "entrypoints":  {
+                        "eval388":  {
+                                        "executable":  true,
+                                        "exists":  true,
+                                        "kind":  "file",
+                                        "mode":  "0755",
+                                        "owner_uid":  0,
+                                        "readable":  true
+                                    },
+                        "eval470":  {
+                                        "exists":  false
+                                    },
+                        "nsu_compose":  {
+                                            "executable":  true,
+                                            "exists":  true,
+                                            "kind":  "file",
+                                            "mode":  "0755",
+                                            "owner_uid":  0,
+                                            "readable":  true
+                                        },
+                        "nsu_probe":  {
+                                          "exists":  false
+                                      }
+                    },
+    "memory_kib":  {
+                       "MemAvailable":  1405460,
+                       "MemTotal":  3472864,
+                       "SwapFree":  8089320,
+                       "SwapTotal":  8089596
+                   },
+    "nsu_runtime_configuration_checked":  false,
+    "observed_at":  "2026-11-15T09:04:03.994563+00:00",
+    "root_disk_bytes":  {
+                            "free":  47940059136,
+                            "total":  79929139200
+                        },
+    "scope":  "unprivileged host metadata; no app, DB, logs or model calls",
+    "services_started":  false,
+    "sudo":  {
+                 "explicit_paths_listed":  {
+                                               "eval388":  true,
+                                               "eval470":  false,
+                                               "nsu_compose":  false,
+                                               "nsu_probe":  false
+                                           },
+                 "query_exit_code":  0
+             },
+    "collector_sha256":  "9cd3a92b8dfab8db07ce0ac4ac7c6d917ba06c5c7e6ebeb6d80bc232e8c4a166"
+}

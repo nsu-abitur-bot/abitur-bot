@@ -1,0 +1,29 @@
+{
+  "review_commit": "1d479843bf367fb647a0c9d6c7e10d384e973780",
+  "runtime_base_commit": "7eb7b179d71ecc008ec96678132ba344a178112e",
+  "tests_run": 42,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "successful": true,
+  "packages": {
+    "deepseek-recipe": "0.2.0",
+    "tokenizers": "0.22.2"
+  },
+  "code_hashes": {
+    "tools/release470_auth_probe.py": "92596a9337944fcad83d71a7cfda822d9708328aa1755dd1ecece0e51f326368",
+    "tools/release470_budget.py": "bc6fab289c4fab29b37e944c5bc6744432259ed0da06eff897739f50be71ad8d",
+    "tools/release470_cloudru.py": "188e05f27fa5ce8fcc05d627b01279a2fec144430932dc0dedc76ab7ad874dc0",
+    "tools/release470_gate.py": "a08ba17d6fb3b0274132ec7e1a2151c3ca1579ed5fcef1fe62911b8daa6e1c1f",
+    "tools/release470_inventory.py": "9cd3a92b8dfab8db07ce0ac4ac7c6d917ba06c5c7e6ebeb6d80bc232e8c4a166",
+    "tools/release470_plan.py": "1378610911edc1807b357fca883d35132a30889d864deeb21686b52dd3284524",
+    "tools/release470_runtime.py": "9175eb54484c3b757c4c6a25ec1ce33b074bbca55b1305fa0e26f18c3ba31350",
+    "tools/release470_state_probe.py": "0a1b01d9227750a8894a60da96177c851af8923db8fbbe768def357c08ca28a5",
+    "tools/release470_store.py": "42bdcf4efb18ac79e21fa107534b993acf2d79db28e84ef53379b79063bc30e9",
+    "tools/release470_tokens.py": "38de22612d7aaa683e090e3f1937ee2b10d587683ee4493cd9224ba62e8707d3"
+  },
+  "network_mode": "internal-only; no provider egress",
+  "live_budget_created": false,
+  "provider_calls": 0,
+  "messages_sent": 0
+}

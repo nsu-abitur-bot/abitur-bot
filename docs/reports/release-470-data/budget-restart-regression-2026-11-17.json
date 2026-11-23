@@ -1,0 +1,1 @@
+{"old_head": "155b409", "before_restart": {"input": 100, "output": 10, "embedding": 0}, "after_new_report_directory": {"input": 0, "output": 0, "embedding": 0}, "regression_reproduced": true, "network_calls": 0}

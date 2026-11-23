@@ -1,0 +1,59 @@
+{
+    "run_id":  "7d86f895-1cde-4795-aedf-db47b855b674",
+    "prepared_at":  "2026-11-20T09:53:38.973104+00:00",
+    "stage":  "restored",
+    "closed":  false,
+    "provider_egress":  false,
+    "messages_sent":  0,
+    "rto_complete":  false,
+    "rpo_complete":  false,
+    "before":  {
+                   "confirmed_at":  "2026-11-21T15:51:38.786134+00:00",
+                   "kb_files":  {
+                                    "abitur_kb/graph_chunk_entity_relation.graphml":  "1eefd1020423d3e6eaf647c32716ae3122ded1e0720f749391657590aebdd20a",
+                                    "abitur_kb/kv_store_doc_status.json":  "342cb2cf8c8e88f835c7c969302130ce8e1f4b5c66990073a49f02827c872c3e",
+                                    "abitur_kb/kv_store_entity_chunks.json":  "3130f5ffca26ebed4f00e5d5846d923d0393f64d77b40d7e801fd92fd5e1b215",
+                                    "abitur_kb/kv_store_full_docs.json":  "5e9a61ce41e50dd2436e1367c6bddff43a2b38d5e1da79ea73bb3d7a9a783da6",
+                                    "abitur_kb/kv_store_full_entities.json":  "989faf5d4ea57972ed17c86cb653a73e90360e84681ab6f4950f5b1f767df96a",
+                                    "abitur_kb/kv_store_full_relations.json":  "8aa29d7c667d994d8854eefe78deadfa78aeb2c6e025e976acbc14fa82719c73",
+                                    "abitur_kb/kv_store_llm_response_cache.json":  "0bbce2891f9e4bb6988d7c1fd07ae91cace0a236fb00593a975625c0443cae24",
+                                    "abitur_kb/kv_store_relation_chunks.json":  "fd33acf27083b3e06a0b1d617d7d2b7a08dc4ba05af8438c58b96294fe557a09",
+                                    "abitur_kb/kv_store_text_chunks.json":  "90fab4be507b675a92f5220a22e756f3c4db8a825bc5b571a143080108db008e",
+                                    "abitur_kb/vdb_chunks.json":  "cf79d071f921648c2cd486fe0e98dce9215f0b6b053304a3d991fb0ac96bc1dc",
+                                    "abitur_kb/vdb_entities.json":  "0dd7b8e9c78b1e9a1bc4e321fc3153cecb45c65304801220bdd39bdbfc397d8d",
+                                    "abitur_kb/vdb_relationships.json":  "282d123a23970bbf1722c330280a1f2803d14c188b2e36afb0a0afca574c44a7"
+                                }
+               },
+    "snapshot_confirmed_at":  "2026-11-21T15:51:46.424723+00:00",
+    "snapshot_seconds":  3.756,
+    "snapshot_sha256":  {
+                            "data.tar.gz":  "7d87dcd59e33f4449cf17a03b0a230fbd8d4c4914905670d3fc4ffdd80661775",
+                            "postgres.dump":  "1328c4aab68b5523fd6a6bc570704dbe30ef55d3bf34773a40e13d9d138bdc2c"
+                        },
+    "after":  {
+                  "confirmed_at":  "2026-11-21T15:51:50.347931+00:00",
+                  "kb_files":  {
+                                   "abitur_kb/graph_chunk_entity_relation.graphml":  "1eefd1020423d3e6eaf647c32716ae3122ded1e0720f749391657590aebdd20a",
+                                   "abitur_kb/kv_store_doc_status.json":  "342cb2cf8c8e88f835c7c969302130ce8e1f4b5c66990073a49f02827c872c3e",
+                                   "abitur_kb/kv_store_entity_chunks.json":  "3130f5ffca26ebed4f00e5d5846d923d0393f64d77b40d7e801fd92fd5e1b215",
+                                   "abitur_kb/kv_store_full_docs.json":  "5e9a61ce41e50dd2436e1367c6bddff43a2b38d5e1da79ea73bb3d7a9a783da6",
+                                   "abitur_kb/kv_store_full_entities.json":  "989faf5d4ea57972ed17c86cb653a73e90360e84681ab6f4950f5b1f767df96a",
+                                   "abitur_kb/kv_store_full_relations.json":  "8aa29d7c667d994d8854eefe78deadfa78aeb2c6e025e976acbc14fa82719c73",
+                                   "abitur_kb/kv_store_llm_response_cache.json":  "0bbce2891f9e4bb6988d7c1fd07ae91cace0a236fb00593a975625c0443cae24",
+                                   "abitur_kb/kv_store_relation_chunks.json":  "fd33acf27083b3e06a0b1d617d7d2b7a08dc4ba05af8438c58b96294fe557a09",
+                                   "abitur_kb/kv_store_text_chunks.json":  "90fab4be507b675a92f5220a22e756f3c4db8a825bc5b571a143080108db008e",
+                                   "abitur_kb/vdb_chunks.json":  "cf79d071f921648c2cd486fe0e98dce9215f0b6b053304a3d991fb0ac96bc1dc",
+                                   "abitur_kb/vdb_entities.json":  "0dd7b8e9c78b1e9a1bc4e321fc3153cecb45c65304801220bdd39bdbfc397d8d",
+                                   "abitur_kb/vdb_relationships.json":  "282d123a23970bbf1722c330280a1f2803d14c188b2e36afb0a0afca574c44a7"
+                               }
+              },
+    "failure_declared_at":  "2026-11-21T15:52:58.663963+00:00",
+    "rto_boundary":  "failure declared on stopped isolated source -\u003e successful final full Telegram response accepted; preparation/restore+search+delivery included after this point",
+    "restore_completed_at":  "2026-11-21T15:53:15.859509+00:00",
+    "restore_command_seconds":  1.635,
+    "checkpoints_verified":  true,
+    "last_restored_checkpoint":  "before",
+    "missing_checkpoint":  "after",
+    "rpo_controlled_interval_seconds":  11.561797,
+    "rpo_definition":  "controlled before/after checkpoint interval, not measured production RPO"
+}

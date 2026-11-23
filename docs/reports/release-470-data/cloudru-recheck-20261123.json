@@ -1,0 +1,107 @@
+{
+    "completed":  true,
+    "physical_attempts":  1,
+    "messages_sent":  0,
+    "index_changed":  false,
+    "started_at_utc":  "2026-11-23T07:10:49.781842+00:00",
+    "budget_before":  {
+                          "totals":  {
+                                         "input":  37173,
+                                         "output":  964,
+                                         "embedding":  402,
+                                         "micro_cny":  82058,
+                                         "micro_rub":  12959
+                                     },
+                          "cases":  {
+                                        "rag-1":  {
+                                                      "input":  15321,
+                                                      "output":  391,
+                                                      "embedding":  112,
+                                                      "micro_cny":  33770,
+                                                      "micro_rub":  3611,
+                                                      "generations":  16
+                                                  },
+                                        "rag-2":  {
+                                                      "input":  21852,
+                                                      "output":  573,
+                                                      "embedding":  196,
+                                                      "micro_cny":  48288,
+                                                      "micro_rub":  6319,
+                                                      "generations":  30
+                                                  },
+                                        "setup":  {
+                                                      "input":  0,
+                                                      "output":  0,
+                                                      "embedding":  94,
+                                                      "micro_cny":  0,
+                                                      "micro_rub":  3029,
+                                                      "generations":  0
+                                                  }
+                                    },
+                          "attempts_started":  58,
+                          "attempts_finished":  58,
+                          "pending_or_uncertain":  [
+
+                                                   ],
+                          "halted":  false
+                      },
+    "reserved_micro_rub_bound":  3029,
+    "token_bound":  94,
+    "http_status":  200,
+    "response_model":  "ai-sage/Giga-Embeddings-instruct-3B",
+    "usage":  {
+                  "prompt_tokens":  94,
+                  "total_tokens":  94
+              },
+    "budget_after":  {
+                         "totals":  {
+                                        "input":  37173,
+                                        "output":  964,
+                                        "embedding":  496,
+                                        "micro_cny":  82058,
+                                        "micro_rub":  15988
+                                    },
+                         "cases":  {
+                                       "rag-1":  {
+                                                     "input":  15321,
+                                                     "output":  391,
+                                                     "embedding":  112,
+                                                     "micro_cny":  33770,
+                                                     "micro_rub":  3611,
+                                                     "generations":  16
+                                                 },
+                                       "rag-2":  {
+                                                     "input":  21852,
+                                                     "output":  573,
+                                                     "embedding":  196,
+                                                     "micro_cny":  48288,
+                                                     "micro_rub":  6319,
+                                                     "generations":  30
+                                                 },
+                                       "setup":  {
+                                                     "input":  0,
+                                                     "output":  0,
+                                                     "embedding":  188,
+                                                     "micro_cny":  0,
+                                                     "micro_rub":  6058,
+                                                     "generations":  0
+                                                 }
+                                   },
+                         "attempts_started":  59,
+                         "attempts_finished":  59,
+                         "pending_or_uncertain":  [
+
+                                                  ],
+                         "halted":  false
+                     },
+    "vector_count":  2,
+    "dimensions":  2048,
+    "finished_at_utc":  "2026-11-23T07:10:55.985930+00:00",
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  29.556,
+                   "minimum_host_available_mib":  952.9,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}

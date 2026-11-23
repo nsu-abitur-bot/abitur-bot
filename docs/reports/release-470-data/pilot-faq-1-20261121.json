@@ -1,0 +1,89 @@
+{
+    "case_id":  "faq-1",
+    "completed":  false,
+    "ingress":  "synthetic worker; real pipeline/formatting/Telegram delivery",
+    "telegram_polling_verified":  false,
+    "botcore_prefix_path_verified":  false,
+    "budget_before":  {
+                          "totals":  {
+                                         "input":  37173,
+                                         "output":  964,
+                                         "embedding":  308,
+                                         "micro_cny":  82058,
+                                         "micro_rub":  9930
+                                     },
+                          "cases":  {
+                                        "rag-1":  {
+                                                      "input":  15321,
+                                                      "output":  391,
+                                                      "embedding":  112,
+                                                      "micro_cny":  33770,
+                                                      "micro_rub":  3611,
+                                                      "generations":  16
+                                                  },
+                                        "rag-2":  {
+                                                      "input":  21852,
+                                                      "output":  573,
+                                                      "embedding":  196,
+                                                      "micro_cny":  48288,
+                                                      "micro_rub":  6319,
+                                                      "generations":  30
+                                                  }
+                                    },
+                          "attempts_started":  57,
+                          "attempts_finished":  57,
+                          "pending_or_uncertain":  [
+
+                                                   ],
+                          "halted":  false
+                      },
+    "error_type":  "CloudRuError",
+    "budget_after":  {
+                         "totals":  {
+                                        "input":  37173,
+                                        "output":  964,
+                                        "embedding":  402,
+                                        "micro_cny":  82058,
+                                        "micro_rub":  12959
+                                    },
+                         "cases":  {
+                                       "rag-1":  {
+                                                     "input":  15321,
+                                                     "output":  391,
+                                                     "embedding":  112,
+                                                     "micro_cny":  33770,
+                                                     "micro_rub":  3611,
+                                                     "generations":  16
+                                                 },
+                                       "rag-2":  {
+                                                     "input":  21852,
+                                                     "output":  573,
+                                                     "embedding":  196,
+                                                     "micro_cny":  48288,
+                                                     "micro_rub":  6319,
+                                                     "generations":  30
+                                                 },
+                                       "setup":  {
+                                                     "input":  0,
+                                                     "output":  0,
+                                                     "embedding":  94,
+                                                     "micro_cny":  0,
+                                                     "micro_rub":  3029,
+                                                     "generations":  0
+                                                 }
+                                   },
+                         "attempts_started":  58,
+                         "attempts_finished":  58,
+                         "pending_or_uncertain":  [
+                                                      58
+                                                  ],
+                         "halted":  true
+                     },
+    "runner":  {
+                   "returncode":  137,
+                   "seconds":  41.325,
+                   "minimum_host_available_mib":  997.5,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}
