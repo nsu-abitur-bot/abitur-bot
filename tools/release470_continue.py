@@ -62,23 +62,33 @@ def api_child(pipe):
         from faq.matcher import get_faq_matcher
 
         manifest = Path("/reports/faq-continue-records-20261123.json")
+        application = faq_application()
         created = False
         try:
-            result = await helper.operate("create", manifest_path=manifest)
+            result = await helper.operate(
+                "create", manifest_path=manifest, application=application
+            )
             created = True
             await get_faq_matcher().refresh_from_db()
             pipe.send({"created": result, "cache_hot": True})
             command = await asyncio.to_thread(pipe.recv)
             if command == "update":
                 result = await helper.operate(
-                    "update", manifest_path=manifest, refresh_before=False
+                    "update",
+                    manifest_path=manifest,
+                    refresh_before=False,
+                    application=application,
                 )
                 pipe.send({"updated": result})
                 await asyncio.to_thread(pipe.recv)
         finally:
             if created:
                 pipe.send(
-                    {"cleanup": await helper.operate("cleanup", manifest_path=manifest)}
+                    {
+                        "cleanup": await helper.operate(
+                            "cleanup", manifest_path=manifest, application=application
+                        )
+                    }
                 )
 
     try:
@@ -87,6 +97,22 @@ def api_child(pipe):
         pipe.send({"failed": type(error).__name__})
     finally:
         pipe.close()
+
+
+def faq_application():
+    """Native routes and auth dependency, without unrelated import workers."""
+    from fastapi import Depends, FastAPI
+
+    from api.auth.dependencies import require_admin
+    from api.auth.router import router as auth_router
+    from api.routes.faq import router as faq_router
+
+    app = FastAPI()
+    app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(
+        faq_router, prefix="/api/v1", dependencies=[Depends(require_admin)]
+    )
+    return app
 
 
 async def receive(pipe):
@@ -255,8 +281,7 @@ def main():
     plan = json.loads(Path("/reports/pilot-plan-approved-2026-11-21.json").read_text())
     ledger = connect_fix(plan, probe=args.probe)
     if args.probe:
-        from api.main import app
-
+        app = faq_application()
         print(
             json.dumps(
                 {
@@ -276,8 +301,7 @@ def main():
             raise RuntimeError("A remaining case already has accounted requests")
     # Preload safe code only so fork shares these pages, without API lifespan,
     # import queue, listeners or database connections.
-    from api.main import app
-
+    app = faq_application()
     if not app.routes:
         raise RuntimeError("Native API routes missing")
     receipt = Path("/reports/pilot-continue-20261123.json")

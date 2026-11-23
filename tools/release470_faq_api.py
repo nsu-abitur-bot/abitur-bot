@@ -61,16 +61,21 @@ async def operate(
     *,
     manifest_path: Path | None = None,
     refresh_before: bool = True,
+    application=None,
 ) -> dict:
     from sqlalchemy import func, select
 
     from api.auth.security import hash_password
-    from api.main import app
     from bootstrap.runtime_settings import runtime_settings
     from db.postgres.db import AsyncSessionLocal, engine
     from db.postgres.models import Admin, FaqEntry
     from faq.matcher import get_faq_matcher
     from tools.release470_store import BudgetStore
+
+    if application is None:
+        from api.main import app
+    else:
+        app = application
 
     if (engine.url.host, engine.url.database) != ("postgres", "eval470"):
         raise RuntimeError("Unexpected API test target")
