@@ -2,11 +2,12 @@
 
 import contextvars
 import copy
+import os
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import httpx
 
@@ -55,6 +56,7 @@ class OwnerTests(unittest.TestCase):
             )
             transport = Mock(return_value=response)
             with (
+                patch.dict(os.environ, {"PYTHON_DOTENV_DISABLED": "1"}),
                 ledger.capture(patch_provider=False),
                 httpx.Client(transport=httpx.MockTransport(transport)) as client,
             ):
