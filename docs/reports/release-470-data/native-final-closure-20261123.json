@@ -1,0 +1,80 @@
+{
+    "verified_at_utc":  "2026-11-23T07:57:07.7854057Z",
+    "close_exit_code":  0,
+    "pg15_source_status_empty":  true,
+    "pg15_target_status_empty":  true,
+    "budget":  {
+                   "totals":  {
+                                  "input":  73496,
+                                  "output":  1870,
+                                  "embedding":  1380,
+                                  "micro_cny":  161952,
+                                  "micro_rub":  44477
+                              },
+                   "cases":  {
+                                 "rag-1":  {
+                                               "input":  15321,
+                                               "output":  391,
+                                               "embedding":  112,
+                                               "micro_cny":  33770,
+                                               "micro_rub":  3611,
+                                               "generations":  16
+                                           },
+                                 "rag-2":  {
+                                               "input":  21852,
+                                               "output":  573,
+                                               "embedding":  196,
+                                               "micro_cny":  48288,
+                                               "micro_rub":  6319,
+                                               "generations":  30
+                                           },
+                                 "setup":  {
+                                               "input":  0,
+                                               "output":  0,
+                                               "embedding":  282,
+                                               "micro_cny":  0,
+                                               "micro_rub":  9087,
+                                               "generations":  0
+                                           },
+                                 "faq-1":  {
+                                               "input":  338,
+                                               "output":  26,
+                                               "embedding":  47,
+                                               "micro_cny":  884,
+                                               "micro_rub":  1515,
+                                               "generations":  2
+                                           },
+                                 "faq-2":  {
+                                               "input":  169,
+                                               "output":  13,
+                                               "embedding":  47,
+                                               "micro_cny":  442,
+                                               "micro_rub":  1515,
+                                               "generations":  1
+                                           },
+                                 "tools-1":  {
+                                                 "input":  15822,
+                                                 "output":  412,
+                                                 "embedding":  274,
+                                                 "micro_cny":  34940,
+                                                 "micro_rub":  8831,
+                                                 "generations":  16
+                                             },
+                                 "tools-2":  {
+                                                 "input":  19994,
+                                                 "output":  455,
+                                                 "embedding":  422,
+                                                 "micro_cny":  43628,
+                                                 "micro_rub":  13599,
+                                                 "generations":  16
+                                             }
+                             },
+                   "attempts_started":  105,
+                   "attempts_finished":  105,
+                   "pending_or_uncertain":  [
+
+                                            ],
+                   "halted":  false
+               },
+    "provider_route_closure":  "fixed runner close completed successfully"
+}
