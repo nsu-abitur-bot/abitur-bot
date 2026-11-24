@@ -91,6 +91,8 @@ def test_preview_counts_matched_and_unmatched(client: TestClient):
     assert resp.status_code == 200
     body = resp.json()
     assert len(body["rows"]) == 2
+    assert all(row["seat_count"] is None for row in body["rows"])
+    assert all(row["source_url"] is None for row in body["rows"])
     summary = body["summary"]
     assert summary["total"] == 2
     assert summary["matched"] == 1

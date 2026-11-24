@@ -187,3 +187,69 @@ async def test_v1_import_filter_and_confirm_study_form(
             f"{path}/import", json={"rows": [{**legacy, "admission_basis": "paid"}]}
         )
         assert conflict.status_code == 422
+
+
+async def test_v1_seat_count_import_edit_and_legacy_rows(
+    session: AsyncSession, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    await _seed_program(session)
+    monkeypatch.setitem(app.dependency_overrides, require_admin, lambda: object())
+    monkeypatch.setitem(app.dependency_overrides, get_async_session, lambda: session)
+    path = "/api/v1/admission-scores"
+    common = {"faculty_name": "Faculty", "program_name": "Program", "year": 2025}
+    budget = {**common, "admission_basis": "budget", "study_form": "full_time"}
+    paid = {**budget, "admission_basis": "paid"}
+    source_url = "https://example.test/admission/2025"
+    rows = [
+        {**budget, "seat_count": 0, "source_url": source_url},
+        {**paid, "seat_count": 12},
+        {**budget, "study_form": "correspondence", "seat_count": 5},
+        {**budget, "year": 2024, "seat_count": 7},
+        {**common, "form": "budget", "passing_score": 241.5},
+    ]
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app), base_url="http://test"
+    ) as client:
+        response = await client.post(f"{path}/import", json={"rows": rows})
+        assert response.json() == {"created": 5, "updated": 0, "skipped": 0}
+        response = await client.post(
+            f"{path}/import", json={"rows": [{**budget}, {**paid, "seat_count": None}]}
+        )
+        assert response.json() == {"created": 0, "updated": 2, "skipped": 0}
+
+        items = (await client.get(path)).json()
+        assert {
+            (item["year"], item["study_form"], item["admission_basis"]): item[
+                "seat_count"
+            ]
+            for item in items
+        } == {
+            (2024, "full_time", "budget"): 7,
+            (2025, "full_time", "budget"): 0,
+            (2025, "full_time", "paid"): 12,
+            (2025, "correspondence", "budget"): 5,
+            (2025, None, "budget"): None,
+        }
+        zero = next(item for item in items if item["seat_count"] == 0)
+        assert zero["source_url"] == source_url
+        assert zero["passing_score"] is None and zero["average_score"] is None
+        legacy = next(item for item in items if item["study_form"] is None)
+        assert legacy["passing_score"] == 241.5
+
+        patch_path = f"{path}/{zero['id']}"
+        for invalid in (-1, 1.5, True, "12", 2**31):
+            payload = {"seat_count": invalid}
+            assert (await client.patch(patch_path, json=payload)).status_code == 422
+            result = await client.post(
+                f"{path}/import", json={"rows": [{**budget, **payload}]}
+            )
+            assert result.status_code == 422
+
+        updated_source = "https://example.test/updated"
+        result = await client.patch(
+            patch_path, json={"seat_count": 17, "source_url": updated_source}
+        )
+        assert result.json() == {**zero, "seat_count": 17, "source_url": updated_source}
+        result = await client.patch(patch_path, json={"seat_count": None})
+        assert result.json() == {**zero, "seat_count": None, "source_url": updated_source}

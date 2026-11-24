@@ -1,4 +1,4 @@
-"""Инструмент get_admission_scores: проходные/средние баллы прошлых лет.
+"""Инструмент get_admission_scores: баллы и объявленные места приёма.
 
 Позволяет модели брать реальные числа из структурированного хранилища
 (:class:`AdmissionScoreService`), а не выдумывать их. Возвращает компактный
@@ -6,6 +6,7 @@
 """
 
 import logging
+from html import escape
 from typing import Literal, Optional
 
 from abbrev.expander import get_abbrev_expander
@@ -54,11 +55,11 @@ class AdmissionScoresResult(str):
 ADMISSION_SCORES_TOOL = ToolSpec(
     name="get_admission_scores",
     description=(
-        "Проходные и средние баллы прошлых лет по направлениям НГУ "
-        "с фильтрацией по уровню образования, форме обучения и основанию приёма. "
-        "Указывай форму и основание для каждого числа, по которому есть данные. "
-        "Используй для любых вопросов про проходной/средний балл, чтобы не "
-        "выдумывать числа."
+        "Проходные и средние баллы прошлых лет и объявленные места по программам НГУ. "
+        "Фильтры: год, уровень, форма обучения и основание приёма. Для запроса мест "
+        "укажи metric=seats, а для мест вместе с баллами добавь include_seat_count. "
+        "Число объявленных мест не равно числу зачисленных или свободных мест "
+        "и не гарантирует поступление."
     ),
     parameters={
         "type": "object",
@@ -110,12 +111,16 @@ ADMISSION_SCORES_TOOL = ToolSpec(
             },
             "metric": {
                 "type": "string",
-                "enum": ["passing", "average", "both"],
+                "enum": ["passing", "average", "both", "seats"],
                 "description": (
                     "Какой балл нужен: passing — проходной (по умолчанию), "
-                    "average — средний, both — оба. Указывай average или both "
-                    "ТОЛЬКО если пользователь явно спросил про средний балл."
+                    "average — средний, both — оба, seats — только объявленные места. "
+                    "Указывай average или both при явном запросе среднего балла."
                 ),
+            },
+            "include_seat_count": {
+                "type": "boolean",
+                "description": "Покажи объявленные места вместе с запрошенными баллами.",
             },
         },
         "additionalProperties": False,
@@ -167,14 +172,19 @@ def _format_score_value(row: dict, metric: str) -> str:
     return ", ".join(parts)
 
 
-def _format_scores(rows: list[dict], metric: str) -> str:
-    """Компактный текст с классификацией каждой строки баллов."""
-    header = (
-        "Проходные баллы прошлых лет (НГУ):"
-        if is_nsu()
-        else "Проходные баллы прошлых лет:"
-    )
-    lines: list[str] = [header]
+def _format_scores(
+    rows: list[dict], metric: str, *, include_seat_count: bool = False
+) -> str:
+    """Компактный текст с классификацией каждой строки данных приёма."""
+    show_seats = metric == "seats" or include_seat_count
+    if metric == "seats":
+        header = "Объявленные места"
+    elif show_seats:
+        header = "Баллы и объявленные места"
+    else:
+        header = "Проходные баллы прошлых лет"
+    university = " (НГУ)" if is_nsu() else ""
+    lines = [f"{header}{university}:"]
 
     current_key: Optional[tuple] = None
     for row in rows:
@@ -200,8 +210,18 @@ def _format_scores(rows: list[dict], metric: str) -> str:
             if study_form is not None
             else "форма обучения не указана"
         )
-        value = _format_score_value(row, metric)
-        lines.append(f"- {year}, {study_label}, {basis_label}: {value}")
+        values = [_format_score_value(row, metric)] if metric != "seats" else []
+        seat_count = row.get("seat_count")
+        if show_seats:
+            values.append(
+                f"объявлено мест: {seat_count}"
+                if seat_count is not None
+                else "нет данных о количестве мест"
+            )
+        source_url = row.get("source_url")
+        if source_url and (metric != "seats" or seat_count is not None):
+            values.append(f"источник: {escape(source_url, quote=False)}")
+        lines.append(f"- {year}, {study_label}, {basis_label}: {', '.join(values)}")
 
     return "\n".join(lines).strip()
 
@@ -249,8 +269,10 @@ async def execute_admission_scores(arguments: dict) -> str:
     if raw_level is not None and level is None:
         return AdmissionScoresResult("Неизвестный уровень образования.", status="error")
     metric = str(arguments.get("metric") or "passing").lower()
-    if metric not in ("passing", "average", "both"):
+    if metric not in ("passing", "average", "both", "seats"):
         metric = "passing"
+    include_seat_count = arguments.get("include_seat_count") is True
+    show_seats = metric == "seats" or include_seat_count
 
     faculty = _expand(arguments.get("faculty"))
     program = _expand(arguments.get("program"))
@@ -278,9 +300,10 @@ async def execute_admission_scores(arguments: dict) -> str:
                 level=level,
                 program_ids=program_ids,
                 include_identity=True,
+                only_with_scores=not show_seats,
             )
             note = ""
-            if not rows and year is not None:
+            if not rows and year is not None and not show_seats:
                 # Модель подставляет текущий год, а итоги приёма за него ещё не
                 # опубликованы: лучше показать прошлые годы, чем «данных нет».
                 rows = await service.query_scores(
@@ -291,23 +314,14 @@ async def execute_admission_scores(arguments: dict) -> str:
                     level=level,
                     program_ids=program_ids,
                     include_identity=True,
+                    only_with_scores=True,
                 )
                 if rows:
                     note = f"За {year} год данных нет, показаны доступные годы."
     except Exception:
         logger.exception("Ошибка выполнения инструмента get_admission_scores")
         return AdmissionScoresResult(
-            "Не удалось получить данные о проходных баллах.", status="error"
-        )
-
-    if not rows:
-        return AdmissionScoresResult(
-            "По этому запросу данных о проходных баллах нет.",
-            status="empty",
-            scope={"_program_ids": sorted(set(program_ids))}
-            if program_ids is not None
-            else {},
-            use_as_answer=study_form is not None,
+            "Не удалось получить данные о приёме.", status="error"
         )
 
     scope = {
@@ -323,12 +337,28 @@ async def execute_admission_scores(arguments: dict) -> str:
         if arguments.get(key) is not None
     }
     scope["metric"] = metric
+    if include_seat_count:
+        scope["include_seat_count"] = True
     scope["_program_ids"] = sorted(
         set(program_ids)
         if program_ids is not None
         else {row["program_id"] for row in rows}
     )
     scope["_program_names"] = {row["program_id"]: [row["program_name"]] for row in rows}
+    if not rows:
+        if show_seats:
+            subject = "о количестве мест" if metric == "seats" else "о баллах и местах"
+            period = f" за {year} год" if year is not None else ""
+            text = f"По этому запросу нет данных {subject}{period}."
+        else:
+            text = "По этому запросу данных о проходных баллах нет."
+        return AdmissionScoresResult(
+            text,
+            status="empty",
+            scope=scope,
+            use_as_answer=show_seats or study_form is not None,
+        )
+
     # Один фактически найденный вариант сохраняем для следующего уточнения.
     # Форму обучения сохраняем только при явном выборе пользователя.
     for key, column in (
@@ -343,10 +373,11 @@ async def execute_admission_scores(arguments: dict) -> str:
             scope[key] = next(iter(values))
         elif key in ("year", "admission_basis"):
             scope.pop(key, None)
-    text = _format_scores(rows, metric)
+    text = _format_scores(rows, metric, include_seat_count=include_seat_count)
     return AdmissionScoresResult(
         f"{note}\n\n{text}" if note else text,
         status="ok",
         scope=scope,
-        use_as_answer=any(row.get("study_form") is not None for row in rows),
+        use_as_answer=show_seats
+        or any(row.get("study_form") is not None for row in rows),
     )

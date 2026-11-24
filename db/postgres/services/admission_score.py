@@ -231,11 +231,21 @@ class ScoreRow:
     average_score: Optional[float]
     level: str = "bachelor"
     study_form: StudyForm | None = None
+    seat_count: int | None = None
+    source_url: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.seat_count is not None and (
+            type(self.seat_count) is not int or not 0 <= self.seat_count <= 2**31 - 1
+        ):
+            raise ValueError("Количество мест должно быть неотрицательным целым числом")
 
 
-class ScoreClassificationChanges(TypedDict, total=False):
+class ScoreChanges(TypedDict, total=False):
     admission_basis: AdmissionBasis
     study_form: StudyForm | None
+    seat_count: int | None
+    source_url: str | None
 
 
 class AdmissionScoreConflict(ValueError):
@@ -409,16 +419,15 @@ class AdmissionScoreService:
         return []
 
     async def upsert_from_rows(self, rows: Iterable[ScoreRow]) -> dict[str, int]:
-        """Идемпотентный upsert по ключу (program_id, year, form).
+        """Идемпотентный upsert по программе, году, форме и основанию приёма.
 
         Разрешает program_id через факультет (по алиасу) и направление (по
         нормализованному имени). Если факультет или направление не находятся —
         строка молча пропускается (logger.info). Возвращает счётчики
         ``{"created": int, "updated": int, "skipped": int}``.
 
-        Пустой балл в строке не затирает уже сохранённый: если НГУ поменяет
-        вёрстку страницы итогов, парсер начнёт отдавать строки без чисел, и
-        без этой проверки импорт молча обнулил бы баллы по всему университету.
+        Отсутствующие в импорте значения сохраняют прежние числа и источник,
+        в том числе при повторном импорте баллов из старого формата.
         """
         stats = {"created": 0, "updated": 0, "skipped": 0}
 
@@ -460,12 +469,16 @@ class AdmissionScoreService:
                 study_form=row.study_form,
                 passing_score=row.passing_score,
                 average_score=row.average_score,
+                seat_count=row.seat_count,
+                source_url=row.source_url,
             )
             metrics = {
                 column: value
                 for column, value in (
                     ("passing_score", row.passing_score),
                     ("average_score", row.average_score),
+                    ("seat_count", row.seat_count),
+                    ("source_url", row.source_url),
                 )
                 if value is not None
             }
@@ -490,10 +503,8 @@ class AdmissionScoreService:
         await self.session.commit()
         return stats
 
-    async def update_classification(
-        self, score_id: str, changes: ScoreClassificationChanges
-    ) -> dict | None:
-        """Меняет классификацию записи, сохраняя её ID, баллы и источник."""
+    async def update_score(self, score_id: str, changes: ScoreChanges) -> dict | None:
+        """Обновляет переданные данные приёма, сохраняя ID записи."""
         if changes:
             try:
                 await self.session.execute(
@@ -523,6 +534,7 @@ class AdmissionScoreService:
         program_ids: Optional[Sequence[str]] = None,
         include_identity: bool = False,
         score_id: str | None = None,
+        only_with_scores: bool = False,
     ) -> list[dict]:
         """Выборка проходных баллов с разрешением строковых фильтров.
 
@@ -549,6 +561,13 @@ class AdmissionScoreService:
             stmt = stmt.where(Program.is_active, Faculty.is_active)
         if score_id is not None:
             stmt = stmt.where(AdmissionScore.id == score_id)
+        if only_with_scores:
+            stmt = stmt.where(
+                or_(
+                    AdmissionScore.passing_score.is_not(None),
+                    AdmissionScore.average_score.is_not(None),
+                )
+            )
 
         canonical_level = normalize_level(level)
         if canonical_level is not None:
@@ -600,6 +619,8 @@ class AdmissionScoreService:
                 "study_form": score.study_form,
                 "passing_score": score.passing_score,
                 "average_score": score.average_score,
+                "seat_count": score.seat_count,
+                "source_url": score.source_url,
             }
             if include_identity:
                 row["program_id"] = prog.id

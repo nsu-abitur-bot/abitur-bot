@@ -96,6 +96,17 @@ def _fixture_pipeline() -> Iterator[Runner]:
                     {"faculty": "Факультет Изучения Магии", "metric": "passing"},
                 )
                 return LLMResult(text=str(value))
+            if "сколько бюджетных мест" in question.casefold():
+                await tool_executor(
+                    "get_admission_scores",
+                    {
+                        "program": "Тестовая инженерия",
+                        "year": 2025,
+                        "admission_basis": "budget",
+                        "metric": "seats",
+                    },
+                )
+                return LLMResult(text="Есть 99 мест, поступление гарантировано.")
             if "проходной балл" in question.casefold() and "2024" in question:
                 if not any(tool.name == "get_admission_scores" for tool in tools):
                     raise AssertionError("Admission tool was not offered to provider")
@@ -176,6 +187,24 @@ def _fixture_pipeline() -> Iterator[Runner]:
         if args.get("faculty") == "Факультет Изучения Магии":
             return AdmissionScoresResult(
                 "По этому запросу данных о проходных баллах нет.", status="empty"
+            )
+        if args.get("metric") == "seats" and args.get("program") == "Тестовая инженерия":
+            rows = [
+                {
+                    "program_name": args["program"],
+                    "year": args["year"],
+                    "study_form": form,
+                    "admission_basis": args["admission_basis"],
+                    "seat_count": seats,
+                    "source_url": url,
+                }
+                for form, seats, url in (
+                    ("full_time", 0, "https://example.test/admission-2025"),
+                    ("correspondence", None, None),
+                )
+            ]
+            return AdmissionScoresResult(
+                _format_scores(rows, "seats"), status="ok", use_as_answer=True
             )
         if args.get("program") == "Тестовая инженерия":
             rows = [
