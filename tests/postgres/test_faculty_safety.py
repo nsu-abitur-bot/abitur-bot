@@ -20,7 +20,7 @@ async def test_delete_faculty_preserves_program_and_scores(session: AsyncSession
     faculty = await service.create_faculty("Факультет для удаления")
     program = await service.create_program(faculty.id, "Программная инженерия")
     score = AdmissionScore(
-        program_id=program.id, year=2025, form="budget", passing_score=250
+        program_id=program.id, year=2025, admission_basis="budget", passing_score=250
     )
     session.add(score)
     await session.commit()
@@ -122,7 +122,9 @@ async def test_score_search_tracks_faculty_status(session: AsyncSession, filters
     faculty = await faculties.create_faculty("Тестовый факультет", aliases=["ТФ"])
     program = await faculties.create_program(faculty.id, "Информатика")
     session.add(
-        AdmissionScore(program_id=program.id, year=2025, form="budget", passing_score=250)
+        AdmissionScore(
+            program_id=program.id, year=2025, admission_basis="budget", passing_score=250
+        )
     )
     await session.commit()
     service = AdmissionScoreService(session)
@@ -139,7 +141,9 @@ async def test_score_search_tracks_faculty_status(session: AsyncSession, filters
         ) as client:
             history = await client.get("/api/v1/admission-scores", params=filters)
             assert history.status_code == 200
-            assert history.json() == before
+            assert history.json() == [
+                {**row, "form": row["admission_basis"]} for row in before
+            ]
             active_only = await client.get(
                 "/api/v1/admission-scores", params={**filters, "only_active": "true"}
             )

@@ -24,7 +24,7 @@ def _row(passing_score: int | None = 250) -> ScoreRow:
         program_name="Программная инженерия и компьютерные науки",
         code="09.03.04",
         year=2025,
-        form="budget",
+        admission_basis="budget",
         passing_score=passing_score,
         average_score=None,
     )

@@ -30,7 +30,14 @@ class FakeAdmissionScoreService:
         return {"created": len(self.upserted), "updated": 0, "skipped": 0}
 
     async def query_scores(
-        self, *, faculty=None, program=None, year=None, form=None, only_active=True
+        self,
+        *,
+        faculty=None,
+        program=None,
+        year=None,
+        admission_basis=None,
+        study_form=None,
+        only_active=True,
     ):
         return self.query_result
 
@@ -58,7 +65,7 @@ def _parsed_rows():
             program_name="Программная инженерия",
             code="09.03.01",
             year=2024,
-            form="budget",
+            admission_basis="budget",
             passing_score=246,
             average_score=260.9,
         ),
@@ -67,7 +74,7 @@ def _parsed_rows():
             program_name="Неизвестное направление",
             code=None,
             year=2024,
-            form="budget",
+            admission_basis="budget",
             passing_score=200,
             average_score=210.0,
         ),
@@ -121,6 +128,7 @@ def test_import_returns_stats(client: TestClient, service: FakeAdmissionScoreSer
 def test_get_scores(client: TestClient, service: FakeAdmissionScoreService):
     service.query_result = [
         {
+            "id": "some-score",
             "faculty_name": "Факультет информационных технологий",
             "program_name": "Программная инженерия",
             "code": "09.03.01",

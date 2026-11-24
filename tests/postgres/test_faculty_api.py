@@ -27,7 +27,7 @@ async def test_scores_api_preserves_program_level(session: AsyncSession, monkeyp
                 code=None,
                 level=level,
                 year=2025,
-                form="budget",
+                admission_basis="budget",
                 passing_score=score,
                 average_score=None,
             )

@@ -46,7 +46,10 @@ from pipeline.tools import (
     EDUCATION_PROGRAMS_TOOL,
     default_tool_executor,
 )
-from pipeline.tools.admission_scores import AdmissionScoresResult
+from pipeline.tools.admission_scores import (
+    AdmissionScoresResult,
+    normalize_score_arguments,
+)
 from rag.crag import load_crag_config
 from rag.retriever import (
     RetrievalError,
@@ -654,13 +657,22 @@ async def _run_tool_loop(
     if guard is not None:
         executor = tool_executor
         resolved_scope: dict = {}
+        verified_answer: str | None = None
 
         async def checked_executor(name: str, args: dict) -> str:
-            nonlocal resolved_scope
+            nonlocal resolved_scope, verified_answer
             if name == SCORES_TOOL:
+                try:
+                    args = normalize_score_arguments(dict(args))
+                except ValueError as exc:
+                    guard.verified = False
+                    return str(exc)
                 if not guard.accepts(args, check_names=False):
                     guard.verified = False
                     return "Параметры запроса не соответствуют вопросу пользователя."
+                for key in ("study_form", "admission_basis"):
+                    if key in guard.filters and not args.get(key):
+                        args[key] = guard.filters[key]
                 try:
                     output = await executor(name, args)
                 except Exception:
@@ -690,6 +702,7 @@ async def _run_tool_loop(
                 guard.record(output)
                 if guard.verified and isinstance(output, AdmissionScoresResult):
                     resolved_scope = output.scope or dict(args)
+                    verified_answer = str(output) if output.use_as_answer else None
                 return output
             return await executor(name, args)
 
@@ -721,7 +734,9 @@ async def _run_tool_loop(
                 + result.usage.completion_tokens,
                 total_tokens=usage.total_tokens + result.usage.total_tokens,
             )
-        content = result.text if guard.verified else SCORES_UNAVAILABLE
+        content = (
+            (verified_answer or result.text) if guard.verified else SCORES_UNAVAILABLE
+        )
         if guard.verified and score_scope_callback is not None:
             score_scope_callback(guard.history_scope(resolved_scope))
         if stream_callback is not None:

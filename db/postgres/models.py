@@ -41,15 +41,28 @@ class EducationLevel(str, enum.Enum):
 EDUCATION_LEVELS: frozenset[str] = frozenset(level.value for level in EducationLevel)
 
 
-class AdmissionForm(str, enum.Enum):
-    """Форма обучения для проходных баллов."""
+class AdmissionBasis(str, enum.Enum):
+    """Основание приёма."""
 
     budget = "budget"
     paid = "paid"
 
 
-# Допустимые значения формы обучения (для валидации сидов/API).
-ADMISSION_FORMS: frozenset[str] = frozenset(f.value for f in AdmissionForm)
+ADMISSION_BASES: frozenset[str] = frozenset(basis.value for basis in AdmissionBasis)
+
+
+class StudyForm(str, enum.Enum):
+    """Форма обучения."""
+
+    full_time = "full_time"
+    correspondence = "correspondence"
+
+
+STUDY_FORM_LABELS: dict[StudyForm, str] = {
+    StudyForm.full_time: "очная",
+    StudyForm.correspondence: "заочная",
+}
+ADMISSION_SCORE_SCOPE_CONSTRAINT = "uq_admission_score_program_year_study_form_basis"
 
 
 def timestamp():
@@ -693,12 +706,7 @@ class Program(Base):
 
 
 class AdmissionScore(Base):
-    """Проходные баллы направления подготовки за прошлые годы.
-
-    Структурированное хранилище (одна строка на тройку program/year/form),
-    чтобы отвечать на числовые вопросы из SQL, а не из RAG. Формы обучения —
-    только бюджет и платное (``budget`` / ``paid``).
-    """
+    """Баллы направления за год по форме обучения и основанию приёма."""
 
     __tablename__ = "admission_score"
 
@@ -709,8 +717,8 @@ class AdmissionScore(Base):
         String(36), ForeignKey("program.id", ondelete="CASCADE"), nullable=False
     )
     year: Mapped[int] = mapped_column(Integer, nullable=False)
-    # Форма обучения: budget / paid.
-    form: Mapped[str] = mapped_column(String(20), nullable=False)
+    admission_basis: Mapped[str] = mapped_column(String(20), nullable=False)
+    study_form: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     passing_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     average_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     source_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
@@ -727,8 +735,10 @@ class AdmissionScore(Base):
         UniqueConstraint(
             "program_id",
             "year",
-            "form",
-            name="uq_admission_score_program_year_form",
+            "study_form",
+            "admission_basis",
+            name=ADMISSION_SCORE_SCOPE_CONSTRAINT,
+            postgresql_nulls_not_distinct=True,
         ),
         Index("ix_admission_score_program", "program_id"),
         Index("ix_admission_score_year", "year"),
@@ -737,6 +747,7 @@ class AdmissionScore(Base):
     def __repr__(self) -> str:
         return (
             f"<AdmissionScore(id='{self.id}', program_id='{self.program_id}', "
-            f"year={self.year}, form='{self.form}', "
+            f"year={self.year}, study_form={self.study_form!r}, "
+            f"admission_basis={self.admission_basis!r}, "
             f"passing_score={self.passing_score})>"
         )

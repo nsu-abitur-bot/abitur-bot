@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from abbrev.expander import AbbrevExpander
-from db.postgres.models import Base
+from db.postgres.models import Base, StudyForm
 from db.postgres.services.admission_score import AdmissionScoreService, ScoreRow
 from db.postgres.services.faculty import FacultyService
 from pipeline.tools import admission_scores as tool_mod
@@ -92,7 +92,7 @@ async def _seed_fit(maker) -> None:
                     program_name="Программная инженерия и компьютерные науки",
                     code="09.03.04",
                     year=2024,
-                    form="budget",
+                    admission_basis="budget",
                     passing_score=246,
                     average_score=84.2,
                 ),
@@ -101,12 +101,77 @@ async def _seed_fit(maker) -> None:
                     program_name="Компьютерные науки и системотехника",
                     code="09.03.01",
                     year=2024,
-                    form="budget",
+                    admission_basis="budget",
                     passing_score=260,
                     average_score=88.1,
                 ),
             ]
         )
+
+
+async def test_scores_keep_study_form_and_basis_in_reply_and_followup(
+    sessionmaker_bound, monkeypatch
+) -> None:
+    from langchain_core.messages import AIMessage, HumanMessage
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    await _seed_fit(sessionmaker_bound)
+    catalog = (
+        (StudyForm.full_time, "budget", 255, "очная, бюджет"),
+        (StudyForm.full_time, "paid", 212, "очная, платно"),
+        (StudyForm.correspondence, "budget", 224, "заочная, бюджет"),
+        (StudyForm.correspondence, "paid", 181, "заочная, платно"),
+    )
+    async with sessionmaker_bound() as session:
+        await AdmissionScoreService(session).upsert_from_rows(
+            ScoreRow(
+                faculty_name="ФИТ",
+                program_name="Компьютерные науки и системотехника",
+                code="09.03.01",
+                year=2024,
+                study_form=study_form,
+                admission_basis=basis,
+                passing_score=score,
+                average_score=None,
+            )
+            for study_form, basis, score, _ in catalog
+        )
+    outcomes, scopes = [], []
+
+    class Provider:
+        async def generate_with_tools(self, messages, tools, tool_executor, **kwargs):
+            outcomes.append(
+                await tool_executor(
+                    "get_admission_scores", {"program": "09.03.01", "year": 2024}
+                )
+            )
+            return LLMResult("Показан один проходной балл.")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    question = HumanMessage(content="Какой проходной балл на 09.03.01 в 2024?")
+    answer, _, _ = await llm_client._run_tool_loop(
+        [question], "study-forms", score_scope_callback=scopes.append
+    )
+    for _, _, score, label in catalog:
+        assert f"2024, {label}: проходной {score}" in answer
+    assert "форма обучения не указана, бюджет: проходной 260" in answer
+    assert "study_form" not in scopes[0]
+
+    followup, _, _ = await llm_client._run_tool_loop(
+        [
+            question,
+            AIMessage(content=answer, additional_kwargs={"admission_scores": scopes[0]}),
+            HumanMessage(content="А на заочной?"),
+        ],
+        "study-forms",
+    )
+    assert "заочная, бюджет: проходной 224" in followup
+    assert "заочная, платно: проходной 181" in followup
+    assert "проходной 255" not in followup
+    assert "проходной 260" not in followup
+    assert outcomes[-1].scope["study_form"] == "correspondence"
 
 
 @pytest.mark.parametrize("use_crag", [True, False], ids=["crag", "lightrag"])
@@ -221,7 +286,7 @@ async def test_shared_code_cannot_substitute_a_different_profile(
             "faculty": faculty,
             "program": initial_program,
             "year": 2024,
-            "form": "budget",
+            "admission_basis": "budget",
         }
     )
     assert isinstance(initial, AdmissionScoresResult)
@@ -244,7 +309,7 @@ async def test_shared_code_cannot_substitute_a_different_profile(
                 "faculty": faculty,
                 "program": second,
                 "year": 2024,
-                "form": form,
+                "admission_basis": form,
                 "metric": "average",
                 "level": "bachelor",
             }
@@ -263,7 +328,7 @@ async def test_shared_code_cannot_substitute_a_different_profile(
                 args = {
                     "program_ids": ids,
                     "year": 2024,
-                    "form": form,
+                    "admission_basis": form,
                     "metric": "average",
                     "level": "bachelor",
                 }
@@ -383,12 +448,12 @@ async def test_program_name_resolves_master_clarification(
             "А средний балл за 2023 и 2024 годы?",
             "year",
             2025,
-            {"form": "budget"},
+            {"admission_basis": "budget"},
             [2023, 2024],
         ),
         (
             "А средний балл на бюджет и платное?",
-            "form",
+            "admission_basis",
             "budget",
             {"year": 2024},
             ["budget", "paid"],
@@ -459,7 +524,7 @@ async def test_comparison_recovers_full_sql_query_and_preserves_context(
                 "admission_scores": {
                     "program": "09.03.04",
                     "year": 2024,
-                    "form": "budget",
+                    "admission_basis": "budget",
                     "metric": "passing",
                 },
             }
@@ -537,7 +602,7 @@ async def test_master_program_after_clarification_uses_new_code(
                     "program": "09.04.01",
                     "level": "master",
                     "year": 2024,
-                    "form": "budget",
+                    "admission_basis": "budget",
                 },
             )
             assert isinstance(output, AdmissionScoresResult) and output.status == "ok"
@@ -664,7 +729,7 @@ async def test_sql_scope_survives_storing_and_rebuilding_history(
         "faculty": "Факультет информационных технологий",
         "level": "bachelor",
         "year": 2024,
-        "form": "budget",
+        "admission_basis": "budget",
         "metric": "passing",
     }
     tasks = []
@@ -782,7 +847,7 @@ async def test_custom_scores_use_own_university(sessionmaker_bound, expander):
                     program_name="Северная инженерия",
                     code=None,
                     year=2025,
-                    form="budget",
+                    admission_basis="budget",
                     passing_score=210,
                     average_score=None,
                 )
@@ -793,7 +858,7 @@ async def test_custom_scores_use_own_university(sessionmaker_bound, expander):
     )
     assert "НГУ" not in text
     assert "Северная инженерия — Факультет Севера" in text
-    assert "2025, бюджет: проходной 210" in text
+    assert "2025, форма обучения не указана, бюджет: проходной 210" in text
 
 
 @pytest.mark.asyncio
@@ -834,8 +899,13 @@ def test_format_scores_distinguishes_same_names_at_different_levels():
     from pipeline.tools.admission_scores import _format_scores
 
     rows = [
-        {"program_name": "Информатика", "level": "bachelor", "year": 2024},
-        {"program_name": "Информатика", "level": "spo", "year": 2024},
+        {
+            "program_name": "Информатика",
+            "level": level,
+            "year": 2024,
+            "admission_basis": "budget",
+        }
+        for level in ("bachelor", "spo")
     ]
     text = _format_scores(rows, "passing")
     assert "бакалавриат" in text
@@ -862,7 +932,7 @@ async def test_scores_tool_separates_same_name_programs(
                     code="09.02.07",
                     level="spo",
                     year=2024,
-                    form="budget",
+                    admission_basis="budget",
                     passing_score=5,
                     average_score=None,
                 )

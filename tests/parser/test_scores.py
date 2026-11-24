@@ -20,7 +20,11 @@ def scores_rows(scores_html):
 def _find(rows, program, year, form):
     """Строка итогов приёма или падение: её отсутствие — провал теста, не пустота."""
     for row in rows:
-        if row.program_name == program and row.year == year and row.form == form:
+        if (
+            row.program_name == program
+            and row.year == year
+            and row.admission_basis == form
+        ):
             return row
     raise AssertionError(f"нет строки: {program!r}, {year}, {form!r}")
 
@@ -32,7 +36,8 @@ class TestParseScores:
     def test_faculties_and_forms(self, scores_rows):
         faculties = {r.faculty_name for r in scores_rows}
         assert "Факультет информационных технологий" in faculties
-        assert {r.form for r in scores_rows} == {"budget", "paid"}
+        assert {r.admission_basis for r in scores_rows} == {"budget", "paid"}
+        assert all(r.study_form is None for r in scores_rows)
         assert {r.level for r in scores_rows} == {"bachelor", "specialist"}
 
     def test_fit_programmnaya_inzheneriya(self, scores_rows):

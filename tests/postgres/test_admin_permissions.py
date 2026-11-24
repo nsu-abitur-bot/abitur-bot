@@ -62,7 +62,7 @@ async def test_directory_delete_requires_superadmin(
     faculty = await service.create_faculty("Факультет")
     program = await service.create_program(faculty.id, "Направление")
     score = AdmissionScore(
-        program_id=program.id, year=2025, form="budget", passing_score=250
+        program_id=program.id, year=2025, admission_basis="budget", passing_score=250
     )
     session.add(score)
     await session.commit()
