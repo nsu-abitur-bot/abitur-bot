@@ -817,3 +817,33 @@ async def test_recovery_is_bounded_and_error_is_not_empty(monkeypatch, mode):
     assert len(calls) == (2 if mode in ("missing", "wrong") else 1)
     if mode == "wrong":
         assert not executed
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Сколько мест в общежитии?",
+        "Сколько свободных мест осталось на 09.03.04?",
+        "Сколько мест в конкурсном списке?",
+        "Сколько человек зачислили на ФИТ?",
+    ],
+)
+def test_other_types_of_places_do_not_use_admission_scores(question: str) -> None:
+    assert ScoreGuard.from_messages([HumanMessage(content=question)]) is None
+
+
+def test_seats_followup_uses_admission_scope() -> None:
+    guard = ScoreGuard.from_messages(
+        [
+            HumanMessage(content="Какой проходной балл на 09.03.04 в 2025 на бюджете?"),
+            HumanMessage(content="А сколько мест на заочной?"),
+        ]
+    )
+    assert guard is not None and guard.requests_seats
+    assert guard.filters == {
+        "metric": "seats",
+        "program": "09.03.04",
+        "year": 2025,
+        "admission_basis": "budget",
+        "study_form": "correspondence",
+    }

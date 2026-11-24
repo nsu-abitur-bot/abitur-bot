@@ -178,7 +178,11 @@ async def test_query_scores_distinguishes_programs(session: AsyncSession):
         "study_form",
         "passing_score",
         "average_score",
+        "seat_count",
+        "source_url",
     }
+    assert sample["seat_count"] is None
+    assert sample["source_url"] is None
     assert sample["faculty_name"] == "Факультет информационных технологий"
     assert sample["level"] == "bachelor"
 

@@ -978,3 +978,141 @@ async def test_program_tool_excludes_inactive_entries(sessionmaker_bound, monkey
         assert "Архивная программа" not in text
         assert "Скрытая программа" not in text
         assert ("Доступная программа" in text) == (faculty == "Колледж")
+
+
+@pytest.mark.parametrize(
+    ("question", "metric", "basis", "year", "include_seats", "expected", "has_source"),
+    [
+        (
+            "Сколько бюджетных мест на 09.03.04 очно в 2025?",
+            "seats",
+            "budget",
+            2025,
+            False,
+            "очная, бюджет: объявлено мест: 0",
+            True,
+        ),
+        (
+            "Сколько платных мест на 09.03.04 очно в 2025?",
+            "seats",
+            "paid",
+            2025,
+            False,
+            "очная, платно: нет данных о количестве мест",
+            False,
+        ),
+        (
+            "Сколько бюджетных мест на 09.03.04 очно в 2026?",
+            "seats",
+            "budget",
+            2026,
+            False,
+            "нет данных о количестве мест за 2026 год",
+            False,
+        ),
+        (
+            "Какой проходной балл и сколько мест на 09.03.04 очно на бюджете в 2025?",
+            "passing",
+            "budget",
+            2025,
+            True,
+            "проходной 249, объявлено мест: 0",
+            True,
+        ),
+    ],
+)
+async def test_seat_count_reply_uses_sql_and_requested_scope(
+    sessionmaker_bound,
+    monkeypatch,
+    expander,
+    question,
+    metric,
+    basis,
+    year,
+    include_seats,
+    expected,
+    has_source,
+):
+    from langchain_core.messages import HumanMessage
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    await _seed_fit(sessionmaker_bound)
+    source_url = "https://example.test/announced-2025"
+    async with sessionmaker_bound() as session:
+        await AdmissionScoreService(session).upsert_from_rows(
+            ScoreRow(
+                faculty_name="ФИТ",
+                program_name="Программная инженерия и компьютерные науки",
+                code="09.03.04",
+                year=2025,
+                admission_basis=row_basis,
+                passing_score=passing_score,
+                average_score=None,
+                study_form=form,
+                seat_count=seats,
+                source_url=source_url,
+            )
+            for row_basis, form, passing_score, seats in (
+                ("budget", StudyForm.full_time, 249, 0),
+                ("paid", StudyForm.full_time, 201, None),
+                ("budget", StudyForm.correspondence, None, 18),
+            )
+        )
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            if kwargs.get("required_tool"):
+                assert kwargs["tools"][0].parameters["properties"]["metric"]["enum"] == [
+                    metric
+                ]
+                result = await kwargs["tool_executor"](
+                    "get_admission_scores",
+                    {"metric": metric, "include_seat_count": include_seats},
+                )
+                assert isinstance(result, AdmissionScoresResult)
+                assert result.scope["year"] == year
+                assert result.scope["admission_basis"] == basis
+                assert result.scope["study_form"] == "full_time"
+            return LLMResult(text="Мест 999, поступление гарантировано.")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    text, _, _ = await llm_client._run_tool_loop(
+        [HumanMessage(content=question)], "seats"
+    )
+    assert expected in text
+    assert (source_url in text) == has_source
+    assert "999" not in text
+    assert "гарантировано" not in text
+    assert "объявлено мест: 18" not in text
+    if year == 2025:
+        assert "Программная инженерия и компьютерные науки" in text
+        assert "2025" in text
+
+
+async def test_only_seats_do_not_hide_previous_passing_scores(
+    sessionmaker_bound, expander
+) -> None:
+    await _seed_fit(sessionmaker_bound)
+    async with sessionmaker_bound() as session:
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    faculty_name="ФИТ",
+                    program_name="Программная инженерия и компьютерные науки",
+                    code="09.03.04",
+                    year=2025,
+                    admission_basis="budget",
+                    passing_score=None,
+                    average_score=None,
+                    seat_count=30,
+                )
+            ]
+        )
+    arguments = {"program": "09.03.04", "year": 2025, "admission_basis": "budget"}
+    seats = await execute_admission_scores({**arguments, "metric": "seats"})
+    scores = await execute_admission_scores(arguments)
+    assert "2025, форма обучения не указана, бюджет: объявлено мест: 30" in seats
+    assert "За 2025 год данных нет, показаны доступные годы." in scores
+    assert "проходной 246" in scores

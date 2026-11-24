@@ -9,9 +9,9 @@ from api.schemas.admission_score import (
     PreviewRequest,
     PreviewResponse,
     PreviewSummary,
-    ScoreClassificationUpdate,
     ScoreItem,
     ScoreRowSchema,
+    ScoreUpdate,
     UnmatchedSample,
 )
 from config.university import is_nsu
@@ -20,7 +20,7 @@ from db.postgres.models import AdmissionBasis, StudyForm
 from db.postgres.services.admission_score import (
     AdmissionScoreConflict,
     AdmissionScoreService,
-    ScoreClassificationChanges,
+    ScoreChanges,
     ScoreRow,
 )
 from parser.scores import DEFAULT_SCORES_URL, parse_scores
@@ -47,6 +47,8 @@ def _to_row(item: ScoreRowSchema) -> ScoreRow:
         passing_score=item.passing_score,
         average_score=item.average_score,
         level=item.level,
+        seat_count=item.seat_count,
+        source_url=item.source_url,
     )
 
 
@@ -161,20 +163,24 @@ async def get_years(
 @router.patch(
     "/{score_id}",
     response_model=ScoreItem,
-    summary="Уточнить форму обучения или основание приёма записи",
+    summary="Уточнить классификацию, количество мест или источник",
 )
-async def update_score_classification(
+async def update_score(
     score_id: str,
-    data: ScoreClassificationUpdate,
+    data: ScoreUpdate,
     service: AdmissionScoreService = Depends(get_admission_score_service),
 ) -> ScoreItem:
-    changes: ScoreClassificationChanges = {}
+    changes: ScoreChanges = {}
     if data.admission_basis is not None:
         changes["admission_basis"] = data.admission_basis
     if "study_form" in data.model_fields_set:
         changes["study_form"] = data.study_form
+    if "seat_count" in data.model_fields_set:
+        changes["seat_count"] = data.seat_count
+    if "source_url" in data.model_fields_set:
+        changes["source_url"] = data.source_url
     try:
-        row = await service.update_classification(score_id, changes)
+        row = await service.update_score(score_id, changes)
     except AdmissionScoreConflict:
         raise HTTPException(
             409, "Для этой формы обучения и основания приёма уже есть запись"

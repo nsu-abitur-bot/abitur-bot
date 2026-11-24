@@ -7,6 +7,7 @@ from sqlalchemy import (
     JSON,
     BigInteger,
     Boolean,
+    CheckConstraint,
     DateTime,
     Float,
     ForeignKey,
@@ -706,7 +707,7 @@ class Program(Base):
 
 
 class AdmissionScore(Base):
-    """Баллы направления за год по форме обучения и основанию приёма."""
+    """Данные приёма на программу за год по форме обучения и основанию."""
 
     __tablename__ = "admission_score"
 
@@ -721,6 +722,7 @@ class AdmissionScore(Base):
     study_form: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     passing_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     average_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    seat_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     source_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
     updated_at: Mapped[datetime] = mapped_column(
@@ -740,6 +742,7 @@ class AdmissionScore(Base):
             name=ADMISSION_SCORE_SCOPE_CONSTRAINT,
             postgresql_nulls_not_distinct=True,
         ),
+        CheckConstraint("seat_count >= 0", name="ck_admission_score_seat_count"),
         Index("ix_admission_score_program", "program_id"),
         Index("ix_admission_score_year", "year"),
     )
