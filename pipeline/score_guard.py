@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from langchain_core.messages import BaseMessage
 
+from db.postgres.models import StudyForm
 from llm.base import ToolSpec
 from pipeline.tools.admission_scores import AdmissionScoresResult
 
@@ -14,6 +15,12 @@ SCORES_UNAVAILABLE = "Не удалось проверить баллы. Поп�
 SCORES_CLARIFY = "Уточните направление подготовки, для которого нужны баллы."
 _CODE = re.compile(r"\b\d{2}\.\d{2}\.\d{2}\b")
 _YEAR = re.compile(r"\b20\d{2}\b")
+_STUDY_FORM_PATTERNS = {
+    StudyForm.full_time: re.compile(r"(?<![\w-])очн[а-яё]*(?![\w-])", re.I),
+    StudyForm.correspondence: re.compile(r"(?<![\w-])заоч(?:н|к)[а-яё]*(?![\w-])", re.I),
+}
+_CLASSIFICATION_FILTERS = ("admission_basis", "study_form")
+_COMPARISON_FILTERS = ("program", "year", *_CLASSIFICATION_FILTERS)
 _REFERENCE_SUBJECT = re.compile(
     r"^(?:эт(?:от|а|о|и|ого|ой|их|ому|им|у|ими|ом)|"
     r"т(?:от|а|о|е|ого|ой|ех|ому|ем|у|еми|ом)|"
@@ -29,11 +36,13 @@ _SUBJECT_FILLERS = frozenset(
     "код кода коду кодом коде направление направления направлению направлением "
     "направлении программа программы программе программу программой профиль профиля "
     "профилю профилем профиле специальность специальности подготовки в за на по для "
-    "год года году годы годах и или какой какая какие каком там же".split()
+    "год года году годы годах и или какой какая какие каком там же "
+    "форма форму формы форме формой обучения отделении".split()
 )
 _SUBJECT_MODIFIER = re.compile(
     r"(?:бюджет(?:а|у|е|ом)?|платн[а-яё]*|платк[а-яё]*|"
-    r"бакалавриат[а-яё]*|магистратур[а-яё]*|специалитет[а-яё]*|спо)",
+    r"бакалавриат[а-яё]*|магистратур[а-яё]*|специалитет[а-яё]*|спо|"
+    r"очн[а-яё]*|заоч(?:н|к)[а-яё]*)",
     re.I,
 )
 
@@ -54,6 +63,7 @@ _SHORT = re.compile(
     r"^(?:а\s+)?(?:(?:средн\w*|проходн\w*)"
     r"(?=\s*(?:$|[?!.,]|бал|како|на\b|по\b|в\b|за\b))|"
     r"в\s+20\d{2}|за\s+20\d{2}|"
+    r"(?:(?:на|по)\s+)?(?:очн\w*|заоч(?:н|к)\w*)|"
     r"(?:на|по)\s+(?:плат\w*|бюджет\w*|магистр\w*|бакалавр\w*|спо|"
     r"\d{2}\.\d{2}\.\d{2}))\b",
     re.I,
@@ -133,17 +143,18 @@ class ScoreGuard:
                     raw = metadata.get("_comparisons", {})
                     if isinstance(raw, dict):
                         saved_comparisons = {
-                            key: list(values)
+                            ("admission_basis" if key == "form" else key): list(values)
                             for key, values in raw.items()
-                            if key in ("program", "year", "form")
+                            if key in (*_COMPARISON_FILTERS, "form")
                             and isinstance(values, list)
                         }
                     saved_scope = {
                         key: value
                         for key, value in metadata.items()
-                        if key
-                        in ("program", "faculty", "level", "year", "form", "metric")
+                        if key in (*_COMPARISON_FILTERS, "faculty", "level", "metric")
                     }
+                    if metadata.get("form") is not None:
+                        saved_scope.setdefault("admission_basis", metadata["form"])
                     break
                 if message.type == "human":
                     question = str(message.content).lower().strip()
@@ -199,7 +210,7 @@ class ScoreGuard:
                     and not _REFERENCE_SUBJECT.match(value)
                     and not re.match(
                         r"плат|бюджет|бесплат|договор|магистр|бакалавр|спо\b|"
-                        r"специалитет|20\d{2}\b",
+                        r"специалитет|очн|заоч|20\d{2}\b",
                         value,
                     )
                 ):
@@ -247,14 +258,22 @@ class ScoreGuard:
             budget = "бюджет" in question or "бесплат" in question
             paid = bool(re.search(r"\bплат|договор", question))
             if budget and paid:
-                filters.pop("form", None)
-                comparisons["form"] = ["budget", "paid"]
-            elif budget:
-                filters["form"] = "budget"
-                comparisons.pop("form", None)
-            elif paid:
-                filters["form"] = "paid"
-                comparisons.pop("form", None)
+                filters.pop("admission_basis", None)
+                comparisons["admission_basis"] = ["budget", "paid"]
+            elif budget or paid:
+                filters["admission_basis"] = "budget" if budget else "paid"
+                comparisons.pop("admission_basis", None)
+            forms = [
+                form.value
+                for form, pattern in _STUDY_FORM_PATTERNS.items()
+                if pattern.search(question)
+            ]
+            if len(forms) > 1:
+                filters.pop("study_form", None)
+                comparisons["study_form"] = forms
+            elif forms:
+                filters["study_form"] = forms[0]
+                comparisons.pop("study_form", None)
             for pattern, level in (
                 (r"магистр", "master"),
                 (r"бакалавр", "bachelor"),
@@ -284,7 +303,7 @@ class ScoreGuard:
     def history_scope(self, resolved_scope: dict) -> dict:
         """Сравнение сохраняется как запрос, даже если SQL нашёл один вариант."""
         scope = dict(resolved_scope)
-        for key in ("year", "form", "level", "metric"):
+        for key in ("year", *_CLASSIFICATION_FILTERS, "level", "metric"):
             if key in self.filters:
                 scope[key] = self.filters[key]
         if self.program_ids:
@@ -310,6 +329,8 @@ class ScoreGuard:
         parameters = deepcopy(tool.parameters)
         for name in self.comparisons:
             parameters["properties"].pop(name, None)
+        if "study_form" not in self.filters:
+            parameters["properties"].pop("study_form", None)
         for name, value in self.filters.items():
             parameters["properties"][name]["enum"] = [value]
         parameters["required"] = list(self.filters)
@@ -340,6 +361,8 @@ class ScoreGuard:
             return False
         if any(arguments.get(key) not in (None, "") for key in self.comparisons):
             return False
+        if arguments.get("study_form") and "study_form" not in self.filters:
+            return False
         if metric not in (self.filters.get("metric"), "both"):
             return False
         if (
@@ -352,7 +375,7 @@ class ScoreGuard:
             # Дополнительный факультет способен сузить выборку до чужого
             # факультета, даже когда код направления указан верно.
             return False
-        for key in ("program", "faculty", "year", "form", "level"):
+        for key in ("program", "faculty", "year", *_CLASSIFICATION_FILTERS, "level"):
             if key in ("program", "faculty") and not check_names:
                 continue
             expected = self.filters.get(key)

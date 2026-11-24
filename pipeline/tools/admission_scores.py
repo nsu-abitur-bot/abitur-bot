@@ -11,7 +11,12 @@ from typing import Literal, Optional
 from abbrev.expander import get_abbrev_expander
 from config.university import is_nsu
 from db.postgres.db import AsyncSessionLocal
-from db.postgres.models import EDUCATION_LEVELS
+from db.postgres.models import (
+    ADMISSION_BASES,
+    EDUCATION_LEVELS,
+    STUDY_FORM_LABELS,
+    StudyForm,
+)
 from db.postgres.services.admission_score import AdmissionScoreService
 from db.postgres.services.faculty import normalize_level
 from llm.base import ToolSpec
@@ -25,6 +30,7 @@ class AdmissionScoresResult(str):
 
     status: Literal["ok", "empty", "error"]
     scope: dict
+    use_as_answer: bool
 
     @property
     def program_ids(self) -> frozenset[str]:
@@ -36,10 +42,12 @@ class AdmissionScoresResult(str):
         *,
         status: Literal["ok", "empty", "error"],
         scope: dict | None = None,
+        use_as_answer: bool = False,
     ) -> "AdmissionScoresResult":
         instance = super().__new__(cls, text)
         instance.status = status
         instance.scope = dict(scope or {})
+        instance.use_as_answer = use_as_answer
         return instance
 
 
@@ -47,7 +55,8 @@ ADMISSION_SCORES_TOOL = ToolSpec(
     name="get_admission_scores",
     description=(
         "Проходные и средние баллы прошлых лет по направлениям НГУ "
-        "с фильтрацией по уровню образования. "
+        "с фильтрацией по уровню образования, форме обучения и основанию приёма. "
+        "Указывай форму и основание для каждого числа, по которому есть данные. "
         "Используй для любых вопросов про проходной/средний балл, чтобы не "
         "выдумывать числа."
     ),
@@ -82,12 +91,21 @@ ADMISSION_SCORES_TOOL = ToolSpec(
                 "type": "integer",
                 "description": "Год приёма (например, 2024). Необязательно.",
             },
-            "form": {
+            "admission_basis": {
                 "type": "string",
-                "enum": ["budget", "paid"],
+                "enum": sorted(ADMISSION_BASES),
                 "description": (
-                    "Форма обучения: budget — бюджет, paid — платное (по договору). "
-                    "Необязательно."
+                    "Основание приёма: budget — бюджет, paid — платное. "
+                    "Без фильтра вернутся все основания."
+                ),
+            },
+            "study_form": {
+                "type": "string",
+                "enum": [form.value for form in STUDY_FORM_LABELS],
+                "description": (
+                    "Форма обучения: full_time — очная, correspondence — заочная. "
+                    "Указывай только форму, прямо запрошенную пользователем. "
+                    "Для сравнения форм или без уточнения оставь поле пустым."
                 ),
             },
             "metric": {
@@ -105,7 +123,17 @@ ADMISSION_SCORES_TOOL = ToolSpec(
 )
 
 
-_FORM_LABELS = {"budget": "бюджет", "paid": "платно"}
+_BASIS_LABELS = {"budget": "бюджет", "paid": "платно"}
+
+
+def normalize_score_arguments(arguments: dict) -> dict:
+    """Поддерживает прежнее имя основания приёма во внутренних вызовах."""
+    if "form" in arguments:
+        arguments = dict(arguments)
+        legacy = arguments.pop("form")
+        if arguments.setdefault("admission_basis", legacy) != legacy:
+            raise ValueError("form и admission_basis должны совпадать")
+    return arguments
 
 
 def _coerce_year(value: object) -> Optional[int]:
@@ -129,7 +157,10 @@ def _format_score_value(row: dict, metric: str) -> str:
 
     parts: list[str] = []
     if metric in ("passing", "both"):
-        parts.append("проходной " + (str(passing) if passing is not None else "—"))
+        parts.append(
+            "проходной "
+            + (str(passing).removesuffix(".0") if passing is not None else "—")
+        )
     if metric in ("average", "both"):
         avg_text = f"{average:g}" if isinstance(average, (int, float)) else "—"
         parts.append("средний " + avg_text)
@@ -137,7 +168,7 @@ def _format_score_value(row: dict, metric: str) -> str:
 
 
 def _format_scores(rows: list[dict], metric: str) -> str:
-    """Компактный RU-текст, сгруппированный по направлению, затем по году/форме."""
+    """Компактный текст с классификацией каждой строки баллов."""
     header = (
         "Проходные баллы прошлых лет (НГУ):"
         if is_nsu()
@@ -161,9 +192,16 @@ def _format_scores(rows: list[dict], metric: str) -> str:
             lines.append(f"{program}{code_suffix}{faculty_suffix}{level_suffix}:")
 
         year = row.get("year")
-        form_label = _FORM_LABELS.get(row.get("form", ""), row.get("form", ""))
+        basis = row["admission_basis"]
+        basis_label = _BASIS_LABELS.get(basis, basis)
+        study_form = row.get("study_form")
+        study_label = (
+            STUDY_FORM_LABELS.get(study_form, study_form)
+            if study_form is not None
+            else "форма обучения не указана"
+        )
         value = _format_score_value(row, metric)
-        lines.append(f"- {year}, {form_label}: {value}")
+        lines.append(f"- {year}, {study_label}, {basis_label}: {value}")
 
     return "\n".join(lines).strip()
 
@@ -195,6 +233,10 @@ async def execute_admission_scores(arguments: dict) -> str:
     Пустые/отсутствующие фильтры не передаются в сервис. Если данных нет —
     возвращает единый маркер, по которому модель понимает, что цифр нет.
     """
+    try:
+        arguments = normalize_score_arguments(arguments)
+    except ValueError as exc:
+        return AdmissionScoresResult(str(exc), status="error")
     program_ids = arguments.get("program_ids")
     if program_ids is not None and (
         not isinstance(program_ids, list)
@@ -212,7 +254,16 @@ async def execute_admission_scores(arguments: dict) -> str:
 
     faculty = _expand(arguments.get("faculty"))
     program = _expand(arguments.get("program"))
-    form = arguments.get("form")
+    basis = _str_or_none(arguments.get("admission_basis"))
+    if basis is not None:
+        basis = basis.strip().lower()
+        if basis not in ADMISSION_BASES:
+            return AdmissionScoresResult("Неизвестное основание приёма.", status="error")
+    raw_study_form = _str_or_none(arguments.get("study_form"))
+    try:
+        study_form = StudyForm(raw_study_form) if raw_study_form is not None else None
+    except ValueError:
+        return AdmissionScoresResult("Неизвестная форма обучения.", status="error")
     year = _coerce_year(arguments.get("year"))
 
     try:
@@ -222,7 +273,8 @@ async def execute_admission_scores(arguments: dict) -> str:
                 faculty=faculty,
                 program=program,
                 year=year,
-                form=_str_or_none(form),
+                admission_basis=basis,
+                study_form=study_form,
                 level=level,
                 program_ids=program_ids,
                 include_identity=True,
@@ -234,7 +286,8 @@ async def execute_admission_scores(arguments: dict) -> str:
                 rows = await service.query_scores(
                     faculty=faculty,
                     program=program,
-                    form=_str_or_none(form),
+                    admission_basis=basis,
+                    study_form=study_form,
                     level=level,
                     program_ids=program_ids,
                     include_identity=True,
@@ -254,11 +307,19 @@ async def execute_admission_scores(arguments: dict) -> str:
             scope={"_program_ids": sorted(set(program_ids))}
             if program_ids is not None
             else {},
+            use_as_answer=study_form is not None,
         )
 
     scope = {
         key: arguments[key]
-        for key in ("program", "faculty", "level", "year", "form")
+        for key in (
+            "program",
+            "faculty",
+            "level",
+            "year",
+            "admission_basis",
+            "study_form",
+        )
         if arguments.get(key) is not None
     }
     scope["metric"] = metric
@@ -269,20 +330,23 @@ async def execute_admission_scores(arguments: dict) -> str:
     )
     scope["_program_names"] = {row["program_id"]: [row["program_name"]] for row in rows}
     # Один фактически найденный вариант сохраняем для следующего уточнения.
-    # Несколько лет/форм не превращаем в случайно выбранный последний вариант.
+    # Форму обучения сохраняем только при явном выборе пользователя.
     for key, column in (
         ("program", "code"),
         ("faculty", "faculty_name"),
         ("level", "level"),
         ("year", "year"),
-        ("form", "form"),
+        ("admission_basis", "admission_basis"),
     ):
         values = {row.get(column) for row in rows}
         if len(values) == 1 and None not in values:
             scope[key] = next(iter(values))
-        elif key in ("year", "form"):
+        elif key in ("year", "admission_basis"):
             scope.pop(key, None)
     text = _format_scores(rows, metric)
     return AdmissionScoresResult(
-        f"{note}\n\n{text}" if note else text, status="ok", scope=scope
+        f"{note}\n\n{text}" if note else text,
+        status="ok",
+        scope=scope,
+        use_as_answer=any(row.get("study_form") is not None for row in rows),
     )

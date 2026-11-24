@@ -119,7 +119,7 @@ async def test_pikn_phrasings_find_scores(service: AdmissionScoreService, progra
 async def test_pikn_with_faculty(service: AdmissionScoreService, faculty: str):
     rows = await service.query_scores(faculty=faculty, program="ПИиКН", year=2024)
     assert _programs(rows) == {PIKN}
-    assert all(r["passing_score"] for r in rows if r["form"] == "budget")
+    assert all(r["passing_score"] for r in rows if r["admission_basis"] == "budget")
 
 
 @pytest.mark.asyncio
