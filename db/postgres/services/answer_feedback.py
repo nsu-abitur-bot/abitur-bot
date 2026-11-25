@@ -20,6 +20,8 @@ class AnswerFeedbackService:
         channel: str,
         question: str,
         bot_response: str,
+        *,
+        commit: bool = True,
     ) -> AnswerFeedback:
         candidate = AnswerFeedback(
             user_id=user_id,
@@ -29,8 +31,11 @@ class AnswerFeedbackService:
             bot_response=bot_response,
         )
         self.session.add(candidate)
-        await self.session.commit()
-        await self.session.refresh(candidate)
+        if commit:
+            await self.session.commit()
+            await self.session.refresh(candidate)
+        else:
+            await self.session.flush()
         return candidate
 
     async def rate(self, feedback_id: str, user_id: int, rating: str) -> bool:

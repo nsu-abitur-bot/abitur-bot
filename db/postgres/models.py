@@ -754,3 +754,49 @@ class AdmissionScore(Base):
             f"admission_basis={self.admission_basis!r}, "
             f"passing_score={self.passing_score})>"
         )
+
+
+class MiniAppConversation(Base):
+    __tablename__ = "mini_app_conversation"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    instance_id: Mapped[str] = mapped_column(String(64))
+    platform: Mapped[str] = mapped_column(String(8))
+    external_id: Mapped[int] = mapped_column(BigInteger)
+    title: Mapped[str] = mapped_column(String(80), default="Новый чат")
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=timestamp)
+
+    __table_args__ = (
+        Index(
+            "ix_mini_app_conversation_owner",
+            "instance_id",
+            "platform",
+            "external_id",
+            "updated_at",
+        ),
+    )
+
+
+class MiniAppTurn(Base):
+    __tablename__ = "mini_app_turn"
+
+    conversation_id: Mapped[str] = mapped_column(
+        ForeignKey("mini_app_conversation.id", ondelete="CASCADE"), primary_key=True
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    question: Mapped[str] = mapped_column(Text)
+    started_at: Mapped[datetime] = mapped_column(DateTime)
+    attempt: Mapped[int] = mapped_column(Integer)
+    status: Mapped[str] = mapped_column(String(8))
+    answer: Mapped[str | None] = mapped_column(Text)
+    sources: Mapped[list[dict]] = mapped_column(JSON, default=list)
+    history_entry: Mapped[dict] = mapped_column(JSON, default=dict)
+    feedback_id: Mapped[str | None] = mapped_column(
+        ForeignKey("answer_feedback.id", ondelete="SET NULL")
+    )
+
+    __table_args__ = (
+        Index(
+            "ix_mini_app_turn_conversation_order", "conversation_id", "started_at", "id"
+        ),
+    )
