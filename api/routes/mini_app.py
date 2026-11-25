@@ -192,19 +192,23 @@ async def send_question(
     try:
         async with asyncio.timeout(85):
             user_id = await _user_id(session, owner)
-            await session.commit()
-            rate = await check_rate_limit(user_id, allow_on_database_error=False)
+            rate = await check_rate_limit(session, user_id)
             if not rate.allowed:
                 raise HTTPException(429, rate.message)
-            log = await log_chat_question(user_id, session_id, body.text, "mini-app")
+            log = await log_chat_question(
+                session, user_id, session_id, body.text, "mini-app"
+            )
+            log_id = log.id
+            await session.commit()
             answer = await ask_local_llm(
                 body.text,
                 session_id=session_id,
                 user_id=user_id,
-                log_entry_id=log.id,
+                log_entry_id=log_id,
                 prior_history=history,
             )
     except HTTPException:
+        await session.rollback()
         await _finish_failed(session, service, chat_id, turn_id, attempt)
         raise
     except Exception:

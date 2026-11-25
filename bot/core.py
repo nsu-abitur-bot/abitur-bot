@@ -135,7 +135,10 @@ class BotCore:
         self, user_id: int, session_id: str, message: str, source: str
     ) -> Optional[MessageLog]:
         try:
-            return await log_chat_question(user_id, session_id, message, source)
+            async with AsyncSessionLocal() as session:
+                return await log_chat_question(
+                    session, user_id, session_id, message, source
+                )
         except Exception as e:
             logger.error(f"Ошибка сохранения входящего сообщения в БД: {e}")
             return None
@@ -188,7 +191,12 @@ class BotCore:
             return None
 
     async def _check_rate_limit(self, user_id: int) -> RateLimitResult:
-        return await check_rate_limit(user_id)
+        try:
+            async with AsyncSessionLocal() as session:
+                return await check_rate_limit(session, user_id)
+        except Exception:
+            logger.exception("Ошибка проверки rate limit для user_id=%s", user_id)
+            return RateLimitResult(allowed=True)
 
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str

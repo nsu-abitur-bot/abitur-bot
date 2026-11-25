@@ -13,8 +13,9 @@ from api.main import app
 from db.postgres.db import get_async_session
 from db.postgres.models import FeedbackReport, MiniAppTurn, User, timestamp
 from db.postgres.services.mini_app import LEASE_DURATION
+from db.postgres.services.settings import SettingsService
 from llm.base import LLMResult
-from pipeline import chat_access, llm_client
+from pipeline import llm_client
 from rag.trace import RetrievalResult
 
 SECRET = "local-test-key-with-at-least-32-characters"
@@ -40,7 +41,6 @@ async def mini_api(test_engine, monkeypatch):
             yield connection
 
     monkeypatch.setitem(app.dependency_overrides, get_async_session, session)
-    monkeypatch.setattr(chat_access, "AsyncSessionLocal", maker)
     monkeypatch.setattr(llm_client, "AsyncSessionLocal", maker)
     async with AsyncClient(
         transport=ASGITransport(app), base_url="http://test"
@@ -177,6 +177,10 @@ async def test_history_retry_isolation_and_ratings(mini_api, monkeypatch):
     async with maker() as session:
         assert await session.scalar(select(func.count()).select_from(User)) == 2
         assert await session.scalar(select(func.count()).select_from(FeedbackReport)) == 1
+        await SettingsService(session).update_rate_limit_settings(100, 1)
+    limited = await ask(first, "Вопрос сверх дневного лимита")
+    assert limited.status_code == 429
+    assert "дневной лимит" in limited.json()["detail"]
 
 
 async def test_stale_attempt_recovery_and_instance_boundary(mini_api, monkeypatch):
