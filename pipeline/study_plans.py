@@ -36,8 +36,14 @@ _STUDY = re.compile(
 )
 _ADMISSIONS = re.compile(r"\b(?:егэ|вступительн\w+|для поступления)\b", re.IGNORECASE)
 _NON_DISCIPLINE = re.compile(
-    r"\b(?:оплат\w*|стоимость|общежити\w*|стипенди\w*|сроки|начинается|"
+    r"\b(?:оплат\w*|стоимость|общежити\w*|стипенди\w*|сроки|"
     r"каникул\w*|отчислен\w*)\b",
+    re.IGNORECASE,
+)
+_SCHEDULE_EVENT = r"(?:занятия|уч[её]ба|обучение|(?:учебн\w+\s+)?(?:год|семестр\w*))"
+_SCHEDULE_START = re.compile(
+    rf"\b(?:начина(?:ется|ются)\s+{_SCHEDULE_EVENT}|"
+    rf"{_SCHEDULE_EVENT}\s+начина(?:ется|ются))\b",
     re.IGNORECASE,
 )
 _YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
@@ -183,16 +189,26 @@ def _cohort(pages: list[PdfPage]) -> int | None:
 
 
 def _semesters_from_quote(quote: str) -> tuple[int, ...]:
-    ordinal = r"[1-9]\d?(?:\s*[-–]\s*(?:й|м|ом))?"
-    numbers = rf"({ordinal}(?:\s*[,и]\s*{ordinal})*)"
+    dash = r"[-–—]"
+    ordinal = rf"\d+(?:\s*{dash}\s*(?:й|м|ом|го)\b)?"
+    range_separator = rf"(?:{dash}|\bпо\b)"
+    numbers = rf"({ordinal}(?:\s*(?:{range_separator}|[,и])\s*{ordinal})*)"
     matches = re.findall(
-        rf"{numbers}\s+семестр\w*|семестр\w*\s*[:№-]?\s*{numbers}", quote
+        rf"(?<!\w){numbers}\s+семестр\w*|"
+        rf"\bсеместр\w*\s*[:№-]?\s*{numbers}(?!\w)",
+        quote,
     )
     if len(matches) != 1:
         return ()
-    return tuple(
-        sorted({int(value) for value in re.findall(r"\d+", "".join(matches[0]))})
-    )
+
+    semesters: set[int] = set()
+    # Validate the full expression so a malformed range cannot yield a single endpoint.
+    for item in re.split(r"[,и]", "".join(matches[0])):
+        bounds = [int(value) for value in re.findall(r"\d+", item)]
+        if len(bounds) > 2 or not 1 <= bounds[0] <= bounds[-1] <= 99:
+            return ()
+        semesters.update(range(bounds[0], bounds[-1] + 1))
+    return tuple(sorted(semesters))
 
 
 def _read_model_evidence(
@@ -390,13 +406,16 @@ async def answer_study_plan(question: str) -> StudyPlanAnswer | None:
         or _STUDY.search(scope)
         or (
             (direct or _PIIKN.search(scope))
-            and re.search(r"\b(?:есть\s+ли|когда\s+(?:проходят|изучают))\b", scope, re.I)
+            and re.search(
+                r"\b(?:есть\s+ли|когда\s+(?:проходят|изучают|начинается))\b", scope, re.I
+            )
         )
     )
     if (
         not has_subject_question
         or _ADMISSIONS.search(scope)
         or _NON_DISCIPLINE.search(scope)
+        or _SCHEDULE_START.search(scope)
     ):
         return None
     year = _year_hint(scope)

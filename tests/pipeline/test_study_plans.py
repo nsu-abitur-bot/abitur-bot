@@ -142,6 +142,69 @@ async def test_bot_answers_with_confirmed_pdf_page_and_cohort(plan_pipeline, coh
         assert "2025" in answer.text
 
 
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Когда начинается дисциплина «Дискретная математика»? Учебный план:",
+        "Когда начинается изучение дискретной математики?",
+        "Когда начинается дискретная математика?",
+    ],
+)
+async def test_bot_verifies_when_a_discipline_starts(
+    plan_pipeline, question: str
+) -> None:
+    answer = await llm_client.ask_local_llm(
+        f"{question} {_PLAN_URL}", "curriculum-start-test"
+    )
+
+    assert plan_pipeline == [_PLAN_URL]
+    assert "3-й семестр" in answer.text
+    assert [source["url"] for source in answer.sources] == [f"{_PLAN_URL}#page=2"]
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Когда начинается учёба?",
+        "Когда начинаются занятия?",
+        "Когда учебный семестр начинается?",
+        "Когда начинаются каникулы?",
+    ],
+)
+async def test_schedule_questions_skip_study_plan(plan_pipeline, question: str) -> None:
+    answer = await study_plans.answer_study_plan(f"{question} Учебный план: {_PLAN_URL}")
+
+    assert answer is None
+    assert plan_pipeline == []
+
+
+@pytest.mark.parametrize(
+    ("semester_text", "expected"),
+    [
+        ("1–4 семестры", (1, 2, 3, 4)),
+        ("1-4 семестры", (1, 2, 3, 4)),
+        ("семестры: 1-й – 3-й и 5-й", (1, 2, 3, 5)),
+        ("с 1-го по 3-й семестр", (1, 2, 3)),
+        ("3-й семестр", (3,)),
+        ("семестры: 2-м, 4-ом и 7-м", (2, 4, 7)),
+        ("4–1 семестры", ()),
+        ("0–4 семестры", ()),
+        ("семестры 1-4-6", ()),
+    ],
+)
+def test_model_evidence_reads_whole_semester_ranges_and_lists(
+    semester_text: str, expected: tuple[int, ...]
+) -> None:
+    name = "Дискретная математика"
+    quote = f"{name} — {semester_text}, обязательная дисциплина."
+    response = json.dumps([{"page": 2, "name": name, "quote": quote}])
+
+    [(_, discipline)] = study_plans._read_model_evidence(response, {2: quote}, name)
+
+    assert discipline.semesters == expected
+    assert discipline.obligation == "обязательная часть"
+
+
 @pytest.mark.parametrize("plan_pipeline", [True], indirect=True)
 @pytest.mark.parametrize("evidence", ["verified", "invented", "wrong-page", "joined"])
 async def test_bot_uses_ocr_only_with_verified_page_evidence(
