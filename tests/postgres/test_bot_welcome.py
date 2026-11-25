@@ -14,6 +14,11 @@ from db.postgres.db import get_async_session
 from db.postgres.models import Admin, AdminRole, Base
 from db.redis import client as redis_client
 
+DISCLAIMER = (
+    "Бот может ошибаться. Проверяйте важную информацию "
+    "в официальных источниках или в приёмной комиссии"
+)
+
 
 async def test_welcome_settings_apply_to_both_channels_and_stay_on_their_stand(
     test_engine: AsyncEngine, monkeypatch
@@ -50,14 +55,23 @@ async def test_welcome_settings_apply_to_both_channels_and_stay_on_their_stand(
         monkeypatch.setattr(runtime_settings, "AsyncSessionLocal", stand)
         await runtime_settings.refresh_settings()
 
-    async def check_replies(expected: str, *, custom: bool) -> None:
+    async def check_replies(expected: str, *, custom: bool, split: bool = False) -> None:
         for channel in ("telegram", "max"):
-            reply = await bot.cmd_start(channel, "123", "456")
-            if custom:
-                assert reply.text == expected
+            replies = await bot.cmd_start(channel, "123", "456")
+            assert all(
+                len(reply.text.encode("utf-16-le")) // 2 <= 3999 for reply in replies
+            )
+            if split:
+                assert [reply.text for reply in replies] == [expected, DISCLAIMER]
+                assert all(reply.parse_mode is None for reply in replies)
+            elif custom:
+                (reply,) = replies
+                assert reply.text == f"{expected}\n\n{DISCLAIMER}"
                 assert reply.parse_mode is None
             else:
+                (reply,) = replies
                 assert expected in reply.text
+                assert reply.text.endswith(f"\n\n<b>{DISCLAIMER}</b>")
                 assert reply.parse_mode == "HTML"
 
     try:
@@ -70,6 +84,8 @@ async def test_welcome_settings_apply_to_both_channels_and_stay_on_their_stand(
             monkeypatch.setattr(redis_client, "_redis_client", store)
             await refresh()
             await check_replies("«НГУ»", custom=False)
+            brand = await http.get("/api/v1/branding")
+            assert brand.json()["chat_disclaimer"] == DISCLAIMER
 
             async def save(revision: int, changes: dict[str, str]) -> None:
                 response = await http.put(
@@ -94,6 +110,8 @@ async def test_welcome_settings_apply_to_both_channels_and_stay_on_their_stand(
                 },
             )
             await check_replies(other_text, custom=True)
+            brand = await http.get("/api/v1/branding")
+            assert brand.json()["chat_disclaimer"] == DISCLAIMER
 
             stand = nsu
             await refresh()
@@ -102,9 +120,22 @@ async def test_welcome_settings_apply_to_both_channels_and_stay_on_their_stand(
             setting = next(s for s in response.json()["settings"] if s["key"] == key)
             assert setting["kind"] == "textarea"
             assert setting["value"] == nsu_text
+            assert not any(
+                "disclaimer" in s["key"].lower() for s in response.json()["settings"]
+            )
             await check_replies(nsu_text, custom=True)
             await save(1, {key: ""})
             await check_replies("«НГУ»", custom=False)
+
+            budget = 3999 - len(DISCLAIMER) - 2
+            fitting_text = "👋" * (budget // 2) + "я" * (budget % 2)
+            await save(2, {key: fitting_text})
+            await check_replies(fitting_text, custom=True)
+            await save(3, {key: fitting_text + "я"})
+            await check_replies(fitting_text + "я", custom=True, split=True)
+            max_text = "👋" * 1999 + "я"
+            await save(4, {key: max_text})
+            await check_replies(max_text, custom=True, split=True)
 
             stand = other
             await refresh()

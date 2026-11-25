@@ -115,15 +115,16 @@ async def run_max_bot() -> bool | None:
 
     async def send_welcome(chat_id: int | None, user_id: int) -> None:
         session_id = str(chat_id if chat_id is not None else user_id)
-        reply = await core.cmd_start("max", str(user_id), session_id)
-        # Bot.send_message inherits the client's HTML mode even with parse_mode=None.
-        await SendMessage(
-            bot=client,
-            chat_id=chat_id,
-            user_id=user_id if chat_id is None else None,
-            text=reply.text,
-            parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
-        ).fetch()
+        replies = await core.cmd_start("max", str(user_id), session_id)
+        for reply in replies:
+            # Bot.send_message inherits the client's HTML mode with parse_mode=None.
+            await SendMessage(
+                bot=client,
+                chat_id=chat_id,
+                user_id=user_id if chat_id is None else None,
+                text=reply.text,
+                parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
+            ).fetch()
 
     @dp.bot_started()
     async def on_bot_started(event: BotStarted) -> None:

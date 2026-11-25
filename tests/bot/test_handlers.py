@@ -7,8 +7,12 @@ from typing import Any, cast
 from unittest.mock import AsyncMock
 
 import pytest
+from aiogram import Bot as TelegramBot
+from aiogram import Dispatcher as TelegramDispatcher
+from aiogram.enums import ParseMode as TelegramParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.methods import SendMessage
+from aiogram.types import Update
 from maxapi import Bot, Dispatcher
 from maxapi.connection.base import BaseConnection
 from maxapi.types.updates.bot_started import BotStarted
@@ -17,7 +21,8 @@ from maxapi.types.updates.message_created import MessageCreated
 from bot.core import ERROR_REPLY_TEXT, BotReply
 from bot.max_bot import answer_max_message, run_max_bot
 from bot.splitting import MESSAGE_CHUNK_LIMIT
-from bot.telegram_bot import answer_message
+from bot.telegram_bot import answer_message, run_telegram_bot
+from config.chat import CHAT_DISCLAIMER
 
 LONG_HTML_ANSWER = "\n\n".join(
     f"<b>Пункт {i}.</b> " + "Документы подаются через Госуслуги. " * 20 for i in range(20)
@@ -245,9 +250,11 @@ async def test_max_long_answer_edits_status_then_sends_rest():
     assert ERROR_REPLY_TEXT not in parts
 
 
-async def test_max_start_event_and_command_send_welcome_as_plain_text(monkeypatch):
+@pytest.mark.parametrize("split", [False, True])
+async def test_max_start_event_and_command_send_welcome_as_plain_text(monkeypatch, split):
     welcome = "Привет!\n\n<b>Документы</b> & **сроки**"
-    start = AsyncMock(return_value=BotReply(text=welcome))
+    texts = [welcome, CHAT_DISCLAIMER] if split else [f"{welcome}\n\n{CHAT_DISCLAIMER}"]
+    start = AsyncMock(return_value=tuple(BotReply(text=text) for text in texts))
     request = AsyncMock(return_value=object())
     user = {"user_id": 9, "first_name": "А", "is_bot": False, "last_activity_time": 0}
 
@@ -280,6 +287,55 @@ async def test_max_start_event_and_command_send_welcome_as_plain_text(monkeypatc
     assert start.await_count == 2
     assert all(call.args == ("max", "9", "5") for call in start.await_args_list)
     assert [call.kwargs["json"] for call in request.await_args_list] == [
-        {"attachments": [], "text": welcome},
-        {"attachments": [], "text": welcome},
+        {"attachments": [], "text": text} for text in texts * 2
     ]
+
+
+@pytest.mark.parametrize(
+    "texts, parse_mode",
+    [
+        ((f"Привет!\n\n<b>{CHAT_DISCLAIMER}</b>",), TelegramParseMode.HTML),
+        (("Привет!\n\n<b>Документы</b>", CHAT_DISCLAIMER), None),
+    ],
+)
+async def test_telegram_start_sends_all_welcome_messages(
+    monkeypatch, tmp_path, texts, parse_mode
+):
+    start = AsyncMock(return_value=tuple(BotReply(text, parse_mode) for text in texts))
+    send = AsyncMock()
+
+    async def poll(dispatcher: TelegramDispatcher, bot: TelegramBot, **kwargs) -> None:
+        await dispatcher.feed_update(
+            bot,
+            Update.model_validate(
+                {
+                    "update_id": 1,
+                    "message": {
+                        "message_id": 2,
+                        "date": 1,
+                        "chat": {"id": 100, "type": "private"},
+                        "from": {"id": 7, "is_bot": False, "first_name": "А"},
+                        "text": "/start",
+                        "entities": [{"type": "bot_command", "offset": 0, "length": 6}],
+                    },
+                }
+            ),
+        )
+
+    monkeypatch.setenv("BOT_TOKEN", "123456:test-token")
+    monkeypatch.setenv("TELEGRAM_POLLING_LOCK_FILE", str(tmp_path / "telegram.lock"))
+    monkeypatch.setattr("bot.telegram_bot.BotCore.cmd_start", start)
+    monkeypatch.setattr(TelegramDispatcher, "start_polling", poll)
+    monkeypatch.setattr(TelegramBot, "send_message", send)
+
+    await run_telegram_bot()
+
+    start.assert_awaited_once_with(
+        channel="telegram", external_user_id="7", session_id="100"
+    )
+    assert [call.args for call in send.await_args_list] == [
+        ("100", text) for text in texts
+    ]
+    assert [call.kwargs["parse_mode"] for call in send.await_args_list] == [
+        parse_mode
+    ] * len(texts)
