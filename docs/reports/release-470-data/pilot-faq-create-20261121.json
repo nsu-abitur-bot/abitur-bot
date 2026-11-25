@@ -1,0 +1,48 @@
+{
+    "operation":  "create",
+    "network_listener_tested":  false,
+    "authentication":  "real API login with disposable isolated admin",
+    "status":  201,
+    "committed_at_utc":  "2026-11-21T16:05:54.013471+00:00",
+    "temporary_admin_removed":  true,
+    "budget_after":  {
+                         "totals":  {
+                                        "input":  37173,
+                                        "output":  964,
+                                        "embedding":  308,
+                                        "micro_cny":  82058,
+                                        "micro_rub":  9930
+                                    },
+                         "cases":  {
+                                       "rag-1":  {
+                                                     "input":  15321,
+                                                     "output":  391,
+                                                     "embedding":  112,
+                                                     "micro_cny":  33770,
+                                                     "micro_rub":  3611,
+                                                     "generations":  16
+                                                 },
+                                       "rag-2":  {
+                                                     "input":  21852,
+                                                     "output":  573,
+                                                     "embedding":  196,
+                                                     "micro_cny":  48288,
+                                                     "micro_rub":  6319,
+                                                     "generations":  30
+                                                 }
+                                   },
+                         "attempts_started":  57,
+                         "attempts_finished":  57,
+                         "pending_or_uncertain":  [
+
+                                                  ],
+                         "halted":  false
+                     },
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  47.592,
+                   "minimum_host_available_mib":  1034.7,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}

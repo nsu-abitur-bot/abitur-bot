@@ -32,7 +32,7 @@ def test_reference_to_same_program_preserves_identity(reference):
         "faculty": "ФИТ",
         "level": "bachelor",
         "year": 2024,
-        "form": "budget",
+        "admission_basis": "budget",
         "metric": "passing",
         "_program_ids": ["profile-a"],
     }
@@ -191,7 +191,7 @@ def test_broader_sql_result_does_not_expand_known_profile_or_requested_filters()
         filters={
             "program": "09.03.01",
             "year": 2024,
-            "form": "budget",
+            "admission_basis": "budget",
             "metric": "average",
         },
         program_ids=frozenset({"profile-a"}),
@@ -200,13 +200,17 @@ def test_broader_sql_result_does_not_expand_known_profile_or_requested_filters()
         {
             "program": "09.03.01",
             "year": 2023,
-            "form": "paid",
+            "admission_basis": "paid",
             "metric": "both",
             "_program_ids": ["profile-a", "profile-b"],
         }
     )
     assert scope["_program_ids"] == ["profile-a"]
-    assert (scope["year"], scope["form"], scope["metric"]) == (2024, "budget", "average")
+    assert (scope["year"], scope["admission_basis"], scope["metric"]) == (
+        2024,
+        "budget",
+        "average",
+    )
 
 
 @pytest.mark.asyncio
@@ -215,13 +219,18 @@ def test_broader_sql_result_does_not_expand_known_profile_or_requested_filters()
     [
         ("Какой средний балл?", {"metric": "average"}),
         ("А на 09.03.04?", {"program": "09.03.04"}),
-        ("А по платному?", {"form": "paid"}),
+        ("А по платному?", {"admission_basis": "paid"}),
     ],
 )
 async def test_review_followups_require_matching_query_before_publication(
     monkeypatch, question, changes
 ):
-    scope = {"program": "09.03.01", "year": 2024, "form": "budget", "metric": "passing"}
+    scope = {
+        "program": "09.03.01",
+        "year": 2024,
+        "admission_basis": "budget",
+        "metric": "passing",
+    }
     expected = {**scope, **changes}
     calls, queries, published = [], [], []
 
@@ -235,7 +244,7 @@ async def test_review_followups_require_matching_query_before_publication(
                         {
                             "program": "38.03.01",
                             "year": 2025,
-                            "form": "paid",
+                            "admission_basis": "paid",
                             "metric": "average",
                         },
                     )
@@ -363,7 +372,12 @@ async def test_average_followup_does_not_publish_unchecked_absence(monkeypatch):
         (["а средний балл?"], {"program": "09.03.01", "metric": "average"}),
         (
             ["а средний?", "а в 2023 году?", "а на платку?"],
-            {"program": "09.03.01", "metric": "average", "year": 2023, "form": "paid"},
+            {
+                "program": "09.03.01",
+                "metric": "average",
+                "year": 2023,
+                "admission_basis": "paid",
+            },
         ),
         (
             ["а на магистратуру?"],
@@ -433,8 +447,8 @@ def test_explicit_program_after_level_clarification_is_accepted():
     [
         ("А средний балл за 2023 и 2024 годы?", "year", 2025),
         ("А средний балл за 2023 и 2024 годы?", "year", 2023),
-        ("А средний балл на бюджет и платное?", "form", "budget"),
-        ("А средний балл на бюджет и платное?", "form", "paid"),
+        ("А средний балл на бюджет и платное?", "admission_basis", "budget"),
+        ("А средний балл на бюджет и платное?", "admission_basis", "paid"),
     ],
 )
 def test_comparison_requires_complete_query(question, key, value):
@@ -446,7 +460,7 @@ def test_comparison_requires_complete_query(question, key, value):
                     "admission_scores": {
                         "program": "09.03.01",
                         "year": 2024,
-                        "form": "budget",
+                        "admission_basis": "budget",
                         "metric": "passing",
                     }
                 },
@@ -521,7 +535,7 @@ def test_trusted_sql_scope_carries_faculty_year_and_form():
                         "faculty": "Институт информационных технологий",
                         "level": "bachelor",
                         "year": 2024,
-                        "form": "budget",
+                        "admission_basis": "budget",
                         "metric": "passing",
                     }
                 },
@@ -535,7 +549,7 @@ def test_trusted_sql_scope_carries_faculty_year_and_form():
         "faculty": "Институт информационных технологий",
         "level": "bachelor",
         "year": 2024,
-        "form": "budget",
+        "admission_basis": "budget",
         "metric": "average",
     }
     assert not guard.accepts({"faculty": "Другой институт", "metric": "average"})
@@ -550,7 +564,7 @@ def test_context_is_not_taken_from_unverified_answer_text():
         ]
     )
     assert guard is not None
-    assert "year" not in guard.filters and "form" not in guard.filters
+    assert "year" not in guard.filters and "admission_basis" not in guard.filters
 
 
 def test_context_resets_after_unrelated_topic():
@@ -664,7 +678,7 @@ def test_failed_followup_parameters_are_not_lost_before_next_question():
         "program": "09.03.01",
         "year": 2023,
         "metric": "passing",
-        "form": "paid",
+        "admission_basis": "paid",
     }
 
 
@@ -693,7 +707,7 @@ def test_free_education_does_not_mean_paid():
     guard = ScoreGuard.from_messages(
         [HumanMessage(content="Какой проходной балл на бесплатное обучение?")]
     )
-    assert guard is not None and guard.filters["form"] == "budget"
+    assert guard is not None and guard.filters["admission_basis"] == "budget"
 
 
 @pytest.mark.asyncio
@@ -720,7 +734,7 @@ async def test_failed_validation_does_not_store_rejected_query_as_context(monkey
         {"program": "09.03.04", "metric": "average"},
         {"program": "09.03.01", "metric": "passing"},
         {"metric": "average", "year": 2025},
-        {"metric": "average", "form": "paid"},
+        {"metric": "average", "admission_basis": "paid"},
         {"metric": "average", "level": "master"},
     ],
 )
@@ -730,7 +744,7 @@ def test_wrong_query_cannot_verify_answer(arguments):
             "program": "09.03.01",
             "metric": "average",
             "year": 2024,
-            "form": "budget",
+            "admission_basis": "budget",
             "level": "bachelor",
         }
     )
@@ -738,8 +752,35 @@ def test_wrong_query_cannot_verify_answer(arguments):
 
 
 def test_complete_broader_query_covers_subset():
-    guard = ScoreGuard(filters={"metric": "average", "year": 2024, "form": "budget"})
+    guard = ScoreGuard(
+        filters={"metric": "average", "year": 2024, "admission_basis": "budget"}
+    )
     assert guard.accepts({"metric": "both"})
+
+
+def test_study_form_comparison_keeps_admission_basis_from_legacy_history():
+    guard = ScoreGuard.from_messages(
+        [
+            HumanMessage(content="Какой проходной балл на бюджет 09.03.01?"),
+            AIMessage(
+                content="Проходной балл 245.",
+                additional_kwargs={
+                    "admission_scores": {
+                        "program": "09.03.01",
+                        "form": "budget",
+                        "year": 2024,
+                    }
+                },
+            ),
+            HumanMessage(content="А на очной и заочной форме?"),
+        ]
+    )
+    assert guard is not None and not guard.clarify
+    assert guard.filters["admission_basis"] == "budget"
+    assert guard.filters["program"] == "09.03.01"
+    assert guard.comparisons["study_form"] == ["full_time", "correspondence"]
+    assert guard.accepts({"admission_basis": "budget"})
+    assert not guard.accepts({"admission_basis": "budget", "study_form": "full_time"})
 
 
 @pytest.mark.asyncio
@@ -776,3 +817,33 @@ async def test_recovery_is_bounded_and_error_is_not_empty(monkeypatch, mode):
     assert len(calls) == (2 if mode in ("missing", "wrong") else 1)
     if mode == "wrong":
         assert not executed
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Сколько мест в общежитии?",
+        "Сколько свободных мест осталось на 09.03.04?",
+        "Сколько мест в конкурсном списке?",
+        "Сколько человек зачислили на ФИТ?",
+    ],
+)
+def test_other_types_of_places_do_not_use_admission_scores(question: str) -> None:
+    assert ScoreGuard.from_messages([HumanMessage(content=question)]) is None
+
+
+def test_seats_followup_uses_admission_scope() -> None:
+    guard = ScoreGuard.from_messages(
+        [
+            HumanMessage(content="Какой проходной балл на 09.03.04 в 2025 на бюджете?"),
+            HumanMessage(content="А сколько мест на заочной?"),
+        ]
+    )
+    assert guard is not None and guard.requests_seats
+    assert guard.filters == {
+        "metric": "seats",
+        "program": "09.03.04",
+        "year": 2025,
+        "admission_basis": "budget",
+        "study_form": "correspondence",
+    }

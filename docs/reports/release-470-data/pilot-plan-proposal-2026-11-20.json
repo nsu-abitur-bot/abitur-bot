@@ -1,0 +1,56 @@
+{
+  "run_id": "eval470-offline-example",
+  "status": "proposal_not_launch_authorization",
+  "questions": {
+    "faq-1": "EVAL470-eval470-offline-example: \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044c\u043d\u044b\u0439 FAQ \u0434\u043e \u043f\u0440\u0430\u0432\u043a\u0438",
+    "faq-2": "EVAL470-eval470-offline-example: \u043a\u043e\u043d\u0442\u0440\u043e\u043b\u044c\u043d\u044b\u0439 FAQ \u043f\u043e\u0441\u043b\u0435 \u043f\u0440\u0430\u0432\u043a\u0438",
+    "rag-1": "\u041a\u0430\u043a\u0438\u0435 \u043f\u0440\u043e\u0444\u0438\u043b\u0438 \u0431\u0430\u043a\u0430\u043b\u0430\u0432\u0440\u0438\u0430\u0442\u0430 \u0435\u0441\u0442\u044c \u043d\u0430 \u0424\u0418\u0422?",
+    "rag-2": "\u041a\u0430\u043a\u0438\u0435 \u044f\u0437\u044b\u043a\u0438 \u043f\u0440\u043e\u0433\u0440\u0430\u043c\u043c\u0438\u0440\u043e\u0432\u0430\u043d\u0438\u044f \u0438\u0437\u0443\u0447\u0430\u044e\u0442 \u043d\u0430 \u041f\u0418\u0438\u041a\u041d?",
+    "tools-1": "\u041a\u0430\u043a\u0438\u0435 \u043d\u0430\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044f \u0431\u0430\u043a\u0430\u043b\u0430\u0432\u0440\u0438\u0430\u0442\u0430 \u0435\u0441\u0442\u044c \u043d\u0430 \u0424\u0418\u0422 \u041d\u0413\u0423? \u0423\u043a\u0430\u0436\u0438 \u043a\u043e\u0434\u044b.",
+    "tools-2": "\u041a\u0430\u043a\u0438\u0435 \u043f\u0440\u043e\u0445\u043e\u0434\u043d\u044b\u0435 \u0431\u0430\u043b\u043b\u044b \u043f\u0440\u043e\u0448\u043b\u044b\u0445 \u043b\u0435\u0442 \u0435\u0441\u0442\u044c \u0434\u043b\u044f \u0424\u0418\u0422?"
+  },
+  "case_plan": {
+    "faq-1": "b47419264a77037ff2f541a59463bfad01486bcc236ef0e6bd05d5a4dc33ca4b",
+    "faq-2": "c0ca5fa204c1fede20e77c0eb75f62f0ba9cad5adeb5f1f34248554498bbf876",
+    "rag-1": "757fb49a820d8d546d30a3dcf38dec8ace6d38b38f76626765b78519fa718efe",
+    "rag-2": "792c8ff3a35eeeb1e6e9d1ceef59ae49413524195ee6c9f921dc5575b96bc6c0",
+    "tools-1": "03d1c1c57b866bd3488b4990cb3ca589e19d020844c1a13791965e955616c254",
+    "tools-2": "d870813d77568b1325a3f26a7f797588bccefba31db916b4a1228e5c3042207b"
+  },
+  "cloudru": {
+    "model": "ai-sage/Giga-Embeddings-instruct-3B",
+    "dimensions": 2048,
+    "rate_rub_per_million": "32.22",
+    "proposed_embedding_limit": 10000,
+    "calculated_micro_rub": 322200,
+    "proposed_micro_rub_limit": 1000000,
+    "approved": false
+  },
+  "deepseek": {
+    "model": "deepseek-flash",
+    "thinking": false,
+    "input_limit": 300000,
+    "output_limit": 10000,
+    "approved_micro_cny_limit": 3000000
+  },
+  "index_rebuild": {
+    "owner": "Marat",
+    "embedding_tokens": null,
+    "micro_rub_limit": null,
+    "approved": false,
+    "illustrations_only": [
+      {
+        "tokens": 100000,
+        "micro_rub": 3222000
+      },
+      {
+        "tokens": 500000,
+        "micro_rub": 16110000
+      },
+      {
+        "tokens": 1000000,
+        "micro_rub": 32220000
+      }
+    ]
+  }
+}

@@ -1,0 +1,172 @@
+{
+    "case_id":  "tools-2",
+    "parts":  1,
+    "ingress":  "synthetic native BotCore",
+    "telegram_polling_tested":  false,
+    "api_bot_separate_processes":  false,
+    "budget_before":  {
+                          "totals":  {
+                                         "input":  53333,
+                                         "output":  1402,
+                                         "embedding":  911,
+                                         "micro_cny":  117882,
+                                         "micro_rub":  29363
+                                     },
+                          "cases":  {
+                                        "rag-1":  {
+                                                      "input":  15321,
+                                                      "output":  391,
+                                                      "embedding":  112,
+                                                      "micro_cny":  33770,
+                                                      "micro_rub":  3611,
+                                                      "generations":  16
+                                                  },
+                                        "rag-2":  {
+                                                      "input":  21852,
+                                                      "output":  573,
+                                                      "embedding":  196,
+                                                      "micro_cny":  48288,
+                                                      "micro_rub":  6319,
+                                                      "generations":  30
+                                                  },
+                                        "setup":  {
+                                                      "input":  0,
+                                                      "output":  0,
+                                                      "embedding":  282,
+                                                      "micro_cny":  0,
+                                                      "micro_rub":  9087,
+                                                      "generations":  0
+                                                  },
+                                        "faq-1":  {
+                                                      "input":  169,
+                                                      "output":  13,
+                                                      "embedding":  0,
+                                                      "micro_cny":  442,
+                                                      "micro_rub":  0,
+                                                      "generations":  1
+                                                  },
+                                        "faq-2":  {
+                                                      "input":  169,
+                                                      "output":  13,
+                                                      "embedding":  47,
+                                                      "micro_cny":  442,
+                                                      "micro_rub":  1515,
+                                                      "generations":  1
+                                                  },
+                                        "tools-1":  {
+                                                        "input":  15822,
+                                                        "output":  412,
+                                                        "embedding":  274,
+                                                        "micro_cny":  34940,
+                                                        "micro_rub":  8831,
+                                                        "generations":  16
+                                                    }
+                                    },
+                          "attempts_started":  83,
+                          "attempts_finished":  83,
+                          "pending_or_uncertain":  [
+
+                                                   ],
+                          "halted":  false
+                      },
+    "budget_after":  {
+                         "totals":  {
+                                        "input":  73327,
+                                        "output":  1857,
+                                        "embedding":  1333,
+                                        "micro_cny":  161510,
+                                        "micro_rub":  42962
+                                    },
+                         "cases":  {
+                                       "rag-1":  {
+                                                     "input":  15321,
+                                                     "output":  391,
+                                                     "embedding":  112,
+                                                     "micro_cny":  33770,
+                                                     "micro_rub":  3611,
+                                                     "generations":  16
+                                                 },
+                                       "rag-2":  {
+                                                     "input":  21852,
+                                                     "output":  573,
+                                                     "embedding":  196,
+                                                     "micro_cny":  48288,
+                                                     "micro_rub":  6319,
+                                                     "generations":  30
+                                                 },
+                                       "setup":  {
+                                                     "input":  0,
+                                                     "output":  0,
+                                                     "embedding":  282,
+                                                     "micro_cny":  0,
+                                                     "micro_rub":  9087,
+                                                     "generations":  0
+                                                 },
+                                       "faq-1":  {
+                                                     "input":  169,
+                                                     "output":  13,
+                                                     "embedding":  0,
+                                                     "micro_cny":  442,
+                                                     "micro_rub":  0,
+                                                     "generations":  1
+                                                 },
+                                       "faq-2":  {
+                                                     "input":  169,
+                                                     "output":  13,
+                                                     "embedding":  47,
+                                                     "micro_cny":  442,
+                                                     "micro_rub":  1515,
+                                                     "generations":  1
+                                                 },
+                                       "tools-1":  {
+                                                       "input":  15822,
+                                                       "output":  412,
+                                                       "embedding":  274,
+                                                       "micro_cny":  34940,
+                                                       "micro_rub":  8831,
+                                                       "generations":  16
+                                                   },
+                                       "tools-2":  {
+                                                       "input":  19994,
+                                                       "output":  455,
+                                                       "embedding":  422,
+                                                       "micro_cny":  43628,
+                                                       "micro_rub":  13599,
+                                                       "generations":  16
+                                                   }
+                                   },
+                         "attempts_started":  103,
+                         "attempts_finished":  103,
+                         "pending_or_uncertain":  [
+
+                                                  ],
+                         "halted":  false
+                     },
+    "memory_current":  469651456,
+    "question_started_at_utc":  "2026-11-23T07:52:22.846777+00:00",
+    "graph_returns":  [
+                          {
+                              "function":  "query_graph_with_crag",
+                              "context_characters":  2227,
+                              "sources_count":  1
+                          }
+                      ],
+    "faq_matched":  false,
+    "tools_called":  [
+                         "get_admission_scores"
+                     ],
+    "sources_count":  1,
+    "answer_sha256":  "7e4f15afdecad96561fc7875c91e0a432771525ef4d997b32e2307e7af3ab478",
+    "pipeline_returned_at_utc":  "2026-11-23T07:53:04.357412+00:00",
+    "delivery_attempted_at_utc":  "2026-11-23T07:53:04.489601+00:00",
+    "last_bot_api_accept_at_utc":  "2026-11-23T07:53:04.668217+00:00",
+    "seconds":  41.8498,
+    "completed":  true,
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  82.908,
+                   "minimum_host_available_mib":  1109.2,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}

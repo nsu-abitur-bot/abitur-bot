@@ -130,11 +130,13 @@ async def test_real_offline_pipeline_passes_and_records_trace(monkeypatch):
 
     with offline_pipeline() as runner:
         report = await PipelineEvaluator(runner=runner).run(offline=True)
-    assert report["total"] == report["passed_perfectly"] == 8
+    assert report["total"] == report["passed_perfectly"] == 10
     assert not connections
     by_id = {r["id"]: r for r in report["results"]}
     assert by_id["abbrev_1"]["faq_matched"]
     assert by_id["tool_1"]["tools_called"] == ["get_admission_scores"]
+    assert by_id["admission_score_study_forms"]["passed"]
+    assert by_id["admission_announced_seats"]["passed"]
     assert not by_id["faq_negative_1"]["faq_matched"]
     assert by_id["crag_topic_switch_mmf"]["passed"]
     assert report["skipped_ids"] == ["guardrails", "hallucination_check"]
@@ -207,7 +209,7 @@ async def test_judge_runs_only_after_deterministic_checks(monkeypatch):
     evaluator = PipelineEvaluator(runner=runner, judge=judge)
     report = await evaluator.run()
     assert all(c["question"] != "Напиши код калькулятора на Python." for c in called)
-    assert report["total"] == 10
+    assert report["total"] == 12
 
 
 @pytest.mark.parametrize(

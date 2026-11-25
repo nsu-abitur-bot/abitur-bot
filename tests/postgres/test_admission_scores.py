@@ -87,7 +87,7 @@ async def test_query_scores_finds_sibgiu_program_with_database_typos(
                 program_name=program_name,
                 code="09.03.01",
                 year=2025,
-                form="budget",
+                admission_basis="budget",
                 passing_score=141,
                 average_score=None,
             )
@@ -95,11 +95,15 @@ async def test_query_scores_finds_sibgiu_program_with_database_typos(
     )
     assert stats == {"created": 1, "updated": 0, "skipped": 0}
 
-    by_code = await service.query_scores(program="09.03.01", year=2025, form="budget")
+    by_code = await service.query_scores(
+        program="09.03.01", year=2025, admission_basis="budget"
+    )
     assert len(by_code) == 1
     assert by_code[0]["passing_score"] == 141
 
     for query in ("программная инженерия", "программную инженерию"):
-        rows = await service.query_scores(program=query, year=2025, form="budget")
+        rows = await service.query_scores(
+            program=query, year=2025, admission_basis="budget"
+        )
         assert rows == by_code
         assert rows[0]["program_name"] == program_name

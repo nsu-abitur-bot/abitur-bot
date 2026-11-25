@@ -20,6 +20,7 @@ from db.postgres.db import AsyncSessionLocal
 from db.postgres.models import Document, FaqEntry, Settings
 from db.postgres.services.instance_settings import SETTINGS_KEY, InstanceSettingsService
 from faq.matcher import FAQMatcher
+from llm.providers.cloudru import CloudRuEmbedding
 from llm.providers.gigachat import GigaChatEmbedding
 from rag.reembed import rebuild_workspace
 
@@ -46,16 +47,20 @@ def _migration_lock(root: Path) -> Iterator[None]:
             fcntl.flock(lock.fileno(), fcntl.LOCK_UN)
 
 
-async def migrate(changes: dict[str, str]) -> dict:
+async def migrate(changes: dict[str, str], *, provider: str = "gigachat") -> dict:
+    if provider not in {"gigachat", "cloudru"}:
+        raise ValueError("Неизвестный провайдер пересчёта")
     root = Path(os.environ.get("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
     if root.is_symlink():
         raise ValueError("Символическая ссылка вместо индекса")
     root = root.resolve()
     with _migration_lock(root):
-        return await _migrate(changes, root)
+        return await _migrate(changes, root, provider=provider)
 
 
-async def _migrate(changes: dict[str, str], root: Path) -> dict:
+async def _migrate(
+    changes: dict[str, str], root: Path, *, provider: str = "gigachat"
+) -> dict:
     if os.getenv("LIGHTRAG_STORAGE", "json") != "json":
         raise ValueError("Эта процедура поддерживает файловое JSON-хранилище")
     root.parent.mkdir(parents=True, exist_ok=True)
@@ -71,8 +76,8 @@ async def _migrate(changes: dict[str, str], root: Path) -> dict:
             snapshot,
             {
                 **changes,
-                "FAQ_EMBEDDING_PROVIDER": "gigachat",
-                "LIGHTRAG_EMBEDDING_PROVIDER": "gigachat",
+                "FAQ_EMBEDDING_PROVIDER": provider,
+                "LIGHTRAG_EMBEDDING_PROVIDER": provider,
             },
         )
         for status_file in root.glob("*/kv_store_doc_status.json"):
@@ -99,10 +104,17 @@ async def _migrate(changes: dict[str, str], root: Path) -> dict:
             directory / "settings-before.json",
             {"revision": snapshot.revision, "encrypted_snapshot": raw},
         )
-        adapter = GigaChatEmbedding(
-            auth_key=proposed["GIGACHAT_API_KEY"],
-            model=proposed["GIGACHAT_EMBEDDING_MODEL"],
-            scope=proposed["GIGACHAT_SCOPE"],
+        adapter = (
+            CloudRuEmbedding(
+                api_key=proposed["CLOUDRU_API_KEY"],
+                model=proposed["CLOUDRU_EMBEDDING_MODEL"],
+            )
+            if provider == "cloudru"
+            else GigaChatEmbedding(
+                auth_key=proposed["GIGACHAT_API_KEY"],
+                model=proposed["GIGACHAT_EMBEDDING_MODEL"],
+                scope=proposed["GIGACHAT_SCOPE"],
+            )
         )
         # Validate the key/model before preparing the replacement index.
         await adapter(["Проверка модели эмбеддингов"])

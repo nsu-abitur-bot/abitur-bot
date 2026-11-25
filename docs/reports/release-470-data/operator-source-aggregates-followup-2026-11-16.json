@@ -1,0 +1,17 @@
+{
+    "database_timezone":  "UTC",
+    "from":  "2026-11-01T04:42:17.015381",
+    "to":  "2026-11-12T04:58:30.226981",
+    "rows":  226,
+    "questions":  46,
+    "answers":  48,
+    "unique_users_including_tests":  7,
+    "latency_samples":  15,
+    "errors_flagged":  0,
+    "no_answer_flagged":  3,
+    "feedback_reports":  2,
+    "answer_ratings":  20,
+    "test_traffic_excluded":  false,
+    "test_traffic_separation":  "No verified historical marker or agreed test cohort; cannot reliably exclude tests",
+    "timestamp_semantics":  "UTC stored without timezone: pinned app db.postgres.models.timestamp() uses datetime.now(UTC).replace(tzinfo=None). Historical imports/manual writes cannot independently be certified."
+}

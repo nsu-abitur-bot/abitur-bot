@@ -1,0 +1,19 @@
+{
+  "wiki_base": "3ee12a302ea051aa690ba1da19d0495217f2d371",
+  "backend_checked": "9acb2c7fa4bd83f03660f0d054285a5cb37621b7",
+  "frontend_checked": "8840179ea6f6319cc1661df6b54f9b1651bc89fa",
+  "pages": {
+    "Gantt-chart.md": "746032c28bfbf92ad549074e993d87e2986424cf0c07827863f5731988975a3d",
+    "Home.md": "b9e4f7a8f4bd1d5e0bab1fe10e0bce8a7afb098ee45cbb10f840b63c5e1a005d",
+    "Installing-a-local-copy.md": "44560cca69d28004a217c95064cba78726096a85056b47443df0939d67a16bc5",
+    "Project-Schedule.md": "ca201761a718d3dd00175a27ec879ed5d7bc33ae0d702cb292f4748560c097b8",
+    "Risk-table.md": "f474172b50a0db28825139d04fa9537181b5155890d63ad23b18a3cad508ea17",
+    "SAD.md": "a1d04de95bd20e63b5e00baafc2c5b008d911ed080cf00de72fcb946b59b7c53",
+    "Software-Requirements-Specification.md": "155e9e571866105828516e2645a88db7b41e099a91d1611fe9c4b8e7214e997c",
+    "System-deployment.md": "a237e1ed4b3255dd834123d02c8ab62e38d9ab3e019395f43e3918737e57c336",
+    "Vision.md": "dbd4047188501b190a31a9854ffd9120936e8322ee0f7bebfaca7f32b0a5c383",
+    "Лимиты-LLM.md": "bd96442a35310693e2e6bfed11848ed1eb472010dc45eaa70fcb8477ccf1b25c",
+    "План-релиза.md": "b5d214a5e3339371ef6c621772dfb7a1e4d9cda48547afea8b7e7adf3cdf2618",
+    "Эталонный-набор.md": "83182b75ee852396de8203004d18201ba111d33bebbc15ff86b3ffc79aea44f6"
+  }
+}

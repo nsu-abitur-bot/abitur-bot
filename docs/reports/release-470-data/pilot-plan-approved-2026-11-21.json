@@ -1,0 +1,76 @@
+{
+  "run_id": "7d86f895-1cde-4795-aedf-db47b855b674",
+  "status": "owner_authorized_awaiting_operator_egress",
+  "questions": {
+    "faq-1": "EVAL470-7d86f895-1cde-4795-aedf-db47b855b674: контрольный FAQ до правки",
+    "faq-2": "EVAL470-7d86f895-1cde-4795-aedf-db47b855b674: контрольный FAQ после правки",
+    "rag-1": "Какие профили бакалавриата есть на ФИТ?",
+    "rag-2": "Какие языки программирования изучают на ПИиКН?",
+    "tools-1": "Какие направления бакалавриата есть на ФИТ НГУ? Укажи коды.",
+    "tools-2": "Какие проходные баллы прошлых лет есть для ФИТ?"
+  },
+  "case_plan": {
+    "faq-1": "77d68ebca50bb9b0bb84620dc1b186ba05963d5219779d2eed540e48754e7a91",
+    "faq-2": "6996b079d8ef71d22bb0752ee070b8a8731c619cbcaf1c793d35a9bbbf4f0937",
+    "rag-1": "757fb49a820d8d546d30a3dcf38dec8ace6d38b38f76626765b78519fa718efe",
+    "rag-2": "792c8ff3a35eeeb1e6e9d1ceef59ae49413524195ee6c9f921dc5575b96bc6c0",
+    "tools-1": "03d1c1c57b866bd3488b4990cb3ca589e19d020844c1a13791965e955616c254",
+    "tools-2": "d870813d77568b1325a3f26a7f797588bccefba31db916b4a1228e5c3042207b"
+  },
+  "cloudru": {
+    "model": "ai-sage/Giga-Embeddings-instruct-3B",
+    "dimensions": 2048,
+    "rate_rub_per_million": "32.22",
+    "proposed_embedding_limit": 10000,
+    "calculated_micro_rub": 322200,
+    "proposed_micro_rub_limit": 1000000,
+    "approved": true
+  },
+  "deepseek": {
+    "model": "deepseek-flash",
+    "thinking": false,
+    "input_limit": 300000,
+    "output_limit": 10000,
+    "approved_micro_cny_limit": 3000000
+  },
+  "index_rebuild": {
+    "owner": "Marat",
+    "status": "completed_by_operator_not_repeated",
+    "diagnostic_and_rebuild_rub": "4.820876",
+    "separate_operator_cap_rub": "10",
+    "included_in_pilot_budget": false
+  },
+  "authorization": {
+    "date": "2026-11-21",
+    "owner": "Mikhail Deshin",
+    "scope": "one sequential six-question pilot and isolated recovery checks",
+    "cloudru_micro_rub_limit": 1000000,
+    "cloudru_embedding_tokens": 10000,
+    "deepseek_micro_cny_limit": 3000000,
+    "no_extra_load_series": true,
+    "no_full_50_rerun": true,
+    "operator_opens_and_closes_api": true
+  },
+  "budget_initialization": {
+    "offline_only": false,
+    "case_plan": {
+      "faq-1": "77d68ebca50bb9b0bb84620dc1b186ba05963d5219779d2eed540e48754e7a91",
+      "faq-2": "6996b079d8ef71d22bb0752ee070b8a8731c619cbcaf1c793d35a9bbbf4f0937",
+      "rag-1": "757fb49a820d8d546d30a3dcf38dec8ace6d38b38f76626765b78519fa718efe",
+      "rag-2": "792c8ff3a35eeeb1e6e9d1ceef59ae49413524195ee6c9f921dc5575b96bc6c0",
+      "tools-1": "03d1c1c57b866bd3488b4990cb3ca589e19d020844c1a13791965e955616c254",
+      "tools-2": "d870813d77568b1325a3f26a7f797588bccefba31db916b4a1228e5c3042207b"
+    },
+    "cloudru": {
+      "approved": true,
+      "micro_rub_limit": 1000000,
+      "embedding_limit": 10000,
+      "rate_hundredths": 3222,
+      "tokenizer_sha256": "6fb1280bd7fd529f425929b5df823a5a44485cd7fa9679d1ec1acaac4962e8ca",
+      "tokenizer_revision": "b71168088212f0a13688514e4fc288a86106c4e4"
+    }
+  },
+  "expected_policy_sha256": "78531e1d41ba70bd16dc4a5823974261d598910d51fef569fd8eb384589baf58",
+  "budget_file": "/reports/release470-budget.sqlite3",
+  "live_budget_created_by_this_generator": false
+}

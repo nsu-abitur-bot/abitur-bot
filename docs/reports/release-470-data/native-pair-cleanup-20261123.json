@@ -1,0 +1,65 @@
+{
+    "operation":  "cleanup",
+    "network_listener_tested":  false,
+    "authentication":  "real API login with disposable isolated admin",
+    "status":  204,
+    "committed_at_utc":  "2026-11-23T07:45:18.272377+00:00",
+    "temporary_admin_removed":  true,
+    "faq_baseline_restored":  true,
+    "budget_after":  {
+                         "totals":  {
+                                        "input":  37342,
+                                        "output":  977,
+                                        "embedding":  590,
+                                        "micro_cny":  82500,
+                                        "micro_rub":  19017
+                                    },
+                         "cases":  {
+                                       "rag-1":  {
+                                                     "input":  15321,
+                                                     "output":  391,
+                                                     "embedding":  112,
+                                                     "micro_cny":  33770,
+                                                     "micro_rub":  3611,
+                                                     "generations":  16
+                                                 },
+                                       "rag-2":  {
+                                                     "input":  21852,
+                                                     "output":  573,
+                                                     "embedding":  196,
+                                                     "micro_cny":  48288,
+                                                     "micro_rub":  6319,
+                                                     "generations":  30
+                                                 },
+                                       "setup":  {
+                                                     "input":  0,
+                                                     "output":  0,
+                                                     "embedding":  282,
+                                                     "micro_cny":  0,
+                                                     "micro_rub":  9087,
+                                                     "generations":  0
+                                                 },
+                                       "faq-1":  {
+                                                     "input":  169,
+                                                     "output":  13,
+                                                     "embedding":  0,
+                                                     "micro_cny":  442,
+                                                     "micro_rub":  0,
+                                                     "generations":  1
+                                                 }
+                                   },
+                         "attempts_started":  61,
+                         "attempts_finished":  61,
+                         "pending_or_uncertain":  [
+
+                                                  ],
+                         "halted":  false
+                     },
+    "runner":  {
+                   "returncode":  0,
+                   "seconds":  14.534,
+                   "minimum_host_available_mib":  1473.5,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               }
+}

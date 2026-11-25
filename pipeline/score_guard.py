@@ -6,14 +6,25 @@ from dataclasses import dataclass, field
 
 from langchain_core.messages import BaseMessage
 
+from db.postgres.models import StudyForm
 from llm.base import ToolSpec
 from pipeline.tools.admission_scores import AdmissionScoresResult
 
 SCORES_TOOL = "get_admission_scores"
 SCORES_UNAVAILABLE = "Не удалось проверить баллы. Попробуйте повторить запрос позже."
 SCORES_CLARIFY = "Уточните направление подготовки, для которого нужны баллы."
+SEATS_UNAVAILABLE = (
+    "Не удалось проверить количество мест. Попробуйте повторить запрос позже."
+)
+SEATS_CLARIFY = "Уточните направление подготовки, для которого нужно количество мест."
 _CODE = re.compile(r"\b\d{2}\.\d{2}\.\d{2}\b")
 _YEAR = re.compile(r"\b20\d{2}\b")
+_STUDY_FORM_PATTERNS = {
+    StudyForm.full_time: re.compile(r"(?<![\w-])очн[а-яё]*(?![\w-])", re.I),
+    StudyForm.correspondence: re.compile(r"(?<![\w-])заоч(?:н|к)[а-яё]*(?![\w-])", re.I),
+}
+_CLASSIFICATION_FILTERS = ("admission_basis", "study_form")
+_COMPARISON_FILTERS = ("program", "year", *_CLASSIFICATION_FILTERS)
 _REFERENCE_SUBJECT = re.compile(
     r"^(?:эт(?:от|а|о|и|ого|ой|их|ому|им|у|ими|ом)|"
     r"т(?:от|а|о|е|ого|ой|ех|ому|ем|у|еми|ом)|"
@@ -29,11 +40,13 @@ _SUBJECT_FILLERS = frozenset(
     "код кода коду кодом коде направление направления направлению направлением "
     "направлении программа программы программе программу программой профиль профиля "
     "профилю профилем профиле специальность специальности подготовки в за на по для "
-    "год года году годы годах и или какой какая какие каком там же".split()
+    "год года году годы годах и или какой какая какие каком там же "
+    "форма форму формы форме формой обучения отделении".split()
 )
 _SUBJECT_MODIFIER = re.compile(
     r"(?:бюджет(?:а|у|е|ом)?|платн[а-яё]*|платк[а-яё]*|"
-    r"бакалавриат[а-яё]*|магистратур[а-яё]*|специалитет[а-яё]*|спо)",
+    r"бакалавриат[а-яё]*|магистратур[а-яё]*|специалитет[а-яё]*|спо|"
+    r"очн[а-яё]*|заоч(?:н|к)[а-яё]*)",
     re.I,
 )
 
@@ -50,10 +63,33 @@ def _subject_words(text: str) -> list[str]:
 
 
 _SCORE = re.compile(r"(?:проходн\w*|средн\w*)\s+бал", re.I)
+_SEAT_COUNT = re.compile(
+    r"\b(?:(?:сколько|количеств\w*|число)\s+"
+    r"(?:(?:бюджетн\w*|платн\w*|выдел\w*|объявл\w*|предусмотр\w*|будет|было|всего|и)\s+)*"
+    r"мест\b|кцп\b|контрольн\w*\s+цифр\w*\s+при[её]ма\b)",
+    re.I,
+)
+_OTHER_SEATS = re.compile(
+    r"общежити|парков|свободн|вакант|остал|конкурсн\w*\s+списк|"
+    r"сколько\s+(?:человек\s+)?зачисл",
+    re.I,
+)
+
+
+def is_seat_count_question(question: str) -> bool:
+    """Распознаёт запрос объявленных мест приёма."""
+    return bool(_SEAT_COUNT.search(question) and not _OTHER_SEATS.search(question))
+
+
+def _admission_question(question: str) -> bool:
+    return bool(_SCORE.search(question) or is_seat_count_question(question))
+
+
 _SHORT = re.compile(
     r"^(?:а\s+)?(?:(?:средн\w*|проходн\w*)"
     r"(?=\s*(?:$|[?!.,]|бал|како|на\b|по\b|в\b|за\b))|"
     r"в\s+20\d{2}|за\s+20\d{2}|"
+    r"(?:(?:на|по)\s+)?(?:очн\w*|заоч(?:н|к)\w*)|"
     r"(?:на|по)\s+(?:плат\w*|бюджет\w*|магистр\w*|бакалавр\w*|спо|"
     r"\d{2}\.\d{2}\.\d{2}))\b",
     re.I,
@@ -67,12 +103,24 @@ _GENERIC_SCORE = re.compile(
 )
 
 
+def _is_generic_seat_question(question: str) -> bool:
+    question = re.sub(r"^(?:а|и)\s+", "", question.strip(" ?!.,"), flags=re.I)
+    question = re.sub(r"\s+(?:в|за)\s+20\d{2}(?:\s+году)?$", "", question)
+    return bool(_SEAT_COUNT.fullmatch(question))
+
+
 def _is_followup(question: str) -> bool:
+    seat_followup = question.lower().startswith(("а ", "и ")) and is_seat_count_question(
+        question
+    )
     question = re.sub(
         r"^(?:(?:а|какой|какие|каков|каковы)\s+)+", "", question.strip(), flags=re.I
     )
     return bool(
-        _SHORT.search(question.strip()) or _GENERIC_SCORE.fullmatch(question.strip())
+        _SHORT.search(question.strip())
+        or _GENERIC_SCORE.fullmatch(question.strip())
+        or _is_generic_seat_question(question)
+        or seat_followup
     )
 
 
@@ -89,6 +137,12 @@ class ScoreGuard:
     program_names: dict[str, list[str]] = field(default_factory=dict)
     named_program: bool = False
 
+    @property
+    def requests_seats(self) -> bool:
+        return self.filters.get("metric") == "seats" or bool(
+            self.filters.get("include_seat_count")
+        )
+
     @classmethod
     def from_messages(cls, messages: list[BaseMessage]) -> "ScoreGuard | None":
         questions = [str(m.content).lower() for m in messages if m.type == "human"]
@@ -96,9 +150,13 @@ class ScoreGuard:
             return None
         current = questions[-1].strip(' «"!?.,')
         # Средний балл аттестата и индивидуальные результаты — другой источник.
-        if re.search(r"аттестат|диплом|мой средн", current) and "проходн" not in current:
+        if (
+            re.search(r"аттестат|диплом|мой средн", current)
+            and "проходн" not in current
+            and not is_seat_count_question(current)
+        ):
             return None
-        direct = bool(_SCORE.search(current))
+        direct = _admission_question(current)
         short = _is_followup(current)
         if not direct and not short:
             return None
@@ -106,7 +164,7 @@ class ScoreGuard:
         chain = [current]
         previous = questions[:-1] if short else []
         for question in reversed(previous):
-            if _SCORE.search(question):
+            if _admission_question(question):
                 chain.insert(0, question)
                 if not _is_followup(question) or _CODE.search(question):
                     break
@@ -133,17 +191,25 @@ class ScoreGuard:
                     raw = metadata.get("_comparisons", {})
                     if isinstance(raw, dict):
                         saved_comparisons = {
-                            key: list(values)
+                            ("admission_basis" if key == "form" else key): list(values)
                             for key, values in raw.items()
-                            if key in ("program", "year", "form")
+                            if key in (*_COMPARISON_FILTERS, "form")
                             and isinstance(values, list)
                         }
                     saved_scope = {
                         key: value
                         for key, value in metadata.items()
                         if key
-                        in ("program", "faculty", "level", "year", "form", "metric")
+                        in (
+                            *_COMPARISON_FILTERS,
+                            "faculty",
+                            "level",
+                            "metric",
+                            "include_seat_count",
+                        )
                     }
+                    if metadata.get("form") is not None:
+                        saved_scope.setdefault("admission_basis", metadata["form"])
                     break
                 if message.type == "human":
                     question = str(message.content).lower().strip()
@@ -151,11 +217,14 @@ class ScoreGuard:
                         break
                     scope_updates.insert(0, question)
         anchored = bool(saved_scope) or any(
-            _SCORE.search(q) and not _GENERIC_SCORE.fullmatch(q.strip())
+            _admission_question(q)
+            and not (_GENERIC_SCORE.fullmatch(q.strip()) or _is_generic_seat_question(q))
             for q in chain[:-1]
         )
         if not anchored and _GENERIC_SCORE.fullmatch(current):
             return cls(clarify=True)
+        if not anchored and _is_generic_seat_question(current):
+            return cls(filters={"metric": "seats"}, clarify=True)
         if short and not direct and not anchored:
             # «А в 2024?» после вопроса об общежитии не является запросом баллов.
             if not re.search(r"средн|проходн", current):
@@ -199,7 +268,7 @@ class ScoreGuard:
                     and not _REFERENCE_SUBJECT.match(value)
                     and not re.match(
                         r"плат|бюджет|бесплат|договор|магистр|бакалавр|спо\b|"
-                        r"специалитет|20\d{2}\b",
+                        r"специалитет|очн|заоч|20\d{2}\b",
                         value,
                     )
                 ):
@@ -244,17 +313,33 @@ class ScoreGuard:
                 filters["metric"] = "average"
             if "проходн" in question:
                 filters["metric"] = "both" if "средн" in question else "passing"
+            if "средн" in question or "проходн" in question:
+                filters.pop("include_seat_count", None)
+            if is_seat_count_question(question):
+                if _SCORE.search(question):
+                    filters["include_seat_count"] = True
+                else:
+                    filters["metric"] = "seats"
+                    filters.pop("include_seat_count", None)
             budget = "бюджет" in question or "бесплат" in question
             paid = bool(re.search(r"\bплат|договор", question))
             if budget and paid:
-                filters.pop("form", None)
-                comparisons["form"] = ["budget", "paid"]
-            elif budget:
-                filters["form"] = "budget"
-                comparisons.pop("form", None)
-            elif paid:
-                filters["form"] = "paid"
-                comparisons.pop("form", None)
+                filters.pop("admission_basis", None)
+                comparisons["admission_basis"] = ["budget", "paid"]
+            elif budget or paid:
+                filters["admission_basis"] = "budget" if budget else "paid"
+                comparisons.pop("admission_basis", None)
+            forms = [
+                form.value
+                for form, pattern in _STUDY_FORM_PATTERNS.items()
+                if pattern.search(question)
+            ]
+            if len(forms) > 1:
+                filters.pop("study_form", None)
+                comparisons["study_form"] = forms
+            elif forms:
+                filters["study_form"] = forms[0]
+                comparisons.pop("study_form", None)
             for pattern, level in (
                 (r"магистр", "master"),
                 (r"бакалавр", "bachelor"),
@@ -284,7 +369,13 @@ class ScoreGuard:
     def history_scope(self, resolved_scope: dict) -> dict:
         """Сравнение сохраняется как запрос, даже если SQL нашёл один вариант."""
         scope = dict(resolved_scope)
-        for key in ("year", "form", "level", "metric"):
+        for key in (
+            "year",
+            *_CLASSIFICATION_FILTERS,
+            "level",
+            "metric",
+            "include_seat_count",
+        ):
             if key in self.filters:
                 scope[key] = self.filters[key]
         if self.program_ids:
@@ -310,6 +401,8 @@ class ScoreGuard:
         parameters = deepcopy(tool.parameters)
         for name in self.comparisons:
             parameters["properties"].pop(name, None)
+        if "study_form" not in self.filters:
+            parameters["properties"].pop("study_form", None)
         for name, value in self.filters.items():
             parameters["properties"][name]["enum"] = [value]
         parameters["required"] = list(self.filters)
@@ -340,7 +433,14 @@ class ScoreGuard:
             return False
         if any(arguments.get(key) not in (None, "") for key in self.comparisons):
             return False
-        if metric not in (self.filters.get("metric"), "both"):
+        if arguments.get("study_form") and "study_form" not in self.filters:
+            return False
+        expected_metric = self.filters.get("metric")
+        if metric != expected_metric and (metric != "both" or expected_metric == "seats"):
+            return False
+        if bool(arguments.get("include_seat_count")) != bool(
+            self.filters.get("include_seat_count")
+        ):
             return False
         if (
             check_names
@@ -352,7 +452,7 @@ class ScoreGuard:
             # Дополнительный факультет способен сузить выборку до чужого
             # факультета, даже когда код направления указан верно.
             return False
-        for key in ("program", "faculty", "year", "form", "level"):
+        for key in ("program", "faculty", "year", *_CLASSIFICATION_FILTERS, "level"):
             if key in ("program", "faculty") and not check_names:
                 continue
             expected = self.filters.get(key)

@@ -13,6 +13,7 @@ from openai import AsyncOpenAI
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.chat import WELCOME_MESSAGE_MAX_LENGTH, utf16_length
 from config.instance import SPECS, SettingSpec, remember_secrets
 from db.postgres.models import Document, FaqEntry
 from db.postgres.services.instance_settings import InstanceSnapshot
@@ -20,9 +21,6 @@ from db.postgres.services.instance_settings import InstanceSnapshot
 
 class ConfigurationError(ValueError):
     pass
-
-
-WELCOME_MESSAGE_MAX_LENGTH = 3999
 
 
 def merge_changes(
@@ -58,7 +56,7 @@ def validate_value(spec: SettingSpec, value: str) -> None:
     if spec.kind == "textarea":
         if re.search(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\ud800-\udfff]", value):
             raise ConfigurationError("Приветствие содержит недопустимые символы")
-        if len(value.encode("utf-16-le")) // 2 > WELCOME_MESSAGE_MAX_LENGTH:
+        if utf16_length(value) > WELCOME_MESSAGE_MAX_LENGTH:
             raise ConfigurationError(
                 f"Приветствие должно содержать не более "
                 f"{WELCOME_MESSAGE_MAX_LENGTH} символов"
@@ -134,6 +132,7 @@ async def guard_embeddings(
         "OPENAI_GRAPH_EMBEDDING_MODEL",
         "GEMINI_GRAPH_EMBEDDING_MODEL",
         "GIGACHAT_EMBEDDING_MODEL",
+        "CLOUDRU_EMBEDDING_MODEL",
         "OPENAI_BASE_URL",
         "GEMINI_BASE_URL",
     }
@@ -183,6 +182,17 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
                 finally:
                     await bot_max.close_session()
             provider, purpose = target.split(":", 1)
+            if provider == "cloudru":
+                if purpose not in {"embedding", "graph_embedding"}:
+                    raise ConfigurationError("Cloud.ru доступен только для эмбеддингов")
+                from llm.providers.cloudru import CloudRuEmbedding
+
+                adapter_cloud = CloudRuEmbedding(
+                    api_key=values["CLOUDRU_API_KEY"],
+                    model=values["CLOUDRU_EMBEDDING_MODEL"],
+                )
+                await adapter_cloud(["Проверка подключения"])
+                return "Подключение и доступ к модели проверены"
             if provider == "gigachat":
                 if purpose not in {"embedding", "graph_embedding"}:
                     raise ConfigurationError("GigaChat доступен только для эмбеддингов")
@@ -293,7 +303,7 @@ async def check_connection(target: str, values: dict[str, str]) -> str:
 
 def required_checks(changes: dict[str, str | None], values: dict[str, str]) -> set[str]:
     targets = set()
-    for provider in ("openai", "gemini", "deepseek", "gigachat"):
+    for provider in ("openai", "gemini", "deepseek", "gigachat", "cloudru"):
         prefix = provider.upper() + "_"
         changed = any(k.startswith(prefix) for k in changes)
         active = (

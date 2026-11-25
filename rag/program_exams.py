@@ -19,6 +19,32 @@ _EGE = re.compile(r"\bегэ\b|\bедин\w+\s+государственн\w+\s+�
 _EXAMS = re.compile(r"\bэкзамен\w*|\bвступительн\w+\s+испытан\w*", re.I)
 _OTHER_EXAMS = re.compile(r"внутренн|расписани|\bкогда\b|после\s+спо", re.I)
 _ADMISSION_SCORES = re.compile(r"\b(?:проходн\w*|средн\w*)\s+балл\w*\b", re.I)
+_SELECTION_OR_RECOMMENDATION = re.compile(
+    r"\b(?:подбор\w*|подбер\w+|подходящ\w+|подойд[её]т\w*|подойдут|"
+    r"куда\s+(?:я\s+)?(?:могу|можно)\s+поступить|"
+    r"вариант\w+\s+(?:поступлени\w+|для)|"
+    r"перечисл\w+\s+(?:все\s+)?(?:подходящ\w+\s+)?(?:направлени\w+|программ\w+|специальност\w+|вариант\w+)|"
+    r"(?:все|какие)\s+(?:направлени\w+|программ\w+|специальност\w+|вариант\w+)\s+(?:для|по|с)\b|"
+    r"порекоменд\w+|рекоменд\w+|"
+    r"на\s+какие\s+(?:направлени\w+|программ\w+|специальност\w+)\s+(?:я\s+)?(?:могу|пройду|хватит))\b",
+    re.I,
+)
+_EXAM_SUBJECT_NAMES = {
+    "русский язык",
+    "математика",
+    "профильная математика",
+    "базовая математика",
+    "физика",
+    "информатика",
+    "география",
+    "химия",
+    "биология",
+    "история",
+    "обществознание",
+    "литература",
+    "иностранный язык",
+    "английский язык",
+}
 _HISTORY_ROLE = re.compile(r"(?m)^(user|assistant|system): ")
 _CLARIFY_PROFILE = "Уточните профиль, чтобы я назвал требования к ЕГЭ."
 _SUBJECT = re.compile(
@@ -90,6 +116,7 @@ def is_program_exam_question(question: str) -> bool:
     return (
         not _OTHER_EXAMS.search(question)
         and not _ADMISSION_SCORES.search(question)
+        and not _SELECTION_OR_RECOMMENDATION.search(question)
         and bool(_EGE.search(question) or _EXAMS.search(question))
     )
 
@@ -108,8 +135,13 @@ def _pending_exam_question(history: str | None) -> str | None:
 
 def can_query_program_exams(question: str, history: str | None) -> bool:
     """Проверяет, нужен ли резолвер карточек, включая уточнение профиля."""
-    return not _ADMISSION_SCORES.search(question) and (
-        is_program_exam_question(question) or _pending_exam_question(history) is not None
+    return (
+        not _ADMISSION_SCORES.search(question)
+        and not _SELECTION_OR_RECOMMENDATION.search(question)
+        and (
+            is_program_exam_question(question)
+            or _pending_exam_question(history) is not None
+        )
     )
 
 
@@ -189,6 +221,13 @@ def _select_cards(
             continue
         profile_match = _mentioned(card.profile, question_key)
         name_match = _mentioned(card.name, question_key)
+        if not codes:
+            profile_key = _name_key(card.profile)
+            name_key = _name_key(card.name)
+            if profile_match and profile_key in _EXAM_SUBJECT_NAMES:
+                profile_match = False
+            if name_match and name_key in _EXAM_SUBJECT_NAMES:
+                name_match = False
         if not codes and not (profile_match or name_match):
             rejected.append((card.doc_id, "name_mismatch"))
             continue
@@ -404,7 +443,10 @@ async def retrieve_program_exams(
     conversation_history: str | None = None,
 ) -> RetrievalResult | None:
     """Возвращает контекст одной карточки или готовое уточнение/отсутствие данных."""
-    if _ADMISSION_SCORES.search(question):
+    if (
+        _ADMISSION_SCORES.search(question)
+        or _SELECTION_OR_RECOMMENDATION.search(question)
+    ):
         return None
     follow_up = None
     if is_program_exam_question(question):

@@ -38,7 +38,10 @@ from pipeline.score_guard import (
     SCORES_CLARIFY,
     SCORES_TOOL,
     SCORES_UNAVAILABLE,
+    SEATS_CLARIFY,
+    SEATS_UNAVAILABLE,
     ScoreGuard,
+    is_seat_count_question,
 )
 from pipeline.study_plans import answer_study_plan
 from pipeline.tools import (
@@ -47,7 +50,10 @@ from pipeline.tools import (
     EDUCATION_PROGRAMS_TOOL,
     default_tool_executor,
 )
-from pipeline.tools.admission_scores import AdmissionScoresResult
+from pipeline.tools.admission_scores import (
+    AdmissionScoresResult,
+    normalize_score_arguments,
+)
 from rag.crag import load_crag_config
 from rag.retriever import (
     RetrievalError,
@@ -645,30 +651,53 @@ async def _run_tool_loop(
     колбэка не должен ломать сам ответ.
     """
     tool_executor = tool_executor or default_tool_executor
-    guard = ScoreGuard.from_messages(messages)
-    if guard is not None and guard.clarify:
-        return SCORES_CLARIFY, LLMUsage(), "none"
+    score_guard = ScoreGuard.from_messages(messages)
+    if score_guard is not None and score_guard.clarify:
+        clarify = SEATS_CLARIFY if score_guard.requests_seats else SCORES_CLARIFY
+        return clarify, LLMUsage(), "none"
     provider = get_llm_provider()
     provider_name = provider.__class__.__name__
     logger.info(f"[{session_id}] Sending payload to LLM ({provider_name}).")
 
-    if guard is not None:
+    if score_guard is not None:
+        guard = score_guard
+        unavailable = SEATS_UNAVAILABLE if guard.requests_seats else SCORES_UNAVAILABLE
         executor = tool_executor
         resolved_scope: dict = {}
+        verified_answer: str | None = None
 
         async def checked_executor(name: str, args: dict) -> str:
-            nonlocal resolved_scope
+            nonlocal resolved_scope, verified_answer
             if name == SCORES_TOOL:
+                try:
+                    args = normalize_score_arguments(dict(args))
+                except ValueError as exc:
+                    guard.verified = False
+                    return str(exc)
+                if guard.requests_seats:
+                    for key in ("program", "year", "level"):
+                        if not args.get(key) and key in guard.filters:
+                            args[key] = guard.filters[key]
+                    if not guard.program_ids and not (
+                        args.get("program")
+                        or args.get("faculty")
+                        or "program" in guard.comparisons
+                    ):
+                        guard.verified = False
+                        return "Укажите программу или факультет, для которых нужны места."
                 if not guard.accepts(args, check_names=False):
                     guard.verified = False
                     return "Параметры запроса не соответствуют вопросу пользователя."
+                for key in ("study_form", "admission_basis"):
+                    if key in guard.filters and not args.get(key):
+                        args[key] = guard.filters[key]
                 try:
                     output = await executor(name, args)
                 except Exception:
                     logger.exception("[%s] Admission scores query failed", session_id)
                     guard.verified = False
                     guard.attempted = True
-                    return SCORES_UNAVAILABLE
+                    return unavailable
                 resolved_args = dict(args)
                 if isinstance(output, AdmissionScoresResult) and output.status == "error":
                     guard.record(output)
@@ -691,6 +720,7 @@ async def _run_tool_loop(
                 guard.record(output)
                 if guard.verified and isinstance(output, AdmissionScoresResult):
                     resolved_scope = output.scope or dict(args)
+                    verified_answer = str(output) if output.use_as_answer else None
                 return output
             return await executor(name, args)
 
@@ -722,7 +752,7 @@ async def _run_tool_loop(
                 + result.usage.completion_tokens,
                 total_tokens=usage.total_tokens + result.usage.total_tokens,
             )
-        content = result.text if guard.verified else SCORES_UNAVAILABLE
+        content = (verified_answer or result.text) if guard.verified else unavailable
         if guard.verified and score_scope_callback is not None:
             score_scope_callback(guard.history_scope(resolved_scope))
         if stream_callback is not None:
@@ -875,7 +905,12 @@ async def _answer_without_kb(
         )
         return RAG_UNAVAILABLE_ANSWER, []
 
-    if not used_tool and content in (SCORES_CLARIFY, SCORES_UNAVAILABLE):
+    if not used_tool and content in (
+        SCORES_CLARIFY,
+        SCORES_UNAVAILABLE,
+        SEATS_CLARIFY,
+        SEATS_UNAVAILABLE,
+    ):
         return content, []
     if not used_tool:
         logger.info(
@@ -946,7 +981,13 @@ async def _generate_answer(
             score_scope_callback=ctx.remember_score_scope,
         )
 
-        processed = _postprocess(content, rag.sources)
+        score_query = ctx.score_query or {}
+        seat_answer = (
+            score_query.get("metric") == "seats"
+            or score_query.get("include_seat_count")
+            or content in (SEATS_CLARIFY, SEATS_UNAVAILABLE)
+        )
+        processed = _postprocess(content, [] if seat_answer else rag.sources)
         logger.info(f"[{session_id}] Received response from LLM.")
         logger.info(
             f"[{session_id}] - Raw response (first 500 chars): "
@@ -993,6 +1034,8 @@ def _store_answer(
     if ctx.score_query is not None and stored_text not in (
         SCORES_UNAVAILABLE,
         SCORES_CLARIFY,
+        SEATS_UNAVAILABLE,
+        SEATS_CLARIFY,
         RAG_UNAVAILABLE_ANSWER,
         "LLM временно недоступна.",
     ):
@@ -1049,34 +1092,37 @@ async def ask_local_llm(
         task_history = asyncio.create_task(redis_client.get_history(session_id))
 
         faq_answer = await _await_faq(task_faq, session_id)
-        if faq_answer:
+        seat_question = is_seat_count_question(expanded_message)
+        if faq_answer and not seat_question:
             task_history.cancel()
             with suppress(asyncio.CancelledError, Exception):
                 await task_history
             return await _answer_from_faq(faq_answer, message, redis_client, ctx)
 
         history_entries = await _await_history(task_history, session_id)
-        history_text = _build_history_text(history_entries)
+        if seat_question:
+            rag = _RagResult(context=RAG_CONTEXT_NOT_FOUND)
+        else:
+            await ctx.emit_status(STATUS_RAG)
+            plan_answer = await answer_study_plan(expanded_message)
+            if plan_answer is not None:
+                ctx.log(
+                    "llm_response",
+                    _strip_markup(plan_answer.text),
+                    response_length=len(plan_answer.text),
+                    provider="study_plan",
+                    no_answer=not plan_answer.sources,
+                    latency_ms=ctx.latency_ms(),
+                )
+                if not plan_answer.sources:
+                    ctx.log("no_answer", message)
+                _store_answer(plan_answer.text, message, redis_client, ctx)
+                return LlmAnswer(
+                    text=plan_answer.text, sources=plan_answer.sources, trace=ctx.trace
+                )
 
-        await ctx.emit_status(STATUS_RAG)
-        plan_answer = await answer_study_plan(expanded_message)
-        if plan_answer is not None:
-            ctx.log(
-                "llm_response",
-                _strip_markup(plan_answer.text),
-                response_length=len(plan_answer.text),
-                provider="study_plan",
-                no_answer=not plan_answer.sources,
-                latency_ms=ctx.latency_ms(),
-            )
-            if not plan_answer.sources:
-                ctx.log("no_answer", message)
-            _store_answer(plan_answer.text, message, redis_client, ctx)
-            return LlmAnswer(
-                text=plan_answer.text, sources=plan_answer.sources, trace=ctx.trace
-            )
-
-        rag = await _retrieve_context(expanded_message, history_text, ctx)
+            history_text = _build_history_text(history_entries)
+            rag = await _retrieve_context(expanded_message, history_text, ctx)
 
         content, answer_sources = await _generate_answer(
             rag,

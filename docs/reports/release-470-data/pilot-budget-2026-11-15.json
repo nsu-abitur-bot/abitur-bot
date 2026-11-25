@@ -1,0 +1,58 @@
+{
+  "checked_on": "2026-11-15",
+  "status": "proposal_only_not_spending_authorization",
+  "pilot": {
+    "delivered_questions_max": 6,
+    "scope": "FAQ/RAG/tools in two test channels, no judge or indexing",
+    "per_question": {
+      "generation_attempts": 40,
+      "deepseek_input_tokens": 32000,
+      "deepseek_output_tokens": 1024,
+      "embedding_tokens": 512
+    },
+    "proposed_deepseek_money_cap_cny": "3.00",
+    "proposed_total_embedding_token_cap": 10000,
+    "includes_setup_calls": true
+  },
+  "deepseek_scenarios": [
+    {
+      "model": "deepseek-flash",
+      "currency": "CNY",
+      "peak_cache_miss_input_per_million": "2",
+      "peak_output_per_million": "8",
+      "six_question_upper_bound": "0.433152",
+      "whole_pilot_input_cap": 300000,
+      "whole_pilot_output_cap": 10000,
+      "whole_pilot_upper_bound": "0.68"
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "currency": "CNY",
+      "peak_cache_miss_input_per_million": "9",
+      "peak_output_per_million": "27",
+      "six_question_upper_bound": "1.893888",
+      "whole_pilot_input_cap": 300000,
+      "whole_pilot_output_cap": 10000,
+      "whole_pilot_upper_bound": "2.97"
+    }
+  ],
+  "deepseek_price_source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "gigachat": {
+    "confirmed_account_tariff": null,
+    "proposed_tokens": 10000,
+    "existing_legacy_pers_package_example": {
+      "tokens": 50000000,
+      "price_rub": "700",
+      "token_equivalent_rub": "0.14"
+    },
+    "package_purchase_authorized": false,
+    "price_source": "https://developers.sber.ru/docs/ru/gigachat/tariffs/individual-tariffs"
+  },
+  "required_before_run": [
+    "actual endpoint/model/thinking mode and account tariff confirmed",
+    "isolated current NSU target and test recipients ready",
+    "all attempts including retries and setup metered before sending",
+    "token reservations and monetary limits enforced",
+    "user approves monetary and token limits"
+  ]
+}

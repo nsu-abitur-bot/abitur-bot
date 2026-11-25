@@ -24,6 +24,7 @@ from api.routes.evals import router as evals_router
 from api.routes.faculty import router as faculty_router
 from api.routes.faq import router as faq_router
 from api.routes.feedback_report import router as feedback_report_router
+from api.routes.gap_report import router as gap_report_router
 from api.routes.instance_settings import router as instance_settings_router
 from api.routes.message_log import router as message_log_router
 from api.routes.rag import router as rag_router
@@ -190,6 +191,11 @@ app.include_router(
 )
 app.include_router(
     feedback_report_router,
+    prefix="/api/v1",
+    dependencies=[Depends(get_current_admin)],
+)
+app.include_router(
+    gap_report_router,
     prefix="/api/v1",
     dependencies=[Depends(get_current_admin)],
 )

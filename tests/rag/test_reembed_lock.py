@@ -12,7 +12,7 @@ async def test_parallel_migration_is_rejected_before_reading_or_publishing(
     monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(root))
     called = []
 
-    async def forbidden(changes, target):
+    async def forbidden(changes, target, **kwargs):
         called.append(True)
         return {}
 
@@ -29,7 +29,7 @@ async def test_lock_is_held_until_migration_finishes(monkeypatch, tmp_path):
     root = tmp_path / "index"
     monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(root))
 
-    async def migrate(changes, target: Path):
+    async def migrate(changes, target: Path, **kwargs):
         with pytest.raises(BlockingIOError):
             with reembed_gigachat._migration_lock(target):
                 pytest.fail("parallel lock acquired")

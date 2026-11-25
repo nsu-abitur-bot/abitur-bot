@@ -1,21 +1,30 @@
 """Сервис для проходных баллов направлений подготовки.
 
-Структурированное хранилище проходных баллов прошлых лет (одна строка на
-тройку program/year/form). Позволяет отвечать на числовые вопросы из SQL,
-а не из RAG. Разрешение program_id идёт через авторитетный справочник
-факультетов (:class:`FacultyService`).
+Разрешение program_id идёт через справочник факультетов (:class:`FacultyService`).
 """
 
 import logging
 import re
 from dataclasses import dataclass
 from difflib import SequenceMatcher
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Optional, Sequence, TypedDict
 
-from sqlalchemy import select
+from sqlalchemy import or_, select, update
+from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from uuid6 import uuid7
 
-from ..models import ADMISSION_FORMS, AdmissionScore, Faculty, Program
+from ..models import (
+    ADMISSION_BASES,
+    ADMISSION_SCORE_SCOPE_CONSTRAINT,
+    AdmissionBasis,
+    AdmissionScore,
+    Faculty,
+    Program,
+    StudyForm,
+    timestamp,
+)
 from .faculty import (
     FacultyDirectory,
     FacultyService,
@@ -217,10 +226,30 @@ class ScoreRow:
     program_name: str
     code: Optional[str]
     year: int
-    form: str
+    admission_basis: str
     passing_score: Optional[float]
     average_score: Optional[float]
     level: str = "bachelor"
+    study_form: StudyForm | None = None
+    seat_count: int | None = None
+    source_url: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.seat_count is not None and (
+            type(self.seat_count) is not int or not 0 <= self.seat_count <= 2**31 - 1
+        ):
+            raise ValueError("Количество мест должно быть неотрицательным целым числом")
+
+
+class ScoreChanges(TypedDict, total=False):
+    admission_basis: AdmissionBasis
+    study_form: StudyForm | None
+    seat_count: int | None
+    source_url: str | None
+
+
+class AdmissionScoreConflict(ValueError):
+    """Для сочетания программы, года, формы и основания уже есть баллы."""
 
 
 class AdmissionScoreService:
@@ -390,26 +419,25 @@ class AdmissionScoreService:
         return []
 
     async def upsert_from_rows(self, rows: Iterable[ScoreRow]) -> dict[str, int]:
-        """Идемпотентный upsert по ключу (program_id, year, form).
+        """Идемпотентный upsert по программе, году, форме и основанию приёма.
 
         Разрешает program_id через факультет (по алиасу) и направление (по
         нормализованному имени). Если факультет или направление не находятся —
         строка молча пропускается (logger.info). Возвращает счётчики
         ``{"created": int, "updated": int, "skipped": int}``.
 
-        Пустой балл в строке не затирает уже сохранённый: если НГУ поменяет
-        вёрстку страницы итогов, парсер начнёт отдавать строки без чисел, и
-        без этой проверки импорт молча обнулил бы баллы по всему университету.
+        Отсутствующие в импорте значения сохраняют прежние числа и источник,
+        в том числе при повторном импорте баллов из старого формата.
         """
         stats = {"created": 0, "updated": 0, "skipped": 0}
 
         for row in rows:
-            form = (row.form or "").strip().lower()
-            if form not in ADMISSION_FORMS:
+            basis = row.admission_basis.strip().lower()
+            if basis not in ADMISSION_BASES:
                 logger.info(
-                    "Пропущена строка проходного балла: недопустимая форма %r "
+                    "Пропущена строка проходного балла: недопустимое основание %r "
                     "(факультет=%r, направление=%r, год=%s)",
-                    row.form,
+                    row.admission_basis,
                     row.faculty_name,
                     row.program_name,
                     row.year,
@@ -432,35 +460,66 @@ class AdmissionScoreService:
                 stats["skipped"] += 1
                 continue
 
-            stmt = select(AdmissionScore).where(
-                AdmissionScore.program_id == program.id,
-                AdmissionScore.year == row.year,
-                AdmissionScore.form == form,
+            score_id = str(uuid7())
+            stmt = insert(AdmissionScore).values(
+                id=score_id,
+                program_id=program.id,
+                year=row.year,
+                admission_basis=basis,
+                study_form=row.study_form,
+                passing_score=row.passing_score,
+                average_score=row.average_score,
+                seat_count=row.seat_count,
+                source_url=row.source_url,
             )
-            result = await self.session.execute(stmt)
-            existing = result.scalar_one_or_none()
-
-            if existing is None:
-                self.session.add(
-                    AdmissionScore(
-                        program_id=program.id,
-                        year=row.year,
-                        form=form,
-                        passing_score=row.passing_score,
-                        average_score=row.average_score,
-                        source_url=None,
-                    )
+            metrics = {
+                column: value
+                for column, value in (
+                    ("passing_score", row.passing_score),
+                    ("average_score", row.average_score),
+                    ("seat_count", row.seat_count),
+                    ("source_url", row.source_url),
                 )
-                stats["created"] += 1
+                if value is not None
+            }
+            if metrics:
+                stmt = stmt.on_conflict_do_update(
+                    constraint=ADMISSION_SCORE_SCOPE_CONSTRAINT,
+                    set_={**metrics, "updated_at": timestamp()},
+                    where=or_(
+                        *(
+                            AdmissionScore.__table__.c[column].is_distinct_from(value)
+                            for column, value in metrics.items()
+                        )
+                    ),
+                )
             else:
-                if row.passing_score is not None:
-                    existing.passing_score = row.passing_score
-                if row.average_score is not None:
-                    existing.average_score = row.average_score
-                stats["updated"] += 1
+                stmt = stmt.on_conflict_do_nothing(
+                    constraint=ADMISSION_SCORE_SCOPE_CONSTRAINT
+                )
+            saved_id = await self.session.scalar(stmt.returning(AdmissionScore.id))
+            stats["created" if saved_id == score_id else "updated"] += 1
 
         await self.session.commit()
         return stats
+
+    async def update_score(self, score_id: str, changes: ScoreChanges) -> dict | None:
+        """Обновляет переданные данные приёма, сохраняя ID записи."""
+        if changes:
+            try:
+                await self.session.execute(
+                    update(AdmissionScore)
+                    .where(AdmissionScore.id == score_id)
+                    .values(**changes)
+                )
+            except IntegrityError as exc:
+                await self.session.rollback()
+                if getattr(exc.orig, "sqlstate", None) == "23505":
+                    raise AdmissionScoreConflict from exc
+                raise
+        rows = await self.query_scores(score_id=score_id, only_active=False)
+        await self.session.commit()
+        return rows[0] if rows else None
 
     async def query_scores(
         self,
@@ -468,11 +527,14 @@ class AdmissionScoreService:
         faculty: Optional[str] = None,
         program: Optional[str] = None,
         year: Optional[int] = None,
-        form: Optional[str] = None,
+        admission_basis: Optional[str] = None,
+        study_form: StudyForm | None = None,
         level: Optional[str] = None,
         only_active: bool = True,
         program_ids: Optional[Sequence[str]] = None,
         include_identity: bool = False,
+        score_id: str | None = None,
+        only_with_scores: bool = False,
     ) -> list[dict]:
         """Выборка проходных баллов с разрешением строковых фильтров.
 
@@ -481,22 +543,31 @@ class AdmissionScoreService:
         аббревиатура → код → слова). ``level=None`` (по умолчанию)
         означает любой уровень — так находятся и специалитетные программы
         (медицина), а не только бакалавриат. Возвращает список плоских словарей,
-        отсортированный по (program_name, year, form). Пустой список, если
+        отсортированный по программе, году, форме и основанию. Пустой список, если
         ничего не найдено. ``only_active=False`` включает архивные записи
         для административного просмотра.
 
         ``program_ids`` привязывает запрос к точным программам вместо строковых
         program/faculty: общий код ФГОС не различает профили. ``include_identity``
-        добавляет program_id в строки для внутренней проверки пайплайна;
-        по умолчанию форма результата остаётся прежней.
+        добавляет program_id в строки для внутренней проверки пайплайна.
         """
         stmt = (
             select(AdmissionScore, Program, Faculty)
             .join(Program, AdmissionScore.program_id == Program.id)
             .join(Faculty, Program.faculty_id == Faculty.id)
+            .execution_options(populate_existing=True)
         )
         if only_active:
             stmt = stmt.where(Program.is_active, Faculty.is_active)
+        if score_id is not None:
+            stmt = stmt.where(AdmissionScore.id == score_id)
+        if only_with_scores:
+            stmt = stmt.where(
+                or_(
+                    AdmissionScore.passing_score.is_not(None),
+                    AdmissionScore.average_score.is_not(None),
+                )
+            )
 
         canonical_level = normalize_level(level)
         if canonical_level is not None:
@@ -527,28 +598,46 @@ class AdmissionScoreService:
         if year is not None:
             stmt = stmt.where(AdmissionScore.year == year)
 
-        if form is not None:
-            normalized_form = form.strip().lower()
-            stmt = stmt.where(AdmissionScore.form == normalized_form)
+        if admission_basis is not None:
+            stmt = stmt.where(
+                AdmissionScore.admission_basis == admission_basis.strip().lower()
+            )
+        if study_form is not None:
+            stmt = stmt.where(AdmissionScore.study_form == study_form)
 
         result = await self.session.execute(stmt)
         rows: list[dict] = []
         for score, prog, fac in result.all():
             row = {
+                "id": score.id,
                 "faculty_name": fac.name,
                 "program_name": prog.name,
                 "code": prog.code,
                 "level": prog.level,
                 "year": score.year,
-                "form": score.form,
+                "admission_basis": score.admission_basis,
+                "study_form": score.study_form,
                 "passing_score": score.passing_score,
                 "average_score": score.average_score,
+                "seat_count": score.seat_count,
+                "source_url": score.source_url,
             }
             if include_identity:
                 row["program_id"] = prog.id
             rows.append(row)
 
-        rows.sort(key=lambda r: (r["program_name"], r["year"], r["form"]))
+        rows.sort(
+            key=lambda r: (
+                r["program_name"],
+                r["faculty_name"],
+                r["code"] or "",
+                r["level"],
+                r["year"],
+                r["study_form"] is None,
+                r["study_form"],
+                r["admission_basis"],
+            )
+        )
         return rows
 
     async def get_available_years(self) -> list[int]:

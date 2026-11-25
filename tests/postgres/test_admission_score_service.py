@@ -47,7 +47,7 @@ def _fit_rows() -> list[ScoreRow]:
             program_name="Программная инженерия и компьютерные науки",
             code="09.03.04",
             year=2024,
-            form="budget",
+            admission_basis="budget",
             passing_score=246,
             average_score=84.2,
         ),
@@ -56,7 +56,7 @@ def _fit_rows() -> list[ScoreRow]:
             program_name="Компьютерные науки и системотехника",
             code="09.03.01",
             year=2024,
-            form="budget",
+            admission_basis="budget",
             passing_score=260,
             average_score=88.1,
         ),
@@ -120,7 +120,7 @@ async def test_upsert_skips_unknown_faculty_and_program(session: AsyncSession):
             program_name="Что-то",
             code=None,
             year=2024,
-            form="budget",
+            admission_basis="budget",
             passing_score=200,
             average_score=None,
         ),
@@ -129,7 +129,7 @@ async def test_upsert_skips_unknown_faculty_and_program(session: AsyncSession):
             program_name="Направление, которого нет на ФИТ",
             code=None,
             year=2024,
-            form="budget",
+            admission_basis="budget",
             passing_score=210,
             average_score=None,
         ),
@@ -139,7 +139,7 @@ async def test_upsert_skips_unknown_faculty_and_program(session: AsyncSession):
             program_name="Компьютерные науки и системотехника",
             code="09.03.01",
             year=2024,
-            form="целевое",
+            admission_basis="целевое",
             passing_score=220,
             average_score=None,
         ),
@@ -157,7 +157,9 @@ async def test_query_scores_distinguishes_programs(session: AsyncSession):
     service = AdmissionScoreService(session)
     await service.upsert_from_rows(_fit_rows())
 
-    by_faculty = await service.query_scores(faculty="ФИТ", year=2024, form="budget")
+    by_faculty = await service.query_scores(
+        faculty="ФИТ", year=2024, admission_basis="budget"
+    )
     assert len(by_faculty) == 2
     scores_by_program = {s["program_name"]: s["passing_score"] for s in by_faculty}
     assert scores_by_program["Программная инженерия и компьютерные науки"] == 246
@@ -166,15 +168,21 @@ async def test_query_scores_distinguishes_programs(session: AsyncSession):
     # Проверяем плоскую форму словаря.
     sample = by_faculty[0]
     assert set(sample.keys()) == {
+        "id",
         "faculty_name",
         "program_name",
         "code",
         "level",
         "year",
-        "form",
+        "admission_basis",
+        "study_form",
         "passing_score",
         "average_score",
+        "seat_count",
+        "source_url",
     }
+    assert sample["seat_count"] is None
+    assert sample["source_url"] is None
     assert sample["faculty_name"] == "Факультет информационных технологий"
     assert sample["level"] == "bachelor"
 
@@ -194,7 +202,7 @@ async def test_query_scores_separates_spo_from_higher_education(session: AsyncSe
                 code=None,
                 level=level,
                 year=2025,
-                form="budget",
+                admission_basis="budget",
                 passing_score=score,
                 average_score=None,
             )
@@ -360,14 +368,14 @@ async def test_strict_matching_profile_field_and_aggregate(session: AsyncSession
     stats = await svc.upsert_from_rows(rows)
     assert stats == {"created": 3, "updated": 0, "skipped": 1}
 
-    fit = await svc.query_scores(faculty="ФИТ", year=2024, form="budget")
+    fit = await svc.query_scores(faculty="ФИТ", year=2024, admission_basis="budget")
     by = {s["program_name"]: s["passing_score"] for s in fit}
     assert by[KNIS] == 260
     assert by[PIKN] == 246
     # Агрегат 999 никуда не записался (не перезаписал профиль).
     assert 999 not in by.values()
 
-    ff = await svc.query_scores(faculty="ФФ", year=2024, form="budget")
+    ff = await svc.query_scores(faculty="ФФ", year=2024, admission_basis="budget")
     assert len(ff) == 1 and ff[0]["passing_score"] == 190
 
 
@@ -438,7 +446,7 @@ async def test_get_available_years_descending(session: AsyncSession):
             program_name="Компьютерные науки и системотехника",
             code="09.03.01",
             year=2023,
-            form="budget",
+            admission_basis="budget",
             passing_score=255,
             average_score=None,
         )

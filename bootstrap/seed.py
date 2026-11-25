@@ -88,8 +88,8 @@ async def _scores_are_fresh(now: datetime) -> bool:
 async def seed_admission_scores() -> None:
     """Подтягивает проходные баллы прошлых лет со страницы итогов приёма НГУ.
 
-    Upsert идемпотентен по (program_id, year, form), поэтому повторные запуски
-    безопасны. Отключить целиком: SEED_ADMISSION_SCORES=0. Игнорировать
+    Upsert идемпотентен по программе, году, форме обучения и основанию приёма.
+    Отключить целиком: SEED_ADMISSION_SCORES=0. Игнорировать
     свежесть: SEED_ADMISSION_SCORES_FORCE=1.
     """
     if not is_nsu() or not _env_flag("SEED_ADMISSION_SCORES", True):

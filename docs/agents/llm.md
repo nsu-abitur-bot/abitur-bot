@@ -11,8 +11,8 @@
 |-----------|-----------|---------|
 | `LLM_PROVIDER` | Ответы бота | `openai`, `gemini`, `deepseek` |
 | `LIGHTRAG_LLM_PROVIDER` | LightRAG граф (независимо от бота) | `openai`, `gemini`, `deepseek` |
-| `FAQ_EMBEDDING_PROVIDER` | Эмбеддинги FAQ | `openai`, `gemini`, `gigachat` |
-| `LIGHTRAG_EMBEDDING_PROVIDER` | Эмбеддинги графа | `openai`, `gemini`, `gigachat` |
+| `FAQ_EMBEDDING_PROVIDER` | Эмбеддинги FAQ | `openai`, `gemini`, `gigachat`, `cloudru` |
+| `LIGHTRAG_EMBEDDING_PROVIDER` | Эмбеддинги графа | `openai`, `gemini`, `gigachat`, `cloudru` |
 | `PDF_PARSER_PROVIDER` | Парсинг PDF (vision) | `openai`, `gemini` |
 
 Новый провайдер: `providers/<name>.py` плюс
@@ -53,3 +53,7 @@ GigaChat подключён только для эмбеддингов. Один
 
 Контракт DeepSeek, live-сценарии, условия перехода и откат —
 [DeepSeek](../deepseek.md). До live-сравнения назначение стенда не меняется.
+
+Cloud.ru подключён только для эмбеддингов. `CLOUDRU_API_KEY` и единая
+`CLOUDRU_EMBEDDING_MODEL` настраиваются в админке. Перенос наполненного FAQ и
+LightRAG с сохранением старых векторов для отката — [инструкция](../cloudru.md).

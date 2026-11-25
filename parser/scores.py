@@ -10,7 +10,8 @@
 группе «Зачислены на бюджет» и один раз в группе «Зачислены платно».
 
 Парсинг детерминированный (BeautifulSoup, без LLM). Возвращает список
-:class:`ScoreRow` — по одной строке на тройку (направление, год, форма).
+:class:`ScoreRow` — по одной строке на направление, год и основание приёма.
+Таблицы без подтверждённой формы обучения дают study_form=None.
 """
 
 import asyncio
@@ -44,8 +45,8 @@ _PROGRAM_PAREN_RE = re.compile(
 )
 _CODE_RE = re.compile(r"\d{2}\.\d{2}\.\d{2}")
 
-_FORM_BUDGET_RE = re.compile(r"зачислены\s+на\s+бюджет", re.IGNORECASE)
-_FORM_PAID_RE = re.compile(r"зачислены\s+платно", re.IGNORECASE)
+_BASIS_BUDGET_RE = re.compile(r"зачислены\s+на\s+бюджет", re.IGNORECASE)
+_BASIS_PAID_RE = re.compile(r"зачислены\s+платно", re.IGNORECASE)
 
 _EMPTY_CELLS = {"", "-", "—", "–", "0"}
 
@@ -131,13 +132,13 @@ def _parse_table(
     if not year_by_col:
         return []
 
-    # form -> metric -> {year: value}
+    # basis -> metric -> {year: value}
     collected: dict[str, dict[str, dict[int, float]]] = {
         "budget": {"passing": {}, "average": {}},
         "paid": {"passing": {}, "average": {}},
     }
 
-    current_form: str | None = None
+    current_basis: str | None = None
     for tr in rows[1:]:
         cells = tr.find_all(["td", "th"])
         if not cells:
@@ -145,14 +146,14 @@ def _parse_table(
         label = _clean(cells[0].get_text(" ", strip=True))
         label_lower = label.lower()
 
-        if _FORM_BUDGET_RE.search(label_lower):
-            current_form = "budget"
+        if _BASIS_BUDGET_RE.search(label_lower):
+            current_basis = "budget"
             continue
-        if _FORM_PAID_RE.search(label_lower):
-            current_form = "paid"
+        if _BASIS_PAID_RE.search(label_lower):
+            current_basis = "paid"
             continue
 
-        if current_form is None:
+        if current_basis is None:
             continue
 
         if label_lower.startswith("проходной балл"):
@@ -167,12 +168,12 @@ def _parse_table(
                 continue
             value = _parse_number(cells[col_idx].get_text(" ", strip=True))
             if value is not None:
-                collected[current_form][metric][year] = value
+                collected[current_basis][metric][year] = value
 
     result: list[ScoreRow] = []
-    for form in ("budget", "paid"):
-        passing = collected[form]["passing"]
-        average = collected[form]["average"]
+    for basis in ("budget", "paid"):
+        passing = collected[basis]["passing"]
+        average = collected[basis]["average"]
         years = sorted(set(passing) | set(average))
         for year in years:
             p_val = passing.get(year)
@@ -185,7 +186,7 @@ def _parse_table(
                     program_name=program_name,
                     code=code,
                     year=year,
-                    form=form,
+                    admission_basis=basis,
                     passing_score=int(round(p_val)) if p_val is not None else None,
                     average_score=a_val,
                     level=level,
@@ -228,8 +229,8 @@ def parse_scores_html(html: str) -> list[ScoreRow]:
 async def parse_scores(url: str = DEFAULT_SCORES_URL) -> list[ScoreRow]:
     """Загружает и парсит страницу «Итоги приёма прошлых лет» НГУ.
 
-    Возвращает список :class:`ScoreRow` — по одной строке на тройку
-    (направление, год, форма). Проходной/средний баллы за годы без данных
+    Возвращает список :class:`ScoreRow` — по одной строке на направление,
+    год и основание приёма. Проходной/средний баллы за годы без данных
     пропускаются.
     """
     try:

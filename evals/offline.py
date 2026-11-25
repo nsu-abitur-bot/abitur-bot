@@ -41,6 +41,7 @@ def _fixture_pipeline() -> Iterator[Runner]:
     from faq.matcher import FAQMatcher
     from llm.base import LLMResult
     from pipeline import llm_client
+    from pipeline.tools.admission_scores import AdmissionScoresResult, _format_scores
     from rag.graph_memory import GraphMemory
 
     class MemoryHistory:
@@ -95,9 +96,26 @@ def _fixture_pipeline() -> Iterator[Runner]:
                     {"faculty": "Факультет Изучения Магии", "metric": "passing"},
                 )
                 return LLMResult(text=str(value))
+            if "сколько бюджетных мест" in question.casefold():
+                await tool_executor(
+                    "get_admission_scores",
+                    {
+                        "program": "Тестовая инженерия",
+                        "year": 2025,
+                        "admission_basis": "budget",
+                        "metric": "seats",
+                    },
+                )
+                return LLMResult(text="Есть 99 мест, поступление гарантировано.")
             if "проходной балл" in question.casefold() and "2024" in question:
                 if not any(tool.name == "get_admission_scores" for tool in tools):
                     raise AssertionError("Admission tool was not offered to provider")
+                if "тестовая инженерия" in question.casefold():
+                    await tool_executor(
+                        "get_admission_scores",
+                        {"program": "Тестовая инженерия", "year": 2024},
+                    )
+                    return LLMResult(text="Проходной балл 255.")
                 value = await tool_executor("get_admission_scores", {"year": 2024})
                 return LLMResult(text=f"Проходной балл: {value}")
             if "добраться" in question.casefold() and any(
@@ -166,11 +184,46 @@ def _fixture_pipeline() -> Iterator[Runner]:
     async def executor(name: str, args: dict) -> str:
         if name != "get_admission_scores":
             raise AssertionError("Unexpected tool")
-        from pipeline.tools.admission_scores import AdmissionScoresResult
-
         if args.get("faculty") == "Факультет Изучения Магии":
             return AdmissionScoresResult(
                 "По этому запросу данных о проходных баллах нет.", status="empty"
+            )
+        if args.get("metric") == "seats" and args.get("program") == "Тестовая инженерия":
+            rows = [
+                {
+                    "program_name": args["program"],
+                    "year": args["year"],
+                    "study_form": form,
+                    "admission_basis": args["admission_basis"],
+                    "seat_count": seats,
+                    "source_url": url,
+                }
+                for form, seats, url in (
+                    ("full_time", 0, "https://example.test/admission-2025"),
+                    ("correspondence", None, None),
+                )
+            ]
+            return AdmissionScoresResult(
+                _format_scores(rows, "seats"), status="ok", use_as_answer=True
+            )
+        if args.get("program") == "Тестовая инженерия":
+            rows = [
+                {
+                    "program_name": args["program"],
+                    "year": 2024,
+                    "study_form": form,
+                    "admission_basis": basis,
+                    "passing_score": score,
+                }
+                for form, basis, score in (
+                    ("full_time", "budget", 255),
+                    ("full_time", "paid", 212),
+                    ("correspondence", "budget", 224),
+                    ("correspondence", "paid", 181),
+                )
+            ]
+            return AdmissionScoresResult(
+                _format_scores(rows, "passing"), status="ok", use_as_answer=True
             )
         return AdmissionScoresResult("246 (тестовая фикстура, 2024)", status="ok")
 

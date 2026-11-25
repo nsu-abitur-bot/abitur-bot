@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.services.branding import favicon_url, media_root
+from config.chat import CHAT_DISCLAIMER
 from config.instance import SPECS
 from db.postgres.db import get_async_session
 from db.postgres.services.instance_settings import InstanceSettingsService
@@ -22,6 +23,7 @@ class BrandingResponse(BaseModel):
     logo_url: str
     favicon_url: str
     accent_color: str
+    chat_disclaimer: str
 
 
 @router.get("", response_model=BrandingResponse)
@@ -43,6 +45,7 @@ async def get_branding(
         "favicon_url": favicon_url(logo),
         "accent_color": values.get("UNIVERSITY_ACCENT_COLOR")
         or SPECS["UNIVERSITY_ACCENT_COLOR"].default,
+        "chat_disclaimer": CHAT_DISCLAIMER,
     }
 
 

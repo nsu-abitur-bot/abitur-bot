@@ -1,0 +1,14 @@
+{
+    "runner":  {
+                   "returncode":  137,
+                   "seconds":  46.839,
+                   "minimum_host_available_mib":  1088.8,
+                   "stop_reason":  null,
+                   "output_truncated":  false
+               },
+    "cases_completed_confirmed":  0,
+    "delivery_state":  "unconfirmed",
+    "receipt_lost_before_worker_exit":  true,
+    "cause":  "unestablished",
+    "shared_host_memory_floor_reached":  false
+}

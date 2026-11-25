@@ -88,6 +88,37 @@ scenarios:
       - {kind: contains, value: Тестовый контекст НГУ}
       - {kind: faq_match, value: false}
 
+  - id: admission_score_study_forms
+    question: Какой проходной балл на программе «Тестовая инженерия» в 2024 году?
+    reference_answer: Очная — бюджет 255, платно 212. Заочная — бюджет 224, платно 181.
+    topic: admission_scores
+    source: "Синтетические баллы для регрессии #482 из evals/offline.py"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: contains, value: "очная, бюджет: проходной 255"}
+      - {kind: contains, value: "очная, платно: проходной 212"}
+      - {kind: contains, value: "заочная, бюджет: проходной 224"}
+      - {kind: contains, value: "заочная, платно: проходной 181"}
+
+  - id: admission_announced_seats
+    question: Сколько бюджетных мест на очной и заочной формах на программе «Тестовая инженерия» в 2025 году?
+    reference_answer: На программе «Тестовая инженерия» в 2025 году объявлено 0 бюджетных мест на очной форме. Показана ссылка на источник. По заочной форме количество неизвестно.
+    topic: admission_scores
+    source: "Синтетические данные для регрессии #483 из evals/offline.py"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: contains, value: Тестовая инженерия}
+      - {kind: contains, value: "2025, очная, бюджет: объявлено мест: 0"}
+      - {kind: contains, value: "2025, заочная, бюджет: нет данных о количестве мест"}
+      - {kind: contains, value: "https://example.test/admission-2025"}
+      - {kind: not_contains, value: "гарантировано"}
+
   - id: rag_rerank_failure
     question: Как добраться до главного корпуса НГУ?
     reference_answer: Тестовый контекст НГУ сохраняется при таймауте ранжировщика.

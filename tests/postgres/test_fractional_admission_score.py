@@ -25,12 +25,12 @@ async def test_college_score_round_trip(session: AsyncSession):
         code=program.code,
         level="spo",
         year=2024,
-        form="budget",
+        admission_basis="budget",
         passing_score=4.43,
         average_score=4.42,
     )
     service = AdmissionScoreService(session)
-    row = ScoreRow(**payload.model_dump())
+    row = ScoreRow(**payload.model_dump(exclude={"form"}))
     assert await service.upsert_from_rows([row]) == {
         "created": 1,
         "updated": 0,

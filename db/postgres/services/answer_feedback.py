@@ -1,4 +1,7 @@
-from sqlalchemy import update
+from datetime import datetime
+from typing import Optional
+
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..models import AnswerFeedback, FeedbackReport, timestamp
@@ -61,3 +64,42 @@ class AnswerFeedbackService:
         )
         await self.session.commit()
         return True
+
+    async def negative_by_question(
+        self,
+        start: Optional[datetime],
+        end: Optional[datetime],
+        limit: int = 10,
+    ) -> list[dict]:
+        """Вопросы с негативной оценкой ответов — «где бот отвечает плохо» (#262).
+
+        Группировка по точному тексту вопроса: отчёт читает редактор, для
+        него важен сам вопрос, а не канонизация формулировок.
+        """
+        negative_expr = func.count().filter(AnswerFeedback.rating == "negative")
+        rated_expr = func.count().filter(AnswerFeedback.rating.isnot(None))
+        stmt = (
+            select(
+                AnswerFeedback.question.label("question"),
+                negative_expr.label("negative"),
+                rated_expr.label("rated"),
+            )
+            .where(AnswerFeedback.rating.isnot(None))
+            .group_by(AnswerFeedback.question)
+            .having(negative_expr > 0)
+            .order_by(negative_expr.desc())
+            .limit(limit)
+        )
+        if start is not None:
+            stmt = stmt.where(AnswerFeedback.created_at >= start.replace(tzinfo=None))
+        if end is not None:
+            stmt = stmt.where(AnswerFeedback.created_at <= end.replace(tzinfo=None))
+        rows = (await self.session.execute(stmt)).all()
+        return [
+            {
+                "question": row._mapping["question"],
+                "negative": int(row._mapping["negative"]),
+                "rated": int(row._mapping["rated"]),
+            }
+            for row in rows
+        ]
