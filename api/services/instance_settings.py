@@ -13,6 +13,7 @@ from openai import AsyncOpenAI
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.chat import WELCOME_MESSAGE_MAX_LENGTH, utf16_length
 from config.instance import SPECS, SettingSpec, remember_secrets
 from db.postgres.models import Document, FaqEntry
 from db.postgres.services.instance_settings import InstanceSnapshot
@@ -20,9 +21,6 @@ from db.postgres.services.instance_settings import InstanceSnapshot
 
 class ConfigurationError(ValueError):
     pass
-
-
-WELCOME_MESSAGE_MAX_LENGTH = 3999
 
 
 def merge_changes(
@@ -58,7 +56,7 @@ def validate_value(spec: SettingSpec, value: str) -> None:
     if spec.kind == "textarea":
         if re.search(r"[\x00-\x08\x0b-\x1f\x7f-\x9f\ud800-\udfff]", value):
             raise ConfigurationError("Приветствие содержит недопустимые символы")
-        if len(value.encode("utf-16-le")) // 2 > WELCOME_MESSAGE_MAX_LENGTH:
+        if utf16_length(value) > WELCOME_MESSAGE_MAX_LENGTH:
             raise ConfigurationError(
                 f"Приветствие должно содержать не более "
                 f"{WELCOME_MESSAGE_MAX_LENGTH} символов"

@@ -11,7 +11,9 @@
 ## Контракт (API выкладывается первым)
 
 - `GET /api/v1/branding`: публичный whitelist `revision`, `short_name`,
-  `full_name`, `logo_url`, `favicon_url`, `accent_color`. `Cache-Control: no-store`.
+  `full_name`, `logo_url`, `favicon_url`, `accent_color`, `chat_disclaimer`.
+  `Cache-Control: no-store`. `chat_disclaimer` — обычный текст предупреждения
+  для подписи рядом с полем ввода Mini App, единый для всех вузов и мессенджеров.
   Не возвращает профиль подключения, секреты, контакты или описание роли.
 - Существующие `GET /university`, `GET /university/profile`,
   `GET/PUT /settings/instance` совместимы. Новый ключ `UNIVERSITY_ACCENT_COLOR`

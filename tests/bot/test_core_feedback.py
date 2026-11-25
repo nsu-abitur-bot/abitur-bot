@@ -8,6 +8,7 @@ from bot.core import (
     TOO_LONG_MESSAGE_TEXT,
     BotCore,
 )
+from config.chat import CHAT_DISCLAIMER
 from pipeline.llm_client import LlmAnswer
 
 
@@ -148,7 +149,10 @@ async def test_empty_feedback_message_keeps_feedback_mode(monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_normal_reply_has_feedback_footer(monkeypatch):
+@pytest.mark.parametrize("channel", ["telegram", "max"])
+async def test_normal_reply_has_sources_and_feedback_without_disclaimer(
+    channel, monkeypatch
+):
     redis = FakeRedis()
     core = BotCore()
     user_log = type("Log", (), {"id": 10})()
@@ -176,11 +180,18 @@ async def test_normal_reply_has_feedback_footer(monkeypatch):
         AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
     )
     monkeypatch.setattr(
-        "bot.core.ask_local_llm", AsyncMock(return_value=LlmAnswer(text="Ответ бота"))
+        "bot.core.ask_local_llm",
+        AsyncMock(
+            return_value=LlmAnswer(
+                text="Ответ бота",
+                sources=[{"title": "Сайт приёмной комиссии", "url": "https://nsu.ru/"}],
+            ),
+        ),
     )
+    await core.cmd_start(channel, "123", "session-1")
 
     reply = await core.handle_message(
-        channel="telegram",
+        channel=channel,
         external_user_id="123",
         session_id="session-1",
         user_name="user",
@@ -189,6 +200,9 @@ async def test_normal_reply_has_feedback_footer(monkeypatch):
 
     assert reply.text.endswith(FEEDBACK_FOOTER)
     assert reply.feedback_id == "feedback-1"
+    assert "Сайт приёмной комиссии" in reply.text
+    assert "https://nsu.ru/" in reply.text
+    assert CHAT_DISCLAIMER not in reply.text
 
 
 @pytest.mark.asyncio
@@ -245,7 +259,7 @@ async def test_cmd_start_has_no_feedback_footer(monkeypatch):
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
 
-    reply = await core.cmd_start("telegram", "123", "session-1")
+    (reply,) = await core.cmd_start("telegram", "123", "session-1")
 
     assert "Напишите свой вопрос" in reply.text
     assert FEEDBACK_FOOTER not in reply.text

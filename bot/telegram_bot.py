@@ -200,16 +200,17 @@ async def run_telegram_bot() -> bool | None:
     async def cmd_start(message: Message):
         if not message.from_user:
             return
-        reply = await core.cmd_start(
+        replies = await core.cmd_start(
             channel="telegram",
             external_user_id=str(message.from_user.id),
             session_id=get_session_id(message),
         )
-        await bot.send_message(
-            str(message.chat.id),
-            reply.text,
-            parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
-        )
+        for reply in replies:
+            await bot.send_message(
+                str(message.chat.id),
+                reply.text,
+                parse_mode=ParseMode.HTML if reply.parse_mode == "HTML" else None,
+            )
 
     @dp.message(Command("track"))
     async def cmd_track(message: Message):

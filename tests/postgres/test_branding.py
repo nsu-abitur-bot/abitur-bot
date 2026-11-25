@@ -65,6 +65,7 @@ async def test_atomic_brand_lifecycle_and_public_whitelist(
                 "logo_url",
                 "favicon_url",
                 "accent_color",
+                "chat_disclaimer",
             }
             assert brand["short_name"] == "Север"
             assert brand["accent_color"] == "#006633"
@@ -101,7 +102,9 @@ async def test_atomic_brand_lifecycle_and_public_whitelist(
             assert (await upload(4, picture())).status_code == 403
             app.dependency_overrides.pop(get_current_admin)
             assert (await upload(4, picture())).status_code == 401
-            assert (await client.get("/api/v1/branding")).status_code == 200
+            public = await client.get("/api/v1/branding")
+            assert public.status_code == 200
+            assert public.json()["chat_disclaimer"].startswith("Бот может ошибаться.")
             assert (
                 await client.get("/api/v1/branding/media/anything.svg")
             ).status_code == 404

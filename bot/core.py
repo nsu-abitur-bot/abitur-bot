@@ -5,6 +5,7 @@ from html import escape
 from typing import Awaitable, Callable, Optional
 
 from bot.formatting import format_for_channel
+from config.chat import CHAT_DISCLAIMER, WELCOME_MESSAGE_MAX_LENGTH, utf16_length
 from config.instance import get_setting
 from config.university import identity
 from db.postgres.db import AsyncSessionLocal
@@ -236,7 +237,7 @@ class BotCore:
 
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str
-    ) -> BotReply:
+    ) -> tuple[BotReply, ...]:
         internal_user_id = await self.resolve_internal_user_id(channel, external_user_id)
         redis_client = await get_redis_client()
         await redis_client.set_awaiting_applicant_id(session_id, False)
@@ -248,8 +249,11 @@ class BotCore:
             internal_user_id,
         )
         welcome = get_setting("BOT_WELCOME_MESSAGE")
-        if welcome:
-            return BotReply(text=welcome)
+        if welcome and welcome.strip():
+            text = f"{welcome}\n\n{CHAT_DISCLAIMER}"
+            if utf16_length(text) <= WELCOME_MESSAGE_MAX_LENGTH:
+                return (BotReply(text=text),)
+            return BotReply(text=welcome), BotReply(text=CHAT_DISCLAIMER)
 
         university = (
             get_setting("UNIVERSITY_SHORT_NAME")
@@ -259,9 +263,8 @@ class BotCore:
         template = (
             _SIBGIU_WELCOME_TEXT if university.casefold() == "сибгиу" else WELCOME_TEXT
         )
-        return BotReply(
-            text=template.format(university=escape(university)), parse_mode="HTML"
-        )
+        text = template.format(university=escape(university))
+        return (BotReply(text=f"{text}\n\n<b>{CHAT_DISCLAIMER}</b>", parse_mode="HTML"),)
 
     async def cmd_track(self, session_id: str) -> BotReply:
         redis_client = await get_redis_client()
