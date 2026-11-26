@@ -561,3 +561,112 @@ async def test_program_exam_card_preserves_scores_from_history(
         assert answer == "44 по информатике ниже минимального балла 46."
     finally:
         await memory.cleanup(graph_id)
+
+
+async def test_architecture_exam_followup_retrieves_math_after_partial_answer(
+    real_lightrag_env, monkeypatch
+):
+    from llm.base import LLMResult
+    from pipeline import llm_client
+    from rag import crag
+
+    memory, _ = real_lightrag_env
+    graph_id = "test_architecture_exam_followup"
+    source = "https://priem.sibsiu.ru/specialities/395"
+    subject_question = "А математика нужна?"
+    fresh_question = "Какие экзамены нужны на 07.03.01?"
+    details_question = "Расскажи подробнее про архитектуру"
+    searches = []
+
+    class Provider:
+        async def generate(self, messages, **kwargs):
+            return '{"score": 1}'
+
+        async def generate_with_tools(self, messages, **kwargs):
+            question = str(messages[-1].content)
+            if question.startswith("Какие направления"):
+                return LLMResult(text="Архитектура и Строительство.")
+            if question == details_question:
+                return LLMResult(text="Русский язык и вступительное испытание — рисунок.")
+            context = str(messages[0].content)
+            if all(
+                fact in context
+                for fact in ("Математика (профильная)", "Рисунок", "Русский язык")
+            ) and any(
+                "code=07.03.01" in line and "selected" in line
+                for line in searches[-1].trace
+            ):
+                if question.startswith("Какие экзамены"):
+                    return LLMResult(
+                        text="Профильная математика, русский язык и рисунок."
+                    )
+                return LLMResult(text="Профильная математика нужна. Минимум 40 баллов.")
+            return LLMResult(text="Информация не найдена.")
+
+    async def config():
+        return crag.CragConfig(enabled=True, allow_refine=False)
+
+    async def no_faq(*args):
+        return None
+
+    async def retrieve(question, **kwargs):
+        answer = await memory.query_with_crag(graph_id, question, mode="naive", **kwargs)
+        searches.append(answer)
+        return answer
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    monkeypatch.setattr(crag, "get_llm_provider", Provider)
+    monkeypatch.setattr(llm_client, "query_graph_with_crag", retrieve)
+    monkeypatch.setattr(llm_client, "load_crag_config", config)
+    monkeypatch.setattr(gm, "load_crag_config", config)
+    monkeypatch.setattr(llm_client, "get_faq_matcher", lambda: None)
+    monkeypatch.setattr(llm_client, "_match_faq", no_faq)
+    monkeypatch.setattr(llm_client, "_expand_abbrevs", lambda question, _: question)
+    monkeypatch.setattr(llm_client, "_spawn_bg", lambda coro: coro.close())
+    try:
+        assert await memory.save(
+            graph_id,
+            "# 07.03.01 Архитектура\n"
+            "## Экзамены для поступающих\n"
+            "##### Единый государственный экзамен (ЕГЭ)\n"
+            "- Математика (профильная) (мин. балл 40)\n"
+            "- Рисунок (1, 2) (мин. балл 40)\n"
+            "- Русский язык (мин. балл 40)\n"
+            "##### Для поступающих после среднего профессионального образования\n"
+            "- Математические основы технических наук (мин. балл 40)\n",
+            file_paths_str=source,
+            source_id="architecture",
+        )
+        history = []
+        for question in ("Какие направления связаны с архитектурой?", details_question):
+            prior = await llm_client.ask_local_llm(
+                question, "dialog", prior_history=history
+            )
+            history.extend([{"role": "user", "content": question}, prior.history_entry])
+        assert "русский" in prior.text.lower() and "математик" not in prior.text.lower()
+
+        clarified = await llm_client.ask_local_llm(
+            subject_question, "dialog", prior_history=history
+        )
+        contextual = searches[-1]
+        fresh = await llm_client.ask_local_llm(fresh_question, "fresh", prior_history=[])
+        required = ("профильная математика", "русский язык", "рисунок")
+        assert all(fact in fresh.text.lower() for fact in required)
+        assert "математика" in clarified.text.lower(), contextual.trace
+        assert [item["url"] for item in clarified.sources] == [source]
+        assert all(
+            text in contextual.context
+            for text in ("Математика (профильная)", "Русский язык", "Рисунок")
+        )
+        assert "Математические основы технических наук" not in contextual.context
+
+        named = await llm_client.ask_local_llm(
+            "Какие экзамены нужны на архитектуру?", "dialog", prior_history=history
+        )
+        assert all(fact in named.text.lower() for fact in required)
+        assert [item["url"] for item in named.sources] == [source]
+        assert any(
+            "code=07.03.01" in line and "selected" in line for line in searches[-1].trace
+        )
+    finally:
+        await memory.cleanup(graph_id)

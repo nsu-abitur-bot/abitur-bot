@@ -129,8 +129,10 @@ async def test_real_offline_pipeline_passes_and_records_trace(monkeypatch):
     monkeypatch.setattr(AsyncEngine, "connect", forbid_connect)
 
     with offline_pipeline() as runner:
-        report = await PipelineEvaluator(runner=runner).run(offline=True)
-    assert report["total"] == report["passed_perfectly"] == 13
+        evaluator = PipelineEvaluator(runner=runner)
+        report = await evaluator.run(offline=True)
+    expected_total = sum(not scenario.requires_llm for scenario in evaluator.scenarios)
+    assert report["total"] == report["passed_perfectly"] == expected_total
     assert not connections
     by_id = {r["id"]: r for r in report["results"]}
     assert by_id["abbrev_1"]["faq_matched"]
@@ -145,6 +147,12 @@ async def test_real_offline_pipeline_passes_and_records_trace(monkeypatch):
     assert by_id["admission_announced_seats"]["passed"]
     assert not by_id["faq_negative_1"]["faq_matched"]
     assert by_id["crag_topic_switch_mmf"]["passed"]
+    for scenario in (
+        "dialog_scope_fresh",
+        "dialog_scope_switch",
+        "dialog_scope_documents",
+    ):
+        assert by_id[scenario]["passed"]
     assert report["skipped_ids"] == ["guardrails", "hallucination_check"]
 
 
@@ -215,7 +223,7 @@ async def test_judge_runs_only_after_deterministic_checks(monkeypatch):
     evaluator = PipelineEvaluator(runner=runner, judge=judge)
     report = await evaluator.run()
     assert all(c["question"] != "Напиши код калькулятора на Python." for c in called)
-    assert report["total"] == 15
+    assert report["total"] == len(evaluator.scenarios)
 
 
 @pytest.mark.parametrize(

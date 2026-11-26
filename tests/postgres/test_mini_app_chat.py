@@ -72,6 +72,7 @@ async def test_history_retry_isolation_and_ratings(mini_api, monkeypatch):
     client, maker = mini_api
     generation_started, allow_generation = asyncio.Event(), asyncio.Event()
     contexts = []
+    queries = []
     fail_provider = True
 
     class NoFaq:
@@ -96,6 +97,7 @@ async def test_history_retry_isolation_and_ratings(mini_api, monkeypatch):
 
     async def retrieval(query, conversation_history=None, search_query=None):
         contexts.append(conversation_history)
+        queries.append(search_query or query)
         return RetrievalResult(
             context="Материалы о приёме",
             sources=[
@@ -152,12 +154,14 @@ async def test_history_retry_isolation_and_ratings(mini_api, monkeypatch):
         {"url": "https://example.org/catalog", "title": "Каталог"}
     ]
     assert (await ask(second, "Вопрос о лабораториях")).status_code == 200
-    assert "общежитии" not in contexts[-1]
-    assert (await ask(first, "А когда подавать заявление?")).status_code == 200
-    assert "Первый вопрос об общежитии" in contexts[-1]
-    assert "Вопрос о лабораториях" not in contexts[-1]
+    assert contexts[-1] is None
+    assert (await ask(first, "А сколько оно стоит?")).status_code == 200
+    followup_history = contexts[-1]
+    assert followup_history is not None
+    assert "Первый вопрос об общежитии" in followup_history
+    assert "Вопрос о лабораториях" not in followup_history
     assert (await ask(max_chat, "Чат в MAX", headers=auth("max"))).status_code == 200
-    assert "общежитии" not in contexts[-1]
+    assert contexts[-1] is None
 
     rate_url = f"{CHATS}/{first}/turns/{answer['id']}/rating"
     assert (
@@ -181,7 +185,8 @@ async def test_history_retry_isolation_and_ratings(mini_api, monkeypatch):
     loaded = await client.get(f"{CHATS}/{first}", headers=auth())
     assert [turn["status"] for turn in loaded.json()["turns"]] == ["complete"] * 3
     assert loaded.json()["turns"][0]["rating"] == "positive"
-    assert contexts[-1].count("Повтори ещё раз") == 1
+    assert "Повтори ещё раз" not in (contexts[-1] or "")
+    assert queries[-1].count("Повтори ещё раз") == 1
 
     slow = asyncio.create_task(ask(first, "Ожидание ответа"))
     try:

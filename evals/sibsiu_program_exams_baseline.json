@@ -3,6 +3,8 @@
   "cases": {
     "sibsiu_geology_ege_code": {"passed": true},
     "sibsiu_geology_ege_code_level": {"passed": true},
-    "sibsiu_geology_ege_name": {"passed": true}
+    "sibsiu_geology_ege_name": {"passed": true},
+    "sibsiu_architecture_exams_fresh": {"passed": true},
+    "sibsiu_architecture_math_followup": {"passed": true}
   }
 }

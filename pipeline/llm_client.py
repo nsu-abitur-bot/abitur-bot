@@ -55,6 +55,7 @@ from pipeline.tools.admission_scores import (
     normalize_score_arguments,
 )
 from rag.crag import load_crag_config
+from rag.dialog_context import prior_search_history, prior_user_questions
 from rag.retriever import (
     RetrievalError,
     can_query_program_exams,
@@ -239,15 +240,16 @@ async def _classify_intent_bg(
         logger.warning(f"[{session_id}] Background intent classification error: {e}")
 
 
-def _build_history_text(history_entries: list[dict], limit: int = 6) -> str:
-    """Собирает текст последних N сообщений истории для передачи в RAG-запрос."""
+def _build_history_text(history_entries: list[dict]) -> str:
+    """Передаёт роль каждой реплики резолверам поиска."""
     history_lines = []
-    for entry in history_entries[-limit:]:
+    for entry in history_entries:
         role = entry.get("role", "")
         content = entry.get("content", "")
         if not content:
             continue
-        history_lines.append(f"{role}: {content}")
+        if role in {"user", "assistant"}:
+            history_lines.append(f"{role}: {' '.join(content.split())}")
     return "\n".join(history_lines).strip()
 
 
@@ -503,12 +505,15 @@ async def _retrieve_context(
         use_crag = (await load_crag_config()).enabled
         level_hint = "" if use_crag else f"\n\n{LIGHTRAG_LEVEL_HINT}"
         rag_query = f"{expanded_message}{level_hint}\n\n{LIGHTRAG_FORMAT_HINT}"
+        search_history = prior_search_history(expanded_message, history_text)
+        if not use_crag and search_history:
+            rag_query = f"{search_history}\n\n{rag_query}"
         ctx.log(
             "rag_query",
             _truncate_log_content(rag_query),
             title="Запрос к базе знаний",
             query_length=len(rag_query),
-            history_present=bool(history_text),
+            history_present=bool(search_history),
         )
 
         if use_crag:
@@ -582,17 +587,24 @@ async def _retrieve_context(
         return _RagResult(context="", failed=True)
 
 
+_OWN_RESULTS_REFERENCE = re.compile(
+    r"\b(?:с|по|при)\s+(?:мо(?:им[и]?|их)|эт(?:им[и]?|их))\s+"
+    r"(?:балл\w*|результат\w*)\b",
+    re.I,
+)
+_OWN_RESULTS = re.compile(
+    r"\b(?:у меня|мо[ий] (?:балл\w*|результат\w*)|я набрал[а]?)\b[^!?]*\d+",
+    re.I,
+)
+
+
 def _build_messages(
     rag_context: str, history_entries: list[dict], question: str
 ) -> list[BaseMessage]:
-    """Собирает промпт: системная часть с контекстом, история, текущий вопрос.
+    """Собирает промпт с найденными данными и текущим вопросом в конце.
 
-    Вопрос добавляется всегда и последним, а история — только контекст: она
-    живёт в Redis и может оказаться пустой (сбой, истёкший TTL, рестарт), и
-    тогда модель получала один системный промпт без вопроса.
-
-    Из прошлых ответов ассистента вырезаем блок «Источники» и ссылки: раньше
-    они попадали в историю целиком и модель начинала их копировать.
+    Для коротких продолжений добавляет связанные реплики пользователя.
+    Путь баллов сохраняет метаданные SQL для своего резолвера.
     """
     system_prompt = SYSTEM_PROMPT_BASE.format(
         context=rag_context,
@@ -623,7 +635,20 @@ def _build_messages(
             )
 
     messages.append(HumanMessage(content=question))
-    return messages
+    # The scores guard has its own scope resolver and reads verified SQL metadata.
+    if ScoreGuard.from_messages(messages) is not None:
+        return messages
+    previous = [
+        str(message.content) for message in messages[:-1] if message.type == "human"
+    ]
+    prior = prior_user_questions(question, previous)
+    if _OWN_RESULTS_REFERENCE.search(question):
+        results = next(
+            (text for text in reversed(previous) if _OWN_RESULTS.search(text)), None
+        )
+        if results is not None and results not in prior:
+            prior.append(results)
+    return [messages[0], *(HumanMessage(content=text) for text in prior), messages[-1]]
 
 
 def _university_scores_tool() -> ToolSpec:
@@ -1123,7 +1148,6 @@ async def ask_local_llm(
             previous = _history_before_question(history_entries, message)
         else:
             previous = (prior_history or [])[-(HISTORY_LIMIT - 1) :]
-            history_entries = [*previous, current]
         if seat_question:
             rag = _RagResult(context=RAG_CONTEXT_NOT_FOUND)
         else:
@@ -1145,7 +1169,7 @@ async def ask_local_llm(
                     text=plan_answer.text, sources=plan_answer.sources, trace=ctx.trace
                 )
 
-            history_text = _build_history_text(history_entries)
+            history_text = _build_history_text(previous)
             rag = await _retrieve_context(expanded_message, history_text, ctx)
 
         content, answer_sources = await _generate_answer(

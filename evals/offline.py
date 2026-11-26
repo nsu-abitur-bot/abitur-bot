@@ -2,7 +2,7 @@
 
 import os
 from collections.abc import Iterator
-from contextlib import ExitStack, contextmanager
+from contextlib import ExitStack, asynccontextmanager, contextmanager, nullcontext
 from contextvars import ContextVar
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,6 +10,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from evals.checks import Observation
+from evals.dialog_scope import CHUNKS, DialogProvider
 from evals.evaluator import Runner
 from evals.schema import Scenario
 from rag.trace import RetrievalResult
@@ -37,11 +38,13 @@ def offline_pipeline() -> Iterator[Runner]:
 def _fixture_pipeline() -> Iterator[Runner]:
     # Import only after rejecting accidental live configuration loading.
     from abbrev.expander import AbbrevExpander
+    from db.postgres.models import Faculty, Program
     from evals.product import run_product
     from faq.matcher import FAQMatcher
     from llm.base import LLMResult
     from pipeline import llm_client
     from pipeline.tools.admission_scores import AdmissionScoresResult, _format_scores
+    from rag import crag, graph_memory
     from rag.graph_memory import GraphMemory
 
     class MemoryHistory:
@@ -149,7 +152,40 @@ def _fixture_pipeline() -> Iterator[Runner]:
             # No suspension while the process-local provider patch is active.
             raise TimeoutError("Synthetic reranker timeout (#291)")
 
+    class DialogIndex:
+        async def aquery_llm(self, question, param):
+            return {"status": "success", "data": {"chunks": CHUNKS}}
+
+    class DialogCatalog:
+        async def get_all_faculties(self, *, only_active):
+            return [
+                Faculty(
+                    id="fit", name="Факультет информационных технологий", aliases=["ФИТ"]
+                ),
+                Faculty(id="ef", name="Экономический факультет", aliases=["ЭФ"]),
+            ]
+
+        async def get_all_programs(self, *, only_active):
+            return [Program(name="Бизнес-информатика", faculty_id="ef", level="bachelor")]
+
+    @asynccontextmanager
+    async def dialog_index(graph_id):
+        yield DialogIndex()
+
+    async def dialog_source_titles(graph_id):
+        return {}
+
+    dialog_memory = GraphMemory()
+    dialog_case = ContextVar("offline_dialog_case", default=False)
+
     async def retrieve(question: str, conversation_history: str | None = None, **kwargs):
+        if dialog_case.get():
+            return await dialog_memory.query_with_crag(
+                "offline-dialog",
+                question,
+                conversation_history=conversation_history,
+                search_query=kwargs.get("search_query"),
+            )
         if reranker_case.get():
             candidates = [
                 {
@@ -181,14 +217,18 @@ def _fixture_pipeline() -> Iterator[Runner]:
     reranker_case = ContextVar("offline_reranker_case", default=False)
 
     async def config():
+        if dialog_case.get():
+            return crag.CragConfig(enabled=True, min_chunks=2, allow_refine=True)
         return SimpleNamespace(enabled=not reranker_case.get())
 
     async def run_case(scenario: Scenario, session_id: str) -> Observation:
         # Per-task state: concurrent scenarios must keep their normal CRAG path.
         token = reranker_case.set(scenario.id == "rag_rerank_failure")
+        dialog_token = dialog_case.set(scenario.id.startswith("dialog_scope_"))
         try:
             return await run_product(scenario, session_id)
         finally:
+            dialog_case.reset(dialog_token)
             reranker_case.reset(token)
 
     async def threshold() -> float:
@@ -275,7 +315,9 @@ def _fixture_pipeline() -> Iterator[Runner]:
             "get_redis_client": history,
             "get_abbrev_expander": lambda: expander,
             "get_faq_matcher": lambda: matcher,
-            "get_llm_provider": FixtureProvider,
+            "get_llm_provider": lambda: DialogProvider()
+            if dialog_case.get()
+            else FixtureProvider(),
             "query_graph_with_sources": retrieve,
             "query_graph_with_crag": retrieve,
             "load_crag_config": config,
@@ -286,4 +328,14 @@ def _fixture_pipeline() -> Iterator[Runner]:
         }
         for name, value in replacements.items():
             stack.enter_context(patch.object(llm_client, name, value))
+        stack.enter_context(patch.object(dialog_memory, "_use_graph", dialog_index))
+        stack.enter_context(
+            patch.object(dialog_memory, "_get_source_titles", dialog_source_titles)
+        )
+        stack.enter_context(patch.object(graph_memory, "load_crag_config", config))
+        stack.enter_context(patch.object(crag, "get_llm_provider", DialogProvider))
+        stack.enter_context(patch.object(crag, "AsyncSessionLocal", nullcontext))
+        stack.enter_context(
+            patch.object(crag, "FacultyService", lambda _: DialogCatalog())
+        )
         yield run_case

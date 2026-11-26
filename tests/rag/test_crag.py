@@ -736,3 +736,34 @@ async def test_default_and_explicit_levels_filter_other_programs(
         is not None
     }
     assert kept == expected_names
+
+
+@pytest.mark.asyncio
+async def test_short_followup_uses_only_user_faculty_and_level(seeded):
+    from rag.crag import detect_faculty_hint
+
+    hint = await detect_faculty_hint(
+        "А какие документы нужны?",
+        conversation_history=(
+            "user: Когда подают документы на ФИТ в магистратуру?\n"
+            "assistant: Уточню требования для бакалавриата ММФ."
+        ),
+    )
+    assert hint.faculty is not None
+    assert hint.faculty.name == "Факультет информационных технологий"
+    assert hint.level == "master"
+
+
+def test_followup_explicit_year_replaces_only_previous_year():
+    from rag.dialog_context import prior_search_history
+
+    scope = prior_search_history(
+        "А в 2025 году?",
+        "user: Когда начинается приём на «Бизнес-информатика» на бюджет в 2026 году?\n"
+        "assistant: Не нашёл информации.\n"
+        "user: А на платное?",
+    )
+    assert scope is not None
+    assert "Бизнес-информатика" in scope and "А на платное?" in scope
+    assert "2026" not in scope and "бюджет" not in scope
+    assert "Не нашёл информации" not in scope

@@ -34,6 +34,7 @@ from llm.providers.gigachat import GigaChatEmbedding
 from llm.providers.openai_graph_adapters import OpenAIEmbedding, OpenAILLM
 from rag import pg_storage
 from rag.crag import CragChunk, load_crag_config, run_crag
+from rag.dialog_context import prior_search_history
 from rag.program_exams import (
     ProgramCard,
     can_query_program_exams,
@@ -932,7 +933,7 @@ class GraphMemory:
         Финальную генерацию выполняет вызывающий код (llm_client) по этому
         контексту.
         """
-        history = conversation_history.strip() if conversation_history else ""
+        history = prior_search_history(question, conversation_history)
         retrieval_query = search_query if search_query is not None else question
         search_question = (
             f"{history}\n\n{retrieval_query}" if history else retrieval_query
@@ -950,7 +951,7 @@ class GraphMemory:
                         "CRAG retrieval start: graph_id=%s mode=%s question=%s",
                         graph_id,
                         mode,
-                        _clip_for_log(question),
+                        _clip_for_log(search_question),
                     )
                     raw_chunks = await self._retrieve_raw_chunks(
                         rag, search_question, mode
@@ -976,7 +977,8 @@ class GraphMemory:
                     candidates = _to_crag_chunks(raw_chunks)
 
                     async def _retrieve_fn(refined: str) -> list:
-                        more = await self._retrieve_raw_chunks(rag, refined, mode)
+                        refined_query = f"{history}\n\n{refined}" if history else refined
+                        more = await self._retrieve_raw_chunks(rag, refined_query, mode)
                         return _to_crag_chunks(more)
 
                     try:
@@ -985,7 +987,7 @@ class GraphMemory:
                             candidates,
                             retrieve_fn=_retrieve_fn,
                             config=config,
-                            conversation_history=history or None,
+                            conversation_history=history,
                         )
                     except TypeError:
                         kept, hint = await run_crag(
@@ -1195,7 +1197,9 @@ class GraphMemory:
 
                     reranked_sources = await self._rerank_sources_with_llm(
                         question=question,
-                        conversation_history=conversation_history,
+                        conversation_history=prior_search_history(
+                            program_question or question, conversation_history
+                        ),
                         sources=sources_candidates,
                         max_sources=max_sources,
                     )

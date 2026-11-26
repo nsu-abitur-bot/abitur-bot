@@ -205,16 +205,14 @@ async def test_history_does_not_duplicate_current_question(monkeypatch):
 
     await llm_client.ask_local_llm("Сколько оно стоит?", session_id)
 
-    assert [m.type for m in provider.messages] == ["system", "human", "ai", "human"]
+    assert [m.type for m in provider.messages] == ["system", "human", "human"]
     assert [m.content for m in provider.messages[1:]] == [
         "Есть ли общежитие?",
-        "Да, есть.",
         "Сколько оно стоит?",
     ]
 
 
-async def test_repeated_question_keeps_earlier_turn(monkeypatch):
-    """Тот же вопрос раньше в переписке — часть истории, вырезать его нельзя."""
+async def test_repeated_standalone_question_reaches_model_once(monkeypatch):
     redis = _FakeRedis()
     session_id = "s-repeat"
     await redis.add_message(session_id, {"role": "user", "content": "Есть ли общежитие?"})
@@ -224,8 +222,4 @@ async def test_repeated_question_keeps_earlier_turn(monkeypatch):
 
     await llm_client.ask_local_llm("Есть ли общежитие?", session_id)
 
-    assert [m.content for m in provider.messages[1:]] == [
-        "Есть ли общежитие?",
-        "Да, есть.",
-        "Есть ли общежитие?",
-    ]
+    assert [m.content for m in provider.messages[1:]] == ["Есть ли общежитие?"]

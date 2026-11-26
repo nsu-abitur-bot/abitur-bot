@@ -127,3 +127,13 @@ def test_select_cards_does_not_match_exam_subjects_as_programs():
     selected, recognized = _select_cards(query_with_subjects, cards, trace)
     assert not selected
     assert recognized is None
+
+
+def test_exam_subject_followup_does_not_inherit_program_across_topic_switch():
+    history = (
+        "user: Какие вступительные испытания нужны на архитектуру?\n"
+        "assistant: Русский язык и рисунок.\n"
+        "user: Где находится приёмная комиссия?\n"
+        "assistant: У Главного корпуса."
+    )
+    assert not can_query_program_exams("А нужна ли профильная математика?", history)

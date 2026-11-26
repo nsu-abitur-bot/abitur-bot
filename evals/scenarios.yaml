@@ -190,3 +190,46 @@ scenarios:
       - {kind: contains, value: Тестовый контекст ММФ}
       - {kind: source_contains, value: "https://mmf.nsu.ru"}
       - {kind: faq_match, value: false}
+
+  - id: dialog_scope_fresh
+    question: Когда начинается приём на «Бизнес-информатика» на бюджет в 2026 году?
+    reference_answer: До 18 июля. Источник — запись о сроке приёма.
+    topic: retrieval
+    source: "Синтетическая БЗ #481, контроль в свежей сессии"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: до 18 июля}
+      - {kind: source_contains, value: "https://example.test/dialog/deadline"}
+
+  - id: dialog_scope_switch
+    setup_questions:
+      - Когда начинается приём в магистратуру ФИТ?
+    question: Когда начинается приём на «Бизнес-информатика» на бюджет в 2026 году?
+    reference_answer: До 18 июля. Источник — запись о сроке приёма.
+    topic: retrieval
+    source: "Синтетическая БЗ #481, смена темы после ответа об отсутствии данных"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: до 18 июля}
+      - {kind: source_contains, value: "https://example.test/dialog/deadline"}
+
+  - id: dialog_scope_documents
+    setup_questions:
+      - Когда начинается приём в магистратуру ФИТ?
+      - Когда начинается приём на «Бизнес-информатика» на бюджет в 2026 году?
+      - А на платное?
+      - А в другом году?
+    question: А какие документы нужны?
+    reference_answer: Нужно согласие на зачисление. Источник — запись о документах программы.
+    topic: retrieval
+    source: "Синтетическая БЗ #481, дополнительные сведения в той же сессии"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: согласие на зачисление}
+      - {kind: source_contains, value: "https://example.test/dialog/documents"}

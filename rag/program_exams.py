@@ -52,6 +52,13 @@ _SUBJECT = re.compile(
     r"истори|обществознани|литератур|иностранн\w*\s+язык|английск\w*\s+язык",
     re.I,
 )
+_SUBJECT_FOLLOW_UP = re.compile(
+    rf"(?:а\s+)?(?:(?:нуж(?:ен|на|но|ны)\s+(?:ли\s+)?)|(?:нужно\s+ли\s+сдавать\s+))?"
+    rf"(?:(?:профильн\w*|базов\w*)\s+)?(?:{_SUBJECT.pattern})\w*"
+    rf"(?:\s+(?:нуж(?:ен|на|но|ны)|обязател\w*|надо\s+сдавать))?",
+    re.I,
+)
+_PROGRAM_DETAILS = re.compile(r"\b(?:подробн\w*|расскаж\w*)\b.*\b(?:про|об?|по)\s+", re.I)
 _EXAM_GROUP = re.compile(
     r"^(?:обязательн|по выбору|(?:один|одна)\s+на выбор)|\b(?:по|на)\s+выбор\w*",
     re.I,
@@ -133,6 +140,25 @@ def _pending_exam_question(history: str | None) -> str | None:
     return None
 
 
+def _is_subject_follow_up(question: str) -> bool:
+    return _SUBJECT_FOLLOW_UP.fullmatch(question.strip(" ?!.,")) is not None
+
+
+def _subject_exam_anchor(question: str, history: str | None) -> str | None:
+    if not history or not _is_subject_follow_up(question):
+        return None
+
+    parts = _HISTORY_ROLE.split(history)
+    for role, message in reversed(list(zip(parts[1::2], parts[2::2]))):
+        previous = message.strip()
+        if role != "user" or not previous or _is_subject_follow_up(previous):
+            continue
+        if is_program_exam_question(previous) or _PROGRAM_DETAILS.search(previous):
+            return previous
+        break
+    return None
+
+
 def can_query_program_exams(question: str, history: str | None) -> bool:
     """Проверяет, нужен ли резолвер карточек, включая уточнение профиля."""
     return (
@@ -141,6 +167,7 @@ def can_query_program_exams(question: str, history: str | None) -> bool:
         and (
             is_program_exam_question(question)
             or _pending_exam_question(history) is not None
+            or _subject_exam_anchor(question, history) is not None
         )
     )
 
@@ -156,6 +183,16 @@ def _name_key(text: str) -> str:
 def _mentioned(name: str, question_key: str) -> bool:
     key = _name_key(name)
     return bool(key) and f" {key} " in question_key
+
+
+def _inflected_name_mentioned(name: str, question_key: str) -> bool:
+    key = _name_key(name)
+    if len(key) < 6 or " " in key:
+        return False
+    endings = {"а": ("у", "е", "ы", "ой"), "я": ("ю", "е", "и", "ей")}
+    return any(
+        f" {key[:-1]}{ending} " in question_key for ending in endings.get(key[-1], ())
+    )
 
 
 def read_program_card(
@@ -212,7 +249,7 @@ def _select_cards(
     requested_level = detect_level(question)
     explicit_profile = bool(_PROFILE_REQUEST.search(question))
     question_key = f" {_name_key(question)} "
-    candidates: list[tuple[int, ProgramCard]] = []
+    candidates: list[tuple[tuple[bool, int], ProgramCard]] = []
     recognized = None
     rejected = []
     for card in cards:
@@ -220,7 +257,8 @@ def _select_cards(
             rejected.append((card.doc_id, "code_mismatch"))
             continue
         profile_match = _mentioned(card.profile, question_key)
-        name_match = _mentioned(card.name, question_key)
+        exact_name = _mentioned(card.name, question_key)
+        name_match = exact_name or _inflected_name_mentioned(card.name, question_key)
         if not codes:
             profile_key = _name_key(card.profile)
             name_key = _name_key(card.name)
@@ -241,9 +279,9 @@ def _select_cards(
         score = len(_name_key(card.name)) if name_match and not codes else 0
         if profile_match:
             score += len(_name_key(card.profile))
-        candidates.append((score, card))
+        candidates.append(((bool(codes or profile_match or exact_name), score), card))
 
-    best = max((score for score, _ in candidates), default=0)
+    best = max((score for score, _ in candidates), default=(False, 0))
     selected = []
     for score, card in candidates:
         if score < best:
@@ -443,18 +481,14 @@ async def retrieve_program_exams(
     conversation_history: str | None = None,
 ) -> RetrievalResult | None:
     """Возвращает контекст одной карточки или готовое уточнение/отсутствие данных."""
-    if (
-        _ADMISSION_SCORES.search(question)
-        or _SELECTION_OR_RECOMMENDATION.search(question)
+    if _ADMISSION_SCORES.search(question) or _SELECTION_OR_RECOMMENDATION.search(
+        question
     ):
         return None
     follow_up = None
     if is_program_exam_question(question):
         selected, recognized = _select_cards(question, cards, trace)
-    else:
-        previous = _pending_exam_question(conversation_history)
-        if previous is None:
-            return None
+    elif previous := _pending_exam_question(conversation_history):
         pending, _ = _select_cards(previous, cards, trace)
         reply = _PROFILE.sub(r"\1", question.strip())
         selected = [
@@ -466,6 +500,13 @@ async def retrieve_program_exams(
             return None
         recognized = selected[0]
         follow_up = f"{previous}\n{question}"
+    elif previous := _subject_exam_anchor(question, conversation_history):
+        selected, recognized = _select_cards(previous, cards, trace)
+        if not selected:
+            return None
+        follow_up = f"{previous}\n{question}"
+    else:
+        return None
 
     codes = sorted(set(_CODE.findall(question)))
     if not selected:
