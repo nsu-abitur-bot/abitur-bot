@@ -55,7 +55,7 @@ async def main() -> None:
             asyncio.create_task(supervise_channel("max", run_max_bot)),
             asyncio.create_task(
                 watch_faq_updates(
-                    get_faq_matcher(),
+                    get_faq_matcher,
                     DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://", 1),
                 )
             ),

@@ -241,7 +241,7 @@ async def list_docs(workspace: str) -> list[dict]:
                 "SELECT id, status, content_summary, content_length, file_path,"
                 " metadata, created_at FROM lightrag_doc_status WHERE workspace = :ws"
             ),
-            {"ws": workspace},
+            {"ws": physical_workspace(workspace)},
         )
         rows = result.mappings().all()
     docs = [doc_status_row_to_dict(r) for r in rows]
@@ -257,7 +257,7 @@ async def get_full_doc(workspace: str, doc_id: str) -> str | None:
                 "SELECT COALESCE(content, '') AS content FROM lightrag_doc_full"
                 " WHERE workspace = :ws AND id = :doc_id"
             ),
-            {"ws": workspace, "doc_id": doc_id},
+            {"ws": physical_workspace(workspace), "doc_id": doc_id},
         )
         row = result.mappings().first()
     if row is None:
@@ -274,7 +274,7 @@ async def doc_status_signature(workspace: str) -> tuple[int, Any]:
                 "SELECT COUNT(*) AS cnt, MAX(updated_at) AS max_updated"
                 " FROM lightrag_doc_status WHERE workspace = :ws"
             ),
-            {"ws": workspace},
+            {"ws": physical_workspace(workspace)},
         )
         row = result.mappings().first()
     if row is None:
@@ -290,7 +290,7 @@ async def doc_diagnostics(workspace: str, doc_id: str) -> dict:
                 "SELECT status, content_length, chunks_count, error_msg, metadata"
                 " FROM lightrag_doc_status WHERE workspace = :ws AND id = :doc_id"
             ),
-            {"ws": workspace, "doc_id": doc_id},
+            {"ws": physical_workspace(workspace), "doc_id": doc_id},
         )
         status_row = status_result.mappings().first()
         if status_row is None:
@@ -308,7 +308,7 @@ async def doc_diagnostics(workspace: str, doc_id: str) -> dict:
                 "SELECT count FROM lightrag_full_entities"
                 " WHERE workspace = :ws AND id = :doc_id"
             ),
-            {"ws": workspace, "doc_id": doc_id},
+            {"ws": physical_workspace(workspace), "doc_id": doc_id},
         )
         entities_row = entities_result.mappings().first()
         relations_result = await session.execute(
@@ -316,7 +316,7 @@ async def doc_diagnostics(workspace: str, doc_id: str) -> dict:
                 "SELECT count FROM lightrag_full_relations"
                 " WHERE workspace = :ws AND id = :doc_id"
             ),
-            {"ws": workspace, "doc_id": doc_id},
+            {"ws": physical_workspace(workspace), "doc_id": doc_id},
         )
         relations_row = relations_result.mappings().first()
 
@@ -378,7 +378,9 @@ async def dump_kv_stores(workspace: str) -> dict[str, str]:
     dump: dict[str, str] = {}
     async with AsyncSessionLocal() as session:
         for filename, query in tables.items():
-            result = await session.execute(text(query), {"ws": workspace})
+            result = await session.execute(
+                text(query), {"ws": physical_workspace(workspace)}
+            )
             rows = result.mappings().all()
             payload = {}
             for row in rows:
@@ -389,3 +391,58 @@ async def dump_kv_stores(workspace: str) -> dict[str, str]:
                 payload[str(row["id"])] = item
             dump[filename] = json.dumps(payload, ensure_ascii=False, default=str)
     return dump
+
+
+def physical_workspace(workspace: str, generation: str | None = None) -> str:
+    from config.instance import generation_id
+
+    generation = generation_id() if generation is None else generation
+    result = workspace + ("__" + generation if generation else "")
+    if len(result) > 255:
+        raise ValueError("Слишком длинное имя базы знаний")
+    return result
+
+
+async def clone_generation(
+    session: Any, workspaces: list[str], source: str, target: str
+) -> None:
+    """Clone canonical PG stores in the same transaction as settings activation."""
+    for table in _TABLES_DDL:
+        if table.startswith("lightrag_vdb_") or table == "lightrag_llm_cache":
+            continue
+        columns = (
+            (
+                await session.execute(
+                    text(
+                        "SELECT column_name FROM information_schema.columns "
+                        "WHERE table_schema=current_schema() AND table_name=:table "
+                        "ORDER BY ordinal_position"
+                    ),
+                    {"table": table},
+                )
+            )
+            .scalars()
+            .all()
+        )
+        if not columns or "workspace" not in columns:
+            raise ValueError("Отсутствует PostgreSQL-хранилище LightRAG")
+        names = ", ".join('"' + column + '"' for column in columns)
+        projection = ", ".join(
+            ":target" if column == "workspace" else '"' + column + '"'
+            for column in columns
+        )
+        for workspace in workspaces:
+            await session.execute(
+                text(f"DELETE FROM {table} WHERE workspace=:target"),
+                {"target": physical_workspace(workspace, target)},
+            )
+            await session.execute(
+                text(
+                    f"INSERT INTO {table} ({names}) SELECT {projection} "
+                    f"FROM {table} WHERE workspace=:source"
+                ),
+                {
+                    "source": physical_workspace(workspace, source),
+                    "target": physical_workspace(workspace, target),
+                },
+            )

@@ -249,3 +249,27 @@ async def test_dump_restore_roundtrip_real_postgres(
         assert value.scalar_one() == "must-survive"
         await session.execute(text("DROP TABLE backup_probe_229"))
     await engine.dispose()
+
+
+def test_generation_backup_preserves_the_complete_root_layout(tmp_path, monkeypatch):
+    import tarfile
+
+    from config.content_gate import storage_root
+    from config.instance import get_setting, settings_scope
+
+    root = tmp_path / "lightrag"
+    active = root / ".generations" / ("a" * 32) / "abitur_kb"
+    active.mkdir(parents=True)
+    (active / "vectors.json").write_text("new")
+    legacy = root / "abitur_kb"
+    legacy.mkdir()
+    (legacy / "vectors.json").write_text("old")
+    monkeypatch.setenv("LIGHTRAG_WORKSPACE_BASE", str(root))
+    with settings_scope({"_embedding_generation": "a" * 32}, 1):
+        assert get_setting("LIGHTRAG_WORKSPACE_BASE") == str(active.parent)
+        archive = tmp_path / "snapshot.tar.gz"
+        backup.archive_lightrag(storage_root(), archive)
+    with tarfile.open(archive) as data:
+        names = data.getnames()
+    assert "lightrag/abitur_kb/vectors.json" in names
+    assert "lightrag/.generations/" + ("a" * 32) + "/abitur_kb/vectors.json" in names

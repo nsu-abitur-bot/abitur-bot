@@ -7,7 +7,7 @@ from google import genai
 from google.genai import types
 from openai import AsyncOpenAI
 
-from config.instance import get_setting
+from config.instance import get_setting, pinned_settings
 from llm.profiles import LLMProfiles
 from parser.prompts import CONTEXT_ENRICHMENT_PROMPT
 
@@ -36,6 +36,7 @@ def _clean_markdown(text: str) -> str:
     return text.strip()
 
 
+@pinned_settings()
 async def parse_images_with_llm(
     images_base64: List[str], provider: Optional[str] = None
 ) -> str:
@@ -45,11 +46,21 @@ async def parse_images_with_llm(
     Если provider не указан, берет из конфигурации окружения PDF_PARSER_PROVIDER,
     по умолчанию "gemini".
     """
+    if get_setting("DOCUMENT_RECOGNITION_ENABLED", "true") != "true":
+        raise ValueError(
+            "Для сканов включите распознавание документов в настройках подключений"
+        )
     if not provider:
         provider = get_setting("PDF_PARSER_PROVIDER", "openai").lower()
 
     if not images_base64:
         return ""
+    if provider not in {"openai", "gemini"} or not get_setting(
+        provider.upper() + "_API_KEY"
+    ):
+        raise ValueError(
+            "Для сканов настройте распознавание документов: OpenAI или Gemini"
+        )
 
     logger.info(
         f"LLM получила {len(images_base64)} изображений. Используем провайдер: {provider}"

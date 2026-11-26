@@ -22,6 +22,8 @@ from dataclasses import dataclass, field
 from functools import wraps
 from typing import Generator, Optional, TypeVar
 
+from config.instance import SettingsBinding, capture_settings, settings_scope
+
 LIGHTRAG_LOGGER_NAME = "lightrag"
 RAG_INTERNAL_LOG_LIMIT = 120
 T = TypeVar("T")
@@ -141,8 +143,17 @@ def trace_worker_callback(
     """Bind the trace carried by a queue job, including wait_for child tasks."""
 
     @wraps(function)
-    async def wrapped(*args, _lightrag_trace: LightragTrace | None = None, **kwargs) -> T:
-        with _bind_trace(_lightrag_trace):
+    async def wrapped(
+        *args,
+        _lightrag_trace: LightragTrace | None = None,
+        _lightrag_settings: SettingsBinding | None = None,
+        **kwargs,
+    ) -> T:
+        binding = _lightrag_settings or capture_settings()
+        with (
+            _bind_trace(_lightrag_trace),
+            settings_scope(binding.values, binding.revision),
+        ):
             return await function(*args, **kwargs)
 
     return wrapped
@@ -163,9 +174,12 @@ def trace_queued_callback(
     @wraps(function)
     async def wrapped(*args, **kwargs) -> T:
         trace = _active_trace.get()
+        binding = capture_settings()
         try:
-            with _bind_trace(None):
-                return await function(*args, _lightrag_trace=trace, **kwargs)
+            with _bind_trace(None), settings_scope(None, 0):
+                return await function(
+                    *args, _lightrag_trace=trace, _lightrag_settings=binding, **kwargs
+                )
         except Exception as exc:
             if trace is not None:
                 trace.add(

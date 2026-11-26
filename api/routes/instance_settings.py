@@ -21,7 +21,9 @@ from api.services.instance_settings import (
     merge_changes,
     required_checks,
 )
+from config.content_gate import content_write
 from config.instance import SPECS, install
+from config.model_settings import MODEL_FIELDS
 from db.postgres.db import get_async_session
 from db.postgres.services.instance_settings import (
     InstanceSettingsService,
@@ -88,10 +90,13 @@ async def test_connection(
 
 
 @router.put("", response_model=InstanceSettingsResponse)
+@content_write()
 async def update_instance_settings(
     data: SettingsChange, session: AsyncSession = Depends(get_async_session)
 ) -> dict:
     try:
+        if MODEL_FIELDS.intersection(data.changes):
+            raise ConfigurationError("Сохраните выбранные модели в разделе «Модели»")
         service = InstanceSettingsService(session)
         snapshot = await service.read()
         if snapshot.revision != data.revision:
@@ -112,6 +117,7 @@ async def update_instance_settings(
 
 
 @router.post("/branding", response_model=InstanceSettingsResponse)
+@content_write()
 async def save_branding(
     revision: int = Form(...),
     changes: str = Form("{}", max_length=100_000),

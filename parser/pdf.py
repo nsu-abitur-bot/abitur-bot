@@ -20,3 +20,18 @@ def pdf_to_base64_images(pdf_bytes: bytes, max_pages: int = 50) -> List[str]:
             img_bytes = pix.tobytes("jpeg")
             images.append(base64.b64encode(img_bytes).decode("utf-8"))
     return images
+
+
+def extract_pdf_text(pdf_bytes: bytes, max_pages: int = 50) -> str:
+    """Use a complete text layer; mixed/scanned pages require explicit OCR."""
+    pages: list[str] = []
+    with fitz.open(stream=pdf_bytes, filetype="pdf") as document:
+        if len(document) > max_pages:
+            raise ValueError(f"PDF exceeds maximum allowed pages ({max_pages})")
+        for page in document:
+            text = str(page.get_text("text")).strip()
+            if not text and (page.get_images() or page.get_drawings()):
+                return ""
+            if text:
+                pages.append(text)
+    return "\n\n".join(pages)

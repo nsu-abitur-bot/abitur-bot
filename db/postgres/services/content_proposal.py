@@ -1,6 +1,8 @@
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from config.content_gate import content_write
+
 from ..models import ContentProposal, timestamp
 
 
@@ -8,6 +10,7 @@ class ContentProposalService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
+    @content_write()
     async def create(
         self,
         *,
@@ -48,6 +51,7 @@ class ContentProposalService:
         )
         return list(result.scalars().all())
 
+    @content_write()
     async def reject(
         self, proposal_id: str, reviewer_id: str | None
     ) -> ContentProposal | None:

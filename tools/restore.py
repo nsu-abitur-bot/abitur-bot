@@ -15,7 +15,7 @@ import tarfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-from config.instance import get_setting
+from config.content_gate import storage_root
 from tools.backup import pg_connection, pg_env
 
 logger = logging.getLogger(__name__)
@@ -94,7 +94,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     manifest = _load_manifest(args.backup_dir)
     conn = pg_connection()
-    kb_base = Path(get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
+    kb_base = storage_root()
     archive_name = manifest.get("lightrag_archive")
 
     print(f"Слепок от {manifest.get('created_at', '?')}:")

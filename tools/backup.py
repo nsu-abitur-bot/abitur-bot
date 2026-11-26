@@ -24,6 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
+from config.content_gate import storage_root
 from config.instance import get_setting
 from db.postgres.config import get_database_url
 
@@ -150,7 +151,7 @@ def backup_once(backup_root: Path, keep: int = DEFAULT_BACKUP_KEEP) -> Path:
     Поднимает исключение при сбое pg_dump — копия без базы не имеет смысла.
     """
     conn = pg_connection()
-    kb_base = Path(get_setting("LIGHTRAG_WORKSPACE_BASE", "./data/lightrag"))
+    kb_base = storage_root()
 
     created_at = datetime.now(timezone.utc)
     stamp = created_at.strftime("%Y%m%d-%H%M%S")
