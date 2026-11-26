@@ -19,7 +19,7 @@ from db.postgres.services.message import MessageService
 from db.postgres.services.message_log import MessageLogService
 from db.postgres.services.topic import TopicService
 from db.postgres.services.user import UserService
-from db.redis.client import RedisClient
+from db.redis.client import HISTORY_LIMIT, RedisClient
 from faq.matcher import FAQMatcher, get_faq_matcher, load_faq_threshold
 from llm.base import LLMUsage, ToolExecutor, ToolSpec
 from llm.factory import get_llm_provider
@@ -85,6 +85,8 @@ class LlmAnswer:
     text: str
     sources: list[dict] = field(default_factory=list)
     trace: AnswerTrace = field(default_factory=AnswerTrace)
+    history_entry: dict = field(default_factory=dict)
+    failed: bool = False
 
     def __bool__(self) -> bool:
         return bool(self.text)
@@ -323,6 +325,7 @@ class _Ctx:
     status_callback: Optional[StatusCallback] = None
     trace: AnswerTrace = field(default_factory=AnswerTrace)
     score_query: dict | None = None
+    failed: bool = False
     # Начало обработки вопроса (perf_counter): по нему в llm_response
     # пишется latency_ms для агрегатов наблюдаемости (#242).
     started_monotonic: float = field(default_factory=perf_counter)
@@ -844,7 +847,7 @@ def _postprocess(content: str, rag_sources: list[dict]) -> _Postprocessed:
 async def _answer_from_faq(
     faq_answer: str,
     message: str,
-    redis_client: RedisClient,
+    redis_client: RedisClient | None,
     ctx: _Ctx,
 ) -> LlmAnswer:
     """Готовый ответ из матчера частых вопросов: модель не зовём вообще."""
@@ -852,15 +855,16 @@ async def _answer_from_faq(
     logger.info(f"[{session_id}] FAQ match found, returning predefined answer.")
 
     ctx.log("faq_match", faq_answer, source="faq")
-    _spawn_bg(
-        _remember_message(
-            redis_client, session_id, {"role": "assistant", "content": faq_answer}
-        )
-    )
+    entry = {
+        "role": "assistant",
+        "content": _strip_markup(faq_answer) if redis_client is None else faq_answer,
+    }
+    if redis_client is not None:
+        _spawn_bg(_remember_message(redis_client, session_id, entry))
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, session_id, message, faq_answer))
     ctx.trace.faq_matched = True
-    return LlmAnswer(text=faq_answer, trace=ctx.trace)
+    return LlmAnswer(text=faq_answer, trace=ctx.trace, history_entry=entry)
 
 
 async def _answer_without_kb(
@@ -902,6 +906,7 @@ async def _answer_without_kb(
             retrieval_failed=True,
             latency_ms=ctx.latency_ms(),
         )
+        ctx.failed = True
         return RAG_UNAVAILABLE_ANSWER, []
 
     if not used_tool and content in (
@@ -923,6 +928,7 @@ async def _answer_without_kb(
             retrieval_failed=True,
             latency_ms=ctx.latency_ms(),
         )
+        ctx.failed = True
         return RAG_UNAVAILABLE_ANSWER, []
 
     processed = _postprocess(content, [])
@@ -1015,15 +1021,16 @@ async def _generate_answer(
             error=True,
             latency_ms=ctx.latency_ms(),
         )
+        ctx.failed = True
         return "LLM временно недоступна.", []
 
 
 def _store_answer(
     content: str,
     message: str,
-    redis_client: RedisClient,
+    redis_client: RedisClient | None,
     ctx: _Ctx,
-) -> None:
+) -> dict:
     """Сохраняет ответ в историю в фоне — пользователю отвечаем сразу.
 
     В историю кладём текст без тегов: её читает модель, а не человек.
@@ -1039,9 +1046,11 @@ def _store_answer(
         "LLM временно недоступна.",
     ):
         entry["admission_scores"] = ctx.score_query
-    _spawn_bg(_remember_message(redis_client, ctx.session_id, entry))
+    if redis_client is not None:
+        _spawn_bg(_remember_message(redis_client, ctx.session_id, entry))
     if ctx.user_id:
         _spawn_bg(_save_message_to_pg(ctx.user_id, ctx.session_id, message, stored_text))
+    return entry
 
 
 @request_timed("pipeline_total")
@@ -1052,10 +1061,14 @@ async def ask_local_llm(
     log_entry_id: Optional[int] = None,
     stream_callback: Optional[StreamCallback] = None,
     status_callback: Optional[StatusCallback] = None,
+    *,
+    prior_history: list[dict] | None = None,
 ) -> LlmAnswer:
     """Отвечает на сообщение пользователя. Порядок шагов — в теле функции.
 
     session_id — идентификатор переписки, по нему берётся и сохраняется история.
+    prior_history — сохранённые реплики без текущего вопроса, если канал сам
+    хранит завершённые ответы. Redis-история в этом режиме не используется.
     user_id — внутренний идентификатор для записей в PG.
     stream_callback вызывается с накопленным текстом по мере генерации: на
     FAQ-матче модель не зовётся, и колбэк не срабатывает.
@@ -1071,10 +1084,11 @@ async def ask_local_llm(
     )
 
     try:
-        redis_client = await get_redis_client()
-        await _remember_message(
-            redis_client, session_id, {"role": "user", "content": message}
-        )
+        current = {"role": "user", "content": message}
+        redis_client = None
+        if prior_history is None:
+            redis_client = await get_redis_client()
+            await _remember_message(redis_client, session_id, current)
 
         expanded_message = _expand_abbrevs(message, session_id)
 
@@ -1088,17 +1102,27 @@ async def ask_local_llm(
         # за ~10мс. Поиск в базе знаний нельзя запускать до результата FAQ.
         faq_matcher = get_faq_matcher()
         task_faq = asyncio.create_task(_match_faq(faq_matcher, expanded_message))
-        task_history = asyncio.create_task(redis_client.get_history(session_id))
+        task_history = (
+            asyncio.create_task(redis_client.get_history(session_id))
+            if redis_client is not None
+            else None
+        )
 
         faq_answer = await _await_faq(task_faq, session_id)
         seat_question = is_seat_count_question(expanded_message)
         if faq_answer and not seat_question:
-            task_history.cancel()
-            with suppress(asyncio.CancelledError, Exception):
-                await task_history
+            if task_history is not None:
+                task_history.cancel()
+                with suppress(asyncio.CancelledError, Exception):
+                    await task_history
             return await _answer_from_faq(faq_answer, message, redis_client, ctx)
 
-        history_entries = await _await_history(task_history, session_id)
+        if task_history is not None:
+            history_entries = await _await_history(task_history, session_id)
+            previous = _history_before_question(history_entries, message)
+        else:
+            previous = (prior_history or [])[-(HISTORY_LIMIT - 1) :]
+            history_entries = [*previous, current]
         if seat_question:
             rag = _RagResult(context=RAG_CONTEXT_NOT_FOUND)
         else:
@@ -1108,7 +1132,7 @@ async def ask_local_llm(
 
         content, answer_sources = await _generate_answer(
             rag,
-            _history_before_question(history_entries, message),
+            previous,
             expanded_message,
             ctx,
             stream_callback,
@@ -1118,10 +1142,20 @@ async def ask_local_llm(
         # так что повторы одного вопроса накапливаются с частотой.
         if _is_no_answer_text(content):
             ctx.log("no_answer", message)
-        _store_answer(content, message, redis_client, ctx)
+        entry = (
+            _store_answer(content, message, redis_client, ctx)
+            if not ctx.failed or redis_client is not None
+            else {}
+        )
 
         logger.info(f"[{session_id}] Message processing complete.")
-        return LlmAnswer(text=content, sources=answer_sources, trace=ctx.trace)
+        return LlmAnswer(
+            text=content,
+            sources=answer_sources,
+            trace=ctx.trace,
+            history_entry=entry,
+            failed=ctx.failed,
+        )
 
     except Exception as e:
         logger.error(f"[{session_id}] LLM error: {e}")
@@ -1131,7 +1165,7 @@ async def ask_local_llm(
             error=True,
             latency_ms=ctx.latency_ms(),
         )
-        return LlmAnswer(text="Что-то пошло не так", trace=ctx.trace)
+        return LlmAnswer(text="Что-то пошло не так", trace=ctx.trace, failed=True)
 
 
 async def cleanup_redis():

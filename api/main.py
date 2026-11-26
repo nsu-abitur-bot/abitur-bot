@@ -27,6 +27,7 @@ from api.routes.feedback_report import router as feedback_report_router
 from api.routes.gap_report import router as gap_report_router
 from api.routes.instance_settings import router as instance_settings_router
 from api.routes.message_log import router as message_log_router
+from api.routes.mini_app import router as mini_app_router
 from api.routes.rag import router as rag_router
 from api.routes.settings import router as settings_router
 from api.routes.stats import router as stats_router
@@ -147,6 +148,7 @@ app.add_middleware(
 # Auth роутер — публичные эндпоинты /login и /register, остальное защищено внутри
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(branding_router, prefix="/api/v1")
+app.include_router(mini_app_router, prefix="/api/v1")
 app.include_router(instance_settings_router, prefix="/api/v1")
 
 # Все остальные роутеры требуют аутентификации

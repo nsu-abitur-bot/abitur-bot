@@ -1,21 +1,22 @@
 import logging
-from dataclasses import dataclass
-from datetime import UTC, datetime
 from html import escape
 from typing import Awaitable, Callable, Optional
 
 from bot.formatting import format_for_channel
-from config.chat import CHAT_DISCLAIMER, WELCOME_MESSAGE_MAX_LENGTH, utf16_length
+from config.chat import (
+    CHAT_DISCLAIMER,
+    MAX_USER_MESSAGE_LENGTH,
+    WELCOME_MESSAGE_MAX_LENGTH,
+    utf16_length,
+)
 from config.instance import get_setting
 from config.university import identity
 from db.postgres.db import AsyncSessionLocal
-from db.postgres.models import MessageLog
 from db.postgres.services.answer_feedback import AnswerFeedbackService
 from db.postgres.services.feedback_report import FeedbackReportService
-from db.postgres.services.message_log import MessageLogService
-from db.postgres.services.settings import SettingsService
 from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
+from pipeline.chat_access import RateLimitExceeded, reserve_chat_question
 from pipeline.llm_client import ask_local_llm
 
 StreamCallback = Callable[[str], Awaitable[None]]
@@ -70,11 +71,6 @@ FEEDBACK_FOOTER = (
     "Подробности можно отправить через /feedback."
 )
 
-SYSTEM_RATE_LIMIT_MESSAGE = (
-    "Сегодняшний общий лимит запросов к боту исчерпан. Попробуйте завтра."
-)
-USER_RATE_LIMIT_MESSAGE = "Вы исчерпали дневной лимит запросов к боту. Попробуйте завтра."
-
 # Ответ, когда обработка сообщения упала. Без него человек видел «печатает…» и
 # тишину: исключение уходило в лог aiogram, а до чата не доходило ничего.
 ERROR_REPLY_TEXT = (
@@ -85,18 +81,11 @@ ERROR_REPLY_TEXT = (
 # Вопрос абитуриента — это пара предложений. Простыня длиннее — почти всегда
 # вставленный документ: модель на нём дорогая и отвечает хуже, а молча обрезать
 # нельзя — модель ответит на половину вопроса так, будто это весь вопрос.
-MAX_USER_MESSAGE_LENGTH = 2000
 TOO_LONG_MESSAGE_TEXT = (
     "Сообщение получилось слишком длинным — я разбираю вопросы до "
     f"{MAX_USER_MESSAGE_LENGTH} символов. Сформулируйте, пожалуйста, вопрос "
     "короче или разбейте его на несколько сообщений."
 )
-
-
-@dataclass(frozen=True)
-class RateLimitResult:
-    allowed: bool
-    message: str | None = None
 
 
 class BotReply:
@@ -135,24 +124,6 @@ class BotCore:
             else:
                 raise ValueError(f"Unsupported channel: {channel}")
         return user.user_id
-
-    async def _save_user_message_to_db(
-        self, user_id: int, session_id: str, message: str, source: str
-    ) -> Optional[MessageLog]:
-        try:
-            async with AsyncSessionLocal() as db_session:
-                log_service = MessageLogService(db_session)
-                log_entry = await log_service.create_log(
-                    user_id=user_id,
-                    session_id=session_id,
-                    message_type="user_input",
-                    content=message,
-                    message_metadata={"source": source},
-                )
-                return log_entry
-        except Exception as e:
-            logger.error(f"Ошибка сохранения входящего сообщения в БД: {e}")
-            return None
 
     async def _save_feedback_report(
         self,
@@ -200,40 +171,6 @@ class BotCore:
                 "Не удалось создать оценку ответа: session_id=%s", session_id
             )
             return None
-
-    async def _check_rate_limit(self, user_id: int) -> RateLimitResult:
-        day_start = datetime.now(UTC).replace(
-            hour=0,
-            minute=0,
-            second=0,
-            microsecond=0,
-            tzinfo=None,
-        )
-        try:
-            async with AsyncSessionLocal() as session:
-                settings = await SettingsService(session).get_rate_limit_settings()
-                log_service = MessageLogService(session)
-                system_count = await log_service.count_user_inputs_since(day_start)
-                if system_count >= settings.system_requests_per_day:
-                    return RateLimitResult(
-                        allowed=False,
-                        message=SYSTEM_RATE_LIMIT_MESSAGE,
-                    )
-
-                user_count = await log_service.count_user_inputs_since(
-                    day_start,
-                    user_id=user_id,
-                )
-                if user_count >= settings.user_requests_per_day:
-                    return RateLimitResult(
-                        allowed=False,
-                        message=USER_RATE_LIMIT_MESSAGE,
-                    )
-        except Exception:
-            logger.exception("Ошибка проверки rate limit для user_id=%s", user_id)
-            return RateLimitResult(allowed=True)
-
-        return RateLimitResult(allowed=True)
 
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str
@@ -435,27 +372,19 @@ class BotCore:
             )
             return BotReply(text=TOO_LONG_MESSAGE_TEXT)
 
-        rate_limit = await self._check_rate_limit(internal_user_id)
-        if not rate_limit.allowed:
-            return BotReply(
-                text=rate_limit.message or USER_RATE_LIMIT_MESSAGE,
-                include_feedback_footer=False,
-            )
-
         formatted_message = f"[from {user_name}] {user_text}"
-
-        log_entry = await self._save_user_message_to_db(
-            user_id=internal_user_id,
-            session_id=dialog_session_id,
-            message=formatted_message,
-            source=channel,
-        )
+        async with AsyncSessionLocal.begin() as session:
+            reservation = await reserve_chat_question(
+                session, internal_user_id, dialog_session_id, formatted_message, channel
+            )
+        if isinstance(reservation, RateLimitExceeded):
+            return BotReply(text=reservation.value)
 
         answer = await ask_local_llm(
             formatted_message,
             session_id=dialog_session_id,
             user_id=internal_user_id,
-            log_entry_id=log_entry.id if log_entry else None,
+            log_entry_id=reservation,
             stream_callback=stream_callback,
             status_callback=status_callback,
         )
