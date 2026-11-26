@@ -47,9 +47,11 @@ CLI не включает живой режим в CI. API `/evals/run` сохр
 `results`, `mode`, `pass_rate`, `skipped_ids`. Ни один live-прогон не выдаётся
 за проверку развёрнутого продукта только по успешному offline CI.
 
-Для проверки карточки «Прикладная геология» на отдельном окружении СибГИУ
-с существующим индексом используйте три независимых диалога из набора
-`sibsiu_program_exams.yaml`. Baseline задаёт ожидаемое прохождение сценариев.
+Для проверки карточек «Прикладная геология» и «Архитектура» на отдельном
+окружении СибГИУ с существующим индексом используйте
+`sibsiu_program_exams.yaml`. Для архитектуры набор проверяет полный список
+испытаний в свежей сессии и короткое уточнение по математике после
+двух вопросов. Baseline задаёт ожидаемое прохождение сценариев.
 
 ```bash
 uv run python -m evals.evaluator --scenarios evals/sibsiu_program_exams.yaml \
@@ -60,7 +62,7 @@ uv run python -m evals.evaluator --scenarios evals/sibsiu_program_exams.yaml \
 синтетическими карточками в настоящем LightRAG.
 
 ```bash
-uv run pytest tests/rag/test_document_indexer_integration.py -k program_exam_cards
+uv run pytest tests/rag/test_document_indexer_integration.py
 ```
 
 Проверка учебного плана ПИиКН использует публичный PDF НГУ. Первый сценарий

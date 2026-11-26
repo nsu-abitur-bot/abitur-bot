@@ -44,3 +44,35 @@ scenarios:
     requires_llm: true
     assertions: *geology_assertions
     judge_criteria: *geology_criteria
+
+  - id: sibsiu_architecture_exams_fresh
+    question: Какие вступительные испытания нужны на 07.03.01 после 11 класса?
+    reference_answer: Для 07.03.01 «Архитектура» нужны ЕГЭ по профильной математике и русскому языку, а также вступительное испытание «Рисунок». Минимум по каждому — 40 баллов.
+    topic: program-exams
+    source: &architecture_source https://priem.sibsiu.ru/specialities/395
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: regex, value: 'математик\w*.{0,60}40'}
+      - {kind: regex, value: 'русск\w* язык\w*.{0,60}40'}
+      - {kind: regex, value: 'рисун(?:ок|к\w*).{0,60}40'}
+      - {kind: source_contains, value: *architecture_source}
+    judge_criteria: Профильная математика и русский язык указаны как ЕГЭ, рисунок указан как отдельное испытание вуза. Ответ относится к приёму после 11 класса.
+
+  - id: sibsiu_architecture_math_followup
+    setup_questions:
+      - Какие направления связаны с архитектурой?
+      - Расскажи подробнее про архитектуру на бакалавриате после 11 класса.
+    question: А математика нужна?
+    reference_answer: Да, на 07.03.01 «Архитектура» нужна профильная математика. Минимум 40 баллов.
+    topic: program-exams
+    source: *architecture_source
+    approved_by: null
+    approved_at: null
+    requires_llm: true
+    assertions:
+      - {kind: regex, value: 'профильн\w* математик\w*'}
+      - {kind: contains, value: "40"}
+      - {kind: source_contains, value: *architecture_source}
+    judge_criteria: Ответ подтверждает, что профильная математика обязательна для 07.03.01, и указывает минимум 40 баллов по карточке.
