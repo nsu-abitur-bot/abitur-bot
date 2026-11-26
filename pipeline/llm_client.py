@@ -702,10 +702,10 @@ async def _run_tool_loop(
                 except ValueError as exc:
                     guard.verified = False
                     return str(exc)
+                for key in ("program", "year", "level"):
+                    if not args.get(key) and key in guard.filters:
+                        args[key] = guard.filters[key]
                 if guard.requests_seats:
-                    for key in ("program", "year", "level"):
-                        if not args.get(key) and key in guard.filters:
-                            args[key] = guard.filters[key]
                     if not guard.program_ids and not (
                         args.get("program")
                         or args.get("faculty")
@@ -732,7 +732,7 @@ async def _run_tool_loop(
                     return output
                 if guard.program_ids and (
                     not isinstance(output, AdmissionScoresResult)
-                    or not guard.program_ids.issubset(output.program_ids)
+                    or guard.program_ids != output.program_ids
                 ):
                     guard.verified = False
                     return "Запрошены баллы других программ подготовки."

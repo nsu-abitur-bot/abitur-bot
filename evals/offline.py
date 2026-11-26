@@ -93,6 +93,19 @@ def _fixture_pipeline() -> Iterator[Runner]:
             required_tool=None,
         ) -> LLMResult:
             question = str(messages[-1].content)
+            if question == "А средний балл какой?":
+                if required_tool == "get_admission_scores":
+                    properties = tools[0].parameters["properties"]
+                    args = {
+                        key: properties[key]["enum"][0] for key in ("program", "metric")
+                    }
+                    await tool_executor(required_tool, args)
+                return LLMResult(text="Среднего балла в базе нет.")
+            if "09.03.01" in question:
+                await tool_executor(
+                    "get_admission_scores", {"program": "09.03.01", "metric": "passing"}
+                )
+                return LLMResult(text="Среднего балла в базе нет.")
             if required_tool == "get_admission_scores":
                 value = await tool_executor(
                     required_tool,
@@ -226,7 +239,21 @@ def _fixture_pipeline() -> Iterator[Runner]:
             raise AssertionError("Unexpected tool")
         if args.get("faculty") == "Факультет Изучения Магии":
             return AdmissionScoresResult(
-                "По этому запросу данных о проходных баллах нет.", status="empty"
+                "По этому запросу нет данных о баллах.", status="empty"
+            )
+        if args.get("program") == "09.03.01":
+            rows = [
+                {
+                    "program_name": "Тестовая системотехника",
+                    "code": args["program"],
+                    "year": 2024,
+                    "admission_basis": "budget",
+                    "passing_score": 141,
+                    "average_score": 63.27,
+                }
+            ]
+            return AdmissionScoresResult(
+                _format_scores(rows, args["metric"]), status="ok", use_as_answer=True
             )
         if args.get("metric") == "seats" and args.get("program") == "Тестовая инженерия":
             rows = [

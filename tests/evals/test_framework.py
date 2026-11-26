@@ -129,13 +129,21 @@ async def test_real_offline_pipeline_passes_and_records_trace(monkeypatch):
     monkeypatch.setattr(AsyncEngine, "connect", forbid_connect)
 
     with offline_pipeline() as runner:
-        report = await PipelineEvaluator(runner=runner).run(offline=True)
-    assert report["total"] == report["passed_perfectly"] == 13
+        evaluator = PipelineEvaluator(runner=runner)
+        report = await evaluator.run(offline=True)
+    expected_total = sum(not scenario.requires_llm for scenario in evaluator.scenarios)
+    assert report["total"] == report["passed_perfectly"] == expected_total
     assert not connections
     by_id = {r["id"]: r for r in report["results"]}
     assert by_id["abbrev_1"]["faq_matched"]
     assert by_id["tool_1"]["tools_called"] == ["get_admission_scores"]
     assert by_id["admission_score_study_forms"]["passed"]
+    for case_id in (
+        "admission_score_pair_passing",
+        "admission_score_pair_general",
+        "admission_score_pair_followup",
+    ):
+        assert by_id[case_id]["tools_called"] == ["get_admission_scores"]
     assert by_id["admission_announced_seats"]["passed"]
     assert not by_id["faq_negative_1"]["faq_matched"]
     assert by_id["crag_topic_switch_mmf"]["passed"]

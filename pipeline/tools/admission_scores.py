@@ -56,6 +56,8 @@ ADMISSION_SCORES_TOOL = ToolSpec(
     name="get_admission_scores",
     description=(
         "Проходные и средние баллы прошлых лет и объявленные места по программам НГУ. "
+        "Для баллов в каждой записи возвращает оба доступных показателя с программой, "
+        "годом, формой обучения и основанием приёма. "
         "Фильтры: год, уровень, форма обучения и основание приёма. Для запроса мест "
         "укажи metric=seats, а для мест вместе с баллами добавь include_seat_count. "
         "Число объявленных мест не равно числу зачисленных или свободных мест "
@@ -113,14 +115,15 @@ ADMISSION_SCORES_TOOL = ToolSpec(
                 "type": "string",
                 "enum": ["passing", "average", "both", "seats"],
                 "description": (
-                    "Какой балл нужен: passing — проходной (по умолчанию), "
+                    "Что интересует пользователя: passing — проходной (по умолчанию), "
                     "average — средний, both — оба, seats — только объявленные места. "
-                    "Указывай average или both при явном запросе среднего балла."
+                    "Для passing, average и both результат содержит оба доступных "
+                    "показателя."
                 ),
             },
             "include_seat_count": {
                 "type": "boolean",
-                "description": "Покажи объявленные места вместе с запрошенными баллами.",
+                "description": "Покажи объявленные места вместе с баллами.",
             },
         },
         "additionalProperties": False,
@@ -155,21 +158,14 @@ def _coerce_year(value: object) -> Optional[int]:
     return None
 
 
-def _format_score_value(row: dict, metric: str) -> str:
-    """Форматирует значение балла для одной строки под выбранную метрику."""
+def _format_score_values(row: dict) -> str:
     passing = row.get("passing_score")
     average = row.get("average_score")
-
-    parts: list[str] = []
-    if metric in ("passing", "both"):
-        parts.append(
-            "проходной "
-            + (str(passing).removesuffix(".0") if passing is not None else "—")
-        )
-    if metric in ("average", "both"):
-        avg_text = f"{average:g}" if isinstance(average, (int, float)) else "—"
-        parts.append("средний " + avg_text)
-    return ", ".join(parts)
+    if passing is None and average is None:
+        return "проходной и средний баллы не указаны"
+    passing_text = str(passing).removesuffix(".0") if passing is not None else "не указан"
+    average_text = str(average).removesuffix(".0") if average is not None else "не указан"
+    return f"проходной {passing_text}, средний {average_text}"
 
 
 def _format_scores(
@@ -182,7 +178,7 @@ def _format_scores(
     elif show_seats:
         header = "Баллы и объявленные места"
     else:
-        header = "Проходные баллы прошлых лет"
+        header = "Проходные и средние баллы прошлых лет"
     university = " (НГУ)" if is_nsu() else ""
     lines = [f"{header}{university}:"]
 
@@ -210,7 +206,7 @@ def _format_scores(
             if study_form is not None
             else "форма обучения не указана"
         )
-        values = [_format_score_value(row, metric)] if metric != "seats" else []
+        values = [_format_score_values(row)] if metric != "seats" else []
         seat_count = row.get("seat_count")
         if show_seats:
             values.append(
@@ -250,8 +246,7 @@ def _expand(value: object) -> Optional[str]:
 async def execute_admission_scores(arguments: dict) -> str:
     """Выполняет запрос проходных/средних баллов и форматирует результат.
 
-    Пустые/отсутствующие фильтры не передаются в сервис. Если данных нет —
-    возвращает единый маркер, по которому модель понимает, что цифр нет.
+    Отличает пустую выборку и сбой запроса от записей с незаполненными баллами.
     """
     try:
         arguments = normalize_score_arguments(arguments)
@@ -291,33 +286,42 @@ async def execute_admission_scores(arguments: dict) -> str:
     try:
         async with AsyncSessionLocal() as session:
             service = AdmissionScoreService(session)
-            rows = await service.query_scores(
+            filters = dict(
                 faculty=faculty,
                 program=program,
-                year=year,
                 admission_basis=basis,
                 study_form=study_form,
                 level=level,
                 program_ids=program_ids,
                 include_identity=True,
-                only_with_scores=not show_seats,
             )
+            rows = await service.query_scores(year=year, **filters)
             note = ""
-            if not rows and year is not None and not show_seats:
-                # Модель подставляет текущий год, а итоги приёма за него ещё не
-                # опубликованы: лучше показать прошлые годы, чем «данных нет».
-                rows = await service.query_scores(
-                    faculty=faculty,
-                    program=program,
-                    admission_basis=basis,
-                    study_form=study_form,
-                    level=level,
-                    program_ids=program_ids,
-                    include_identity=True,
-                    only_with_scores=True,
+            if (
+                year is not None
+                and not show_seats
+                and not any(
+                    row["passing_score"] is not None or row["average_score"] is not None
+                    for row in rows
                 )
-                if rows:
-                    note = f"За {year} год данных нет, показаны доступные годы."
+            ):
+                other_years = await service.query_scores(only_with_scores=True, **filters)
+                if other_years:
+                    # Объявленные места могут появиться до публикации итоговых баллов.
+                    note = (
+                        f"В записях за {year} год баллы не указаны. "
+                        "Показаны также доступные баллы за другие годы."
+                        if rows
+                        else f"За {year} год данных нет, показаны доступные годы."
+                    )
+                    rows = sorted(
+                        [*rows, *other_years],
+                        key=lambda row: (
+                            row["program_name"],
+                            row["program_id"],
+                            row["year"],
+                        ),
+                    )
     except Exception:
         logger.exception("Ошибка выполнения инструмента get_admission_scores")
         return AdmissionScoresResult(
@@ -351,12 +355,12 @@ async def execute_admission_scores(arguments: dict) -> str:
             period = f" за {year} год" if year is not None else ""
             text = f"По этому запросу нет данных {subject}{period}."
         else:
-            text = "По этому запросу данных о проходных баллах нет."
+            text = "По этому запросу нет данных о баллах."
         return AdmissionScoresResult(
             text,
             status="empty",
             scope=scope,
-            use_as_answer=show_seats or study_form is not None,
+            use_as_answer=True,
         )
 
     # Один фактически найденный вариант сохраняем для следующего уточнения.
@@ -378,6 +382,5 @@ async def execute_admission_scores(arguments: dict) -> str:
         f"{note}\n\n{text}" if note else text,
         status="ok",
         scope=scope,
-        use_as_answer=show_seats
-        or any(row.get("study_form") is not None for row in rows),
+        use_as_answer=True,
     )

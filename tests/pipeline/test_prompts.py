@@ -38,8 +38,8 @@ VERSIONED_PROMPTS = [
 # подними версию в pipeline/prompts.py и обнови обе колонки здесь.
 PINNED = {
     "system": (
-        "4.0",
-        "e3d6cbd470af523d1afffe222f0f66a7c70c72c894090a6aed45c7cea7d2753e",
+        "4.1",
+        "e1814aab88bbabb8277ca287fe4d1372ba818b0c3c67712c962a988bdc9533da",
     ),
     "sources_hint": (
         "1.0",

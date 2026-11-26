@@ -11,6 +11,7 @@ from typing import cast
 import pytest
 import pytest_asyncio
 from lightrag import LightRAG
+from sqlalchemy import text as sql_text
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
     async_sessionmaker,
@@ -107,6 +108,231 @@ async def _seed_fit(maker) -> None:
                 ),
             ]
         )
+
+
+@pytest_asyncio.fixture
+async def score_profile(sessionmaker_bound) -> str:
+    faculty = "Тестовый факультет"
+    program = "Информатика. Программная инженерия"
+    async with sessionmaker_bound() as session:
+        await FacultyService(session).upsert_from_seed(
+            [
+                {
+                    "name": faculty,
+                    "programs": [
+                        {"name": program, "code": "09.03.01", "level": "bachelor"}
+                    ],
+                }
+            ]
+        )
+        await AdmissionScoreService(session).upsert_from_rows(
+            [ScoreRow(faculty, program, "09.03.01", 2024, "budget", 141, 63.27)]
+        )
+    return program
+
+
+@pytest.mark.parametrize("metric", [None, "passing", "average", "both"])
+async def test_score_tool_returns_pair_for_each_metric(score_profile, expander, metric):
+    arguments = {"program": "09.03.01"}
+    if metric is not None:
+        arguments["metric"] = metric
+    result = await execute_admission_scores(arguments)
+
+    assert isinstance(result, AdmissionScoresResult) and result.status == "ok"
+    assert result.scope["metric"] == (metric or "passing")
+    assert score_profile in result
+    assert (
+        "2024, форма обучения не указана, бюджет: проходной 141, средний 63.27" in result
+    )
+
+
+async def test_score_rows_keep_profile_year_form_basis_and_missing_values(
+    sessionmaker_bound, score_profile, expander
+):
+    faculty = "Тестовый факультет"
+    second = "Информатика. Компьютерные науки"
+    async with sessionmaker_bound() as session:
+        faculties = FacultyService(session)
+        entry = await faculties.find_faculty_by_alias(faculty)
+        assert entry is not None
+        await faculties.create_program(
+            entry.id, second, level="bachelor", code="09.03.01"
+        )
+        rows = [
+            (score_profile, 2024, "budget", StudyForm.full_time, 180, 72.5),
+            (score_profile, 2024, "paid", StudyForm.full_time, None, 0),
+            (score_profile, 2024, "budget", StudyForm.correspondence, 0, None),
+            (score_profile, 2023, "budget", StudyForm.full_time, None, None),
+            (second, 2024, "budget", StudyForm.full_time, 260, 88.1),
+        ]
+        await AdmissionScoreService(session).upsert_from_rows(
+            ScoreRow(
+                faculty, name, "09.03.01", year, basis, passing, average, study_form=form
+            )
+            for name, year, basis, form, passing, average in rows
+        )
+
+    result = await execute_admission_scores({"program": "09.03.01", "metric": "passing"})
+    assert isinstance(result, AdmissionScoresResult) and result.status == "ok"
+    assert len(result.program_ids) == 2
+    second_text, first_text = result.split(score_profile)
+    assert second in second_text
+    assert "2024, очная, бюджет: проходной 260, средний 88.1" in second_text
+    assert "проходной 260" not in first_text
+    assert "2024, очная, бюджет: проходной 180, средний 72.5" in first_text
+    assert "2024, очная, платно: проходной не указан, средний 0" in first_text
+    assert "2024, заочная, бюджет: проходной 0, средний не указан" in first_text
+    assert "2023, очная, бюджет: проходной и средний баллы не указаны" in first_text
+
+    exact = await execute_admission_scores(
+        {"program": score_profile, "year": 2023, "study_form": "full_time"}
+    )
+    assert isinstance(exact, AdmissionScoresResult) and exact.status == "ok"
+    assert "2023, очная, бюджет: проходной и средний баллы не указаны" in exact
+    absent = await execute_admission_scores({"program": "99.99.99"})
+    assert isinstance(absent, AdmissionScoresResult) and absent.status == "empty"
+
+
+async def test_existing_row_without_scores_is_not_empty(
+    sessionmaker_bound, score_profile, expander
+):
+    async with sessionmaker_bound() as session:
+        await AdmissionScoreService(session).upsert_from_rows(
+            [
+                ScoreRow(
+                    "Тестовый факультет",
+                    score_profile,
+                    "09.03.01",
+                    2024,
+                    "paid",
+                    None,
+                    None,
+                )
+            ]
+        )
+    result = await execute_admission_scores(
+        {"program": "09.03.01", "year": 2024, "admission_basis": "paid"}
+    )
+    assert isinstance(result, AdmissionScoresResult) and result.status == "ok"
+    assert score_profile in result
+    assert (
+        "2024, форма обучения не указана, платно: проходной и средний баллы не указаны"
+        in result
+    )
+
+
+@pytest.mark.parametrize(
+    "question", ["Какой проходной балл на 09.03.01?", "Какие баллы на 09.03.01?"]
+)
+async def test_score_pair_answer_and_followup_use_real_sql(
+    score_profile, expander, monkeypatch, question
+):
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    async def retrieve(*args, **kwargs):
+        return RetrievalResult(context="")
+
+    async def faq_miss(_matcher, _question):
+        return None
+
+    async def crag_config():
+        return SimpleNamespace(enabled=True)
+
+    calls, published = [], []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            required = kwargs.get("required_tool")
+            calls.append(required)
+            current = str(messages[-1].content)
+            if current == question:
+                await kwargs["tool_executor"](
+                    "get_admission_scores", {"metric": "passing"}
+                )
+            elif required:
+                properties = kwargs["tools"][0].parameters["properties"]
+                assert properties["metric"]["enum"] == ["average"]
+                assert properties["year"]["enum"] == [2024]
+                assert properties["admission_basis"]["enum"] == ["budget"]
+                program_ids = properties["program_ids"]["items"]["enum"]
+                value = await kwargs["tool_executor"](
+                    required,
+                    {"metric": "average", "program_ids": program_ids, "year": 2024},
+                )
+                return LLMResult(
+                    "Средний балл 63.27." if "63.27" in value else str(value)
+                )
+            return LLMResult("Среднего балла в базе нет.")
+
+    async def publish(value):
+        published.append(value)
+
+    monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: expander)
+    monkeypatch.setattr(llm_client, "get_faq_matcher", lambda: None)
+    monkeypatch.setattr(llm_client, "_match_faq", faq_miss)
+    monkeypatch.setattr(llm_client, "load_crag_config", crag_config)
+    monkeypatch.setattr(llm_client, "query_graph_with_crag", retrieve)
+    monkeypatch.setattr(llm_client, "_spawn_bg", lambda coro: coro.close())
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+
+    first = await llm_client.ask_local_llm(
+        question, "score-pair", prior_history=[], stream_callback=publish
+    )
+    assert score_profile in first.text
+    assert (
+        "2024, форма обучения не указана, бюджет: проходной 141, средний 63.27"
+        in first.text
+    )
+    assert first.trace.tools_called == ["get_admission_scores"]
+    followup = await llm_client.ask_local_llm(
+        "А средний балл какой?",
+        "score-pair",
+        prior_history=[{"role": "user", "content": question}, first.history_entry],
+        stream_callback=publish,
+    )
+    assert (
+        "средний 63.27" in followup.text.lower()
+        or "средний балл 63.27" in followup.text.lower()
+    )
+    assert followup.trace.tools_called == ["get_admission_scores"]
+    assert calls == [None, None, "get_admission_scores"]
+    assert published == [first.text, followup.text]
+
+
+async def test_real_score_sql_error_does_not_publish_missing_data(
+    sessionmaker_bound, score_profile, expander, monkeypatch
+):
+    from langchain_core.messages import HumanMessage
+
+    from llm.base import LLMResult
+    from pipeline import llm_client
+
+    async with sessionmaker_bound() as session:
+        await session.execute(
+            sql_text(
+                "ALTER TABLE admission_score RENAME COLUMN average_score TO unavailable"
+            )
+        )
+        await session.commit()
+
+    calls = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            calls.append(kwargs.get("required_tool"))
+            output = await kwargs["tool_executor"](
+                "get_admission_scores", {"program": "09.03.01", "metric": "passing"}
+            )
+            assert isinstance(output, AdmissionScoresResult) and output.status == "error"
+            return LLMResult("По этому запросу баллов нет.")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    answer, _, _ = await llm_client._run_tool_loop(
+        [HumanMessage(content="Какие баллы на 09.03.01?")], "score-sql-error"
+    )
+    assert answer == llm_client.SCORES_UNAVAILABLE
+    assert calls == [None]
 
 
 async def test_scores_keep_study_form_and_basis_in_reply_and_followup(
@@ -366,7 +592,7 @@ async def test_shared_code_cannot_substitute_a_different_profile(
         assert published == [text]
         return
     if mode == "empty_paid":
-        assert text == "По этому запросу данных о проходных баллах нет."
+        assert text == "По этому запросу нет данных о баллах."
         assert "99" not in text
     else:
         assert "63.27" in text
@@ -638,28 +864,12 @@ async def test_execute_returns_distinct_passing_scores(sessionmaker_bound):
 
     text = await execute_admission_scores({"faculty": "ФИТ", "year": 2024})
 
-    # Оба направления присутствуют с РАЗНЫМИ проходными баллами.
-    assert "246" in text
-    assert "260" in text
-    assert text.startswith("Проходные баллы прошлых лет (НГУ):")
+    assert "проходной 246, средний 84.2" in text
+    assert "проходной 260, средний 88.1" in text
+    assert text.startswith("Проходные и средние баллы прошлых лет (НГУ):")
     assert "Программная инженерия и компьютерные науки" in text
     assert "Компьютерные науки и системотехника" in text
-    # По умолчанию — только проходной, без среднего.
-    assert "84.2" not in text
-    assert "88.1" not in text
     assert isinstance(text, AdmissionScoresResult) and text.status == "ok"
-
-
-@pytest.mark.asyncio
-async def test_execute_includes_average_when_requested(sessionmaker_bound):
-    await _seed_fit(sessionmaker_bound)
-
-    text = await execute_admission_scores(
-        {"faculty": "ФИТ", "year": 2024, "metric": "both"}
-    )
-    assert "246" in text
-    assert "84.2" in text
-    assert "средний" in text
 
 
 @pytest.mark.asyncio
@@ -763,7 +973,7 @@ async def test_execute_empty_returns_marker(sessionmaker_bound):
     await _seed_fit(sessionmaker_bound)
 
     text = await execute_admission_scores({"faculty": "Несуществующий"})
-    assert text == "По этому запросу данных о проходных баллах нет."
+    assert text == "По этому запросу нет данных о баллах."
     assert isinstance(text, AdmissionScoresResult) and text.status == "empty"
 
 
@@ -892,7 +1102,7 @@ async def test_scores_tool_retains_level_in_year_fallback(sessionmaker_bound, ex
     text = await execute_admission_scores(
         {"faculty": "ФИТ", "level": "spo", "year": 2026}
     )
-    assert text == "По этому запросу данных о проходных баллах нет."
+    assert text == "По этому запросу нет данных о баллах."
 
 
 def test_format_scores_distinguishes_same_names_at_different_levels():
@@ -1016,7 +1226,7 @@ async def test_program_tool_excludes_inactive_entries(sessionmaker_bound, monkey
             "budget",
             2025,
             True,
-            "проходной 249, объявлено мест: 0",
+            "проходной 249, средний не указан, объявлено мест: 0",
             True,
         ),
     ],
@@ -1114,5 +1324,9 @@ async def test_only_seats_do_not_hide_previous_passing_scores(
     seats = await execute_admission_scores({**arguments, "metric": "seats"})
     scores = await execute_admission_scores(arguments)
     assert "2025, форма обучения не указана, бюджет: объявлено мест: 30" in seats
-    assert "За 2025 год данных нет, показаны доступные годы." in scores
+    assert "В записях за 2025 год баллы не указаны." in scores
+    assert (
+        "2025, форма обучения не указана, бюджет: проходной и средний баллы не указаны"
+        in scores
+    )
     assert "проходной 246" in scores
