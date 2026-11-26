@@ -10,6 +10,37 @@ from pipeline.tools.admission_scores import AdmissionScoresResult
 
 
 @pytest.mark.parametrize(
+    "question", ["Какой проходной балл на 09.03.01?", "Какие баллы на 09.03.01?"]
+)
+async def test_score_question_blocks_answer_without_sql(monkeypatch, question):
+    attempts = []
+
+    class Provider:
+        async def generate_with_tools(self, messages, **kwargs):
+            attempts.append(kwargs.get("required_tool"))
+            return LLMResult("Проходной 999, среднего балла нет.")
+
+    monkeypatch.setattr(llm_client, "get_llm_provider", Provider)
+    answer, _, _ = await llm_client._run_tool_loop(
+        [HumanMessage(content=question)], "no-sql"
+    )
+    assert answer == SCORES_UNAVAILABLE
+    assert attempts == [None, "get_admission_scores"]
+
+
+def test_average_followup_inherits_code_after_unqualified_score_question():
+    guard = ScoreGuard.from_messages(
+        [
+            HumanMessage(content="Какие баллы на 09.03.01?"),
+            AIMessage(content="Проходной 141, средний 63.27."),
+            HumanMessage(content="А средний балл какой?"),
+        ]
+    )
+    assert guard is not None and not guard.clarify
+    assert guard.filters == {"program": "09.03.01", "metric": "average"}
+
+
+@pytest.mark.parametrize(
     "reference",
     [
         "на 09.03.01",
@@ -176,6 +207,9 @@ def test_identity_recovery_requires_all_previously_selected_profiles():
     assert guard is not None
     assert not guard.accepts({"metric": "average", "program_ids": ["profile-b"]})
     assert not guard.accepts({"metric": "average", "program_ids": ["profile-c"]})
+    assert not guard.accepts(
+        {"metric": "average", "program_ids": ["profile-a", "profile-b", "profile-c"]}
+    )
     schema = guard.recovery_tool(ADMISSION_SCORES_TOOL).parameters
     assert schema["properties"]["program_ids"]["items"]["enum"] == [
         "profile-a",
@@ -511,6 +545,8 @@ def test_full_comparison_question_retains_program_context(question):
     [
         "Сколько стоит общежитие?",
         "Мой средний балл аттестата 4.5",
+        "Какие баллы ЕГЭ нужны для поступления на 09.03.01?",
+        "Какие баллы на ЕГЭ по математике дают за первую часть?",
         "Как дела?",
     ],
 )

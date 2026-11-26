@@ -103,6 +103,48 @@ scenarios:
       - {kind: contains, value: "заочная, бюджет: проходной 224"}
       - {kind: contains, value: "заочная, платно: проходной 181"}
 
+  - id: admission_score_pair_passing
+    question: Какой проходной балл на 09.03.01?
+    reference_answer: Тестовая системотехника, 2024 год, бюджет. Проходной 141, средний 63.27.
+    topic: admission_scores
+    source: Синтетическая запись в evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: contains, value: Тестовая системотехника}
+      - {kind: contains, value: "2024, форма обучения не указана, бюджет: проходной 141, средний 63.27"}
+
+  - id: admission_score_pair_general
+    question: Какие баллы на 09.03.01?
+    reference_answer: Тестовая системотехника, 2024 год, бюджет. Проходной 141, средний 63.27.
+    topic: admission_scores
+    source: Синтетическая запись в evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: contains, value: Тестовая системотехника}
+      - {kind: contains, value: "2024, форма обучения не указана, бюджет: проходной 141, средний 63.27"}
+
+  - id: admission_score_pair_followup
+    question: А средний балл какой?
+    history:
+      - {role: user, content: "Какие баллы на 09.03.01?"}
+      - {role: assistant, content: "Тестовая системотехника, 2024, бюджет. Проходной 141, средний 63.27."}
+    reference_answer: Средний балл 63.27.
+    topic: admission_scores
+    source: Синтетическая запись и восстановительный вызов в evals/offline.py
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: tool_called, value: get_admission_scores}
+      - {kind: contains, value: "средний 63.27"}
+      - {kind: not_contains, value: Среднего балла в базе нет}
+
   - id: admission_announced_seats
     question: Сколько бюджетных мест на очной и заочной формах на программе «Тестовая инженерия» в 2025 году?
     reference_answer: На программе «Тестовая инженерия» в 2025 году объявлено 0 бюджетных мест на очной форме. Показана ссылка на источник. По заочной форме количество неизвестно.
