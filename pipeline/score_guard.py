@@ -63,6 +63,11 @@ def _subject_words(text: str) -> list[str]:
 
 
 _SCORE = re.compile(r"(?:проходн\w*|средн\w*)\s+бал", re.I)
+_UNQUALIFIED_CODE_SCORE = re.compile(
+    r"\b(?:какие|каковы)\s+баллы\s+(?:на|по|для)\s+"
+    r"(?:(?:направлени|программ|специальност|код)\w*\s+)?[«\"]?" + _CODE.pattern,
+    re.I,
+)
 _SEAT_COUNT = re.compile(
     r"\b(?:(?:сколько|количеств\w*|число)\s+"
     r"(?:(?:бюджетн\w*|платн\w*|выдел\w*|объявл\w*|предусмотр\w*|будет|было|всего|и)\s+)*"
@@ -82,7 +87,11 @@ def is_seat_count_question(question: str) -> bool:
 
 
 def _admission_question(question: str) -> bool:
-    return bool(_SCORE.search(question) or is_seat_count_question(question))
+    return _score_question(question) or is_seat_count_question(question)
+
+
+def _score_question(question: str) -> bool:
+    return bool(_SCORE.search(question) or _UNQUALIFIED_CODE_SCORE.search(question))
 
 
 _SHORT = re.compile(
@@ -316,7 +325,7 @@ class ScoreGuard:
             if "средн" in question or "проходн" in question:
                 filters.pop("include_seat_count", None)
             if is_seat_count_question(question):
-                if _SCORE.search(question):
+                if _score_question(question):
                     filters["include_seat_count"] = True
                 else:
                     filters["metric"] = "seats"
@@ -428,7 +437,7 @@ class ScoreGuard:
             not self.program_ids
             or not isinstance(ids, list)
             or any(not isinstance(value, str) for value in ids)
-            or not self.program_ids.issubset(ids)
+            or self.program_ids != set(ids)
         ):
             return False
         if any(arguments.get(key) not in (None, "") for key in self.comparisons):
