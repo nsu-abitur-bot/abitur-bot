@@ -12,17 +12,11 @@ from config.chat import (
 from config.instance import get_setting
 from config.university import identity
 from db.postgres.db import AsyncSessionLocal
-from db.postgres.models import MessageLog
 from db.postgres.services.answer_feedback import AnswerFeedbackService
 from db.postgres.services.feedback_report import FeedbackReportService
 from db.postgres.services.user import UserService
 from db.redis.client import get_redis_client
-from pipeline.chat_access import (
-    USER_RATE_LIMIT_MESSAGE,
-    RateLimitResult,
-    check_rate_limit,
-    log_chat_question,
-)
+from pipeline.chat_access import RateLimitExceeded, reserve_chat_question
 from pipeline.llm_client import ask_local_llm
 
 StreamCallback = Callable[[str], Awaitable[None]]
@@ -131,18 +125,6 @@ class BotCore:
                 raise ValueError(f"Unsupported channel: {channel}")
         return user.user_id
 
-    async def _save_user_message_to_db(
-        self, user_id: int, session_id: str, message: str, source: str
-    ) -> Optional[MessageLog]:
-        try:
-            async with AsyncSessionLocal() as session:
-                return await log_chat_question(
-                    session, user_id, session_id, message, source
-                )
-        except Exception as e:
-            logger.error(f"Ошибка сохранения входящего сообщения в БД: {e}")
-            return None
-
     async def _save_feedback_report(
         self,
         user_id: int,
@@ -189,14 +171,6 @@ class BotCore:
                 "Не удалось создать оценку ответа: session_id=%s", session_id
             )
             return None
-
-    async def _check_rate_limit(self, user_id: int) -> RateLimitResult:
-        try:
-            async with AsyncSessionLocal() as session:
-                return await check_rate_limit(session, user_id)
-        except Exception:
-            logger.exception("Ошибка проверки rate limit для user_id=%s", user_id)
-            return RateLimitResult(allowed=True)
 
     async def cmd_start(
         self, channel: str, external_user_id: str, session_id: str
@@ -398,27 +372,19 @@ class BotCore:
             )
             return BotReply(text=TOO_LONG_MESSAGE_TEXT)
 
-        rate_limit = await self._check_rate_limit(internal_user_id)
-        if not rate_limit.allowed:
-            return BotReply(
-                text=rate_limit.message or USER_RATE_LIMIT_MESSAGE,
-                include_feedback_footer=False,
-            )
-
         formatted_message = f"[from {user_name}] {user_text}"
-
-        log_entry = await self._save_user_message_to_db(
-            user_id=internal_user_id,
-            session_id=dialog_session_id,
-            message=formatted_message,
-            source=channel,
-        )
+        async with AsyncSessionLocal.begin() as session:
+            reservation = await reserve_chat_question(
+                session, internal_user_id, dialog_session_id, formatted_message, channel
+            )
+        if isinstance(reservation, RateLimitExceeded):
+            return BotReply(text=reservation.value)
 
         answer = await ask_local_llm(
             formatted_message,
             session_id=dialog_session_id,
             user_id=internal_user_id,
-            log_entry_id=log_entry.id if log_entry else None,
+            log_entry_id=reservation,
             stream_callback=stream_callback,
             status_callback=status_callback,
         )

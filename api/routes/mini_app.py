@@ -17,7 +17,7 @@ from db.postgres.services.answer_feedback import AnswerFeedbackService
 from db.postgres.services.mini_app import MiniAppChatService, turn_status
 from db.postgres.services.user import UserService
 from db.redis.client import HISTORY_LIMIT
-from pipeline.chat_access import check_rate_limit, log_chat_question
+from pipeline.chat_access import RateLimitExceeded, reserve_chat_question
 from pipeline.llm_client import LlmAnswer, ask_local_llm
 
 logger = logging.getLogger(__name__)
@@ -192,19 +192,17 @@ async def send_question(
     try:
         async with asyncio.timeout(85):
             user_id = await _user_id(session, owner)
-            rate = await check_rate_limit(session, user_id)
-            if not rate.allowed:
-                raise HTTPException(429, rate.message)
-            log = await log_chat_question(
+            reservation = await reserve_chat_question(
                 session, user_id, session_id, body.text, "mini-app"
             )
-            log_id = log.id
+            if isinstance(reservation, RateLimitExceeded):
+                raise HTTPException(429, reservation.value)
             await session.commit()
             answer = await ask_local_llm(
                 body.text,
                 session_id=session_id,
                 user_id=user_id,
-                log_entry_id=log_id,
+                log_entry_id=reservation,
                 prior_history=history,
             )
     except HTTPException:

@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock
+from unittest.mock import ANY, AsyncMock
 
 import pytest
 
@@ -9,6 +9,7 @@ from bot.core import (
     BotCore,
 )
 from config.chat import CHAT_DISCLAIMER
+from pipeline.chat_access import RateLimitExceeded
 from pipeline.llm_client import LlmAnswer
 
 
@@ -155,7 +156,6 @@ async def test_normal_reply_has_sources_and_feedback_without_disclaimer(
 ):
     redis = FakeRedis()
     core = BotCore()
-    user_log = type("Log", (), {"id": 10})()
 
     async def fake_get_redis_client():
         return redis
@@ -163,21 +163,11 @@ async def test_normal_reply_has_sources_and_feedback_without_disclaimer(
     async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
         return 42
 
-    async def fake_save_user_message_to_db(
-        user_id: int, session_id: str, message: str, source: str
-    ):
-        return user_log
-
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
-    monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
+    monkeypatch.setattr("bot.core.reserve_chat_question", AsyncMock(return_value=10))
     monkeypatch.setattr(
         core, "_create_answer_feedback", AsyncMock(return_value="feedback-1")
-    )
-    monkeypatch.setattr(
-        core,
-        "_check_rate_limit",
-        AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
     )
     monkeypatch.setattr(
         "bot.core.ask_local_llm",
@@ -209,7 +199,6 @@ async def test_normal_reply_has_sources_and_feedback_without_disclaimer(
 async def test_report_is_not_feedback_command(monkeypatch):
     redis = FakeRedis()
     core = BotCore()
-    user_log = type("Log", (), {"id": 10})()
     ask_llm = AsyncMock(return_value=LlmAnswer(text="Ответ на report"))
 
     async def fake_get_redis_client():
@@ -218,19 +207,9 @@ async def test_report_is_not_feedback_command(monkeypatch):
     async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
         return 42
 
-    async def fake_save_user_message_to_db(
-        user_id: int, session_id: str, message: str, source: str
-    ):
-        return user_log
-
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
-    monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
-    monkeypatch.setattr(
-        core,
-        "_check_rate_limit",
-        AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
-    )
+    monkeypatch.setattr("bot.core.reserve_chat_question", AsyncMock(return_value=10))
     monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
 
     await core.handle_message(
@@ -287,8 +266,7 @@ async def test_normal_message_uses_dialog_session_for_logs_and_llm(monkeypatch):
     redis = FakeRedis()
     redis.dialog_session_id = "session-1:dialog:2"
     core = BotCore()
-    user_log = type("Log", (), {"id": 10})()
-    saved_session_ids: list[str] = []
+    reserve_question = AsyncMock(return_value=10)
     ask_llm = AsyncMock(return_value=LlmAnswer(text="Ответ бота"))
 
     async def fake_get_redis_client():
@@ -297,20 +275,9 @@ async def test_normal_message_uses_dialog_session_for_logs_and_llm(monkeypatch):
     async def fake_resolve_internal_user_id(channel: str, external_user_id: str) -> int:
         return 42
 
-    async def fake_save_user_message_to_db(
-        user_id: int, session_id: str, message: str, source: str
-    ):
-        saved_session_ids.append(session_id)
-        return user_log
-
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
-    monkeypatch.setattr(core, "_save_user_message_to_db", fake_save_user_message_to_db)
-    monkeypatch.setattr(
-        core,
-        "_check_rate_limit",
-        AsyncMock(return_value=type("RateLimit", (), {"allowed": True})()),
-    )
+    monkeypatch.setattr("bot.core.reserve_chat_question", reserve_question)
     monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
 
     await core.handle_message(
@@ -321,17 +288,19 @@ async def test_normal_message_uses_dialog_session_for_logs_and_llm(monkeypatch):
         user_text="Как поступить?",
     )
 
-    assert saved_session_ids == ["session-1:dialog:2"]
+    reserve_question.assert_awaited_once_with(
+        ANY, 42, "session-1:dialog:2", "[from user] Как поступить?", "telegram"
+    )
     await_args = ask_llm.await_args
     assert await_args is not None
     assert await_args.kwargs["session_id"] == "session-1:dialog:2"
+    assert await_args.kwargs["log_entry_id"] == 10
 
 
 @pytest.mark.asyncio
-async def test_rate_limit_skips_llm_and_user_input_log(monkeypatch):
+async def test_rate_limit_skips_llm(monkeypatch):
     redis = FakeRedis()
     core = BotCore()
-    save_user_message = AsyncMock()
     ask_llm = AsyncMock(return_value=LlmAnswer(text="LLM response"))
 
     async def fake_get_redis_client():
@@ -342,17 +311,8 @@ async def test_rate_limit_skips_llm_and_user_input_log(monkeypatch):
 
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
-    monkeypatch.setattr(core, "_save_user_message_to_db", save_user_message)
     monkeypatch.setattr(
-        core,
-        "_check_rate_limit",
-        AsyncMock(
-            return_value=type(
-                "RateLimit",
-                (),
-                {"allowed": False, "message": "Лимит исчерпан"},
-            )()
-        ),
+        "bot.core.reserve_chat_question", AsyncMock(return_value=RateLimitExceeded.USER)
     )
     monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
 
@@ -364,9 +324,8 @@ async def test_rate_limit_skips_llm_and_user_input_log(monkeypatch):
         user_text="Как поступить?",
     )
 
-    assert reply.text == "Лимит исчерпан"
+    assert reply.text == RateLimitExceeded.USER.value
     assert FEEDBACK_FOOTER not in reply.text
-    save_user_message.assert_not_awaited()
     ask_llm.assert_not_awaited()
 
 
@@ -375,8 +334,7 @@ async def test_too_long_message_is_rejected_before_llm_and_rate_limit(monkeypatc
     redis = FakeRedis()
     core = BotCore()
     ask_llm = AsyncMock(return_value=LlmAnswer(text="LLM response"))
-    rate_limit = AsyncMock()
-    save_message = AsyncMock()
+    reserve_question = AsyncMock()
 
     async def fake_get_redis_client():
         return redis
@@ -386,8 +344,7 @@ async def test_too_long_message_is_rejected_before_llm_and_rate_limit(monkeypatc
 
     monkeypatch.setattr("bot.core.get_redis_client", fake_get_redis_client)
     monkeypatch.setattr(core, "resolve_internal_user_id", fake_resolve_internal_user_id)
-    monkeypatch.setattr(core, "_check_rate_limit", rate_limit)
-    monkeypatch.setattr(core, "_save_user_message_to_db", save_message)
+    monkeypatch.setattr("bot.core.reserve_chat_question", reserve_question)
     monkeypatch.setattr("bot.core.ask_local_llm", ask_llm)
 
     reply = await core.handle_message(
@@ -400,5 +357,4 @@ async def test_too_long_message_is_rejected_before_llm_and_rate_limit(monkeypatc
 
     assert reply.text == TOO_LONG_MESSAGE_TEXT
     ask_llm.assert_not_awaited()
-    rate_limit.assert_not_awaited()
-    save_message.assert_not_awaited()
+    reserve_question.assert_not_awaited()

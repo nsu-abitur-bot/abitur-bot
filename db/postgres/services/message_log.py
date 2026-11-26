@@ -84,6 +84,8 @@ class MessageLogService:
         message_metadata: Optional[dict] = None,
         topic_id: Optional[int] = None,
         tokens_used: Optional[int] = None,
+        *,
+        commit: bool = True,
     ) -> MessageLog:
         """Создает запись в логе сообщений."""
         log_entry = MessageLog(
@@ -96,8 +98,11 @@ class MessageLogService:
             tokens_used=tokens_used,
         )
         self.session.add(log_entry)
-        await self.session.commit()
-        await self.session.refresh(log_entry)
+        if commit:
+            await self.session.commit()
+            await self.session.refresh(log_entry)
+        else:
+            await self.session.flush()
         return log_entry
 
     async def count_user_inputs_since(
