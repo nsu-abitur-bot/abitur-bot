@@ -66,19 +66,18 @@ class TestBuildMessages:
         assert [m.type for m in messages] == ["system", "human"]
         assert messages[-1].content == "Когда приём?"
 
-    def test_history_roles_are_mapped(self):
+    def test_follow_up_uses_user_context(self):
         messages = _build_messages(
             "контекст",
             [
-                {"role": "user", "content": "Когда подавать?"},
+                {"role": "user", "content": "Когда подавать документы на ФИТ?"},
                 {"role": "assistant", "content": "До 25 июля."},
                 {"role": "system", "content": "это игнорируется"},
             ],
-            "А на магистратуру?",
+            "А какие документы нужны?",
         )
-        assert [m.type for m in messages] == ["system", "human", "ai", "human"]
-        assert messages[1].content == "Когда подавать?"
-        assert messages[2].content == "До 25 июля."
+        assert [m.type for m in messages] == ["system", "human", "human"]
+        assert messages[1].content == "Когда подавать документы на ФИТ?"
 
     def test_sources_block_stripped_from_old_answers(self):
         """Иначе модель начинает копировать ссылки из своих прошлых ответов."""
@@ -93,7 +92,7 @@ class TestBuildMessages:
                     ),
                 }
             ],
-            "Вопрос",
+            "Какой проходной балл на ФИТ?",
         )
         assert messages[1].content == "До 25 июля."
 
@@ -101,9 +100,9 @@ class TestBuildMessages:
         messages = _build_messages(
             "контекст",
             [{"role": "assistant", "content": 'Смотри <a href="https://n.ru">тут</a>'}],
-            "Вопрос",
+            "Какой проходной балл на ФИТ?",
         )
-        assert "<a" not in messages[1].content
+        assert messages[1].content == "Смотри"
 
 
 class _FakeProvider:

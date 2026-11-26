@@ -34,6 +34,7 @@ from db.postgres.services.faculty import FacultyService, normalize_name
 from db.postgres.services.settings import SettingsService
 from llm.factory import get_llm_provider
 from llm.profiles import LLMProfiles
+from rag.dialog_context import prior_search_history
 
 logger = logging.getLogger(__name__)
 
@@ -215,26 +216,11 @@ def _match_faculty(
     return best
 
 
-_FOLLOW_UP = re.compile(r"^(?:\[from [^\n\]]+\]\s*)?\s*(?:а|и|там|туда|тогда)\b", re.I)
-_HISTORY_ROLE = re.compile(r"(?m)^(user|assistant|system): ")
-
-
 def _question_level(question: str, history: str | None) -> str:
-    level = detect_level(question)
-    if level is not None:
-        return level
-
-    if history and _FOLLOW_UP.match(question):
-        messages = _HISTORY_ROLE.split(history)
-        for role, message in reversed(list(zip(messages[1::2], messages[2::2]))):
-            if role != "user":
-                continue
-            level = detect_level(message)
-            if level is not None:
-                return level
-            if not _FOLLOW_UP.match(message):
-                break
-
+    for turn in (question, *reversed((history or "").splitlines())):
+        level = detect_level(turn)
+        if level is not None:
+            return level
     return "bachelor"
 
 
@@ -248,9 +234,10 @@ async def detect_faculty_hint(
     факультета или любой из его алиасов как отдельное слово/подстрока вопроса.
     Приоритет отдаётся текущему вопросу: если в нём явно назван факультет,
     он выбирается независимо от наличия других факультетов в истории диалога.
-    Если в текущем вопросе факультет не найден, поиск продолжается в истории.
+    В продолжениях учитываются реплики пользователя по текущей теме.
     """
-    level = _question_level(question, conversation_history)
+    history = prior_search_history(question, conversation_history)
+    level = _question_level(question, history)
 
     try:
         async with AsyncSessionLocal() as session:
@@ -258,17 +245,11 @@ async def detect_faculty_hint(
             # 1. Приоритет: ищем факультет в текущем вопросе
             best = _match_faculty(faculties, question)
 
-            # 2. Если в вопросе факультет не упомянут — ищем в истории диалога
-            if best is None and conversation_history:
-                for line in reversed(conversation_history.splitlines()):
-                    if not line.strip():
-                        continue
-                    found = _match_faculty(faculties, line)
-                    if found is not None:
-                        best = found
+            if best is None and history:
+                for line in reversed(history.splitlines()):
+                    best = _match_faculty(faculties, line)
+                    if best is not None:
                         break
-                if best is None:
-                    best = _match_faculty(faculties, conversation_history)
 
             return FacultyHint(faculty=best, level=level)
     except Exception as exc:
@@ -573,6 +554,7 @@ async def filter_chunks(
     max_graded_chunks для контроля латентности).
     """
     config = config or get_crag_config()
+    history = prior_search_history(question, conversation_history)
     hint = await detect_faculty_hint(question, conversation_history=conversation_history)
 
     if not chunks:
@@ -610,7 +592,7 @@ async def filter_chunks(
                     hint,
                     chunk,
                     config,
-                    conversation_history=conversation_history,
+                    conversation_history=history,
                 )
             except TypeError:
                 return await grade_chunk(question, hint, chunk, config)
@@ -651,10 +633,9 @@ async def refine_query(
         if hint.faculty is not None
         else ""
     )
+    history = prior_search_history(question, conversation_history)
     history_clause = (
-        f" Учитывай контекст предыдущего диалога:\n{conversation_history}\n"
-        if conversation_history
-        else ""
+        f" Учитывай контекст предыдущего диалога:\n{history}\n" if history else ""
     )
     system_prompt = (
         "Ты помогаешь улучшить поисковый запрос к базе знаний. "

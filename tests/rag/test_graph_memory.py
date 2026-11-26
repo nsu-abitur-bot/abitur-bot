@@ -8,7 +8,7 @@ from rag.graph_memory import GraphMemory
 
 
 @pytest.mark.asyncio
-async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch):
+async def test_crag_search_uses_new_faculty_in_short_question(monkeypatch):
     from rag.crag import CragConfig
 
     memory = GraphMemory()
@@ -69,7 +69,7 @@ async def test_crag_search_uses_history_for_follow_up_and_refinement(monkeypatch
         conversation_history=history_text,
     )
 
-    assert searches == [f"{history_text}\n\nа на ММФ?"]
+    assert searches == ["а на ММФ?"]
     assert "математика и компьютерные науки" in retrieval.context.lower()
     assert any("https://mmf.nsu.ru" in s.get("url", "") for s in retrieval.sources)
 
@@ -347,5 +347,5 @@ async def test_crag_separates_search_instructions_from_filter_question(monkeypat
         search_query=search_query,
         conversation_history="user: магистратура",
     )
-    assert searches == [f"user: магистратура\n\n{search_query}"]
-    assert filtered == [(question, "user: магистратура")]
+    assert searches == [search_query]
+    assert filtered == [(question, None)]

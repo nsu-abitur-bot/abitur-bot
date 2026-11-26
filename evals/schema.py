@@ -53,6 +53,7 @@ class Scenario(BaseModel):
     judge_criteria: str | None = None
     min_score: int = Field(default=4, ge=1, le=5, strict=True)
     history: list[dict[str, str]] = Field(default_factory=list)
+    setup_questions: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_checks(self) -> "Scenario":
