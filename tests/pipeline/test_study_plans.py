@@ -10,6 +10,7 @@ from fakeredis.aioredis import FakeRedis
 from abbrev.expander import AbbrevExpander
 from parser import url as url_parser
 from pipeline import llm_client, study_plans
+from rag.trace import RetrievalResult
 
 _PLAN_URL = (
     "https://www.nsu.ru/n/information-technologies-department/education_fit/"
@@ -106,6 +107,7 @@ async def plan_pipeline(monkeypatch, request):
 
         monkeypatch.setenv("UNIVERSITY_PROFILE", "nsu")
         monkeypatch.setattr(study_plans, "_cached_plans", {})
+        monkeypatch.setattr(study_plans, "get_llm_provider", forbid_model)
         monkeypatch.setattr(url_parser, "fetch_url_async", fetch)
         monkeypatch.setattr(llm_client, "get_redis_client", get_history_client)
         monkeypatch.setattr(llm_client, "get_abbrev_expander", lambda: expander)
@@ -148,6 +150,7 @@ async def test_bot_answers_with_confirmed_pdf_page_and_cohort(plan_pipeline, coh
         "Когда начинается дисциплина «Дискретная математика»? Учебный план:",
         "Когда начинается изучение дискретной математики?",
         "Когда начинается дискретная математика?",
+        pytest.param("Когда начнётся дискретная математика?", id="future-discipline"),
         "В каком семестре начинается дисциплина «Дискретная математика»?",
     ],
 )
@@ -168,16 +171,32 @@ async def test_bot_verifies_when_a_discipline_starts(
     [
         "Когда начинается учёба?",
         "Когда начинаются занятия?",
+        pytest.param("Когда начнутся занятия?", id="future-classes"),
         "Когда учебный семестр начинается?",
         "Когда начинается 1-й семестр?",
+        pytest.param("Когда начинается третий семестр?", id="third-semester"),
+        pytest.param("Когда начинается осенний семестр?", id="autumn-semester"),
         "Когда начинаются каникулы?",
     ],
 )
-async def test_schedule_questions_skip_study_plan(plan_pipeline, question: str) -> None:
-    answer = await study_plans.answer_study_plan(f"{question} Учебный план: {_PLAN_URL}")
+async def test_schedule_questions_use_regular_pipeline(
+    plan_pipeline, monkeypatch, question: str
+) -> None:
+    message = f"{question} Учебный план: {_PLAN_URL}"
+    retrieved = []
+    calendar_answer = "Даты указаны в академическом календаре."
 
-    assert answer is None
+    async def retrieve(query: str, **kwargs) -> RetrievalResult:
+        retrieved.append(query.split("\n\n", 1)[0])
+        return RetrievalResult(context="Академический календарь", answer=calendar_answer)
+
+    monkeypatch.setattr(llm_client, "query_graph_with_sources", retrieve)
+
+    answer = await llm_client.ask_local_llm(message, "schedule-start-test")
+
     assert plan_pipeline == []
+    assert retrieved == [message]
+    assert answer.text == calendar_answer
 
 
 @pytest.mark.parametrize(

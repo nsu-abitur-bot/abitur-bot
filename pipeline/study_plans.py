@@ -40,13 +40,18 @@ _NON_DISCIPLINE = re.compile(
     r"каникул\w*|отчислен\w*)\b",
     re.IGNORECASE,
 )
+_STARTS = r"(?:начина(?:ется|ются)|начн[её]тся|начнутся)"
+_SEMESTER_MODIFIER = (
+    r"(?:учебный|осенний|весенний|зимний|летний|первый|второй|третий|"
+    r"четв[её]ртый|пятый|шестой|седьмой|восьмой|девятый|десятый|"
+    r"[1-9]\d?(?:[-–—]й)?)"
+)
 _SCHEDULE_EVENT = (
     r"(?:занятия|уч[её]ба|обучение|(?:учебный\s+)?год|"
-    r"(?:(?:учебный|первый|второй|[1-9]\d?(?:[-–]й)?)\s+)?семестры?)"
+    rf"(?:{_SEMESTER_MODIFIER}\s+){{0,2}}семестры?)"
 )
 _SCHEDULE_START = re.compile(
-    rf"\b(?:начина(?:ется|ются)\s+{_SCHEDULE_EVENT}|"
-    rf"{_SCHEDULE_EVENT}\s+начина(?:ется|ются))\b",
+    rf"\b(?:{_STARTS}\s+{_SCHEDULE_EVENT}|{_SCHEDULE_EVENT}\s+{_STARTS})\b",
     re.IGNORECASE,
 )
 _YEAR = re.compile(r"\b(?:19|20)\d{2}\b")
@@ -410,7 +415,7 @@ async def answer_study_plan(question: str) -> StudyPlanAnswer | None:
         or (
             (direct or _PIIKN.search(scope))
             and re.search(
-                r"\b(?:есть\s+ли|когда\s+(?:проходят|изучают|начинается))\b", scope, re.I
+                rf"\b(?:есть\s+ли|когда\s+(?:проходят|изучают|{_STARTS}))\b", scope, re.I
             )
         )
     )
