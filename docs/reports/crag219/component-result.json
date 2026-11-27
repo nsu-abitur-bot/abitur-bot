@@ -1,0 +1,662 @@
+{
+  "scope": "isolated CRAG component; real provider, fixed real KB candidates; no Telegram/RAG delivery",
+  "baseline_source_sha256": "106ecf2cc58e51f85f6365b84adac6e28922612a5034c9d40573204c7965302c",
+  "candidate_source_sha256": "cf19f55c8a59243650a8ad5fbeff768f2b2699732a92477bb05a766a14c1d2d9",
+  "question": "Какие программы бакалавриата есть на ФИТ НГУ?",
+  "input_sha256": "fd5e102c770ebb5f1f7f7940e0bdf1434f052cf8b18d8c733627ba99b8457159",
+  "http_attempts": 36,
+  "results": [
+    {
+      "arm": "baseline",
+      "duration_ms": 7588.8157080626115,
+      "logical_calls": 24,
+      "http_attempts": 24,
+      "grades": 23,
+      "retrievals": 1,
+      "kept_sha256": [
+        "cd51c16c878096d86d9adc0c12bd91d77e06eb3691df62a2c55b7e711c0dcdb6",
+        "cd51c16c878096d86d9adc0c12bd91d77e06eb3691df62a2c55b7e711c0dcdb6",
+        "9d2c30fa72e8ac05090ab8b47bf7303b967935be48763535c72cb8fe52701f9f"
+      ],
+      "calls": [
+        {
+          "prompt_sha256": "fb56af46c36cb9a0cba3684f88ded27ebe35468e32c9cee64c250fd65c4a201b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 27.37691591028124,
+            "connection.start_tls": 224.436542019248,
+            "http11.send_request_headers": 0.1635829685255885,
+            "http11.send_request_body": 0.09987503290176392,
+            "http11.receive_response_headers": 401.1109579587355,
+            "http11.receive_response_body": 933.6681660497561,
+            "http11.response_closed": 0.6357089150696993
+          },
+          "tokens": {
+            "input": 685,
+            "output": 11
+          },
+          "duration_ms": 1817.4286659341305
+        },
+        {
+          "prompt_sha256": "c20cd8875849edacf2c203d6e1df7caf676507c3306cef5619ef0c3ad46aaa83",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 26.569959009066224,
+            "connection.start_tls": 232.38954204134643,
+            "http11.send_request_headers": 0.13575004413723946,
+            "http11.send_request_body": 0.05166709888726473,
+            "http11.receive_response_headers": 394.6004589088261,
+            "http11.receive_response_body": 947.4872499704361,
+            "http11.response_closed": 0.9944160701707006
+          },
+          "tokens": {
+            "input": 662,
+            "output": 11
+          },
+          "duration_ms": 1654.037458007224
+        },
+        {
+          "prompt_sha256": "0fd8e12cefc1d31c5be9a19d97f5c5e4c229d4348432b996e7062d3ddb302d91",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 27.05116698052734,
+            "connection.start_tls": 223.31729205325246,
+            "http11.send_request_headers": 0.8955000666901469,
+            "http11.send_request_body": 0.2038750099018216,
+            "http11.receive_response_headers": 396.490833023563,
+            "http11.receive_response_body": 556.0801250394434,
+            "http11.response_closed": 0.35991601180285215
+          },
+          "tokens": {
+            "input": 649,
+            "output": 11
+          },
+          "duration_ms": 1257.265541004017
+        },
+        {
+          "prompt_sha256": "f05600b5a2912e96fe0cfb4361321c3d318832f7eda831e1548d2bcef2777fe7",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 26.86166705098003,
+            "connection.start_tls": 224.9782090075314,
+            "http11.send_request_headers": 0.12608303222805262,
+            "http11.send_request_body": 0.11070806067436934,
+            "http11.receive_response_headers": 413.7851250125095,
+            "http11.receive_response_body": 921.5502499137074,
+            "http11.response_closed": 1.5130829997360706
+          },
+          "tokens": {
+            "input": 643,
+            "output": 11
+          },
+          "duration_ms": 1639.9517500540242
+        },
+        {
+          "prompt_sha256": "3ef390f787896d92b12713968d4e7d3af272f8f6000c6382bc4835bdd8f3e5cd",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "connection.connect_tcp": 22.830375004559755,
+            "connection.start_tls": 235.9114590799436,
+            "http11.send_request_headers": 0.13624993152916431,
+            "http11.send_request_body": 0.12025004252791405,
+            "http11.receive_response_headers": 395.05587494932115,
+            "http11.receive_response_body": 529.1697090724483,
+            "http11.response_closed": 0.08283299393951893
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1247.9835420381278
+        },
+        {
+          "prompt_sha256": "7608f3968ab9fbbf11f022fe17c58f4c971477fd7bb7a9c4b3d37b8285c55047",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 1.4868329744786024,
+            "http11.send_request_body": 2.486750017851591,
+            "http11.receive_response_headers": 391.81649999227375,
+            "http11.receive_response_body": 643.776125041768,
+            "http11.response_closed": 0.10025000665336847
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1043.9651670167223
+        },
+        {
+          "prompt_sha256": "b31616eecd2ef18fd3be9b55fab5bc78b72a39d953cf201d97f9caabe7b54995",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.2909590257331729,
+            "http11.send_request_body": 0.15095795970410109,
+            "http11.receive_response_headers": 404.0197089780122,
+            "http11.receive_response_body": 325.6206250516698,
+            "http11.response_closed": 0.08699996396899223
+          },
+          "tokens": {
+            "input": 648,
+            "output": 11
+          },
+          "duration_ms": 733.5947499377653
+        },
+        {
+          "prompt_sha256": "5a31bc3b18b2a36e0a5cbd56b0614ace9c8a76410190062f05d973d62fb2ff2a",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 1.5436660032719374,
+            "http11.send_request_body": 2.186959027312696,
+            "http11.receive_response_headers": 504.468834027648,
+            "http11.receive_response_body": 523.6235830234364,
+            "http11.response_closed": 0.050042057409882545
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1044.507332961075
+        },
+        {
+          "prompt_sha256": "0234ee4d09e09a25ef05cc3e18fc613690cf0b7811e1c9725a4647a10dee482b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.4075419856235385,
+            "http11.send_request_body": 0.16249995678663254,
+            "http11.receive_response_headers": 503.0517498962581,
+            "http11.receive_response_body": 148.33987492602319,
+            "http11.response_closed": 0.09937502909451723
+          },
+          "tokens": {
+            "input": 644,
+            "output": 11
+          },
+          "duration_ms": 660.3162089595571
+        },
+        {
+          "prompt_sha256": "5badbea6dad57a015a19da70a06e6a2d3850dd876dbbb1ddfed54ba15d76abb6",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.17687503714114428,
+            "http11.send_request_body": 0.17320900224149227,
+            "http11.receive_response_headers": 503.05704097263515,
+            "http11.receive_response_body": 367.06574994605035,
+            "http11.response_closed": 0.10441604536026716
+          },
+          "tokens": {
+            "input": 639,
+            "output": 11
+          },
+          "duration_ms": 874.175208969973
+        },
+        {
+          "prompt_sha256": "24b26c7392f2bcd6017c3399d29a2650b4cb8a47cf0e8bd455cfb2b91d674f89",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.28795795515179634,
+            "http11.send_request_body": 0.12674997560679913,
+            "http11.receive_response_headers": 403.1531249638647,
+            "http11.receive_response_body": 812.4794589821249,
+            "http11.response_closed": 0.11212495155632496
+          },
+          "tokens": {
+            "input": 620,
+            "output": 11
+          },
+          "duration_ms": 1219.442458008416
+        },
+        {
+          "prompt_sha256": "01ed74f2f9cd897e5aaa7bd7be63ca422b6680b068283a9d35e166d32185c2a5",
+          "kind": "refine",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.5152500234544277,
+            "http11.send_request_body": 0.1947090495377779,
+            "http11.receive_response_headers": 520.193750038743,
+            "http11.receive_response_body": 644.4704999448732,
+            "http11.response_closed": 0.5619579460471869
+          },
+          "tokens": {
+            "input": 118,
+            "output": 45
+          },
+          "duration_ms": 1181.242375052534
+        },
+        {
+          "prompt_sha256": "fb56af46c36cb9a0cba3684f88ded27ebe35468e32c9cee64c250fd65c4a201b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.6496250862255692,
+            "http11.send_request_body": 0.3159170737490058,
+            "http11.receive_response_headers": 390.1860830374062,
+            "http11.receive_response_body": 482.7336249873042,
+            "http11.response_closed": 0.24654099252074957
+          },
+          "tokens": {
+            "input": 685,
+            "output": 11
+          },
+          "duration_ms": 883.7535420898348
+        },
+        {
+          "prompt_sha256": "fb56af46c36cb9a0cba3684f88ded27ebe35468e32c9cee64c250fd65c4a201b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.5817500641569495,
+            "http11.send_request_body": 0.2731670392677188,
+            "http11.receive_response_headers": 416.8665410252288,
+            "http11.receive_response_body": 667.9356249514967,
+            "http11.response_closed": 0.06499991286545992
+          },
+          "tokens": {
+            "input": 685,
+            "output": 11
+          },
+          "duration_ms": 1094.4267919985577
+        },
+        {
+          "prompt_sha256": "c20cd8875849edacf2c203d6e1df7caf676507c3306cef5619ef0c3ad46aaa83",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.2900830004364252,
+            "http11.send_request_body": 0.12179103214293718,
+            "http11.receive_response_headers": 425.67149992100894,
+            "http11.receive_response_body": 635.7832909561694,
+            "http11.response_closed": 0.052042072638869286
+          },
+          "tokens": {
+            "input": 662,
+            "output": 11
+          },
+          "duration_ms": 1070.7305839750916
+        },
+        {
+          "prompt_sha256": "0fd8e12cefc1d31c5be9a19d97f5c5e4c229d4348432b996e7062d3ddb302d91",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.18104200717061758,
+            "http11.send_request_body": 0.1628749305382371,
+            "http11.receive_response_headers": 387.93683296535164,
+            "http11.receive_response_body": 483.3749580429867,
+            "http11.response_closed": 1.5309579903259873
+          },
+          "tokens": {
+            "input": 649,
+            "output": 11
+          },
+          "duration_ms": 881.2079170020297
+        },
+        {
+          "prompt_sha256": "f05600b5a2912e96fe0cfb4361321c3d318832f7eda831e1548d2bcef2777fe7",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.25941699277609587,
+            "http11.send_request_body": 0.24745892733335495,
+            "http11.receive_response_headers": 424.77337503805757,
+            "http11.receive_response_body": 786.7154999403283,
+            "http11.response_closed": 0.060165999457240105
+          },
+          "tokens": {
+            "input": 643,
+            "output": 11
+          },
+          "duration_ms": 1218.3392499573529
+        },
+        {
+          "prompt_sha256": "3ef390f787896d92b12713968d4e7d3af272f8f6000c6382bc4835bdd8f3e5cd",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.22854201961308718,
+            "http11.send_request_body": 0.18558301962912083,
+            "http11.receive_response_headers": 518.4303750284016,
+            "http11.receive_response_body": 525.8481670171022,
+            "http11.response_closed": 0.45004195999354124
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1049.4665829464793
+        },
+        {
+          "prompt_sha256": "7608f3968ab9fbbf11f022fe17c58f4c971477fd7bb7a9c4b3d37b8285c55047",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.10462501086294651,
+            "http11.send_request_body": 0.06079103332012892,
+            "http11.receive_response_headers": 519.5189999649301,
+            "http11.receive_response_body": 337.24195801187307,
+            "http11.response_closed": 0.08504197467118502
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 859.4919169554487
+        },
+        {
+          "prompt_sha256": "b31616eecd2ef18fd3be9b55fab5bc78b72a39d953cf201d97f9caabe7b54995",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.17658399883657694,
+            "http11.send_request_body": 0.0813750084489584,
+            "http11.receive_response_headers": 428.90029202681035,
+            "http11.receive_response_body": 950.757332961075,
+            "http11.response_closed": 0.5432089092209935
+          },
+          "tokens": {
+            "input": 648,
+            "output": 11
+          },
+          "duration_ms": 1382.846666034311
+        },
+        {
+          "prompt_sha256": "5a31bc3b18b2a36e0a5cbd56b0614ace9c8a76410190062f05d973d62fb2ff2a",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.2521249698475003,
+            "http11.send_request_body": 0.12441701255738735,
+            "http11.receive_response_headers": 409.0922090690583,
+            "http11.receive_response_body": 679.1028339648619,
+            "http11.response_closed": 0.08545804303139448
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1091.3135420996696
+        },
+        {
+          "prompt_sha256": "0234ee4d09e09a25ef05cc3e18fc613690cf0b7811e1c9725a4647a10dee482b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.3190420102328062,
+            "http11.send_request_body": 0.12812495697289705,
+            "http11.receive_response_headers": 416.51999996975064,
+            "http11.receive_response_body": 405.061790952459,
+            "http11.response_closed": 0.11091702617704868
+          },
+          "tokens": {
+            "input": 644,
+            "output": 11
+          },
+          "duration_ms": 824.857790954411
+        },
+        {
+          "prompt_sha256": "5badbea6dad57a015a19da70a06e6a2d3850dd876dbbb1ddfed54ba15d76abb6",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.5132090300321579,
+            "http11.send_request_body": 0.34187501296401024,
+            "http11.receive_response_headers": 384.05158394016325,
+            "http11.receive_response_body": 843.6636669794098,
+            "http11.response_closed": 0.067290966399014
+          },
+          "tokens": {
+            "input": 639,
+            "output": 11
+          },
+          "duration_ms": 1232.7137079555541
+        },
+        {
+          "prompt_sha256": "24b26c7392f2bcd6017c3399d29a2650b4cb8a47cf0e8bd455cfb2b91d674f89",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.5614579422399402,
+            "http11.send_request_body": 0.2191250678151846,
+            "http11.receive_response_headers": 516.9723340077326,
+            "http11.receive_response_body": 523.7588749732822,
+            "http11.response_closed": 0.062290928326547146
+          },
+          "tokens": {
+            "input": 620,
+            "output": 11
+          },
+          "duration_ms": 1045.5198329873383
+        }
+      ]
+    },
+    {
+      "arm": "candidate",
+      "duration_ms": 4566.4893329376355,
+      "logical_calls": 12,
+      "http_attempts": 12,
+      "grades": 11,
+      "retrievals": 1,
+      "kept_sha256": [
+        "cd51c16c878096d86d9adc0c12bd91d77e06eb3691df62a2c55b7e711c0dcdb6",
+        "cd51c16c878096d86d9adc0c12bd91d77e06eb3691df62a2c55b7e711c0dcdb6",
+        "9d2c30fa72e8ac05090ab8b47bf7303b967935be48763535c72cb8fe52701f9f"
+      ],
+      "calls": [
+        {
+          "prompt_sha256": "fb56af46c36cb9a0cba3684f88ded27ebe35468e32c9cee64c250fd65c4a201b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 3.491166979074478,
+            "http11.send_request_body": 0.4387079970911145,
+            "http11.receive_response_headers": 482.658667024225,
+            "http11.receive_response_body": 623.2532080030069,
+            "http11.response_closed": 0.0813750084489584
+          },
+          "tokens": {
+            "input": 685,
+            "output": 11
+          },
+          "duration_ms": 1127.4570840178058
+        },
+        {
+          "prompt_sha256": "c20cd8875849edacf2c203d6e1df7caf676507c3306cef5619ef0c3ad46aaa83",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.4691670183092356,
+            "http11.send_request_body": 0.17304194625467062,
+            "http11.receive_response_headers": 481.05837497860193,
+            "http11.receive_response_body": 570.3944580163807,
+            "http11.response_closed": 0.1598329981788993
+          },
+          "tokens": {
+            "input": 662,
+            "output": 11
+          },
+          "duration_ms": 1072.6597919128835
+        },
+        {
+          "prompt_sha256": "0fd8e12cefc1d31c5be9a19d97f5c5e4c229d4348432b996e7062d3ddb302d91",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.14879193622618914,
+            "http11.send_request_body": 0.06341701373457909,
+            "http11.receive_response_headers": 481.1218340182677,
+            "http11.receive_response_body": 599.587875069119,
+            "http11.response_closed": 0.07504201494157314
+          },
+          "tokens": {
+            "input": 649,
+            "output": 11
+          },
+          "duration_ms": 1100.5839999997988
+        },
+        {
+          "prompt_sha256": "f05600b5a2912e96fe0cfb4361321c3d318832f7eda831e1548d2bcef2777fe7",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.08758401963859797,
+            "http11.send_request_body": 0.05383405368775129,
+            "http11.receive_response_headers": 480.7425419567153,
+            "http11.receive_response_body": 1078.30929197371,
+            "http11.response_closed": 0.10529195424169302
+          },
+          "tokens": {
+            "input": 643,
+            "output": 11
+          },
+          "duration_ms": 1577.8428330086172
+        },
+        {
+          "prompt_sha256": "3ef390f787896d92b12713968d4e7d3af272f8f6000c6382bc4835bdd8f3e5cd",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.1835830044001341,
+            "http11.send_request_body": 0.13583397958427668,
+            "http11.receive_response_headers": 481.66158399544656,
+            "http11.receive_response_body": 668.4912919299677,
+            "http11.response_closed": 0.07158389780670404
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1166.0152919357643
+        },
+        {
+          "prompt_sha256": "7608f3968ab9fbbf11f022fe17c58f4c971477fd7bb7a9c4b3d37b8285c55047",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.506708980537951,
+            "http11.send_request_body": 0.17679203301668167,
+            "http11.receive_response_headers": 473.036874900572,
+            "http11.receive_response_body": 592.940374976024,
+            "http11.response_closed": 0.23612496443092823
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1072.1700829453766
+        },
+        {
+          "prompt_sha256": "b31616eecd2ef18fd3be9b55fab5bc78b72a39d953cf201d97f9caabe7b54995",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.5081250565126538,
+            "http11.send_request_body": 0.25850010570138693,
+            "http11.receive_response_headers": 442.7736670477316,
+            "http11.receive_response_body": 537.0280829956755,
+            "http11.response_closed": 0.08699996396899223
+          },
+          "tokens": {
+            "input": 648,
+            "output": 11
+          },
+          "duration_ms": 985.2485830197111
+        },
+        {
+          "prompt_sha256": "5a31bc3b18b2a36e0a5cbd56b0614ace9c8a76410190062f05d973d62fb2ff2a",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.29812497086822987,
+            "http11.send_request_body": 0.16229203902184963,
+            "http11.receive_response_headers": 437.71404097788036,
+            "http11.receive_response_body": 865.3363339835778,
+            "http11.response_closed": 0.1734589459374547
+          },
+          "tokens": {
+            "input": 642,
+            "output": 11
+          },
+          "duration_ms": 1306.725834030658
+        },
+        {
+          "prompt_sha256": "0234ee4d09e09a25ef05cc3e18fc613690cf0b7811e1c9725a4647a10dee482b",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 1.9739170093089342,
+            "http11.send_request_body": 0.20591600332409143,
+            "http11.receive_response_headers": 423.57887502294034,
+            "http11.receive_response_body": 556.996374973096,
+            "http11.response_closed": 0.15183293726295233
+          },
+          "tokens": {
+            "input": 644,
+            "output": 11
+          },
+          "duration_ms": 986.3740419968963
+        },
+        {
+          "prompt_sha256": "5badbea6dad57a015a19da70a06e6a2d3850dd876dbbb1ddfed54ba15d76abb6",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.40358398109674454,
+            "http11.send_request_body": 0.2479169052094221,
+            "http11.receive_response_headers": 486.49745795410126,
+            "http11.receive_response_body": 657.7832499751821,
+            "http11.response_closed": 0.10787497740238905
+          },
+          "tokens": {
+            "input": 639,
+            "output": 11
+          },
+          "duration_ms": 1148.6629589926451
+        },
+        {
+          "prompt_sha256": "24b26c7392f2bcd6017c3399d29a2650b4cb8a47cf0e8bd455cfb2b91d674f89",
+          "kind": "grade",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.19649998284876347,
+            "http11.send_request_body": 0.09166705422103405,
+            "http11.receive_response_headers": 506.35804201010615,
+            "http11.receive_response_body": 568.0147910024971,
+            "http11.response_closed": 0.08266698569059372
+          },
+          "tokens": {
+            "input": 620,
+            "output": 11
+          },
+          "duration_ms": 1077.2271669702604
+        },
+        {
+          "prompt_sha256": "01ed74f2f9cd897e5aaa7bd7be63ca422b6680b068283a9d35e166d32185c2a5",
+          "kind": "refine",
+          "http_attempts": 1,
+          "transport_ms": {
+            "http11.send_request_headers": 0.4515419714152813,
+            "http11.send_request_body": 0.142207951284945,
+            "http11.receive_response_headers": 474.1639590356499,
+            "http11.receive_response_body": 868.181416997686,
+            "http11.response_closed": 0.08995807729661465
+          },
+          "tokens": {
+            "input": 118,
+            "output": 45
+          },
+          "duration_ms": 1348.0528749059886
+        }
+      ]
+    }
+  ]
+}
