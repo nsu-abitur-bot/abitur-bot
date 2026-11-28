@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..dto import RatingChange, RatingEntry
-from ..models import Leaderboard, User, UserRating
+from ..models import Leaderboard, User, UserRating, timestamp
 from .notification_outbox import NotificationOutboxService
 
 logger = logging.getLogger(__name__)
@@ -61,6 +61,28 @@ class RatingService:
         except Exception as e:
             await self.session.rollback()
             logger.error(f"Ошибка обновления хэша рейтинга {leaderboard_id}: {e}")
+            return False
+
+    async def mark_leaderboard_checked(self, leaderboard_id: str) -> bool:
+        """Зафиксировать время успешной проверки неизменившегося списка."""
+        try:
+            result = await self.session.execute(
+                select(Leaderboard).where(Leaderboard.id == leaderboard_id)
+            )
+            leaderboard = result.scalar_one_or_none()
+            if leaderboard is None:
+                logger.warning(
+                    "Рейтинг %s не найден для фиксации проверки", leaderboard_id
+                )
+                return False
+            leaderboard.last_parsed_at = timestamp()
+            await self.session.commit()
+            return True
+        except Exception as e:
+            await self.session.rollback()
+            logger.error(
+                "Ошибка фиксации времени проверки рейтинга %s: %s", leaderboard_id, e
+            )
             return False
 
     async def get_all_leaderboards(self) -> List[Leaderboard]:
@@ -187,8 +209,16 @@ class RatingService:
             if entries:
                 logger.warning("Нет валидных идентификаторов в списке entries")
                 stats["skipped"] = len(entries)
-            if content_hash and leaderboard:
-                leaderboard.content_hash = content_hash
+            if leaderboard and (entries or content_hash is not None):
+                now = timestamp()
+                hash_changed = (
+                    content_hash is None or leaderboard.content_hash != content_hash
+                )
+                leaderboard.last_parsed_at = now
+                if hash_changed:
+                    leaderboard.data_updated_at = now
+                if content_hash:
+                    leaderboard.content_hash = content_hash
                 await self._commit()
             return stats
 
@@ -312,6 +342,14 @@ class RatingService:
                         f"status='{entry.status}'"
                     )
 
+        if leaderboard and (entries or content_hash is not None):
+            now = timestamp()
+            hash_changed = (
+                content_hash is None or leaderboard.content_hash != content_hash
+            )
+            leaderboard.last_parsed_at = now
+            if hash_changed or stats["created"] > 0 or stats["notifications"]:
+                leaderboard.data_updated_at = now
         if content_hash and leaderboard:
             leaderboard.content_hash = content_hash
         if enqueue_notifications and stats["notifications"]:

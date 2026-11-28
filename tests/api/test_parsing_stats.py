@@ -9,13 +9,15 @@ from fastapi.testclient import TestClient
 from api.main import app
 from db.postgres.db import get_db
 
-Row = namedtuple("Row", ["last_parsed_at", "total_lists"])
+Row = namedtuple("Row", ["last_parsed_at", "data_updated_at", "total_lists"])
 
 
 def test_parsing_stats_empty():
     db = AsyncMock()
     result = MagicMock()
-    result.one_or_none.return_value = Row(last_parsed_at=None, total_lists=0)
+    result.one_or_none.return_value = Row(
+        last_parsed_at=None, data_updated_at=None, total_lists=0
+    )
     db.execute.return_value = result
 
     app.dependency_overrides[get_db] = lambda: db
@@ -25,14 +27,21 @@ def test_parsing_stats_empty():
         app.dependency_overrides.pop(get_db, None)
 
     assert response.status_code == 200
-    assert response.json() == {"last_parsed_at": None, "total_lists": 0}
+    assert response.json() == {
+        "last_parsed_at": None,
+        "data_updated_at": None,
+        "total_lists": 0,
+    }
 
 
 def test_parsing_stats_with_data():
     db = AsyncMock()
     result = MagicMock()
-    dt = datetime(2026, 11, 20, 14, 30, 0)
-    result.one_or_none.return_value = Row(last_parsed_at=dt, total_lists=15)
+    dt_checked = datetime(2026, 11, 20, 14, 30, 0)
+    dt_updated = datetime(2026, 11, 20, 13, 15, 0)
+    result.one_or_none.return_value = Row(
+        last_parsed_at=dt_checked, data_updated_at=dt_updated, total_lists=15
+    )
     db.execute.return_value = result
 
     app.dependency_overrides[get_db] = lambda: db
@@ -44,5 +53,6 @@ def test_parsing_stats_with_data():
     assert response.status_code == 200
     assert response.json() == {
         "last_parsed_at": "2026-11-20T14:30:00",
+        "data_updated_at": "2026-11-20T13:15:00",
         "total_lists": 15,
     }
