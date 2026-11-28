@@ -27,9 +27,7 @@ FULL_QUERY = (
     "направления СибГИУ."
 )
 
-FOLLOW_UP_QUERY = (
-    "А ты скажи мне ВСЕ направления для моих баллов и ЕГЭ а я сам решу уже"
-)
+FOLLOW_UP_QUERY = "А ты скажи мне ВСЕ направления для моих баллов и ЕГЭ а я сам решу уже"
 
 
 def test_program_selection_not_misrouted_to_program_exams():
@@ -127,3 +125,131 @@ def test_select_cards_does_not_match_exam_subjects_as_programs():
     selected, recognized = _select_cards(query_with_subjects, cards, trace)
     assert not selected
     assert recognized is None
+
+
+def _subject_named_cards() -> list[ProgramCard]:
+    return [
+        ProgramCard(
+            doc_id="math",
+            url="https://example.test/01.03.01",
+            title="01.03.01 Математика",
+            code="01.03.01",
+            name="Математика",
+            profile="",
+            level="bachelor",
+        ),
+        ProgramCard(
+            doc_id="phys",
+            url="https://example.test/03.03.02",
+            title="03.03.02 Физика",
+            code="03.03.02",
+            name="Физика",
+            profile="",
+            level="bachelor",
+        ),
+        ProgramCard(
+            doc_id="chem",
+            url="https://example.test/04.03.01",
+            title="04.03.01 Химия",
+            code="04.03.01",
+            name="Химия",
+            profile="",
+            level="bachelor",
+        ),
+        ProgramCard(
+            doc_id="ped-ru",
+            url="https://example.test/44.03.01-ru",
+            title="44.03.01 Педагогическое образование — Русский язык",
+            code="44.03.01",
+            name="Педагогическое образование",
+            profile="Русский язык",
+            level="bachelor",
+        ),
+        ProgramCard(
+            doc_id="ped-info",
+            url="https://example.test/44.03.01-info",
+            title="44.03.01 Педагогическое образование — Информатика",
+            code="44.03.01",
+            name="Педагогическое образование",
+            profile="Информатика",
+            level="bachelor",
+        ),
+    ]
+
+
+@pytest.mark.parametrize(
+    ("question", "expected_doc_ids"),
+    [
+        ("Какие ЕГЭ нужны на направление „Математика“?", ["math"]),
+        ("Какие ЕГЭ нужны на направление «Математика»?", ["math"]),
+        ("Какие ЕГЭ нужны на направление подготовки Математика?", ["math"]),
+        ("Какие ЕГЭ нужны на программу Физика?", ["phys"]),
+        ("Какие ЕГЭ нужны на специальность «Химия»?", ["chem"]),
+        ("Математика, бакалавриат — какие ЕГЭ нужны?", ["math"]),
+        ("Физика: какие ЕГЭ нужны?", ["phys"]),
+        ("Какие ЕГЭ нужны на «Физика»?", ["phys"]),
+        ("Какие ЕГЭ нужны на профиль «Русский язык»?", ["ped-ru"]),
+        (
+            "Какие ЕГЭ нужны на направление «Педагогическое образование», "
+            "профиль «Информатика»?",
+            ["ped-info"],
+        ),
+        (
+            "Какие ЕГЭ нужны на направление «Математика», если я сдаю русский язык "
+            "и информатика?",
+            ["math"],
+        ),
+        ("Какие ЕГЭ нужны на 01.03.01 «Математика»?", ["math"]),
+    ],
+)
+def test_select_cards_keeps_explicit_program_or_profile_names(
+    question: str, expected_doc_ids: list[str]
+):
+    """Явно названные программы/профили (в т.ч. предметные) не отбрасываются."""
+    selected, recognized = _select_cards(
+        question, _subject_named_cards(), LightragTrace()
+    )
+    assert [card.doc_id for card in selected] == expected_doc_ids
+    assert recognized is not None
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "Какие ЕГЭ сдавать, если сдаю математика, физика и русский язык?",
+        "Сдаю русский язык и информатика, какие экзамены ещё нужны?",
+        "У меня есть ЕГЭ: русский язык и математика — какие экзамены нужны?",
+        "Какие предметы ЕГЭ нужны, если выбрал физика и информатика?",
+        "Русский язык и математика — какие ещё ЕГЭ нужны?",
+        "Обязателен ли русский язык на ЕГЭ?",
+        "Нужна ли математика или физика для поступления на ЕГЭ?",
+    ],
+)
+def test_select_cards_rejects_exam_subject_lists_and_general_subject_questions(
+    question: str,
+):
+    """Перечисление предметов и общие вопросы о предметах не матчатся."""
+    selected, recognized = _select_cards(
+        question, _subject_named_cards(), LightragTrace()
+    )
+    assert selected == []
+    assert recognized is None
+
+
+def test_select_cards_with_code_ignores_subject_list_profile_false_positive():
+    """При указании кода «сдаю русский язык» не сужает профиль до «Русский язык»."""
+    cards = [c for c in _subject_named_cards() if c.code == "44.03.01"]
+
+    ambiguous, _ = _select_cards(
+        "Какие ЕГЭ нужны на 44.03.01, если я сдаю русский язык?",
+        cards,
+        LightragTrace(),
+    )
+    assert [c.doc_id for c in ambiguous] == ["ped-ru", "ped-info"]
+
+    explicit, _ = _select_cards(
+        "Какие ЕГЭ нужны на 44.03.01, профиль «Русский язык»?",
+        cards,
+        LightragTrace(),
+    )
+    assert [c.doc_id for c in explicit] == ["ped-ru"]

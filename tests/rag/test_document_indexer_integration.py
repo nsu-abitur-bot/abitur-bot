@@ -561,3 +561,68 @@ async def test_program_exam_card_preserves_scores_from_history(
         assert answer == "44 по информатике ниже минимального балла 46."
     finally:
         await memory.cleanup(graph_id)
+
+
+@pytest.mark.asyncio
+async def test_program_exam_cards_named_like_exam_subjects(real_lightrag_env):
+    """Программы и профили с именами предметов ЕГЭ без указания кода."""
+    memory, _ = real_lightrag_env
+    graph_id = "test_graph_program_exams_subjects"
+    base_url = "https://example.test/programs/"
+    cards = {
+        "math": (
+            "# 01.03.01 Математика\n"
+            "## ЕГЭ\n- Математика (профильная) (мин. балл 40)\n"
+            "- Русский язык (мин. балл 40)\n"
+            "- Физика (41) или информатика (46)\n"
+        ),
+        "ped_ru": (
+            "# 44.03.01 Педагогическое образование — Русский язык\n"
+            "## ЕГЭ\n- Русский язык (мин. балл 42)\n- Обществознание (мин. балл 45)\n"
+        ),
+        "ped_info": (
+            "# 44.03.01 Педагогическое образование — Информатика\n"
+            "## ЕГЭ\n- Информатика (мин. балл 46)\n- Русский язык (мин. балл 40)\n"
+        ),
+    }
+    try:
+        for card_id, text in cards.items():
+            assert await memory.save(
+                graph_id,
+                text,
+                file_paths_str=base_url + card_id,
+                source_id="card-" + card_id,
+            )
+
+        # Явно названная программа без кода — выбирается нужная карточка.
+        math_res = await memory.query_with_crag(
+            graph_id, "Какие ЕГЭ нужны на направление „Математика“?"
+        )
+        assert "Математика (профильная) (мин. балл 40)" in math_res.context
+        assert [s["url"] for s in math_res.sources] == [base_url + "math"]
+
+        # Тот же вопрос с указанием кода даёт тот же результат.
+        code_res = await memory.query_with_crag(
+            graph_id, "Какие ЕГЭ нужны на 01.03.01 «Математика»?"
+        )
+        assert [s["url"] for s in code_res.sources] == [base_url + "math"]
+
+        # Уточнение профиля после вопроса по направлению с профилями-предметами.
+        clarify = await memory.query_with_crag(
+            graph_id, "Какие ЕГЭ нужны на направление «Педагогическое образование»?"
+        )
+        assert clarify.answer and "Уточните профиль" in clarify.answer
+        assert "Русский язык" in clarify.answer and "Информатика" in clarify.answer
+
+        history = (
+            "user: Какие ЕГЭ нужны на направление «Педагогическое образование»?\n"
+            f"assistant: {clarify.answer}\n"
+            "user: Русский язык"
+        )
+        followup = await memory.query_with_crag(
+            graph_id, "Русский язык", conversation_history=history
+        )
+        assert "Обществознание (мин. балл 45)" in followup.context
+        assert [s["url"] for s in followup.sources] == [base_url + "ped_ru"]
+    finally:
+        await memory.cleanup(graph_id)
