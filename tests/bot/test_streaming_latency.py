@@ -132,6 +132,7 @@ async def test_telegram_rating_buttons_are_under_final_answer_chunk():
     assert len(sent) > 1
     assert all(markup is None for _, markup in sent[:-1])
     buttons = sent[-1][1].inline_keyboard[0]
+    assert [button.text for button in buttons] == ["👍 Полезно", "👎 Не помогло"]
     assert [button.callback_data for button in buttons] == [
         "rate:positive:candidate-1",
         "rate:negative:candidate-1",
