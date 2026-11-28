@@ -20,6 +20,7 @@ from parser.rating import (
     fetch_all_leaderboard_urls,
     parse_mock_rating_page,
 )
+from scheduler.monitor import monitor_enabled, monitor_loop
 
 logger = logging.getLogger(__name__)
 
@@ -259,6 +260,13 @@ async def main() -> None:
     async with runtime_settings():
         liveness = LivenessServer()
         await liveness.start()
+        # Алерты дежурному (#243) — отдельной задачей: сбой мониторинга
+        # не должен останавливать цикл конкурсных списков, и наоборот.
+        # Ссылку держим: без неё задачу соберёт GC (см. asyncio.create_task).
+        _monitor_task = None
+        if monitor_enabled():
+            _monitor_task = asyncio.create_task(monitor_loop())
+            logger.info("Алерты включены: проверяем API и долю ошибок")
         interval = int(get_setting("RATING_POLL_START_SECONDS", "1800"))
         while True:
             reload_settings()
