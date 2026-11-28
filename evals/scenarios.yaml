@@ -190,3 +190,17 @@ scenarios:
       - {kind: contains, value: Тестовый контекст ММФ}
       - {kind: source_contains, value: "https://mmf.nsu.ru"}
       - {kind: faq_match, value: false}
+
+  - id: program_exams_subject_named_program
+    question: Какие ЕГЭ нужны на направление «Математика»?
+    reference_answer: На программу 01.03.01 «Математика» нужны ЕГЭ по профильной математике (40), физике (41) или информатике (46) и русскому языку (40).
+    topic: program-exams
+    source: "Синтетическая карточка в evals/offline.py для регрессии #486"
+    approved_by: null
+    approved_at: null
+    requires_llm: false
+    assertions:
+      - {kind: contains, value: "01.03.01"}
+      - {kind: contains, value: "Математика (профильная)"}
+      - {kind: source_contains, value: "https://example.test/programs/01.03.01"}
+      - {kind: faq_match, value: false}

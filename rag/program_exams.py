@@ -45,6 +45,50 @@ _EXAM_SUBJECT_NAMES = {
     "иностранный язык",
     "английский язык",
 }
+_OPEN_QUOTES = "«„\"'“‘"
+_CLOSE_QUOTES = "»“”\"'’"
+_PROGRAM_OR_PROFILE_CUE = re.compile(
+    r"(?:"
+    r"\bнаправлени\w*(?:\s+(?:подготовки|обучения|бакалавриат\w*|специалитет\w*|магистратур\w*|спо))?|"
+    r"\bпрограмм\w*(?:\s+(?:подготовки|обучения|бакалавриат\w*|специалитет\w*|магистратур\w*|спо))?|"
+    r"\bспециальност\w*(?:\s+(?:подготовки|обучения))?|"
+    r"\bпрофил\w*(?:\s+(?:подготовки|обучения))?|"
+    r"\bспециализаци\w*|"
+    r"\bнаправленност\w*"
+    r")\s*[:—–-]*\s*$",
+    re.I,
+)
+_CLAUSE_BREAK = re.compile(
+    r"[.?!;\n]|,\s*(?:если|когда|что|где|а|но|хотя)\b|\b(?:если|когда)\b", re.I
+)
+_SUBJECT_LIST_CUE = re.compile(
+    r"\b(?:сдаю|сдаешь|сдаете|сдает|сдаем|сдадут|сдавал\w*|сдал[аио]?|"
+    r"буд\w*\s+сдавать|выбрал\w*|выбира\w*|имею\w*|набрал\w*|получил\w*|у\s+меня)\b|"
+    r"\b(?:егэ|экзамен\w*|испытан\w*|балл\w*|предмет\w*)\s*(?:по|из|за|:|—|–|-)|"
+    r"\b(?:с|по)\s+предмет(?:ом|ами)\b",
+    re.I,
+)
+_SUBJECT_NAME_ALTERNATIVES = "|".join(
+    r"\s+".join(re.escape(word) for word in subject.split())
+    for subject in sorted(_EXAM_SUBJECT_NAMES, key=len, reverse=True)
+)
+_COORDINATED_SUBJECT_AFTER = re.compile(
+    rf"^\s*(?:и|или|,)\s*(?:{_SUBJECT_NAME_ALTERNATIVES})\b",
+    re.I,
+)
+_COORDINATED_SUBJECT_BEFORE = re.compile(
+    rf"\b(?:{_SUBJECT_NAME_ALTERNATIVES})\s*(?:и|или|,)\s*$",
+    re.I,
+)
+_DIRECT_PROGRAM_PREPOSITION = re.compile(
+    r"\b(?:нужн\w*|требу\w*|сдавать|поступ\w*|пода\w*|экзамен\w*|егэ)\s+(?:на|для)\s+$|"
+    r"\bдля\s+поступления\s+на\s+$",
+    re.I,
+)
+_HEADING_AFTER = re.compile(
+    r"^(?:\s*[:,—–-]|\s+(?:бакалавриат\w*|специалитет\w*|магистратур\w*|спо|какие|что)\b)",
+    re.I,
+)
 _HISTORY_ROLE = re.compile(r"(?m)^(user|assistant|system): ")
 _CLARIFY_PROFILE = "Уточните профиль, чтобы я назвал требования к ЕГЭ."
 _SUBJECT = re.compile(
@@ -158,6 +202,73 @@ def _mentioned(name: str, question_key: str) -> bool:
     return bool(key) and f" {key} " in question_key
 
 
+def _is_explicit_subject_named_target(name: str, question: str) -> bool:
+    """Отличает явно названную программу/профиль от перечисления предметов ЕГЭ."""
+    key = _name_key(name)
+    if not key:
+        return False
+    cleaned = re.sub(r"^\[from\s+[^\]]*\]\s*", "", question.strip(), flags=re.I)
+    lowered = cleaned.lower().replace("ё", "е")
+    term_re = re.compile(
+        r"(?<!\w)" + r"[\s\-–—]+".join(re.escape(w) for w in key.split()) + r"(?!\w)"
+    )
+    for match in term_re.finditer(lowered):
+        before = lowered[: match.start()]
+        after = lowered[match.end() :]
+        before_tail = before.rstrip()
+        after_head = after.lstrip()
+        is_quoted = bool(
+            before_tail
+            and before_tail[-1] in _OPEN_QUOTES
+            and after_head
+            and after_head[0] in _CLOSE_QUOTES
+        )
+        before_plain = before.rstrip(f" \t\r\n{_OPEN_QUOTES}(")
+        after_plain = after.lstrip(f" \t\r\n{_CLOSE_QUOTES})")
+
+        has_program_cue = bool(_PROGRAM_OR_PROFILE_CUE.search(before_plain))
+        has_code_before = bool(
+            re.search(r"\b\d{2}\.\d{2}\.\d{2}\s*[:—–-]*\s*$", before_plain)
+        )
+
+        # Берём текущую клаузу, чтобы фраза «... если сдаю русский язык» не
+        # блокировала явно названную программу в начале того же вопроса.
+        breaks = list(_CLAUSE_BREAK.finditer(before_plain))
+        clause_start = breaks[-1].end() if breaks else 0
+        clause_before = before_plain[clause_start:]
+
+        subject_matches = list(_SUBJECT_LIST_CUE.finditer(clause_before))
+        if subject_matches:
+            tail_after_subject = clause_before[subject_matches[-1].end() :]
+            if not _PROGRAM_OR_PROFILE_CUE.search(tail_after_subject) and not re.search(
+                r"\b(?:на|для)\s+$", tail_after_subject
+            ):
+                continue
+
+        if re.search(r"\bсдавать\s+(?:[\w\s,]+?\s+(?:и|или)\s+)?$", before_plain):
+            continue
+
+        if (
+            not has_program_cue
+            and not is_quoted
+            and (
+                _COORDINATED_SUBJECT_AFTER.match(after_plain)
+                or _COORDINATED_SUBJECT_BEFORE.search(before_plain)
+            )
+        ):
+            continue
+
+        if (
+            has_program_cue
+            or has_code_before
+            or is_quoted
+            or _DIRECT_PROGRAM_PREPOSITION.search(before_plain)
+            or (before_plain.strip() == "" and bool(_HEADING_AFTER.match(after_plain)))
+        ):
+            return True
+    return False
+
+
 def read_program_card(
     doc_id: str, url: str | None, title: str, summary: str
 ) -> ProgramCard | None:
@@ -221,13 +332,10 @@ def _select_cards(
             continue
         profile_match = _mentioned(card.profile, question_key)
         name_match = _mentioned(card.name, question_key)
-        if not codes:
-            profile_key = _name_key(card.profile)
-            name_key = _name_key(card.name)
-            if profile_match and profile_key in _EXAM_SUBJECT_NAMES:
-                profile_match = False
-            if name_match and name_key in _EXAM_SUBJECT_NAMES:
-                name_match = False
+        if profile_match and _name_key(card.profile) in _EXAM_SUBJECT_NAMES:
+            profile_match = _is_explicit_subject_named_target(card.profile, question)
+        if not codes and name_match and _name_key(card.name) in _EXAM_SUBJECT_NAMES:
+            name_match = _is_explicit_subject_named_target(card.name, question)
         if not codes and not (profile_match or name_match):
             rejected.append((card.doc_id, "name_mismatch"))
             continue
@@ -443,9 +551,8 @@ async def retrieve_program_exams(
     conversation_history: str | None = None,
 ) -> RetrievalResult | None:
     """Возвращает контекст одной карточки или готовое уточнение/отсутствие данных."""
-    if (
-        _ADMISSION_SCORES.search(question)
-        or _SELECTION_OR_RECOMMENDATION.search(question)
+    if _ADMISSION_SCORES.search(question) or _SELECTION_OR_RECOMMENDATION.search(
+        question
     ):
         return None
     follow_up = None

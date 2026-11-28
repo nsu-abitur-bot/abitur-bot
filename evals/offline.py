@@ -12,7 +12,7 @@ from unittest.mock import patch
 from evals.checks import Observation
 from evals.evaluator import Runner
 from evals.schema import Scenario
-from rag.trace import RetrievalResult
+from rag.trace import LightragTrace, RetrievalResult
 
 
 @contextmanager
@@ -43,6 +43,7 @@ def _fixture_pipeline() -> Iterator[Runner]:
     from pipeline import llm_client
     from pipeline.tools.admission_scores import AdmissionScoresResult, _format_scores
     from rag.graph_memory import GraphMemory
+    from rag.program_exams import ProgramCard, retrieve_program_exams
 
     class MemoryHistory:
         def __init__(self) -> None:
@@ -139,6 +140,13 @@ def _fixture_pipeline() -> Iterator[Runner]:
                 "Тестовый контекст ММФ." in str(message.content) for message in messages
             ):
                 return LLMResult(text="Тестовый контекст ММФ.")
+            for message in messages:
+                content = str(message.content)
+                if "Программа 01.03.01 «Математика»" in content:
+                    marker = "Контекст из базы знаний об НГУ:\n"
+                    _, _, tail = content.partition(marker)
+                    extracted = tail.split("\n\n\n\nИНСТРУКЦИЯ К ОТВЕТУ", 1)[0].strip()
+                    return LLMResult(text=extracted or content)
             return LLMResult(text="Информация не найдена.")
 
     async def history() -> MemoryHistory:
@@ -149,7 +157,52 @@ def _fixture_pipeline() -> Iterator[Runner]:
             # No suspension while the process-local provider patch is active.
             raise TimeoutError("Synthetic reranker timeout (#291)")
 
+    class _OfflineStore:
+        def __init__(self, data: dict[str, object]) -> None:
+            self._data = data
+
+        async def get_by_id(self, doc_id: str):
+            return self._data.get(doc_id)
+
+        async def get_by_ids(self, ids: list[str]):
+            return [self._data.get(item) for item in ids]
+
     async def retrieve(question: str, conversation_history: str | None = None, **kwargs):
+        if "направление «математика»" in question.casefold():
+            chunk_text = (
+                "## ЕГЭ\n"
+                "- Математика (профильная) (мин. балл 40)\n"
+                "- Русский язык (мин. балл 40)"
+            )
+            card_text = f"# 01.03.01 Математика\n{chunk_text}\n"
+            fake_rag = SimpleNamespace(
+                doc_status=_OfflineStore({"math": {"chunks_list": ["c1"]}}),
+                full_docs=_OfflineStore({"math": {"content": card_text}}),
+                text_chunks=_OfflineStore({"c1": {"content": chunk_text}}),
+                embedding_func=None,
+            )
+            cards = [
+                ProgramCard(
+                    doc_id="math",
+                    url="https://example.test/programs/01.03.01",
+                    title="01.03.01 Математика",
+                    code="01.03.01",
+                    name="Математика",
+                    profile="",
+                    level="bachelor",
+                )
+            ]
+            exam_result = await retrieve_program_exams(
+                fake_rag,  # type: ignore[arg-type]
+                question,
+                cards,
+                LightragTrace(),
+                max_sources=3,
+                conversation_history=conversation_history,
+            )
+            if exam_result is not None:
+                return exam_result
+            return RetrievalResult(context="", sources=[])
         if reranker_case.get():
             candidates = [
                 {
