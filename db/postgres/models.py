@@ -122,6 +122,8 @@ class Leaderboard(Base):
     direction: Mapped[str] = mapped_column(String(200), default="")
     content_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    last_parsed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    data_updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=timestamp,
@@ -136,6 +138,7 @@ class Leaderboard(Base):
         Index("idx_leaderboards_hash", "content_hash"),
         Index("idx_leaderboards_active", "is_active"),
         Index("idx_leaderboards_updated", "updated_at"),
+        Index("idx_leaderboards_last_parsed", "last_parsed_at"),
     )
 
     def __repr__(self) -> str:

@@ -96,8 +96,9 @@ async def _process_leaderboard(
         url, direction_name=direction_name
     )
 
-    # Хэш совпал — данные не менялись, пропускаем.
+    # Хэш совпал — данные не менялись, но проверка списка завершилась успешно.
     if leaderboard.content_hash == page_hash:
+        await rating_service.mark_leaderboard_checked(leaderboard.id)
         return False
 
     # Дедуп по applicant_id: один человек может быть в нескольких номинациях —
