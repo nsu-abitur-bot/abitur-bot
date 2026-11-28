@@ -1,7 +1,7 @@
 import hashlib
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import List, Optional, TypedDict
 
 from sqlalchemy import Float, Sequence, func, or_
@@ -66,6 +66,14 @@ def _advance_dt(dt: datetime, group_by: str) -> datetime:
         month = dt.month % 12 + 1
         year = dt.year + (1 if dt.month == 12 else 0)
         return dt.replace(year=year, month=month)
+    return dt
+
+
+def _naive_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    if dt is None:
+        return None
+    if dt.tzinfo is not None:
+        return dt.astimezone(UTC).replace(tzinfo=None)
     return dt
 
 
@@ -488,6 +496,8 @@ class MessageLogService:
         self,
         raw_limit: int = DEFAULT_QUESTION_RAW_LIMIT,
         message_type: str = "user_input",
+        start: Optional[datetime] = None,
+        end: Optional[datetime] = None,
     ) -> List[QuestionGroup]:
         """Вопросы пользователей, сгруппированные по точному совпадению текста.
 
@@ -496,13 +506,18 @@ class MessageLogService:
         `api/services/popular_questions.py`: для него нужны эмбеддинги, то есть
         вызов модели, и слою данных он не принадлежит.
         """
+        start_dt = _naive_utc(start)
+        end_dt = _naive_utc(end)
+        stmt = select(
+            MessageLog.content.label("question"),
+            func.count(MessageLog.id).label("count"),
+        ).where(MessageLog.message_type == message_type)
+        if start_dt is not None:
+            stmt = stmt.where(MessageLog.created_at >= start_dt)
+        if end_dt is not None:
+            stmt = stmt.where(MessageLog.created_at <= end_dt)
         stmt = (
-            select(
-                MessageLog.content.label("question"),
-                func.count(MessageLog.id).label("count"),
-            )
-            .where(MessageLog.message_type == message_type)
-            .group_by(MessageLog.content)
+            stmt.group_by(MessageLog.content)
             .order_by(func.count(MessageLog.id).desc())
             .limit(raw_limit)
         )

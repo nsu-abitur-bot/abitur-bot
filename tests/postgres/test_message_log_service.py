@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from db.postgres.models import MessageLog
 from db.postgres.services.message_log import MessageLogService
 
 
@@ -303,3 +304,114 @@ async def test_get_answer_stats_aggregates_latency_no_answer_errors(
     assert second["errors"] == 0
     assert second["latency_ms_p50"] is None
     assert second["latency_ms_p95"] is None
+
+
+@pytest.mark.asyncio
+async def test_get_question_groups_filters_period_before_limit(session: AsyncSession):
+    """Период start/end отсекает старые частые вопросы до GROUP BY и LIMIT."""
+    service = MessageLogService(session)
+    old_ts = datetime(2026, 11, 1, 12, 0, 0)
+    recent_ts = datetime(2026, 11, 19, 12, 0, 0)
+    future_ts = datetime(2026, 11, 25, 12, 0, 0)
+
+    rows = [
+        *[
+            MessageLog(
+                user_id=i,
+                session_id=f"old-a-{i}",
+                message_type="user_input",
+                content="Старый популярный А",
+                created_at=old_ts,
+            )
+            for i in range(5)
+        ],
+        *[
+            MessageLog(
+                user_id=10 + i,
+                session_id=f"old-b-{i}",
+                message_type="user_input",
+                content="Старый популярный Б",
+                created_at=old_ts,
+            )
+            for i in range(4)
+        ],
+        MessageLog(
+            user_id=20,
+            session_id="recent",
+            message_type="user_input",
+            content="Свежий вопрос",
+            created_at=recent_ts,
+        ),
+        MessageLog(
+            user_id=21,
+            session_id="future",
+            message_type="user_input",
+            content="Будущий вопрос",
+            created_at=future_ts,
+        ),
+    ]
+    session.add_all(rows)
+    await session.commit()
+
+    # Без периода старые вытесняют свежий вопрос при raw_limit=2.
+    unbounded = await service.get_question_groups(raw_limit=2, message_type="user_input")
+    assert [g["question"] for g in unbounded] == [
+        "Старый популярный А",
+        "Старый популярный Б",
+    ]
+
+    # С периодом фильтрация идёт до LIMIT, поэтому свежий вопрос не теряется.
+    bounded = await service.get_question_groups(
+        raw_limit=2,
+        message_type="user_input",
+        start=datetime(2026, 11, 19, 0, 0, 0, tzinfo=UTC),
+        end=datetime(2026, 11, 20, 0, 0, 0, tzinfo=UTC),
+    )
+    assert [(g["question"], g["count"]) for g in bounded] == [("Свежий вопрос", 1)]
+
+
+@pytest.mark.asyncio
+async def test_get_question_groups_boundary_timestamps(session: AsyncSession):
+    """Границы start и end включительные; вне интервала — отсекаются."""
+    service = MessageLogService(session)
+    start = datetime(2026, 11, 19, 10, 0, 0)
+    end = datetime(2026, 11, 20, 10, 0, 0)
+
+    session.add_all(
+        [
+            MessageLog(
+                user_id=1,
+                session_id="s1",
+                message_type="no_answer",
+                content="До старта",
+                created_at=start - timedelta(microseconds=1),
+            ),
+            MessageLog(
+                user_id=2,
+                session_id="s2",
+                message_type="no_answer",
+                content="Ровно старт",
+                created_at=start,
+            ),
+            MessageLog(
+                user_id=3,
+                session_id="s3",
+                message_type="no_answer",
+                content="Ровно конец",
+                created_at=end,
+            ),
+            MessageLog(
+                user_id=4,
+                session_id="s4",
+                message_type="no_answer",
+                content="После конца",
+                created_at=end + timedelta(microseconds=1),
+            ),
+        ]
+    )
+    await session.commit()
+
+    groups = await service.get_question_groups(
+        raw_limit=10, message_type="no_answer", start=start, end=end
+    )
+    assert {g["question"] for g in groups} == {"Ровно старт", "Ровно конец"}

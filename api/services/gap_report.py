@@ -60,12 +60,12 @@ async def build_gap_report(
 
     # Топ без эмбеддингов: точные группы уже несут частоту и варианты.
     popular = await log_service.get_question_groups(
-        raw_limit=500, message_type="user_input"
+        raw_limit=500, message_type="user_input", start=start, end=now
     )
     unanswered = await log_service.get_question_groups(
-        raw_limit=500, message_type="no_answer"
+        raw_limit=500, message_type="no_answer", start=start, end=now
     )
-    stats = await log_service.get_answer_stats(start=start, end=None, group_by="day")
+    stats = await log_service.get_answer_stats(start=start, end=now, group_by="day")
 
     def _top(groups: list[QuestionGroup]) -> list[dict]:
         return [
@@ -91,5 +91,5 @@ async def build_gap_report(
             "errors": stats["total_errors"],
             "error_share": stats["error_share"],
         },
-        "disliked": await feedback_service.negative_by_question(start, None, limit),
+        "disliked": await feedback_service.negative_by_question(start, now, limit),
     }
