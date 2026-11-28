@@ -30,7 +30,7 @@ def telegram_feedback_keyboard(feedback_id: str) -> InlineKeyboardMarkup:
                     text="👍 Полезно", callback_data=f"rate:positive:{feedback_id}"
                 ),
                 InlineKeyboardButton(
-                    text="👎 Неверно", callback_data=f"rate:negative:{feedback_id}"
+                    text="👎 Не помогло", callback_data=f"rate:negative:{feedback_id}"
                 ),
             ]
         ]
